@@ -17,11 +17,11 @@ public class State : IState, IHubProvider
 
     public List<State> Subjobs { get; set; }
 
-    public Dictionary<object, bool> Preconditions { get; set; }
+    public Dictionary<ICondition, bool> Preconditions { get; set; }
 
-    public Dictionary<object, bool> SuccessedConditions { get; set; }
+    public Dictionary<ICondition, bool> SuccessedConditions { get; set; }
 
-    public Dictionary<object, bool> FailedConditions { get; set; }
+    public Dictionary<ICondition, bool> FailedConditions { get; set; }
 
     public Dictionary<object, bool> SuccessedEffects { get; set; }
 
@@ -61,6 +61,7 @@ public class State : IState, IHubProvider
     public float Interval { get; set; }
     public IHub Hub => GHub.GetIns();
     public string Id { get; set; }
+    public string Name { get; set; }
     public string Layer { get; set; } = "Defult";
     public Type Type { get; set; }
     public Status Status { get; set; } = Status.Running;

@@ -17,6 +17,7 @@ class Move : JobSingle{
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = mState.Host.Velocity;
         velocity.X = direction * mState.RunSpeed;
+        velocity.Y += (float)delta * mState.Gravity;
         mState.Host.Velocity = velocity;
 
         if (!Mathf.IsZeroApprox(direction))

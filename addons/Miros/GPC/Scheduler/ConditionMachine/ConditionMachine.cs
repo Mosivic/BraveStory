@@ -13,7 +13,7 @@ public class ConditionMachine : AbsScheduler
         foreach (var cfg in States)
         {
             var layer = cfg.Layer;
-            _JobsExecute.Add(layer, null);
+            _JobsExecute.TryAdd(layer, null);
         }
     }
 
@@ -91,9 +91,16 @@ public class ConditionMachine : AbsScheduler
         return GetHighestCfg(candicateJobsCfg);
     }
 
-    public static State GetHighestCfg(List<State> cfgs)
+    public static State GetHighestCfg(List<State> states)
     {
-        if (cfgs.Count == 0) return null;
-        return cfgs[cfgs.Max(cfg => cfg.Priority)];
+        if (states.Count == 0) return null;
+        State bestState = null;
+        foreach (var state in states)
+        {
+            if (bestState == null) bestState = state;
+            if (state.Priority > bestState.Priority) bestState = state;
+        }
+
+        return bestState;
     }
 }

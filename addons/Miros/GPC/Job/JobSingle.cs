@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Godot;
 using GPC.Job.Config;
 
 namespace GPC.Job;
@@ -6,6 +8,9 @@ internal class JobSingle : AbsJob, IJob
 {
     public void Enter(State state)
     {
+#if DEBUG
+        GD.Print($"{state.Name} Enter.");
+#endif
         state.Status = Status.Running;
         _Enter(state);
         state.EnterAttachFunc?.Invoke(state);
@@ -13,6 +18,9 @@ internal class JobSingle : AbsJob, IJob
 
     public void Exit(State state)
     {
+#if DEBUG
+        GD.Print($"{state.Name} Exit.");
+#endif
         _Exit(state);
         state.ExitAttachFunc?.Invoke(state);
     }

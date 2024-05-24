@@ -1,5 +1,3 @@
-
-
 using Godot;
 using GPC.Job;
 using GPC.Job.Config;

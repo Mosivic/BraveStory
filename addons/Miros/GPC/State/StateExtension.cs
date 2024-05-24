@@ -16,39 +16,19 @@ public static class StateExtension
         throw new Exception($"GPC.Job.Status.GetArg(): Not found key: {key} in state");
     }
 
-    public static bool IsAllConditionSatisfy(this State state, Dictionary<object, bool> conditions)
+    public static bool IsAllConditionSatisfy(this State state, Dictionary<ICondition, bool> conditions)
     {
-        foreach (var key in conditions.Keys)
-            switch (key)
-            {
-                case string:
-                    bool arg = state.GetArg(key as string);
-                    if (arg != conditions[key]) return false;
-                    break;
-                case ICondition:
-                    if (!(key as ICondition).IsSatisfy(state)) return false;
-                    break;
-                default:
-                    return false;
-            };
+        foreach (var condition in conditions.Keys)
+            if (condition.IsSatisfy(state) != conditions[condition])
+                return false;
         return true;
     }
 
-    public static bool IsAnyConditionSatisfy(this State state, Dictionary<object, bool> conditions)
+    public static bool IsAnyConditionSatisfy(this State state, Dictionary<ICondition, bool> conditions)
     {
-        foreach (var key in conditions.Keys)
-            switch (key)
-            {
-                case string:
-                    bool arg = state.GetArg(key as string);
-                    if (arg == conditions[key]) return true;
-                    break;
-                case ICondition:
-                    if ((key as ICondition).IsSatisfy(state)) return true;
-                    break;
-                default:
-                    return false;
-            };
+        foreach (var condition in conditions.Keys)
+            if (condition.IsSatisfy(state) == conditions[condition])
+                return true;
         return false;
     }
 }

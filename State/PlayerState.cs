@@ -12,9 +12,11 @@ class PlayerState : State{
 	public float RunSpeed{get;} = 200;
 	public float JumpVeocity{get;} = -300;
 
-    public PlayerState(){
+    public PlayerState(CharacterBody2D characterBody2D)
+    {
+        Host = characterBody2D;
         AnimationPlayer = Host.GetNode<AnimationPlayer>("AnimationPlayer");
-        Sprite = Host.GetNode<Sprite2D>("Sprite"); 
+        Sprite = Host.GetNode<Sprite2D>("Sprite2D"); 
     }
 
 }

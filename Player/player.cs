@@ -14,7 +14,7 @@ public partial class player : CharacterBody2D
 	{
 
 		var IsMoveKeyDown = new PredicateCondition((state)=>{
-			return Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
+			return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
 		});
 
 		var IsJumpKeyDown = new PredicateCondition((state)=>{
@@ -26,36 +26,49 @@ public partial class player : CharacterBody2D
 		});
 		
 		_cm = new ConditionMachine([
-			new PlayerState(){
+			new PlayerState(this){
 				Id = "1",
-				Host = this,
 				Type = typeof(Move),
+				Name = "Run",
 				Priority = 2,
-				Preconditions = new Dictionary<object, bool>(){
-					{IsMoveKeyDown,true}
+				Preconditions = new Dictionary<ICondition, bool>(){
+					{IsMoveKeyDown,true},{IsOnFloor,true}
+				},
+				FailedConditions = new Dictionary<ICondition, bool>(){
+					{IsOnFloor,false}
 				},
 			},
-			new PlayerState(){
-			
+			new PlayerState(this){
 				Id = "2",
-				Host = this,
+				Name = "Idle",
 				Priority = 1,
 				Type = typeof(Idle),
-				Preconditions = new Dictionary<object, bool>(){
-					{IsMoveKeyDown,false}
+				Preconditions = new Dictionary<ICondition, bool>(){
+					{IsMoveKeyDown,false},{IsOnFloor,true}
+				},
+				FailedConditions = new Dictionary<ICondition, bool>(){
+					{IsOnFloor,false}
 				},
 			},
-			new PlayerState(){
+			new PlayerState(this){
 				Id = "3",
-				Host = this,
+				Name = "Jump",
 				Priority = 3,
 				Type = typeof(Jump),
-				Preconditions = new Dictionary<object, bool>(){
+				Preconditions = new Dictionary<ICondition, bool>(){
 					{IsJumpKeyDown,true}
+				},
+				FailedConditions = new Dictionary<ICondition, bool>(){
+					{IsOnFloor,true}
 				},
 				
 			}
 		]);
+	}
+
+	public override void _Process(double delta)
+	{
+		_cm.Update(delta);
 	}
 
 	public override void _PhysicsProcess(double delta)

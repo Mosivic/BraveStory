@@ -57,8 +57,8 @@ namespace GPC.Test
             {
                 Type = typeof(Say),
                 Id = "2",
-                Preconditions = new Dictionary<object, bool> { { hasMoveInput, true } },
-                FailedConditions = new Dictionary<object, bool> { { noMoveInput, false } }
+                Preconditions = new Dictionary<ICondition, bool> { { hasMoveInput, true } },
+                FailedConditions = new Dictionary<ICondition, bool> { { noMoveInput, false } }
             };
             var root = new State()
             {
