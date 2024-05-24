@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace GPC.Job.Config;
 
@@ -57,7 +58,6 @@ public class State : IState, IHubProvider
     public Action<State> RunningPhysicsAttachFunc { get; set; }
 
     public Action<State> RunningInterval { get; set; }
-
     public float Interval { get; set; }
     public IHub Hub => GHub.GetIns();
     public string Id { get; set; }

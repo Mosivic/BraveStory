@@ -1,49 +1,65 @@
 using Godot;
+using GPC;
+using GPC.AI;
+using GPC.Job.Config;
 using System;
+using System.Collections.Generic;
 
 public partial class player : CharacterBody2D
 {
-    private float gravity = 980;
-    private const float RUN_SPEED = 200;
-    private const float JUMP_VELOCITY = -300;
 
-    private Sprite2D _sprite;
-    private AnimationPlayer _animationPlayer;
+	private ConditionMachine _cm;
 
-    public override void _Ready()
-    {
-        _sprite = GetNode<Sprite2D>("Sprite2D");
-        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+	public override void _Ready()
+	{
 
-    }
+		var IsMoveKeyDown = new PredicateCondition((state)=>{
+			return Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
+		});
 
-    public override void _PhysicsProcess(double delta)
-    {
-        var direction = Input.GetAxis("move_left", "move_right");
-        Velocity = new Vector2(direction * RUN_SPEED, Velocity.Y + gravity * (float)delta);
+		var IsJumpKeyDown = new PredicateCondition((state)=>{
+			return Input.IsActionJustPressed("jump");
+		});
 
-        if (IsOnFloor() && Input.IsActionJustPressed("jump"))
-            Velocity = new Vector2(Velocity.X, JUMP_VELOCITY);
+		var IsOnFloor = new PredicateCondition((state)=>{
+			return this.IsOnFloor();
+		});
+		
+		_cm = new ConditionMachine([
+			new PlayerState(){
+				Id = "1",
+				Host = this,
+				Type = typeof(Move),
+				Priority = 2,
+				Preconditions = new Dictionary<object, bool>(){
+					{IsMoveKeyDown,true}
+				},
+			},
+			new PlayerState(){
+			
+				Id = "2",
+				Host = this,
+				Priority = 1,
+				Type = typeof(Idle),
+				Preconditions = new Dictionary<object, bool>(){
+					{IsMoveKeyDown,false}
+				},
+			},
+			new PlayerState(){
+				Id = "3",
+				Host = this,
+				Priority = 3,
+				Type = typeof(Jump),
+				Preconditions = new Dictionary<object, bool>(){
+					{IsJumpKeyDown,true}
+				},
+				
+			}
+		]);
+	}
 
-        if (IsOnFloor())
-        {
-            if (Mathf.IsZeroApprox(direction))
-            {
-                _animationPlayer.Play("idle");
-            }
-            else
-            {
-                _animationPlayer.Play("run");
-            }
-        }
-        else
-        {
-            _animationPlayer.Play("jump");
-        }
-
-        if (!Mathf.IsZeroApprox(direction))
-            _sprite.FlipH = direction < 0;
-        
-        MoveAndSlide();
-    }
+	public override void _PhysicsProcess(double delta)
+	{
+		_cm.PhysicsUpdate(delta);
+	}
 }
