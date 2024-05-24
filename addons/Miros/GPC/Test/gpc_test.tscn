@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://ptdj71n7bw3o"]
+
+[ext_resource type="Script" path="res://addons/Miros/GPC/Test/Fsm.cs" id="1_uvvt5"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bs1ci"]
+
+[node name="GPCTest" type="CharacterBody2D"]
+
+[node name="FSM" type="Node2D" parent="."]
+script = ExtResource("1_uvvt5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bs1ci")
