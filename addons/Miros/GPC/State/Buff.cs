@@ -43,22 +43,20 @@ internal struct BuffArgs
 
 internal class Buff : IState
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Layer { get; set; }
-    public int Priority { get; set; }
-    public Type Type { get; set; }
-    public Status Status { get; set; }
-    
     private BuffArgs args;
-    private List<Buff> FailedBuffs { get; set; }= null;
 
     private List<Buff> overflowBuffs = null; //层数溢出后调用的Buff
     private float period = 0;
     private PeriodicInhibitionPolicy periodicInhibitionPolicy = PeriodicInhibitionPolicy.Resume;
     private int stackMaxCount = 1;
     private List<Buff> succeedBuffs = null;
+    private List<Buff> FailedBuffs { get; set; } = null;
 
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instand;
-
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Layer { get; set; }
+    public int Priority { get; set; }
+    public Type Type { get; set; }
+    public Status Status { get; set; }
 }

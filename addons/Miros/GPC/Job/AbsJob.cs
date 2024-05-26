@@ -4,7 +4,7 @@ namespace GPC.Job;
 
 public abstract class AbsJob<T> where T : State
 {
-    protected virtual void _Enter(T state) 
+    protected virtual void _Enter(T state)
     {
         state.EnterFunc?.Invoke(state);
     }

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GPC.Job.Config;
 
 namespace GPC.AI.StateMachine;
 
-public class StateMachine<T> : AbsScheduler<T> where T : class,IState
+public class StateMachine<T>(List<T> states, ConditionLib lib) : AbsScheduler<T>(states, lib)
+    where T : class, IState
 {
     private readonly HashSet<ITransition<T>> _anyTransitions = new();
-    private StateNode<T> _current;
     private readonly Dictionary<string, StateNode<T>> _nodes = new();
-
-    public StateMachine(List<T> states) : base(states)
-    {
-    }
+    private StateNode<T> _current;
 
     public override void Update(double delta)
     {

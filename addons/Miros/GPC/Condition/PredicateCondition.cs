@@ -5,6 +5,8 @@ namespace GPC;
 
 public class PredicateCondition(Predicate<IState> predicate) : ICondition
 {
+    public bool IsMark { get; set; } = false;
+
     public bool IsSatisfy()
     {
         throw new NotImplementedException();

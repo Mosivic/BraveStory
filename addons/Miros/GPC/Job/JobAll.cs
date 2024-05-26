@@ -2,7 +2,7 @@
 
 namespace GPC.Job;
 
-internal class JobAll<T> : AbsJob<T>,IJob<T> where T : State
+internal class JobAll<T> : AbsJob<T>, IJob<T> where T : State
 {
     private readonly JobWrapper<IState> _jobJobWrapper = new();
 

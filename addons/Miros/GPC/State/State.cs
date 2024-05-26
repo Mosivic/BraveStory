@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Godot;
 
 namespace GPC.Job.Config;
 
@@ -8,7 +7,6 @@ public class State : IState, IHubProvider
 {
     public int ChildIndex { get; set; } = -1;
     public int Cost { get; set; }
-    public int Priority { get; set; }
     public Dictionary<string, object> Args { get; set; }
 
     public Dictionary<string, object> Extend { get; set; }
@@ -60,6 +58,7 @@ public class State : IState, IHubProvider
     public Action<IState> RunningInterval { get; set; }
     public float Interval { get; set; }
     public IHub Hub => GHub.GetIns();
+    public int Priority { get; set; }
     public string Id { get; set; }
     public string Name { get; set; }
     public string Layer { get; set; } = "Defult";

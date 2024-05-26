@@ -1,14 +1,13 @@
 using System.Collections.Generic;
-using System.Linq;
 using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public class ConditionMachine<T>: AbsScheduler<T> where T : class,IState
+public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
 {
     protected Dictionary<string, T> JobsExecute = new();
 
-    public ConditionMachine(List<T> states) : base(states)
+    public ConditionMachine(List<T> states, ConditionLib lib) : base(states, lib)
     {
         foreach (var cfg in States)
         {
@@ -91,14 +90,14 @@ public class ConditionMachine<T>: AbsScheduler<T> where T : class,IState
         return GetHighestCfg(candicateJobsCfg);
     }
 
-    public static T GetHighestCfg(List<T> States)
+    public static T GetHighestCfg(List<T> states)
     {
-        if (States.Count == 0) return null;
+        if (states.Count == 0) return null;
         T bestState = null;
-        foreach (var State in States)
+        foreach (var state in states)
         {
-            if (bestState == null) bestState = State;
-            if (State.Priority > bestState.Priority) bestState = State;
+            if (bestState == null) bestState = state;
+            if (state.Priority > bestState.Priority) bestState = state;
         }
 
         return bestState;

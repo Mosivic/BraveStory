@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using GPC.Job.Config;
 
 namespace GPC.Job;
 
-public class JobWrapper<T> where T : IState 
+public class JobWrapper<T> where T : IState
 {
     private static readonly Dictionary<Type, IJob<T>> Jobs = new();
 
     private static IJob<T> _GetJob(Type type)
     {
         if (Jobs.TryGetValue(type, out var value)) return value;
-        var job =  (IJob<T>)Activator.CreateInstance(type);
-        Jobs[type] = job ;
+        var job = (IJob<T>)Activator.CreateInstance(type);
+        Jobs[type] = job;
         return job;
     }
 

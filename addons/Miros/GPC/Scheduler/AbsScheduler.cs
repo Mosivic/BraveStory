@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GPC.Job;
 using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public abstract class AbsScheduler<T>(List<T> states) where T : IState
+public abstract class AbsScheduler<T>(List<T> states, ConditionLib conditionLib) where T : IState
 {
+    protected ConditionLib ConditionLib = conditionLib;
     protected JobWrapper<T> JobWrapper = new();
     protected List<T> States = states;
 

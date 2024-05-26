@@ -133,7 +133,7 @@ public abstract class Hub<H> : IHub where H : Hub<H>, new()
     }
 }
 
-public partial class GHub : Hub<GHub>
+public class GHub : Hub<GHub>
 {
     protected override void Build()
     {

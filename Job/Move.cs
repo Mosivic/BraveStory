@@ -1,11 +1,7 @@
-
-
-using System.Transactions;
 using Godot;
 using GPC.Job;
-using GPC.Job.Config;
 
-class Move<T> : JobSingle<T> where T :PlayerState
+internal class Move<T> : JobSingle<T> where T : PlayerState
 {
     protected override void _Enter(T state)
     {

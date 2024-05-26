@@ -10,5 +10,4 @@ public interface IState
     int Priority { get; set; }
     Type Type { get; set; }
     Status Status { get; set; }
-    
 }

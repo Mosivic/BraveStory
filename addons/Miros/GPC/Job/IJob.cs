@@ -14,5 +14,4 @@ public interface IJob<in T> where T : IState
     bool CanExecute(T cfg);
     void Update(T cfg, double delta);
     void PhysicsUpdate(T cfg, double delta);
-    
 }

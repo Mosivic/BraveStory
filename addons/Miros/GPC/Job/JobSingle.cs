@@ -1,13 +1,11 @@
-using System.Diagnostics;
 using Godot;
 using GPC.Job.Config;
 
 namespace GPC.Job;
 
-
-internal class JobSingle<T> :AbsJob<T>,IJob<T> where T : State
+internal class JobSingle<T> : AbsJob<T>, IJob<T> where T : State
 {
-    public  void Enter(T state)
+    public void Enter(T state)
     {
 #if DEBUG
         GD.Print($"{state.Name} Enter.");
@@ -74,7 +72,6 @@ internal class JobSingle<T> :AbsJob<T>,IJob<T> where T : State
         _PhysicsUpdate(state, delta);
         state.RunningPhysicsAttachFunc?.Invoke(state);
     }
-    
 
 
     private void _UpdateJob(T state)
@@ -88,6 +85,4 @@ internal class JobSingle<T> :AbsJob<T>,IJob<T> where T : State
         else
             state.Status = Status.Running;
     }
-
-
 }
