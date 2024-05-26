@@ -9,7 +9,7 @@ using GPC.Job;
 public partial class player : CharacterBody2D
 {
 
-	private ConditionMachine _cm;
+	private ConditionMachine<PlayerState> _cm;
 	public override void _Ready()
 	{
 		
@@ -25,13 +25,13 @@ public partial class player : CharacterBody2D
 			return this.IsOnFloor();
 		});
 		
-		_cm = new ConditionMachine([
+		_cm = new ConditionMachine<PlayerState>([
 			new PlayerState(this){
 				Id = "1",
 				Type = typeof(Move<PlayerState>),
 				Name = "Run",
 				Priority = 2,
-				Preconditions = new Dictionary<ICondition, bool>(){
+				Preconditions = new  Dictionary<ICondition, bool>(){
 					{isMoveKeyDown,true},{isOnFloor,true}
 				},
 				FailedConditions = new Dictionary<ICondition, bool>(){

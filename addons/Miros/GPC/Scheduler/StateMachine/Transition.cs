@@ -2,14 +2,14 @@
 
 namespace GPC.AI.StateMachine;
 
-public class Transition : ITransition
+public class Transition<T> : ITransition<T> where T : IState
 {
-    public Transition(State to, ICondition condition)
+    public Transition(T to, ICondition condition)
     {
         To = to;
         Condition = condition;
     }
 
-    public State To { get; }
+    public T To { get; }
     public ICondition Condition { get; }
 }

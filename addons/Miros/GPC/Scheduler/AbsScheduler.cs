@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GPC.Job;
 using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public abstract class AbsScheduler(List<State> states)
+public abstract class AbsScheduler<T>(List<T> states) where T : IState
 {
-    protected JobWrapper<IState> JobWrapper = new();
-    protected List<State> States = states;
+    protected JobWrapper<T> JobWrapper = new();
+    protected List<T> States = states;
 
 
     public abstract void Update(double delta);

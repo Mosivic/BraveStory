@@ -2,8 +2,8 @@
 
 namespace GPC.AI.StateMachine;
 
-public interface ITransition
+public interface ITransition<T> where T : IState
 {
-    State To { get; }
+    T To { get; }
     ICondition Condition { get; }
 }

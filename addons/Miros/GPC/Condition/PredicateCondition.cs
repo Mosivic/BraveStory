@@ -3,22 +3,15 @@ using GPC.Job.Config;
 
 namespace GPC;
 
-public class PredicateCondition : ICondition
+public class PredicateCondition(Predicate<IState> predicate) : ICondition
 {
-    private readonly Predicate<State> _predicate;
-
-    public PredicateCondition(Predicate<State> predicate)
-    {
-        _predicate = predicate;
-    }
-
     public bool IsSatisfy()
     {
         throw new NotImplementedException();
     }
 
-    public bool IsSatisfy(State cfg)
+    public bool IsSatisfy(IState state)
     {
-        return _predicate.Invoke(cfg);
+        return predicate.Invoke(state);
     }
 }

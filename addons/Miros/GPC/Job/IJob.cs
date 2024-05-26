@@ -1,6 +1,8 @@
-﻿namespace GPC.Job;
+﻿using GPC.Job.Config;
 
-public interface IJob<in T>
+namespace GPC.Job;
+
+public interface IJob<in T> where T : IState
 {
     void Enter(T cfg);
     void Exit(T cfg);

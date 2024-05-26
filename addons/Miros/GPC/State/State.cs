@@ -15,7 +15,7 @@ public class State : IState, IHubProvider
 
     public Dictionary<object, object> Desired { get; set; }
 
-    public List<State> Subjobs { get; set; }
+    public List<IState> Subjobs { get; set; }
 
     public Dictionary<ICondition, bool> Preconditions { get; set; }
 
@@ -27,37 +27,37 @@ public class State : IState, IHubProvider
 
     public Dictionary<object, bool> FailedEffects { get; set; }
 
-    public Action<State> EnterFunc { get; set; }
+    public Action<IState> EnterFunc { get; set; }
 
-    public Action<State> ExitFunc { get; set; }
+    public Action<IState> ExitFunc { get; set; }
 
-    public Action<State> PauseFunc { get; set; }
+    public Action<IState> PauseFunc { get; set; }
 
-    public Action<State> ResumeFunc { get; set; }
+    public Action<IState> ResumeFunc { get; set; }
 
-    public Action<State> RunningFunc { get; set; }
+    public Action<IState> RunningFunc { get; set; }
 
-    public Action<State> RunningPhysicsFunc { get; set; }
+    public Action<IState> RunningPhysicsFunc { get; set; }
 
-    public Predicate<State> IsPreparedFunc { get; set; }
+    public Predicate<IState> IsPreparedFunc { get; set; }
 
-    public Predicate<State> IsSucceedFunc { get; set; }
+    public Predicate<IState> IsSucceedFunc { get; set; }
 
-    public Predicate<State> IsFailedFunc { get; set; }
+    public Predicate<IState> IsFailedFunc { get; set; }
 
-    public Action<State> EnterAttachFunc { get; set; }
+    public Action<IState> EnterAttachFunc { get; set; }
 
-    public Action<State> ExitAttachFunc { get; set; }
+    public Action<IState> ExitAttachFunc { get; set; }
 
-    public Action<State> PauseAttachFunc { get; set; }
+    public Action<IState> PauseAttachFunc { get; set; }
 
-    public Action<State> ResumeAttachFunc { get; set; }
+    public Action<IState> ResumeAttachFunc { get; set; }
 
-    public Action<State> RunningAttachFunc { get; set; }
+    public Action<IState> RunningAttachFunc { get; set; }
 
-    public Action<State> RunningPhysicsAttachFunc { get; set; }
+    public Action<IState> RunningPhysicsAttachFunc { get; set; }
 
-    public Action<State> RunningInterval { get; set; }
+    public Action<IState> RunningInterval { get; set; }
     public float Interval { get; set; }
     public IHub Hub => GHub.GetIns();
     public string Id { get; set; }

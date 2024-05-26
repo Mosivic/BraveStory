@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GPC.Job.Config;
 
 namespace GPC.AI.StateMachine;
 
-public class StateMachine : AbsScheduler
+public class StateMachine<T> : AbsScheduler<T> where T : class,IState
 {
-    private readonly HashSet<ITransition> _anyTransitions = new();
-    private StateNode _current;
-    private readonly Dictionary<string, StateNode> _nodes = new();
+    private readonly HashSet<ITransition<T>> _anyTransitions = new();
+    private StateNode<T> _current;
+    private readonly Dictionary<string, StateNode<T>> _nodes = new();
 
-    public StateMachine(List<State> states) : base(states)
+    public StateMachine(List<T> states) : base(states)
     {
     }
 
@@ -27,15 +28,15 @@ public class StateMachine : AbsScheduler
         JobWrapper.PhysicsUpdate(_current.State, delta);
     }
 
-    public void SetState(State state)
+    public void SetState(T state)
     {
         _current = _nodes[state.Id];
         JobWrapper.Enter(state);
     }
 
-    private void ChangeState(State state)
+    private void ChangeState(T state)
     {
-        if (state == _current.State) return;
+        if (state.Equals(_current.State)) return;
 
         var previousState = _current.State;
         var nextState = _nodes[state.Id].State;
@@ -45,7 +46,7 @@ public class StateMachine : AbsScheduler
         _current = _nodes[state.Id];
     }
 
-    private ITransition GetTransition()
+    private ITransition<T> GetTransition()
     {
         foreach (var transition in _anyTransitions)
             if (transition.Condition.IsSatisfy(_current.State))
@@ -58,22 +59,22 @@ public class StateMachine : AbsScheduler
         return null;
     }
 
-    public void AddTransition(State from, State to, ICondition condition)
+    public void AddTransition(T from, T to, ICondition condition)
     {
         GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
     }
 
-    public void AddAnyTransition(State to, ICondition condition)
+    public void AddAnyTransition(T to, ICondition condition)
     {
-        _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
+        _anyTransitions.Add(new Transition<T>(GetOrAddNode(to).State, condition));
     }
 
-    private StateNode GetOrAddNode(State state)
+    private StateNode<T> GetOrAddNode(T state)
     {
         var node = _nodes.GetValueOrDefault(state.Id);
         if (node == null)
         {
-            node = new StateNode(state);
+            node = new StateNode<T>(state);
             _nodes.Add(state.Id, node);
         }
 
@@ -81,20 +82,20 @@ public class StateMachine : AbsScheduler
     }
 }
 
-internal class StateNode
+internal class StateNode<T> where T : IState
 {
-    public State State;
+    public T State;
 
-    public StateNode(State state)
+    public StateNode(T state)
     {
         State = state;
-        Transitions = new HashSet<ITransition>();
+        Transitions = new HashSet<ITransition<T>>();
     }
 
-    public HashSet<ITransition> Transitions { get; }
+    public HashSet<ITransition<T>> Transitions { get; }
 
-    public void AddTransition(State state, ICondition condition)
+    public void AddTransition(T state, ICondition condition)
     {
-        Transitions.Add(new Transition(state, condition));
+        Transitions.Add(new Transition<T>(state, condition));
     }
 }

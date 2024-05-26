@@ -4,11 +4,11 @@ using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public class ConditionMachine: AbsScheduler
+public class ConditionMachine<T>: AbsScheduler<T> where T : class,IState
 {
-    protected Dictionary<string, State> JobsExecute = new();
+    protected Dictionary<string, T> JobsExecute = new();
 
-    public ConditionMachine(List<State> states) : base(states)
+    public ConditionMachine(List<T> states) : base(states)
     {
         foreach (var cfg in States)
         {
@@ -77,9 +77,9 @@ public class ConditionMachine: AbsScheduler
         }
     }
 
-    private State _GetBestJobCfg(string layer)
+    private T _GetBestJobCfg(string layer)
     {
-        List<State> candicateJobsCfg = [];
+        List<T> candicateJobsCfg = [];
         foreach (var cfg in States)
         {
             var jobLayer = cfg.Layer;
@@ -91,10 +91,10 @@ public class ConditionMachine: AbsScheduler
         return GetHighestCfg(candicateJobsCfg);
     }
 
-    public static State GetHighestCfg(List<State> States)
+    public static T GetHighestCfg(List<T> States)
     {
         if (States.Count == 0) return null;
-        State bestState = null;
+        T bestState = null;
         foreach (var State in States)
         {
             if (bestState == null) bestState = State;
