@@ -2,22 +2,22 @@ using Godot;
 using GPC.Job;
 using GPC.Job.Config;
 
-class Jump : JobSingle{
-	protected override void _Enter(State state)
+class Jump<T> : JobSingle<T> where T : PlayerState
+{
+	
+	protected override void _Enter(T state)
 	{
-		var mState = state as PlayerState;
-		var velocity = mState.Host.Velocity;
-		mState.Host.Velocity = new Vector2(velocity.X, mState.JumpVeocity);
-		mState.Host.GetNode<AnimationPlayer>("AnimationPlayer").Play("idle");
+		var velocity = state.Host.Velocity;
+		state.Host.Velocity = new Vector2(velocity.X, state.JumpVeocity);
+		state.Host.GetNode<AnimationPlayer>("AnimationPlayer").Play("idle");
 	}
 
-	protected override void _PhysicsUpdate(State state, double delta)
+	protected override void _PhysicsUpdate(T state, double delta)
 	{
-		var mState = state as PlayerState;
-		 var velocity = mState.Host.Velocity;
-		 velocity.Y += mState.Gravity * (float)delta;
-		 mState.Host.Velocity  = velocity;
+		 var velocity = state.Host.Velocity;
+		 velocity.Y += state.Gravity * (float)delta;
+		 state.Host.Velocity  = velocity;
 
-		 mState.Host.MoveAndSlide();
+		 state.Host.MoveAndSlide();
 	}
 }

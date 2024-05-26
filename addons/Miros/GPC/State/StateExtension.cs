@@ -5,6 +5,9 @@ namespace GPC.Job.Config;
 
 public static class StateExtension
 {
+    private static List<IJob<IState>> _jobs = new List<IJob<IState>>();
+    
+    
     public static void SetArg(this State state, string key, object value)
     {
         state.Args[key] = value;

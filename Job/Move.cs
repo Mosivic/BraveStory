@@ -5,24 +5,24 @@ using Godot;
 using GPC.Job;
 using GPC.Job.Config;
 
-class Move : JobSingle{
-    protected override void _Enter(State state)
+class Move<T> : JobSingle<T> where T :PlayerState
+{
+    protected override void _Enter(T state)
     {
-        (state as PlayerState).AnimationPlayer.Play("run");
+        state.AnimationPlayer.Play("run");
     }
 
-    protected override void _PhysicsUpdate(State state, double delta)
+    protected override void _PhysicsUpdate(T state, double delta)
     {
-        var mState = state as PlayerState;
         var direction = Input.GetAxis("move_left", "move_right");
-        var velocity = mState.Host.Velocity;
-        velocity.X = direction * mState.RunSpeed;
-        velocity.Y += (float)delta * mState.Gravity;
-        mState.Host.Velocity = velocity;
+        var velocity = state.Host.Velocity;
+        velocity.X = direction * state.RunSpeed;
+        velocity.Y += (float)delta * state.Gravity;
+        state.Host.Velocity = velocity;
 
         if (!Mathf.IsZeroApprox(direction))
-            mState.Host.GetNode<Sprite2D>("Sprite2D").FlipH = direction < 0;
+            state.Host.GetNode<Sprite2D>("Sprite2D").FlipH = direction < 0;
 
-        mState.Host.MoveAndSlide();
+        state.Host.MoveAndSlide();
     }
 }

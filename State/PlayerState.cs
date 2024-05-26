@@ -3,7 +3,7 @@ using System.Transactions;
 using Godot;
 using GPC.Job.Config;
 
-class PlayerState : State{
+public class PlayerState : State{
     public CharacterBody2D Host {get;set;}
     public AnimationPlayer AnimationPlayer{get;set;} 
     public Sprite2D Sprite {get;set;}

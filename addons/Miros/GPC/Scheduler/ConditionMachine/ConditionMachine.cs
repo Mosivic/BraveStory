@@ -4,46 +4,46 @@ using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public class ConditionMachine : AbsScheduler
+public class ConditionMachine: AbsScheduler
 {
-    protected Dictionary<string, State> _JobsExecute = new();
+    protected Dictionary<string, State> JobsExecute = new();
 
     public ConditionMachine(List<State> states) : base(states)
     {
         foreach (var cfg in States)
         {
             var layer = cfg.Layer;
-            _JobsExecute.TryAdd(layer, null);
+            JobsExecute.TryAdd(layer, null);
         }
     }
 
     public override void Update(double delta)
     {
         _UpdateJob();
-        foreach (var cfg in _JobsExecute.Values)
+        foreach (var cfg in JobsExecute.Values)
             if (cfg != null)
                 JobWrapper.Update(cfg, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var cfg in _JobsExecute.Values)
+        foreach (var cfg in JobsExecute.Values)
             if (cfg != null)
                 JobWrapper.PhysicsUpdate(cfg, delta);
     }
 
     private void _UpdateJob()
     {
-        foreach (var layer in _JobsExecute.Keys)
+        foreach (var layer in JobsExecute.Keys)
         {
-            var currentJobCfg = _JobsExecute[layer];
+            var currentJobCfg = JobsExecute[layer];
             var nextJobCfg = _GetBestJobCfg(layer);
 
             if (currentJobCfg == null)
             {
                 if (nextJobCfg == null) return;
 
-                _JobsExecute[layer] = nextJobCfg;
+                JobsExecute[layer] = nextJobCfg;
                 JobWrapper.Enter(nextJobCfg);
             }
             else
@@ -53,12 +53,12 @@ public class ConditionMachine : AbsScheduler
                     if (nextJobCfg == null)
                     {
                         JobWrapper.Exit(currentJobCfg);
-                        _JobsExecute[layer] = null;
+                        JobsExecute[layer] = null;
                     }
                     else
                     {
                         JobWrapper.Exit(currentJobCfg);
-                        _JobsExecute[layer] = nextJobCfg;
+                        JobsExecute[layer] = nextJobCfg;
                         JobWrapper.Enter(nextJobCfg);
                     }
                 }
@@ -69,7 +69,7 @@ public class ConditionMachine : AbsScheduler
                     if (nextJobCfg.Priority > currentJobCfg.Priority)
                     {
                         JobWrapper.Exit(currentJobCfg);
-                        _JobsExecute[layer] = nextJobCfg;
+                        JobsExecute[layer] = nextJobCfg;
                         JobWrapper.Enter(nextJobCfg);
                     }
                 }
@@ -91,14 +91,14 @@ public class ConditionMachine : AbsScheduler
         return GetHighestCfg(candicateJobsCfg);
     }
 
-    public static State GetHighestCfg(List<State> states)
+    public static State GetHighestCfg(List<State> States)
     {
-        if (states.Count == 0) return null;
+        if (States.Count == 0) return null;
         State bestState = null;
-        foreach (var state in states)
+        foreach (var State in States)
         {
-            if (bestState == null) bestState = state;
-            if (state.Priority > bestState.Priority) bestState = state;
+            if (bestState == null) bestState = State;
+            if (State.Priority > bestState.Priority) bestState = State;
         }
 
         return bestState;

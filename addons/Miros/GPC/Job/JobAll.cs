@@ -2,11 +2,11 @@
 
 namespace GPC.Job;
 
-internal class JobAll : AbsJob
+internal class JobAll<T> : AbsJob<T>,IJob<T> where T : State
 {
-    private readonly JobWrapper _jobJobWrapper = new();
+    private readonly JobWrapper<IState> _jobJobWrapper = new();
 
-    public void Enter(State cfg)
+    public void Enter(T cfg)
     {
         cfg.Status = Status.Running;
         foreach (var childCfg in cfg.Subjobs) _jobJobWrapper.Enter(childCfg);
@@ -15,28 +15,28 @@ internal class JobAll : AbsJob
     }
 
 
-    public void Exit(State cfg)
+    public void Exit(T cfg)
     {
         foreach (var childCfg in cfg.Subjobs) _jobJobWrapper.Exit(childCfg);
         cfg.ExitAttachFunc?.Invoke(cfg);
     }
 
 
-    public void Pause(State cfg)
+    public void Pause(T cfg)
     {
         cfg.Status = Status.Pause;
         cfg.PauseAttachFunc?.Invoke(cfg);
     }
 
 
-    public void Resume(State cfg)
+    public void Resume(T cfg)
     {
         cfg.Status = Status.Running;
         cfg.ResumeAttachFunc?.Invoke(cfg);
     }
 
 
-    public bool IsSucceed(State cfg)
+    public bool IsSucceed(T cfg)
     {
         foreach (var childCfg in cfg.Subjobs)
         {
@@ -48,7 +48,7 @@ internal class JobAll : AbsJob
     }
 
 
-    public bool IsFailed(State cfg)
+    public bool IsFailed(T cfg)
     {
         foreach (var childCfg in cfg.Subjobs)
             if (childCfg.Status == Status.Failed)
@@ -57,17 +57,17 @@ internal class JobAll : AbsJob
     }
 
 
-    public bool IsPrepared(State cfg)
+    public bool IsPrepared(T cfg)
     {
         return _IsPrepared(cfg);
     }
 
-    public bool CanExecute(State cfg)
+    public bool CanExecute(T cfg)
     {
         return IsPrepared(cfg);
     }
 
-    public void Update(State cfg, double delta)
+    public void Update(T cfg, double delta)
     {
         if (cfg.Status == Status.Pause) return;
 
@@ -76,14 +76,14 @@ internal class JobAll : AbsJob
         _UpdateJob(cfg);
     }
 
-    public void PhysicsUpdate(State cfg, double delta)
+    public void PhysicsUpdate(T cfg, double delta)
     {
         foreach (var childCfg in cfg.Subjobs)
             _jobJobWrapper.PhysicsUpdate(childCfg, delta);
     }
 
 
-    private void _UpdateJob(State cfg)
+    private void _UpdateJob(T cfg)
     {
         if (IsFailed(cfg))
             cfg.Status = Status.Failed;
