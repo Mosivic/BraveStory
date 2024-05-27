@@ -24,6 +24,7 @@ public partial class player : CharacterBody2D
                 Id = "1",
                 Type = typeof(Move<PlayerState>),
                 Name = "Run",
+            
                 Priority = 2,
                 Preconditions = new Dictionary<ICondition, bool>
                 {
