@@ -1,13 +1,41 @@
-﻿using GPC;
+﻿using System.Collections.Generic;
+using Godot;
+using GPC;
 using GPC.Job.Config;
 
-public struct Condition<T>(Evaluator<T> evaluator, bool expect = true)
+public class Condition(Dictionary<Evaluator, bool> evaluators)
 {
-    private Evaluator<T> _evaluator = evaluator;
-    private bool _expect = expect;
-    
-    public bool IsSatisfy(T state)
+    public bool IsAllSatisfy(IState state)
     {
-        return _evaluator.Evaluate(state) == _expect;
+        var frames = Engine.GetProcessFrames();
+        foreach (var key in evaluators.Keys)
+        {
+            if (key.Checksum.Equals(frames) && key.Result != evaluators[key])
+                return false;
+            if (key.Evaluate(state) != evaluators[key])
+            {
+                key.Checksum = frames;
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+    public bool IsAnySatisfy(IState state)
+    {
+        var frames = Engine.GetProcessFrames();
+        foreach (var key in evaluators.Keys)
+        {
+            if (key.Checksum.Equals(frames) && key.Result == evaluators[key])
+                return true;
+            if (key.Evaluate(state) == evaluators[key])
+            {
+                key.Checksum = frames;
+                return true;
+            }
+                
+        }
+        return false;
     }
 }

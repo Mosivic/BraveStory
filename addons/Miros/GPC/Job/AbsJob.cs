@@ -28,8 +28,8 @@ public abstract class AbsJob<T> where T : State
     {
         if (state.IsPreparedFunc != null)
             return state.IsPreparedFunc.Invoke(state);
-        if (state.Preconditions != null)
-            return state.IsAllConditionSatisfy(state.Preconditions);
+        if (state.PreCondition != null)
+            return state.PreCondition.IsAllSatisfy(state);
         return true;
     }
 
@@ -37,8 +37,8 @@ public abstract class AbsJob<T> where T : State
     {
         if (state.IsSucceedFunc != null)
             return state.IsSucceedFunc.Invoke(state);
-        if (state.SuccessedConditions != null)
-            return state.IsAllConditionSatisfy(state.SuccessedConditions);
+        if (state.SuccessedCondition != null)
+            return state.SuccessedCondition.IsAllSatisfy(state);
         return false;
     }
 
@@ -46,8 +46,8 @@ public abstract class AbsJob<T> where T : State
     {
         if (state.IsFailedFunc != null)
             return state.IsFailedFunc.Invoke(state);
-        if (state.FailedConditions != null)
-            return state.IsAnyConditionSatisfy(state.FailedConditions);
+        if (state.FailedCondition != null)
+            return state.FailedCondition.IsAnySatisfy(state);
         return false;
     }
 

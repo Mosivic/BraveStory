@@ -1,4 +1,3 @@
-
-public class MoveLayer : EntityLayer{
-    
+public class MoveLayer : EntityLayer
+{
 }

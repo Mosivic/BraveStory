@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://cwh2tu7n4ynt"]
 
-[ext_resource type="Script" path="res://Player/player.cs" id="1_6gap3"]
+[ext_resource type="Script" path="res://Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://cmk51oivoq0j6" path="res://Art/generic_char_v0.2/png/red/char_red_1.png" id="2_vcyf2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
@@ -176,7 +176,7 @@ _data = {
 }
 
 [node name="Player" type="CharacterBody2D"]
-script = ExtResource("1_6gap3")
+script = ExtResource("1_d4cnt")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(1, -28)

@@ -1,3 +1,3 @@
-public class EntityLayer:ILayer{
-
+public class EntityLayer : ILayer
+{
 }

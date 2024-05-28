@@ -1,14 +1,17 @@
 ﻿using System;
+using GPC.Job.Config;
 
 namespace GPC;
 
-public class Evaluator<T>(Predicate<T> predicate)
+public class Evaluator(Func<IState, bool> func)
 {
-    public int VeriNum { get; set; } = 0;
-    private Predicate<T> _predicate = predicate;
+    private readonly Func<IState, bool> _func = func;
+    public ulong Checksum { get; set; } = 666;
+    public bool Result { get; set; }
 
-    public bool Evaluate(T t)
+    public bool Evaluate(IState state)
     {
-       return predicate.Invoke(t);
+        Result = _func.Invoke(state);
+        return Result;
     }
 }

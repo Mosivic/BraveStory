@@ -2,25 +2,22 @@ using System.Collections.Generic;
 using Godot;
 using GPC;
 using GPC.AI;
-using GPC.Job.Config;
 
-public class CommonLib<T> : EvaluatorLib<T> where T : IState
+public class CommonLib : EvaluatorLib
 {
-    public readonly Evaluator<T> IsMoveKeyDown =
-        new (state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
+    public readonly Evaluator IsJumpKeyDown =
+        new(state => Input.IsActionJustPressed("jump"));
 
-    public readonly Evaluator<T> IsJumpKeyDown = 
-        new (state => Input.IsActionJustPressed("jump"));
+    public readonly Evaluator IsMoveKeyDown =
+        new(state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
 }
 
 
-public class PlayerLib<T> : EvaluatorLib<T> where T : PlayerState
+public class PlayerLib : EvaluatorLib
 {
-    public readonly Evaluator<T> IsOnFloor = 
-        new (state => state.Host.IsOnFloor() );
+    public readonly Evaluator IsOnFloor =
+        new(state => ((PlayerState)state).Host.IsOnFloor());
 }
-
-
 
 
 public partial class Player : CharacterBody2D
@@ -29,67 +26,63 @@ public partial class Player : CharacterBody2D
 
     public override void _Ready()
     {
-        EvaluatorSpace<PlayerState, CommonLib<PlayerState>, PlayerLib<PlayerState>> space =
-            new(new CommonLib<PlayerState>(),new PlayerLib<PlayerState>());
-        
+        EvaluatorSpace<CommonLib, PlayerLib> es =
+            new(new CommonLib(), new PlayerLib());
 
-
-    
-        var states = new List<PlayerState>(){
-            new PlayerState(this)
+        var states = new List<PlayerState>
+        {
+            new(this)
             {
                 Id = "1",
                 Type = typeof(Move<PlayerState>),
                 Name = "Run",
                 Priority = 2,
-                PreConditions = new(){
-                    {space.Common.IsMoveKeyDown,true}
-                },
-                Preconditions = [
-                    new Condition<PlayerState>(),
-                    new Condition<PlayerState>(space.Private.IsOnFloor),
-                    ],
-                FailedConditions = [
-                    new Condition<PlayerState>(space.Private.IsOnFloor,false)
-                ]
-
-           
+                PreCondition = new Condition(new Dictionary<Evaluator, bool>
+                {
+                    { es.Common.IsMoveKeyDown, true },
+                    // { es.Private.IsOnFloor, true }
+                }),
+                // FailedCondition = new Condition(new Dictionary<Evaluator, bool>
+                // {
+                //     { es.Private.IsOnFloor, false }
+                // })
             },
-            new PlayerState(this)
+            new(this)
             {
                 Id = "2",
                 Name = "Idle",
                 Priority = 1,
                 Type = typeof(Idle<PlayerState>),
-                Preconditions = [
-
-                ]
-                
-                new Dictionary<ICondition, bool>
+                PreCondition = new Condition(new Dictionary<Evaluator, bool>
                 {
-                    { isMoveKeyDown, false }, { isOnFloor, true }
-                },
-                FailedConditions = new Dictionary<ICondition, bool>
+                    { es.Common.IsMoveKeyDown, false },
+                    { es.Private.IsOnFloor, true }
+                }),
+                FailedCondition = new Condition(new Dictionary<Evaluator, bool>
                 {
-                    { isOnFloor, false }
-                }
+                    { es.Private.IsOnFloor, false }
+                })
             },
-            new PlayerState(this)
+            new(this)
             {
                 Id = "3",
                 Name = "Jump",
                 Priority = 3,
                 Type = typeof(Jump<PlayerState>),
-                Preconditions = new Dictionary<ICondition, bool>
+                PreCondition = new Condition(new Dictionary<Evaluator, bool>
                 {
-                    { isJumpKeyDown, true }, { isOnFloor, true }
-                },
-                FailedConditions = new Dictionary<ICondition, bool>()
+                    { es.Common.IsJumpKeyDown, true },
+                    { es.Private.IsOnFloor, true }
+                }),
+                FailedCondition = new Condition(new Dictionary<Evaluator, bool>()
+                {
+                    {es.Private.IsOnFloor,false}
+                })
             }
-        ])}
+        };
 
 
-        _cm = new ConditionMachine<PlayerState>(states, new PlayerConditionLib());
+        _cm = new ConditionMachine<PlayerState>(states);
     }
 
     public override void _Process(double delta)
@@ -100,7 +93,5 @@ public partial class Player : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         _cm.PhysicsUpdate(delta);
-        
     }
 }
-

@@ -1,9 +1,5 @@
-﻿using Godot;
-using GPC.Job.Config;
+﻿namespace GPC;
 
-namespace GPC;
-
-public class EvaluatorLib<T> where T : IState
+public class EvaluatorLib
 {
-
 }

@@ -7,11 +7,11 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
 {
     protected Dictionary<string, T> JobsExecute = new();
 
-    public ConditionMachine(List<T> states, EvaluatorLib<T> lib) : base(states, lib)
+    public ConditionMachine(List<T> states) : base(states)
     {
-        foreach (var cfg in States)
+        foreach (var state in States)
         {
-            var layer = cfg.Layer;
+            var layer = state.Layer;
             JobsExecute.TryAdd(layer, null);
         }
     }
@@ -19,70 +19,70 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
     public override void Update(double delta)
     {
         _UpdateJob();
-        foreach (var cfg in JobsExecute.Values)
-            if (cfg != null)
-                JobWrapper.Update(cfg, delta);
+        foreach (var state in JobsExecute.Values)
+            if (state != null)
+                JobWrapper.Update(state, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var cfg in JobsExecute.Values)
-            if (cfg != null)
-                JobWrapper.PhysicsUpdate(cfg, delta);
+        foreach (var state in JobsExecute.Values)
+            if (state != null)
+                JobWrapper.PhysicsUpdate(state, delta);
     }
 
     private void _UpdateJob()
     {
         foreach (var layer in JobsExecute.Keys)
         {
-            var currentJobCfg = JobsExecute[layer];
-            var nextJobCfg = _GetBestJobCfg(layer);
+            var currentState = JobsExecute[layer];
+            var nextState = _GetBestState(layer);
 
-            if (currentJobCfg == null)
+            if (currentState == null)
             {
-                if (nextJobCfg == null) return;
+                if (nextState == null) return;
 
-                JobsExecute[layer] = nextJobCfg;
-                JobWrapper.Enter(nextJobCfg);
+                JobsExecute[layer] = nextState;
+                JobWrapper.Enter(nextState);
             }
             else
             {
-                if (currentJobCfg.Status != Status.Running)
+                if (currentState.Status != Status.Running)
                 {
-                    if (nextJobCfg == null)
+                    if (nextState == null)
                     {
-                        JobWrapper.Exit(currentJobCfg);
+                        JobWrapper.Exit(currentState);
                         JobsExecute[layer] = null;
                     }
                     else
                     {
-                        JobWrapper.Exit(currentJobCfg);
-                        JobsExecute[layer] = nextJobCfg;
-                        JobWrapper.Enter(nextJobCfg);
+                        JobWrapper.Exit(currentState);
+                        JobsExecute[layer] = nextState;
+                        JobWrapper.Enter(nextState);
                     }
                 }
                 else
                 {
-                    if (nextJobCfg == null) return;
+                    if (nextState == null) return;
 
-                    if (nextJobCfg.Priority > currentJobCfg.Priority)
+                    if (nextState.Priority > currentState.Priority)
                     {
-                        JobWrapper.Exit(currentJobCfg);
-                        JobsExecute[layer] = nextJobCfg;
-                        JobWrapper.Enter(nextJobCfg);
+                        JobWrapper.Exit(currentState);
+                        JobsExecute[layer] = nextState;
+                        JobWrapper.Enter(nextState);
                     }
                 }
             }
         }
     }
 
-    private T _GetBestJobCfg(string layer)
+    private T _GetBestState(string layer)
     {
         List<T> candicateJobsCfg = [];
-        foreach (var cfg in States)
+        foreach (var state in States)
         {
-            var jobLayer = cfg.Layer;
-            if (jobLayer == layer && JobWrapper.CanExecute(cfg)) candicateJobsCfg.Add(cfg);
+            var jobLayer = state.Layer;
+            if (jobLayer == layer && JobWrapper.CanExecute(state)) candicateJobsCfg.Add(state);
         }
 
         if (candicateJobsCfg.Count == 0)
@@ -90,7 +90,7 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
         return GetHighestCfg(candicateJobsCfg);
     }
 
-    public static T GetHighestCfg(List<T> states)
+    private static T GetHighestCfg(List<T> states)
     {
         if (states.Count == 0) return null;
         T bestState = null;

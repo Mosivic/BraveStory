@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace GPC.Job.Config;
 
@@ -14,21 +13,5 @@ public static class StateExtension
     {
         if (state.Args.TryGetValue(key, out var arg)) return arg;
         throw new Exception($"GPC.Job.Status.GetArg(): Not found key: {key} in state");
-    }
-
-    public static bool IsAllConditionSatisfy(this State state, ConditionSet set)
-    {
-        foreach (var condition in conditions.Keys)
-            if (condition.IsSatisfy(state) != conditions[condition])
-                return false;
-        return true;
-    }
-
-    public static bool IsAnyConditionSatisfy(this State state, ConditionSet set)
-    {
-        foreach (var condition in conditions.Keys)
-            if (condition.IsSatisfy(state) == conditions[condition])
-                return true;
-        return false;
     }
 }

@@ -12,12 +12,10 @@ public class State : IState, IHubProvider
     public Dictionary<string, object> Extend { get; set; }
 
     public Dictionary<object, object> Desired { get; set; }
-
     public List<IState> Subjobs { get; set; }
-
-    public Dictionary<Evaluator<IState>,bool>  PreConditions{get;set;}
-    public Dictionary<Evaluator<IState>,bool>  SuccessedConditions { get; set; }
-    public Dictionary<Evaluator<IState>,bool>  FailedConditions { get; set; }
+    public Condition PreCondition { get; set; }
+    public Condition SuccessedCondition { get; set; }
+    public Condition FailedCondition { get; set; }
 
     public Dictionary<object, bool> SuccessedEffects { get; set; }
 
