@@ -4,21 +4,23 @@ using GPC;
 using GPC.AI;
 using GPC.Job.Config;
 
-public class CommonCL<T> : ConditionLib<T> where T : IState
+public class CommonLib<T> : EvaluatorLib<T> where T : IState
 {
-    public PredicateCondition<T> IsMoveKeyDown =
-            new (state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
+    public readonly Evaluator<T> IsMoveKeyDown =
+        new (state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
 
-    public PredicateCondition<T> IsJumpKeyDown = 
-            new (state => Input.IsActionJustPressed("jump"));
+    public readonly Evaluator<T> IsJumpKeyDown = 
+        new (state => Input.IsActionJustPressed("jump"));
 }
 
 
-public class PlayerCL<T> : CommonCL<T> where T : PlayerState
+public class PlayerLib<T> : EvaluatorLib<T> where T : PlayerState
 {
-    public PredicateCondition<T> IsOnFloor = 
+    public readonly Evaluator<T> IsOnFloor = 
         new (state => state.Host.IsOnFloor());
 }
+
+
 
 public partial class Player : CharacterBody2D
 {
@@ -26,21 +28,21 @@ public partial class Player : CharacterBody2D
 
     public override void _Ready()
     {
-        var cl = new PlayerCL<PlayerState>();
-        cl.IsJumpKeyDown.IsSatisfy();
+        EvaluatorSpace<PlayerState, CommonLib<PlayerState>, PlayerLib<PlayerState>> space =
+            new(new CommonLib<PlayerState>(),new PlayerLib<PlayerState>());
         
+
         var states = new List<PlayerState>([
             new PlayerState(this)
             {
                 Id = "1",
                 Type = typeof(Move<PlayerState>),
                 Name = "Run",
-            
                 Priority = 2,
-                Preconditions = new Dictionary<ICondition<PlayerState>, bool>
-                {
-                    { cl.IsMoveKeyDown, true }, { cl.IsOnFloor, true }
-                },
+                Preconditions = 
+                    new Condition(space.Common.IsMoveKeyDown)],
+                    
+
                 FailedConditions = new Dictionary<ICondition<PlayerState>, bool>
                 {
                     { cl.IsOnFloor, false }

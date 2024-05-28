@@ -4,9 +4,9 @@ using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public abstract class AbsScheduler<T>(List<T> states, ConditionLib<T> conditionLib) where T : IState
+public abstract class AbsScheduler<T>(List<T> states, EvaluatorLib<T> evaluatorLib) where T : IState
 {
-    protected ConditionLib<T> ConditionLib = conditionLib;
+    protected EvaluatorLib<T> EvaluatorLib = evaluatorLib;
     protected JobWrapper<T> JobWrapper = new();
     protected List<T> States = states;
 

@@ -3,7 +3,7 @@ using GPC.Job.Config;
 
 namespace GPC.AI.StateMachine;
 
-public class StateMachine<T>(List<T> states, ConditionLib<T> lib) : AbsScheduler<T>(states, lib)
+public class StateMachine<T>(List<T> states, EvaluatorLib<T> lib) : AbsScheduler<T>(states, lib)
     where T : class, IState
 {
     private readonly HashSet<ITransition<T>> _anyTransitions = new();
@@ -45,7 +45,7 @@ public class StateMachine<T>(List<T> states, ConditionLib<T> lib) : AbsScheduler
     private ITransition<T> GetTransition()
     {
         foreach (var transition in _anyTransitions)
-            if (transition.Condition.IsSatisfy(_current.State))
+            if (transition.Condition. IsSatisfy(_current.State))
                 return transition;
 
         foreach (var transition in _current.Transitions)
@@ -55,12 +55,12 @@ public class StateMachine<T>(List<T> states, ConditionLib<T> lib) : AbsScheduler
         return null;
     }
 
-    public void AddTransition(T from, T to, ICondition<T> condition)
+    public void AddTransition(T from, T to, Condition condition)
     {
         GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
     }
 
-    public void AddAnyTransition(T to, ICondition<T> condition)
+    public void AddAnyTransition(T to, Condition condition)
     {
         _anyTransitions.Add(new Transition<T>(GetOrAddNode(to).State, condition));
     }
@@ -90,7 +90,7 @@ internal class StateNode<T> where T : IState
 
     public HashSet<ITransition<T>> Transitions { get; }
 
-    public void AddTransition(T state, ICondition<T> condition)
+    public void AddTransition(T state, Condition condition)
     {
         Transitions.Add(new Transition<T>(state, condition));
     }
