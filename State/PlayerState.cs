@@ -10,6 +10,7 @@ public class PlayerState : State
         Sprite = Host.GetNode<Sprite2D>("Sprite2D");
     }
 
+
     public CharacterBody2D Host { get; set; }
     public AnimationPlayer AnimationPlayer { get; set; }
     public Sprite2D Sprite { get; set; }

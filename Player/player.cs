@@ -17,8 +17,9 @@ public class CommonLib<T> : EvaluatorLib<T> where T : IState
 public class PlayerLib<T> : EvaluatorLib<T> where T : PlayerState
 {
     public readonly Evaluator<T> IsOnFloor = 
-        new (state => state.Host.IsOnFloor());
+        new (state => state.Host.IsOnFloor() );
 }
+
 
 
 
@@ -32,21 +33,27 @@ public partial class Player : CharacterBody2D
             new(new CommonLib<PlayerState>(),new PlayerLib<PlayerState>());
         
 
-        var states = new List<PlayerState>([
+
+    
+        var states = new List<PlayerState>(){
             new PlayerState(this)
             {
                 Id = "1",
                 Type = typeof(Move<PlayerState>),
                 Name = "Run",
                 Priority = 2,
-                Preconditions = 
-                    new Condition(space.Common.IsMoveKeyDown)],
-                    
+                PreConditions = new(){
+                    {space.Common.IsMoveKeyDown,true}
+                },
+                Preconditions = [
+                    new Condition<PlayerState>(),
+                    new Condition<PlayerState>(space.Private.IsOnFloor),
+                    ],
+                FailedConditions = [
+                    new Condition<PlayerState>(space.Private.IsOnFloor,false)
+                ]
 
-                FailedConditions = new Dictionary<ICondition<PlayerState>, bool>
-                {
-                    { cl.IsOnFloor, false }
-                }
+           
             },
             new PlayerState(this)
             {
@@ -54,7 +61,11 @@ public partial class Player : CharacterBody2D
                 Name = "Idle",
                 Priority = 1,
                 Type = typeof(Idle<PlayerState>),
-                Preconditions = new Dictionary<ICondition, bool>
+                Preconditions = [
+
+                ]
+                
+                new Dictionary<ICondition, bool>
                 {
                     { isMoveKeyDown, false }, { isOnFloor, true }
                 },
@@ -75,7 +86,7 @@ public partial class Player : CharacterBody2D
                 },
                 FailedConditions = new Dictionary<ICondition, bool>()
             }
-        ]);
+        ])}
 
 
         _cm = new ConditionMachine<PlayerState>(states, new PlayerConditionLib());
@@ -89,5 +100,7 @@ public partial class Player : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         _cm.PhysicsUpdate(delta);
+        
     }
 }
+

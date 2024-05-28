@@ -55,12 +55,12 @@ public class StateMachine<T>(List<T> states, EvaluatorLib<T> lib) : AbsScheduler
         return null;
     }
 
-    public void AddTransition(T from, T to, Condition condition)
+    public void AddTransition(T from, T to, Condition<T> condition)
     {
         GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
     }
 
-    public void AddAnyTransition(T to, Condition condition)
+    public void AddAnyTransition(T to, Condition<T> condition)
     {
         _anyTransitions.Add(new Transition<T>(GetOrAddNode(to).State, condition));
     }
@@ -90,7 +90,7 @@ internal class StateNode<T> where T : IState
 
     public HashSet<ITransition<T>> Transitions { get; }
 
-    public void AddTransition(T state, Condition condition)
+    public void AddTransition(T state, Condition<T> condition)
     {
         Transitions.Add(new Transition<T>(state, condition));
     }
