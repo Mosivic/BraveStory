@@ -16,7 +16,7 @@ public static class StateExtension
         throw new Exception($"GPC.Job.Status.GetArg(): Not found key: {key} in state");
     }
 
-    public static bool IsAllConditionSatisfy(this State state, Dictionary<ICondition, bool> conditions)
+    public static bool IsAllConditionSatisfy(this State state, ConditionSet set)
     {
         foreach (var condition in conditions.Keys)
             if (condition.IsSatisfy(state) != conditions[condition])
@@ -24,7 +24,7 @@ public static class StateExtension
         return true;
     }
 
-    public static bool IsAnyConditionSatisfy(this State state, Dictionary<ICondition, bool> conditions)
+    public static bool IsAnyConditionSatisfy(this State state, ConditionSet set)
     {
         foreach (var condition in conditions.Keys)
             if (condition.IsSatisfy(state) == conditions[condition])

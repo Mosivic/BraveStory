@@ -2,9 +2,9 @@
 
 namespace GPC;
 
-public interface ICondition
+public interface ICondition<T> where T : IState
 {
-    bool IsMark { get; set; }
+    int CheckNum { get; set; }
     bool IsSatisfy();
-    bool IsSatisfy(IState state);
+    bool IsSatisfy(T state);
 }

@@ -15,11 +15,11 @@ public class State : IState, IHubProvider
 
     public List<IState> Subjobs { get; set; }
 
-    public Dictionary<ICondition, bool> Preconditions { get; set; }
+    public ConditionSet Preconditions { get; set; }
 
-    public Dictionary<ICondition, bool> SuccessedConditions { get; set; }
+    public ConditionSet SuccessedConditions { get; set; }
 
-    public Dictionary<ICondition, bool> FailedConditions { get; set; }
+    public ConditionSet FailedConditions { get; set; }
 
     public Dictionary<object, bool> SuccessedEffects { get; set; }
 

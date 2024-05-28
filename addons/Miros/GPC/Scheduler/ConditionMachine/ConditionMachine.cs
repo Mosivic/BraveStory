@@ -7,7 +7,7 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
 {
     protected Dictionary<string, T> JobsExecute = new();
 
-    public ConditionMachine(List<T> states, ConditionLib lib) : base(states, lib)
+    public ConditionMachine(List<T> states, ConditionLib<T> lib) : base(states, lib)
     {
         foreach (var cfg in States)
         {

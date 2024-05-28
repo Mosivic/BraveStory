@@ -2,22 +2,33 @@ using System.Collections.Generic;
 using Godot;
 using GPC;
 using GPC.AI;
+using GPC.Job.Config;
 
-internal class PlayerConditionLib : ConditionLib
+public class CommonCL<T> : ConditionLib<T> where T : IState
 {
+    public PredicateCondition<T> IsMoveKeyDown =
+            new (state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
+
+    public PredicateCondition<T> IsJumpKeyDown = 
+            new (state => Input.IsActionJustPressed("jump"));
 }
 
-public partial class player : CharacterBody2D
+
+public class PlayerCL<T> : CommonCL<T> where T : PlayerState
+{
+    public PredicateCondition<T> IsOnFloor = 
+        new (state => state.Host.IsOnFloor());
+}
+
+public partial class Player : CharacterBody2D
 {
     private ConditionMachine<PlayerState> _cm;
 
     public override void _Ready()
     {
-        var isMoveKeyDown =
-            new PredicateCondition(state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
-        var isJumpKeyDown = new PredicateCondition(state => Input.IsActionJustPressed("jump"));
-        var isOnFloor = new PredicateCondition(state => IsOnFloor());
-
+        var cl = new PlayerCL<PlayerState>();
+        cl.IsJumpKeyDown.IsSatisfy();
+        
         var states = new List<PlayerState>([
             new PlayerState(this)
             {
@@ -26,13 +37,13 @@ public partial class player : CharacterBody2D
                 Name = "Run",
             
                 Priority = 2,
-                Preconditions = new Dictionary<ICondition, bool>
+                Preconditions = new Dictionary<ICondition<PlayerState>, bool>
                 {
-                    { isMoveKeyDown, true }, { isOnFloor, true }
+                    { cl.IsMoveKeyDown, true }, { cl.IsOnFloor, true }
                 },
-                FailedConditions = new Dictionary<ICondition, bool>
+                FailedConditions = new Dictionary<ICondition<PlayerState>, bool>
                 {
-                    { isOnFloor, false }
+                    { cl.IsOnFloor, false }
                 }
             },
             new PlayerState(this)
