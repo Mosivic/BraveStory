@@ -31,7 +31,10 @@ public class Condition(Dictionary<Evaluator, bool> evaluators)
         foreach (var key in evaluators.Keys)
         {
             if (key.Checksum.Equals(frames) && key.Result == evaluators[key])
+            {
                 return true;
+            }
+            
             if (key.Evaluate(state) == evaluators[key])
             {
                 key.Checksum = frames;

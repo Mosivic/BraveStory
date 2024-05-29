@@ -4,10 +4,10 @@ using GPC.Job.Config;
 
 namespace GPC.AI;
 
-public abstract class AbsScheduler<T>(List<T> states) where T : IState
+public abstract class AbsScheduler<T>(StateSpace stateSpace) where T : IState
 {
     protected JobWrapper<T> JobWrapper = new();
-    protected List<T> States = states;
+    protected StateSpace StateSpace = stateSpace;
 
     public abstract void Update(double delta);
     public abstract void PhysicsUpdate(double delta);
