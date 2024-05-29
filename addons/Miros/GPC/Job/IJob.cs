@@ -1,4 +1,4 @@
-﻿using GPC.Job.Config;
+﻿using GPC.State;
 
 namespace GPC.Job;
 

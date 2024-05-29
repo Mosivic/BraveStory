@@ -1,9 +1,8 @@
 using Godot;
-using GPC.Job.Config;
 
 namespace GPC.Job;
 
-internal class JobSingle<T> : AbsJob<T>, IJob<T> where T : State
+internal class JobSingle<T> : AbsJob<T>, IJob<T> where T : State.State
 {
     public void Enter(T state)
     {

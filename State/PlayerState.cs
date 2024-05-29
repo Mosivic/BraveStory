@@ -1,5 +1,5 @@
 using Godot;
-using GPC.Job.Config;
+using GPC.State;
 
 public class PlayerState : State
 {
@@ -8,7 +8,7 @@ public class PlayerState : State
         Host = characterBody2D;
         AnimationPlayer = Host.GetNode<AnimationPlayer>("AnimationPlayer");
         Sprite = Host.GetNode<Sprite2D>("Sprite2D");
-        EvaluatorSpacePanel = Host.GetNode<Panel>("EvaluatorSpaceUI");
+        EvaluatorSpacePanel = Host.GetNode<Panel>("EvaluatorSpacePanel");
     }
 
 

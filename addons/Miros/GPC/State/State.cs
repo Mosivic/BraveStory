@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GPC.Job.Config;
+namespace GPC.State;
 
 public class State : IState, IHubProvider
 {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using GPC.Job.Config;
+using GPC.State;
 
-namespace GPC.AI;
+namespace GPC.Scheduler;
 
 public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
 {
@@ -9,7 +9,7 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
 
     public ConditionMachine(StateSpace stateSpace) : base(stateSpace)
     {
-        foreach (var state in States)
+        foreach (var state in stateSpace.States)
         {
             var layer = state.Layer;
             JobsExecute.TryAdd(layer, null);
@@ -79,16 +79,17 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
     private T _GetBestState(string layer)
     {
         List<T> candicateJobsCfg = [];
-        foreach (var state in States)
+        foreach (var state in StateSpace.States)
         {
             var jobLayer = state.Layer;
-            if (jobLayer == layer && JobWrapper.CanExecute(state)) candicateJobsCfg.Add(state);
+            if (jobLayer == layer && JobWrapper.CanExecute((T)state)) candicateJobsCfg.Add((T)state);
         }
 
         if (candicateJobsCfg.Count == 0)
             return null;
         return GetHighestCfg(candicateJobsCfg);
     }
+
 
     private static T GetHighestCfg(List<T> states)
     {

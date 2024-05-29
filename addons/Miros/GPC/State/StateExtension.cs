@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GPC.Job.Config;
+namespace GPC.State;
 
 public static class StateExtension
 {

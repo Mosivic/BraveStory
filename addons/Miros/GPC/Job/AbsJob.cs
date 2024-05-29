@@ -1,8 +1,6 @@
-﻿using GPC.Job.Config;
+﻿namespace GPC.Job;
 
-namespace GPC.Job;
-
-public abstract class AbsJob<T> where T : State
+public abstract class AbsJob<T> where T : State.State
 {
     protected virtual void _Enter(T state)
     {

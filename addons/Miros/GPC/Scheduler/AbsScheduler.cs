@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using GPC.Job;
-using GPC.Job.Config;
+﻿using GPC.Job;
+using GPC.State;
 
-namespace GPC.AI;
+namespace GPC.Scheduler;
 
 public abstract class AbsScheduler<T>(StateSpace stateSpace) where T : IState
 {

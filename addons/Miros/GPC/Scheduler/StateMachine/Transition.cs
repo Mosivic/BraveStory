@@ -1,6 +1,6 @@
-﻿using GPC.Job.Config;
+﻿using GPC.State;
 
-namespace GPC.AI.StateMachine;
+namespace GPC.Scheduler;
 
 public class Transition<T> : ITransition<T> where T : IState
 {

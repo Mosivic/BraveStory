@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GPC.Job.Config;
+using GPC.State;
 
 namespace GPC.Job;
 

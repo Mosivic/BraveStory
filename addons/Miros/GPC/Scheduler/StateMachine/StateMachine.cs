@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using GPC.Job.Config;
+using GPC.State;
 
-namespace GPC.AI.StateMachine;
+namespace GPC.Scheduler;
 
-public class StateMachine<T>(List<T> states) : AbsScheduler<T>(states)
+public class StateMachine<T>(StateSpace stateSpace) : AbsScheduler<T>(stateSpace)
     where T : class, IState
 {
     private readonly HashSet<ITransition<T>> _anyTransitions = new();

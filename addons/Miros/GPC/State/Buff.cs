@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GPC.Job.Config;
+namespace GPC.State;
 
 internal enum DurationPolicy //持续政策
 {
