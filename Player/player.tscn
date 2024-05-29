@@ -194,3 +194,33 @@ shape = SubResource("RectangleShape2D_cxnk6")
 libraries = {
 "": SubResource("AnimationLibrary_3xvkg")
 }
+
+[node name="EvaluatorSpaceDebugPanel" type="Panel" parent="."]
+offset_left = -58.0
+offset_top = -168.0
+offset_right = -58.0
+offset_bottom = -168.0
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EvaluatorSpaceDebugPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_right = 124.0
+offset_bottom = 52.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="EvaluatorSpaceDebugPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Evalutor" type="Label" parent="EvaluatorSpaceDebugPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Evaluator"
+
+[node name="Result" type="CheckButton" parent="EvaluatorSpaceDebugPanel/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
