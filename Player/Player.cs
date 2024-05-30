@@ -18,6 +18,9 @@ public class PlayerLib : EvaluatorLib
 {
     public readonly Evaluator IsOnFloor =
         new(state => ((PlayerState)state).Host.IsOnFloor());
+
+    public readonly Evaluator IsVelocityYPositive =
+        new(state => ((PlayerState)state).Host.Velocity.Y >= 0f);
 }
 
 
@@ -40,11 +43,11 @@ public partial class Player : CharacterBody2D
             {
                 { es.Common.IsMoveKeyDown, true }
                 // { es.Private.IsOnFloor, true }
+            }),
+            FailedCondition = new Condition(new Dictionary<Evaluator, bool>
+            {
+                { es.Common.IsMoveKeyDown, false }
             })
-            // FailedCondition = new Condition(new Dictionary<Evaluator, bool>
-            // {
-            //     { es.Private.IsOnFloor, false }
-            // })
         }).Add(new PlayerState(this)
         {
             Id = "2",
@@ -55,10 +58,6 @@ public partial class Player : CharacterBody2D
             {
                 { es.Common.IsMoveKeyDown, false },
                 { es.Private.IsOnFloor, true }
-            }),
-            FailedCondition = new Condition(new Dictionary<Evaluator, bool>
-            {
-                { es.Private.IsOnFloor, false }
             })
         }).Add(new PlayerState(this)
             {
@@ -70,13 +69,24 @@ public partial class Player : CharacterBody2D
                 {
                     { es.Common.IsJumpKeyDown, true },
                     { es.Private.IsOnFloor, true }
-                }),
-                FailedCondition = new Condition(new Dictionary<Evaluator, bool>
-                {
-                    { es.Private.IsOnFloor, false }
                 })
             }
-        );
+        ).Add(new PlayerState(this)
+        {
+            Id = "4",
+            Name = "Fall",
+            Priority = 9,
+            Type = typeof(Fall<PlayerState>),
+            PreCondition = new Condition(new Dictionary<Evaluator, bool>
+            {
+                { es.Private.IsOnFloor, false },
+                { es.Private.IsVelocityYPositive, true }
+            }),
+            FailedCondition = new Condition(new Dictionary<Evaluator, bool>
+            {
+                { es.Private.IsOnFloor, true }
+            })
+        });
 
 
         _cm = new ConditionMachine<PlayerState>(ss);
