@@ -1,7 +1,7 @@
 ﻿namespace GPC;
 
-public class EvaluatorSpace<C, P>(C common, P privato)
+public class EvaluatorSpace<G, L>(G Global, L local)
 {
-    public C Common { get; } = common;
-    public P Private { get; } = privato;
+    public G Global { get; } = Global;
+    public L Local { get; } = local;
 }

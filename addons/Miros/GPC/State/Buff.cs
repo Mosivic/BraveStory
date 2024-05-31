@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Godot;
+using GPC.Scheduler;
 
 namespace GPC.State;
 
@@ -59,4 +61,7 @@ internal class Buff : IState
     public int Priority { get; set; }
     public Type Type { get; set; }
     public Status Status { get; set; }
+    public Node Host { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public AbsScheduler<IState> Scheduler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
 }

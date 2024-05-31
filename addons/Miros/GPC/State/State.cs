@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Godot;
+using GPC.Scheduler;
 
 namespace GPC.State;
 
@@ -60,4 +62,7 @@ public class State : IState, IHubProvider
     public string Layer { get; set; } = "Defult";
     public Type Type { get; set; }
     public Status Status { get; set; } = Status.Running;
+    public Node Host { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public AbsScheduler<IState> Scheduler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
 }
