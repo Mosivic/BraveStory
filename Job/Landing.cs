@@ -1,4 +1,5 @@
-﻿using GPC.Job;
+﻿using BraveStory.State;
+using GPC.Job;
 
 internal class Landing<T> : JobSingle<T> where T : PlayerState
 {

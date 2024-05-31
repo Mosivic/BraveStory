@@ -3,14 +3,14 @@ using GPC.State;
 
 namespace GPC;
 
-public class Evaluator(Func<IState, bool> func)
+public class Evaluator<S,R>(Func<S, R> func)
 {
     public ulong Checksum { get; set; } = 0;
-    public bool Result { get; set; }
+    public R Result { get; set; }
 
-    public bool Evaluate(IState state)
+    public R Evaluate(S state)
     {
-        Result = func.Invoke(state);
+        Result = func.Invoke(S);
         return Result;
     }
 }

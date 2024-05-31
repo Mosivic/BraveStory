@@ -3,9 +3,9 @@ using Godot;
 using GPC;
 using GPC.State;
 
-public class Condition(Dictionary<Evaluator, bool> evaluators)
+public class Condition(Dictionary<Evaluator<object,object>, bool> evaluators)
 {
-    public bool IsAllSatisfy(IState state)
+    public bool IsAllSatisfy(object state)
     {
         var frames = Engine.GetProcessFrames();
         foreach (var key in evaluators.Keys)

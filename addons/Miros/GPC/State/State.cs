@@ -59,10 +59,10 @@ public class State : IState, IHubProvider
     public int Priority { get; set; }
     public string Id { get; set; }
     public string Name { get; set; }
-    public string Layer { get; set; } = "Defult";
+    public string Layer { get; set; } = "Default";
+    public IScheduler<IState> Scheduler { get; set; }
     public Type Type { get; set; }
     public Status Status { get; set; } = Status.Running;
     public Node Host { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public AbsScheduler<IState> Scheduler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
 }

@@ -1,25 +1,8 @@
-using Godot;
-using GPC.Scheduler;
-using GPC.State;
+namespace BraveStory.State;
 
-
-public struct PlayerParams{
-    public ConditionMachine<PlayerState> ConditionMachine{get;set;}
-    public CharacterBody2D Host { get; set; }
-    public AnimationPlayer AnimationPlayer { get; set; }
-    public Panel EvaluatorSpacePanel { get; }
-    public Sprite2D Sprite { get; set; }
-}
-
-public class PlayerState : State
+public class PlayerState(PlayerParams param) : GPC.State.State
 {
-    public PlayerState(PlayerParams param)
-    {
-        Params = param;
-    }
-
-    public PlayerParams Params{get;set;}
-
+    public PlayerParams Params{get;set;} = param;
     public float Gravity { get; } = 980;
     public float RunSpeed { get; } = 200;
     public float JumpVeocity { get; } = -300;

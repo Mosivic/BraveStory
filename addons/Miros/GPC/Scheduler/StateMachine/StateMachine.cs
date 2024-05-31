@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Godot;
 using GPC.State;
 
 namespace GPC.Scheduler;
 
-public class StateMachine<T>(StateSpace stateSpace) : AbsScheduler<T>(stateSpace)
+public class StateMachine<T>(Node host,StateSpace stateSpace) : AbsScheduler<T>(host,stateSpace)
     where T : class, IState
 {
     private readonly HashSet<ITransition<T>> _anyTransitions = new();

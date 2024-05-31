@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Godot;
 using GPC.State;
 
 namespace GPC.Scheduler;
@@ -7,7 +8,7 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
 {
     protected Dictionary<string, T> JobsExecute = new();
 
-    public ConditionMachine(StateSpace stateSpace) : base(stateSpace)
+    public ConditionMachine(Node host,StateSpace stateSpace) : base(host,stateSpace)
     {
         foreach (var state in stateSpace.States)
         {

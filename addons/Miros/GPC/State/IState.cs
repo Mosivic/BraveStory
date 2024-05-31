@@ -11,7 +11,7 @@ public interface IState
     string Layer { get; set; }
     int Priority { get; set; }
     Node Host {get;set;}
-    AbsScheduler<IState> Scheduler {get;set;}
+    IScheduler<IState> Scheduler { get; set; }
     Type Type { get; set; }
     Status Status { get; set; }
 

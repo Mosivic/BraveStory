@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BraveStory.State;
 using Godot;
 using GPC;
 using GPC.Scheduler;
@@ -17,17 +18,16 @@ public class CommonLib : EvaluatorLib
 public class PlayerLib : EvaluatorLib
 {
 	public readonly Evaluator IsOnFloor =
-		new(state => ((PlayerState)state).Params.Host.IsOnFloor());
+		new(state => ((PlayerState)state).Host.IsOnFloor());
 
 	public readonly Evaluator IsVelocityYPositive =
-		new(state => ((PlayerState)state).Params.Host.Velocity.Y >= 0f);
+		new(state => (CharacterBody2D)(state.Host).Velocity.Y >= 0f);
 }
 
-public struct PlayerParams{
-    public ConditionMachine<PlayerState> ConditionMachine{get;set;}
-    public CharacterBody2D Host { get; set; }
+public struct PlayerParams
+{
     public AnimationPlayer AnimationPlayer { get; set; }
-    public Panel EvaluatorSpacePanel { get; }
+    public Panel EvaluatorSpacePanel { get; set; }
     public Sprite2D Sprite { get; set; }
 }
 
@@ -40,10 +40,9 @@ public partial class Player : CharacterBody2D
 		EvaluatorSpace<CommonLib, PlayerLib> es = new(new CommonLib(), new PlayerLib());
 
         var p = new PlayerParams(){
-            ConditionMachine = _cm,
-            Host = this,
             AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer"),
-            Sprite = GetNode<Sprite2D>("Sprite"),
+            Sprite = GetNode<Sprite2D>("Sprite2D"),
+            EvaluatorSpacePanel = GetNode<Panel>("EvaluatorSpacePanel")
 
         };
 
@@ -104,7 +103,7 @@ public partial class Player : CharacterBody2D
 		});
 
 
-		_cm = new ConditionMachine<PlayerState>(ss);
+		_cm = new ConditionMachine<PlayerState>(this,ss);
 	}
 
 	public override void _Process(double delta)
