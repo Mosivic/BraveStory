@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-using BraveStory.State;
+using System.Data.SqlTypes;
 using Godot;
 using GPC;
 using GPC.Scheduler;
@@ -7,42 +8,44 @@ using GPC.State;
 
 public class CommonLib : EvaluatorLib
 {
-	public readonly Evaluator IsJumpKeyDown =
+	public readonly Evaluator<IState,bool> IsJumpKeyDown =
 		new(state => Input.IsActionJustPressed("jump"));
 
-	public readonly Evaluator IsMoveKeyDown =
+	public readonly Evaluator<IState,bool> IsMoveKeyDown =
 		new(state => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
 }
 
 
 public class PlayerLib : EvaluatorLib
 {
-	public readonly Evaluator IsOnFloor =
-		new(state => ((PlayerState)state).Host.IsOnFloor());
+	public readonly Func<PlayerState,bool> IsOnFloor =
+		new(state => state.Host.IsOnFloor());
 
-	public readonly Evaluator IsVelocityYPositive =
-		new(state => (CharacterBody2D)(state.Host).Velocity.Y >= 0f);
+	public readonly Evaluator<PlayerState,bool> IsVelocityYPositive =
+		new(state => state.Host.Velocity.Y >= 0f);
 }
 
-public struct PlayerParams
-{
+public struct PlayerParams{
+    public ConditionMachine ConditionMachine{get;set;}
+    public CharacterBody2D Host { get; set; }
     public AnimationPlayer AnimationPlayer { get; set; }
-    public Panel EvaluatorSpacePanel { get; set; }
+    public Panel EvaluatorSpacePanel { get; }
     public Sprite2D Sprite { get; set; }
 }
 
 public partial class Player : CharacterBody2D
 {
-	private ConditionMachine<PlayerState> _cm;
+	private ConditionMachine _cm;
 
 	public override void _Ready()
 	{
 		EvaluatorSpace<CommonLib, PlayerLib> es = new(new CommonLib(), new PlayerLib());
 
         var p = new PlayerParams(){
+            ConditionMachine = _cm,
+            Host = this,
             AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer"),
-            Sprite = GetNode<Sprite2D>("Sprite2D"),
-            EvaluatorSpacePanel = GetNode<Panel>("EvaluatorSpacePanel")
+            Sprite = GetNode<Sprite2D>("Sprite"),
 
         };
 
@@ -53,11 +56,13 @@ public partial class Player : CharacterBody2D
 			Type = typeof(Move<PlayerState>),
 			Name = "Run",
 			Priority = 2,
-			PreCondition = new Condition(new Dictionary<Evaluator, bool>
-			{
-				{ es.Global.IsMoveKeyDown, true }
-				// { es.Private.IsOnFloor, true }
-			}),
+			PreCondition = [
+				new Evaluator<PlayerState,bool,CompareFlags.Equal,bool>()
+			],new Condition(new Dictionary<Evaluator, bool>
+			// {
+			// 	{ es.Global.IsMoveKeyDown, true }
+			// 	// { es.Private.IsOnFloor, true }
+			// }),
 			FailedCondition = new Condition(new Dictionary<Evaluator, bool>
 			{
 				{ es.Global.IsMoveKeyDown, false }
@@ -103,7 +108,7 @@ public partial class Player : CharacterBody2D
 		});
 
 
-		_cm = new ConditionMachine<PlayerState>(this,ss);
+		_cm = new ConditionMachine<PlayerState>(ss);
 	}
 
 	public override void _Process(double delta)

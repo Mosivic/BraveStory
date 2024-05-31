@@ -3,7 +3,7 @@ using Godot;
 using GPC;
 using GPC.State;
 
-public class Condition(Dictionary<Evaluator<object,object>, bool> evaluators)
+public class Condition(Dictionary<Evaluator<object,object>, object> evaluators)
 {
     public bool IsAllSatisfy(object state)
     {

@@ -12,7 +12,7 @@ public class StateSpace
     public List<IState> States { get; set; }
 
     public StateSpace Add<S>(S s) where S : IState
-    {
+    { 
         States.Add(s);
         return this;
     }

@@ -2,8 +2,8 @@
 
 namespace GPC.Scheduler;
 
-public interface ITransition<T> where T : IState
+public interface ITransition
 {
-    T To { get; }
+    AbsState To { get; }
     Condition Condition { get; }
 }

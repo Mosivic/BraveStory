@@ -43,17 +43,16 @@ internal struct BuffArgs
     public float LeftTime;
 }
 
-internal class Buff : IState
+internal class AbbsBuff : IState
 {
     private BuffArgs args;
 
-    private List<Buff> overflowBuffs = null; //层数溢出后调用的Buff
+    private List<IState> overflowBuffs = null; //层数溢出后调用的Buff
     private float period = 0;
     private PeriodicInhibitionPolicy periodicInhibitionPolicy = PeriodicInhibitionPolicy.Resume;
     private int stackMaxCount = 1;
-    private List<Buff> succeedBuffs = null;
-    private List<Buff> FailedBuffs { get; set; } = null;
-
+    private List<IState> succeedBuffs = null;
+    private List<IState> FailedBuffs { get; set; } = null;
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instand;
     public string Id { get; set; }
     public string Name { get; set; }
@@ -61,7 +60,7 @@ internal class Buff : IState
     public int Priority { get; set; }
     public Type Type { get; set; }
     public Status Status { get; set; }
-    public Node Host { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public AbsScheduler<IState> Scheduler { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
+    public IScheduler Scheduler {get;set;}
 }
+ 
+   

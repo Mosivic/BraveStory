@@ -4,9 +4,9 @@ using GPC.State;
 
 namespace GPC.Scheduler;
 
-public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
+public class ConditionMachine : AbsScheduler
 {
-    protected Dictionary<string, T> JobsExecute = new();
+    protected Dictionary<string, AbsState> JobsExecute = new();
 
     public ConditionMachine(Node host,StateSpace stateSpace) : base(host,stateSpace)
     {
@@ -77,13 +77,13 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
         }
     }
 
-    private T _GetBestState(string layer)
+    private AbsState _GetBestState(string layer)
     {
-        List<T> candicateJobsCfg = [];
+        List<AbsState> candicateJobsCfg = [];
         foreach (var state in StateSpace.States)
         {
             var jobLayer = state.Layer;
-            if (jobLayer == layer && JobWrapper.CanExecute((T)state)) candicateJobsCfg.Add((T)state);
+            if (jobLayer == layer && JobWrapper.CanExecute((AbsState)state)) candicateJobsCfg.Add((AbsState)state);
         }
 
         if (candicateJobsCfg.Count == 0)
@@ -92,10 +92,10 @@ public class ConditionMachine<T> : AbsScheduler<T> where T : class, IState
     }
 
 
-    private static T GetHighestCfg(List<T> states)
+    private static AbsState GetHighestCfg(List<AbsState> states)
     {
         if (states.Count == 0) return null;
-        T bestState = null;
+        AbsState bestState = null;
         foreach (var state in states)
         {
             if (bestState == null) bestState = state;

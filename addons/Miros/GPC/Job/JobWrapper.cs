@@ -4,64 +4,64 @@ using GPC.State;
 
 namespace GPC.Job;
 
-public class JobWrapper<T> where T : IState
+public class JobWrapper
 {
-    private static readonly Dictionary<Type, IJob<T>> Jobs = new();
+    private static readonly Dictionary<Type, IJob> Jobs = new();
 
-    private static IJob<T> _GetJob(Type type)
+    private static IJob _GetJob(Type type)
     {
         if (Jobs.TryGetValue(type, out var value)) return value;
-        var job = (IJob<T>)Activator.CreateInstance(type);
+        var job = (IJob)Activator.CreateInstance(type);
         Jobs[type] = job;
         return job;
     }
 
-    public void Enter(T state)
+    public void Enter(AbsState state)
     {
         _GetJob(state.Type).Enter(state);
     }
 
-    public void Exit(T state)
+    public void Exit(AbsState state)
     {
         _GetJob(state.Type).Exit(state);
     }
 
-    public void Pause(T state)
+    public void Pause(AbsState state)
     {
         _GetJob(state.Type).Pause(state);
     }
 
-    public void Resume(T state)
+    public void Resume(AbsState state)
     {
         _GetJob(state.Type).Resume(state);
     }
 
-    public bool IsSucceed(T state)
+    public bool IsSucceed(AbsState state)
     {
         return _GetJob(state.Type).IsSucceed(state);
     }
 
-    public bool IsFailed(T state)
+    public bool IsFailed(AbsState state)
     {
         return _GetJob(state.Type).IsFailed(state);
     }
 
-    public bool IsPrepared(T state)
+    public bool IsPrepared(AbsState state)
     {
         return _GetJob(state.Type).IsPrepared(state);
     }
 
-    public bool CanExecute(T state)
+    public bool CanExecute(AbsState state)
     {
         return _GetJob(state.Type).CanExecute(state);
     }
 
-    public void Update(T state, double delta)
+    public void Update(AbsState state, double delta)
     {
         _GetJob(state.Type).Update(state, delta);
     }
 
-    public void PhysicsUpdate(T state, double delta)
+    public void PhysicsUpdate(AbsState state, double delta)
     {
         _GetJob(state.Type).PhysicsUpdate(state, delta);
     }

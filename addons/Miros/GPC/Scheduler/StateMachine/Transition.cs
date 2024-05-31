@@ -2,14 +2,14 @@
 
 namespace GPC.Scheduler;
 
-public class Transition<T> : ITransition<T> where T : IState
+public class Transition: ITransition
 {
-    public Transition(T to, Condition condition)
+    public Transition(AbsState to, Condition condition)
     {
         To = to;
         Condition = condition;
     }
 
-    public T To { get; }
+    public AbsState To { get; }
     public Condition Condition { get; }
 }

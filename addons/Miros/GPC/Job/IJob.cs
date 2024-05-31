@@ -2,16 +2,16 @@
 
 namespace GPC.Job;
 
-public interface IJob<in T> where T : IState
+public interface IJob
 {
-    void Enter(T cfg);
-    void Exit(T cfg);
-    void Pause(T cfg);
-    void Resume(T cfg);
-    bool IsSucceed(T cfg);
-    bool IsPrepared(T cfg);
-    bool IsFailed(T cfg);
-    bool CanExecute(T cfg);
-    void Update(T cfg, double delta);
-    void PhysicsUpdate(T cfg, double delta);
+    void Enter(IState cfg);
+    void Exit(IState cfg);
+    void Pause(IState cfg);
+    void Resume(IState cfg);
+    bool IsSucceed(IState cfg);
+    bool IsPrepared(IState cfg);
+    bool IsFailed(IState cfg);
+    bool CanExecute(IState cfg);
+    void Update(IState cfg, double delta);
+    void PhysicsUpdate(IState cfg, double delta);
 }

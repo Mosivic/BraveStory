@@ -4,12 +4,12 @@ using GPC.State;
 
 namespace GPC.Scheduler;
 
-public class StateMachine<T>(Node host,StateSpace stateSpace) : AbsScheduler<T>(host,stateSpace)
-    where T : class, IState
+public class StateMachine(Node host,StateSpace stateSpace) : AbsScheduler(host,stateSpace)
+
 {
-    private readonly HashSet<ITransition<T>> _anyTransitions = new();
-    private readonly Dictionary<string, StateNode<T>> _nodes = new();
-    private StateNode<T> _current;
+    private readonly HashSet<ITransition> _anyTransitions = new();
+    private readonly Dictionary<string, StateNode> _nodes = new();
+    private StateNode _current;
 
     public override void Update(double delta)
     {
@@ -25,13 +25,13 @@ public class StateMachine<T>(Node host,StateSpace stateSpace) : AbsScheduler<T>(
         JobWrapper.PhysicsUpdate(_current.State, delta);
     }
 
-    public void SetState(T state)
+    public void SetState(AbsState state)
     {
         _current = _nodes[state.Id];
         JobWrapper.Enter(state);
     }
 
-    private void ChangeState(T state)
+    private void ChangeState(AbsState state)
     {
         if (state.Equals(_current.State)) return;
 
@@ -43,7 +43,7 @@ public class StateMachine<T>(Node host,StateSpace stateSpace) : AbsScheduler<T>(
         _current = _nodes[state.Id];
     }
 
-    private ITransition<T> GetTransition()
+    private ITransition GetTransition()
     {
         foreach (var transition in _anyTransitions)
             if (transition.Condition.IsAllSatisfy(transition.To))
@@ -56,22 +56,22 @@ public class StateMachine<T>(Node host,StateSpace stateSpace) : AbsScheduler<T>(
         return null;
     }
 
-    public void AddTransition(T from, T to, Condition condition)
+    public void AddTransition(AbsState from, AbsState to, Condition condition)
     {
         GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
     }
 
-    public void AddAnyTransition(T to, Condition condition)
+    public void AddAnyTransition(AbsState to, Condition condition)
     {
-        _anyTransitions.Add(new Transition<T>(GetOrAddNode(to).State, condition));
+        _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
     }
 
-    private StateNode<T> GetOrAddNode(T state)
+    private StateNode GetOrAddNode(AbsState state)
     {
         var node = _nodes.GetValueOrDefault(state.Id);
         if (node == null)
         {
-            node = new StateNode<T>(state);
+            node = new StateNode(state);
             _nodes.Add(state.Id, node);
         }
 
@@ -79,15 +79,14 @@ public class StateMachine<T>(Node host,StateSpace stateSpace) : AbsScheduler<T>(
     }
 }
 
-internal class StateNode<T>(T state)
-    where T : IState
+internal class StateNode(AbsState state)
 {
-    public readonly T State = state;
+    public readonly AbsState State = state;
 
-    public HashSet<ITransition<T>> Transitions { get; } = new();
+    public HashSet<ITransition> Transitions { get; } = new();
 
-    public void AddTransition(T state, Condition condition)
+    public void AddTransition(AbsState state, Condition condition)
     {
-        Transitions.Add(new Transition<T>(state, condition));
+        Transitions.Add(new Transition(state, condition));
     }
 }

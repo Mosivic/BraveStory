@@ -5,21 +5,21 @@ using GPC.State;
 namespace GPC.Scheduler;
 
 
-public interface IScheduler<out T> 
+public interface IScheduler
 {
 
 }
-public abstract class AbsScheduler<T> : IScheduler<IState> where T : IState
+public abstract class AbsScheduler : IScheduler
 {
-    protected JobWrapper<T> JobWrapper = new();
+    protected JobWrapper JobWrapper = new();
     protected StateSpace StateSpace;
 
-    public AbsScheduler( Node host,StateSpace stateSpace)
+    public AbsScheduler(Node host,StateSpace stateSpace)
     {
         StateSpace = stateSpace;
         foreach (var state in StateSpace.States)
         {
-            state.Host = host;
+            (state as IStateGeneric<Node>).Host = host;
             state.Scheduler = this;
         }
     }

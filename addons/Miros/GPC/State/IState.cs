@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Transactions;
 using Godot;
 using GPC.Scheduler;
 
@@ -10,9 +11,9 @@ public interface IState
     string Name { get; set; }
     string Layer { get; set; }
     int Priority { get; set; }
-    Node Host {get;set;}
-    IScheduler<IState> Scheduler { get; set; }
     Type Type { get; set; }
     Status Status { get; set; }
+    IScheduler Scheduler {get;set;}
 
 }
+

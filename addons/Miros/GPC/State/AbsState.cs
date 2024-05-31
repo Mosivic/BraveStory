@@ -5,7 +5,24 @@ using GPC.Scheduler;
 
 namespace GPC.State;
 
-public class State : IState, IHubProvider
+public interface IStateGeneric<H>
+{
+    public H Host { get; set; }
+}
+
+public class AbsState : StateExtendProperty, IState
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Layer { get; set; }
+    public int Priority { get; set; }
+    public Type Type { get; set; }
+    public Status Status { get; set; }
+    public IScheduler Scheduler { get; set; }
+
+}
+
+public class StateExtendProperty
 {
     public int ChildIndex { get; set; } = -1;
     public int Cost { get; set; }
@@ -14,8 +31,8 @@ public class State : IState, IHubProvider
     public Dictionary<string, object> Extend { get; set; }
 
     public Dictionary<object, object> Desired { get; set; }
-    public List<IState> Subjobs { get; set; }
-    public Condition PreCondition { get; set; }
+    public List<AbsState> Subjobs { get; set; }
+    public List<IEvaluator> PreCondition { get; set; }
     public Condition SuccessedCondition { get; set; }
     public Condition FailedCondition { get; set; }
 
@@ -55,14 +72,6 @@ public class State : IState, IHubProvider
 
     public Action<IState> RunningInterval { get; set; }
     public float Interval { get; set; }
-    public IHub Hub => GHub.GetIns();
-    public int Priority { get; set; }
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string Layer { get; set; } = "Default";
-    public IScheduler<IState> Scheduler { get; set; }
-    public Type Type { get; set; }
-    public Status Status { get; set; } = Status.Running;
-    public Node Host { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
 }
+
+
