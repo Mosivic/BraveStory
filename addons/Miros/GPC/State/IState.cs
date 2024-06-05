@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Transactions;
-using Godot;
 using GPC.Scheduler;
 
-namespace GPC.State;
+namespace GPC.States;
 
 public interface IState
 {
@@ -13,7 +11,5 @@ public interface IState
     int Priority { get; set; }
     Type Type { get; set; }
     Status Status { get; set; }
-    IScheduler Scheduler {get;set;}
-
+    IScheduler Scheduler { get; set; }
 }
-

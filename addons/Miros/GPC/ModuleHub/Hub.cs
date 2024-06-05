@@ -18,12 +18,12 @@ public interface IUtility
 {
 }
 
-public interface ILocal{
-
+public interface ILocal
+{
 }
 
-public interface IGlobal{
-    
+public interface IGlobal
+{
 }
 
 public interface ICanInit : IModule

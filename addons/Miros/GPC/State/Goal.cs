@@ -1,10 +1,9 @@
 ﻿using System;
-using Godot;
 using GPC.Scheduler;
 
-namespace GPC.State;
+namespace GPC.States;
 
-public class Goal<H,S> : IState, IHubProvider 
+public class Goal : IState, IHubProvider
 {
     public IHub Hub => GHub.GetIns();
     public string Id { get; set; }

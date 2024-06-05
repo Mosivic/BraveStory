@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Godot;
 using GPC.Scheduler;
 
-namespace GPC.State;
+namespace GPC.States;
 
 public interface IStateGeneric<H>
 {
     public H Host { get; set; }
 }
 
-public class AbsState : StateExtendProperty, IState
+public class State : StateExtendProperty, IState
 {
     public string Id { get; set; }
     public string Name { get; set; }
@@ -19,7 +18,6 @@ public class AbsState : StateExtendProperty, IState
     public Type Type { get; set; }
     public Status Status { get; set; }
     public IScheduler Scheduler { get; set; }
-
 }
 
 public class StateExtendProperty
@@ -31,8 +29,8 @@ public class StateExtendProperty
     public Dictionary<string, object> Extend { get; set; }
 
     public Dictionary<object, object> Desired { get; set; }
-    public List<AbsState> Subjobs { get; set; }
-    public List<IEvaluator> PreCondition { get; set; }
+    public List<State> Subjobs { get; set; }
+    public List<object> PreCondition { get; set; }
     public Condition SuccessedCondition { get; set; }
     public Condition FailedCondition { get; set; }
 
@@ -73,5 +71,3 @@ public class StateExtendProperty
     public Action<IState> RunningInterval { get; set; }
     public float Interval { get; set; }
 }
-
-

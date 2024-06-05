@@ -1,11 +1,11 @@
 using Godot;
-using GPC.State;
+using GPC.States;
 
 namespace GPC.Job;
 
 internal class JobSingle : AbsJob, IJob
 {
-    public void Enter(AbsState state)
+    public void Enter(State state)
     {
 #if DEBUG
         GD.Print($"{state.Name} Enter.");
@@ -15,7 +15,7 @@ internal class JobSingle : AbsJob, IJob
         state.EnterAttachFunc?.Invoke(state);
     }
 
-    public void Exit(AbsState state)
+    public void Exit(State state)
     {
 #if DEBUG
         GD.Print($"{state.Name} Exit.");
@@ -24,41 +24,41 @@ internal class JobSingle : AbsJob, IJob
         state.ExitAttachFunc?.Invoke(state);
     }
 
-    public void Pause(AbsState state)
+    public void Pause(State state)
     {
         state.Status = Status.Pause;
         _Pause(state);
         state.PauseAttachFunc?.Invoke(state);
     }
 
-    public void Resume(AbsState state)
+    public void Resume(State state)
     {
         state.Status = Status.Running;
         _Resume(state);
         state.ResumeAttachFunc?.Invoke(state);
     }
 
-    public bool IsSucceed(AbsState state)
+    public bool IsSucceed(State state)
     {
         return _IsSucceed(state);
     }
 
-    public bool IsPrepared(AbsState state)
+    public bool IsPrepared(State state)
     {
         return _IsPrepared(state);
     }
 
-    public bool IsFailed(AbsState state)
+    public bool IsFailed(State state)
     {
         return _IsFailed(state);
     }
 
-    public bool CanExecute(AbsState state)
+    public bool CanExecute(State state)
     {
         return _IsPrepared(state);
     }
 
-    public void Update(AbsState state, double delta)
+    public void Update(State state, double delta)
     {
         if (state.Status == Status.Pause) return;
 
@@ -67,14 +67,14 @@ internal class JobSingle : AbsJob, IJob
         _UpdateJob(state);
     }
 
-    public void PhysicsUpdate(AbsState state, double delta)
+    public void PhysicsUpdate(State state, double delta)
     {
         _PhysicsUpdate(state, delta);
         state.RunningPhysicsAttachFunc?.Invoke(state);
     }
 
 
-    private void _UpdateJob(AbsState state)
+    private void _UpdateJob(State state)
     {
         if (IsFailed(state))
             state.Status = Status.Failed;

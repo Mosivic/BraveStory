@@ -1,7 +1,4 @@
-﻿using BraveStory.State;
-using GPC.Job;
-
-namespace BraveStory.Job;
+﻿namespace BraveStory.Job;
 
 internal class UIEvaluator<T> : JobSingle<T> where T : PlayerState
 {

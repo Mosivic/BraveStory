@@ -1,15 +1,15 @@
-﻿using GPC.State;
+﻿using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class Transition: ITransition
+public class Transition : ITransition
 {
-    public Transition(AbsState to, Condition condition)
+    public Transition(State to, Condition condition)
     {
         To = to;
         Condition = condition;
     }
 
-    public AbsState To { get; }
+    public State To { get; }
     public Condition Condition { get; }
 }

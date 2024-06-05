@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Godot;
 using GPC.Scheduler;
 
-namespace GPC.State;
+namespace GPC.States;
 
 internal enum DurationPolicy //持续政策
 {
@@ -43,7 +42,7 @@ internal struct BuffArgs
     public float LeftTime;
 }
 
-internal class AbbsBuff : IState
+internal class Buff : IState
 {
     private BuffArgs args;
 
@@ -60,7 +59,5 @@ internal class AbbsBuff : IState
     public int Priority { get; set; }
     public Type Type { get; set; }
     public Status Status { get; set; }
-    public IScheduler Scheduler {get;set;}
+    public IScheduler Scheduler { get; set; }
 }
- 
-   

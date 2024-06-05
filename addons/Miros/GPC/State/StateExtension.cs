@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GPC.State;
+﻿namespace GPC.States;
 
 public static class StateExtension
 {

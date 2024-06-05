@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Godot;
-using GPC.State;
+using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class StateMachine(Node host,StateSpace stateSpace) : AbsScheduler(host,stateSpace)
+public class StateMachine(Node host, StateSpace stateSpace) : AbsScheduler(host, stateSpace)
 
 {
     private readonly HashSet<ITransition> _anyTransitions = new();
@@ -25,13 +25,13 @@ public class StateMachine(Node host,StateSpace stateSpace) : AbsScheduler(host,s
         JobWrapper.PhysicsUpdate(_current.State, delta);
     }
 
-    public void SetState(AbsState state)
+    public void SetState(State state)
     {
         _current = _nodes[state.Id];
         JobWrapper.Enter(state);
     }
 
-    private void ChangeState(AbsState state)
+    private void ChangeState(State state)
     {
         if (state.Equals(_current.State)) return;
 
@@ -56,17 +56,17 @@ public class StateMachine(Node host,StateSpace stateSpace) : AbsScheduler(host,s
         return null;
     }
 
-    public void AddTransition(AbsState from, AbsState to, Condition condition)
+    public void AddTransition(State from, State to, Condition condition)
     {
         GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
     }
 
-    public void AddAnyTransition(AbsState to, Condition condition)
+    public void AddAnyTransition(State to, Condition condition)
     {
         _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
     }
 
-    private StateNode GetOrAddNode(AbsState state)
+    private StateNode GetOrAddNode(State state)
     {
         var node = _nodes.GetValueOrDefault(state.Id);
         if (node == null)
@@ -79,13 +79,13 @@ public class StateMachine(Node host,StateSpace stateSpace) : AbsScheduler(host,s
     }
 }
 
-internal class StateNode(AbsState state)
+internal class StateNode(State state)
 {
-    public readonly AbsState State = state;
+    public readonly State State = state;
 
     public HashSet<ITransition> Transitions { get; } = new();
 
-    public void AddTransition(AbsState state, Condition condition)
+    public void AddTransition(State state, Condition condition)
     {
         Transitions.Add(new Transition(state, condition));
     }

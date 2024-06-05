@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using Godot;
-using GPC.State;
+using GPC.States;
 
 namespace GPC.Scheduler;
 
 public class ConditionMachine : AbsScheduler
 {
-    protected Dictionary<string, AbsState> JobsExecute = new();
+    protected Dictionary<string, State> JobsExecute = new();
 
-    public ConditionMachine(Node host,StateSpace stateSpace) : base(host,stateSpace)
+    public ConditionMachine(Node host, StateSpace stateSpace) : base(host, stateSpace)
     {
         foreach (var state in stateSpace.States)
         {
@@ -77,13 +77,13 @@ public class ConditionMachine : AbsScheduler
         }
     }
 
-    private AbsState _GetBestState(string layer)
+    private State _GetBestState(string layer)
     {
-        List<AbsState> candicateJobsCfg = [];
+        List<State> candicateJobsCfg = [];
         foreach (var state in StateSpace.States)
         {
             var jobLayer = state.Layer;
-            if (jobLayer == layer && JobWrapper.CanExecute((AbsState)state)) candicateJobsCfg.Add((AbsState)state);
+            if (jobLayer == layer && JobWrapper.CanExecute((State)state)) candicateJobsCfg.Add((State)state);
         }
 
         if (candicateJobsCfg.Count == 0)
@@ -92,10 +92,10 @@ public class ConditionMachine : AbsScheduler
     }
 
 
-    private static AbsState GetHighestCfg(List<AbsState> states)
+    private static State GetHighestCfg(List<State> states)
     {
         if (states.Count == 0) return null;
-        AbsState bestState = null;
+        State bestState = null;
         foreach (var state in states)
         {
             if (bestState == null) bestState = state;

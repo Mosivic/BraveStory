@@ -1,30 +1,30 @@
-﻿using GPC.State;
+﻿using GPC.States;
 
 namespace GPC.Job;
 
 public abstract class AbsJob
 {
-    protected virtual void _Enter(AbsState state)
+    protected virtual void _Enter(State state)
     {
         state.EnterFunc?.Invoke(state);
     }
 
-    protected virtual void _Exit(AbsState state)
+    protected virtual void _Exit(State state)
     {
         state.ExitFunc?.Invoke(state);
     }
 
-    protected virtual void _Pause(AbsState state)
+    protected virtual void _Pause(State state)
     {
         state.PauseFunc?.Invoke(state);
     }
 
-    protected virtual void _Resume(AbsState state)
+    protected virtual void _Resume(State state)
     {
         state.ResumeFunc?.Invoke(state);
     }
 
-    protected virtual bool _IsPrepared(AbsState state)
+    protected virtual bool _IsPrepared(State state)
     {
         if (state.IsPreparedFunc != null)
             return state.IsPreparedFunc.Invoke(state);
@@ -33,7 +33,7 @@ public abstract class AbsJob
         return true;
     }
 
-    protected virtual bool _IsSucceed(AbsState state)
+    protected virtual bool _IsSucceed(State state)
     {
         if (state.IsSucceedFunc != null)
             return state.IsSucceedFunc.Invoke(state);
@@ -42,7 +42,7 @@ public abstract class AbsJob
         return false;
     }
 
-    protected virtual bool _IsFailed(AbsState state)
+    protected virtual bool _IsFailed(State state)
     {
         if (state.IsFailedFunc != null)
             return state.IsFailedFunc.Invoke(state);
@@ -51,17 +51,17 @@ public abstract class AbsJob
         return false;
     }
 
-    protected virtual void _PhysicsUpdate(AbsState state, double delta)
+    protected virtual void _PhysicsUpdate(State state, double delta)
     {
         state.RunningPhysicsFunc?.Invoke(state);
     }
 
-    protected virtual void _Update(AbsState state, double delta)
+    protected virtual void _Update(State state, double delta)
     {
         state.RunningFunc?.Invoke(state);
     }
 
-    protected virtual void _RunningInterval(AbsState state)
+    protected virtual void _RunningInterval(State state)
     {
         state.RunningInterval?.Invoke(state);
     }

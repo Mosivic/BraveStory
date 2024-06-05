@@ -1,8 +1,6 @@
-﻿using BraveStory.State;
-using Godot;
+﻿using Godot;
 using GPC.Job;
-
-internal class Fall<T> : JobSingle<T> where T : PlayerState
+internal class Fall<T> : JobSingle,
 {
     protected override void _Enter(T state)
     {

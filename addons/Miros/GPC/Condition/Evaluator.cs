@@ -1,26 +1,31 @@
 ﻿using System;
-using GPC.State;
+using GPC.States;
 
 namespace GPC;
 
-public enum CompareFlags{
-    Equal,
+public enum CompareType
+{
+    Equals,
     Greater,
     Less
 }
 
-public interface IEvaluator{
+public interface IEvaluator<in S>
+{
+}
+
+
+public class Evaluator(Func<object, object> func) : IEvaluator<object>
+{
 
 }
 
-public class Evaluator<S,R,CompareFlags,E>(Func<S, R> func,CompareFlags flag,E expect):IEvaluator
+public class Evaluator<S>(Func<S, object> func) : IEvaluator<S>
 {
-    public ulong Checksum { get; set; } = 0;
-    private CompareFlags compareFlags {get;set;} = flag;
-    private E Expect {get;set;} = expect;
-    public R Result { get; set; }
+    public ulong Checksum { get; set; }
+    public object Result { get; set; }
 
-    public R Evaluate(S state)
+    public virtual object Evaluate(S state)
     {
         Result = func.Invoke(state);
         return Result;

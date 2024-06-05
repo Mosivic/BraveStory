@@ -16,7 +16,7 @@
         <Folder Include="addons\Miros\GPC\Filter\"/>
     </ItemGroup>
     <ItemGroup>
-        <Content Include="Player\Player.tscn" />
+        <Content Include="Player\Player.tscn"/>
         <Content Include="Scene\Test.tscn"/>
     </ItemGroup>
 </Project>

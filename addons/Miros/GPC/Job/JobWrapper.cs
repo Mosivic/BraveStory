@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GPC.State;
+using GPC.States;
 
 namespace GPC.Job;
 
@@ -16,52 +16,52 @@ public class JobWrapper
         return job;
     }
 
-    public void Enter(AbsState state)
+    public void Enter(State state)
     {
         _GetJob(state.Type).Enter(state);
     }
 
-    public void Exit(AbsState state)
+    public void Exit(State state)
     {
         _GetJob(state.Type).Exit(state);
     }
 
-    public void Pause(AbsState state)
+    public void Pause(State state)
     {
         _GetJob(state.Type).Pause(state);
     }
 
-    public void Resume(AbsState state)
+    public void Resume(State state)
     {
         _GetJob(state.Type).Resume(state);
     }
 
-    public bool IsSucceed(AbsState state)
+    public bool IsSucceed(State state)
     {
         return _GetJob(state.Type).IsSucceed(state);
     }
 
-    public bool IsFailed(AbsState state)
+    public bool IsFailed(State state)
     {
         return _GetJob(state.Type).IsFailed(state);
     }
 
-    public bool IsPrepared(AbsState state)
+    public bool IsPrepared(State state)
     {
         return _GetJob(state.Type).IsPrepared(state);
     }
 
-    public bool CanExecute(AbsState state)
+    public bool CanExecute(State state)
     {
         return _GetJob(state.Type).CanExecute(state);
     }
 
-    public void Update(AbsState state, double delta)
+    public void Update(State state, double delta)
     {
         _GetJob(state.Type).Update(state, delta);
     }
 
-    public void PhysicsUpdate(AbsState state, double delta)
+    public void PhysicsUpdate(State state, double delta)
     {
         _GetJob(state.Type).PhysicsUpdate(state, delta);
     }

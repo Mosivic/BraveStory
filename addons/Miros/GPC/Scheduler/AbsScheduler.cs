@@ -1,20 +1,19 @@
 ﻿using Godot;
 using GPC.Job;
-using GPC.State;
+using GPC.States;
 
 namespace GPC.Scheduler;
 
-
 public interface IScheduler
 {
-
 }
+
 public abstract class AbsScheduler : IScheduler
 {
     protected JobWrapper JobWrapper = new();
     protected StateSpace StateSpace;
 
-    public AbsScheduler(Node host,StateSpace stateSpace)
+    public AbsScheduler(Node host, StateSpace stateSpace)
     {
         StateSpace = stateSpace;
         foreach (var state in StateSpace.States)
@@ -23,7 +22,7 @@ public abstract class AbsScheduler : IScheduler
             state.Scheduler = this;
         }
     }
+
     public abstract void Update(double delta);
     public abstract void PhysicsUpdate(double delta);
-
 }

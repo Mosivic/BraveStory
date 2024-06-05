@@ -1,6 +1,4 @@
-using BraveStory.State;
 using Godot;
-using GPC.Job;
 
 internal class Move<T> : JobSingle<T> where T : PlayerState
 {
