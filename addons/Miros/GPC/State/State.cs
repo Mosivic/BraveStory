@@ -13,12 +13,9 @@ public class State : AbsState
     public Dictionary<string, object> Extend { get; set; }
 
     public Dictionary<object, object> Desired { get; set; }
-    public List<State> Subjobs { get; set; }
-    public List<ConditionBase> PreCondition { get; set; }
-    public List<ConditionBase> SuccessedCondition { get; set; }
-    public List<ConditionBase> FailedCondition { get; set; }
+    public List<AbsState> SubJobs { get; set; }
 
-    public Dictionary<object, bool> SuccessedEffects { get; set; }
+    public Dictionary<object, bool> SucceedEffects { get; set; }
 
     public Dictionary<object, bool> FailedEffects { get; set; }
     public Action<AbsState> EnterFunc { get; set; }
@@ -32,15 +29,10 @@ public class State : AbsState
     public Action<AbsState> RunningFunc { get; set; }
 
     public Action<AbsState> RunningPhysicsFunc { get; set; }
-
-    public Predicate<AbsState> IsPreparedFunc { get; set; }
-
-    public Predicate<AbsState> IsSucceedFunc { get; set; }
-
-    public Predicate<AbsState> IsFailedFunc { get; set; }
-
+    public Func<bool> IsPreparedFunc { get; set; }
+    public Func<bool> IsSucceedFunc { get; set; }
+    public Func<bool> IsFailedFunc { get; set; }
     public Action<AbsState> EnterAttachFunc { get; set; }
-
     public Action<AbsState> ExitAttachFunc { get; set; }
     public Action<AbsState> PauseAttachFunc { get; set; }
     public Action<AbsState> ResumeAttachFunc { get; set; }

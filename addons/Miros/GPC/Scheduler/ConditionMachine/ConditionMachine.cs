@@ -8,9 +8,9 @@ public class ConditionMachine : AbsScheduler
 {
     protected Dictionary<string, State> JobsExecute = new();
 
-    public ConditionMachine(Node host, StateSpace stateSpace) : base(host, stateSpace)
+    public ConditionMachine(StateSet stateSet) : base(stateSet)
     {
-        foreach (var state in stateSpace.States)
+        foreach (var state in stateSet.States)
         {
             var layer = state.Layer;
             JobsExecute.TryAdd(layer, null);
@@ -80,7 +80,7 @@ public class ConditionMachine : AbsScheduler
     private State _GetBestState(string layer)
     {
         List<State> candicateJobsCfg = [];
-        foreach (var state in StateSpace.States)
+        foreach (var state in StateSet.States)
         {
             var jobLayer = state.Layer;
             if (jobLayer == layer && JobWrapper.CanExecute((State)state)) candicateJobsCfg.Add((State)state);

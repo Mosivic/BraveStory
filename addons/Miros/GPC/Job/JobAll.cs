@@ -9,7 +9,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
     public void Enter()
     {
         state.Status = Status.Running;
-        foreach (var childCfg in state.Subjobs) _jobJobWrapper.Enter(childCfg);
+        foreach (var childCfg in state.SubJobs) _jobJobWrapper.Enter(childCfg);
         _Enter();
         state.EnterAttachFunc?.Invoke(state);
     }
@@ -17,7 +17,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
 
     public void Exit()
     {
-        foreach (var childCfg in state.Subjobs) _jobJobWrapper.Exit(childCfg);
+        foreach (var childCfg in state.SubJobs) _jobJobWrapper.Exit(childCfg);
         state.ExitAttachFunc?.Invoke(state);
     }
 
@@ -38,7 +38,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
 
     public bool IsSucceed()
     {
-        foreach (var childCfg in state.Subjobs)
+        foreach (var childCfg in state.SubJobs)
         {
             if (childCfg.Status != Status.Successed) return false;
             _jobJobWrapper.Enter(childCfg);
@@ -50,7 +50,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
 
     public bool IsFailed()
     {
-        foreach (var childCfg in state.Subjobs)
+        foreach (var childCfg in state.SubJobs)
             if (childCfg.Status == Status.Failed)
                 return true;
         return false;
@@ -71,14 +71,14 @@ internal class JobAll(State state) : AbsJob(state), IJob
     {
         if (state.Status == Status.Pause) return;
 
-        foreach (var childCfg in state.Subjobs)
+        foreach (var childCfg in state.SubJobs)
             _jobJobWrapper.Update(childCfg, delta);
         _UpdateJob();
     }
 
     public void PhysicsUpdate(double delta)
     {
-        foreach (var childCfg in state.Subjobs)
+        foreach (var childCfg in state.SubJobs)
             _jobJobWrapper.PhysicsUpdate(childCfg, delta);
     }
 

@@ -1,5 +1,7 @@
 ﻿using System;
-using GPC.Condition;
+
+namespace GPC.Evaluator;
+
 
 public enum CompareType
 {

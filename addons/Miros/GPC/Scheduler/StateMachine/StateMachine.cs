@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Godot;
 using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class StateMachine(Node host, StateSpace stateSpace) : AbsScheduler(host, stateSpace)
+public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
 
 {
     private readonly HashSet<ITransition> _anyTransitions = new();
@@ -25,13 +26,13 @@ public class StateMachine(Node host, StateSpace stateSpace) : AbsScheduler(host,
         JobWrapper.PhysicsUpdate(_current.State, delta);
     }
 
-    public void SetState(State state)
+    public void SetState(AbsState state)
     {
         _current = _nodes[state.Id];
         JobWrapper.Enter(state);
     }
 
-    private void ChangeState(State state)
+    private void ChangeState(AbsState state)
     {
         if (state.Equals(_current.State)) return;
 
@@ -46,24 +47,24 @@ public class StateMachine(Node host, StateSpace stateSpace) : AbsScheduler(host,
     private ITransition GetTransition()
     {
         foreach (var transition in _anyTransitions)
-            if (transition.Condition.IsAllSatisfy(transition.To))
+            if (transition.ConditionFunc.Invoke())
                 return transition;
 
         foreach (var transition in _current.Transitions)
-            if (transition.Condition.IsAllSatisfy(transition.To))
+            if (transition.ConditionFunc.Invoke())
                 return transition;
 
         return null;
     }
 
-    public void AddTransition(State from, State to, Condition condition)
+    public void AddTransition(State from, State to, Func<bool> conditionFunc)
     {
-        GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, condition);
+        GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, conditionFunc);
     }
 
-    public void AddAnyTransition(State to, Condition condition)
+    public void AddAnyTransition(State to, Func<bool> conditionFunc)
     {
-        _anyTransitions.Add(new Transition(GetOrAddNode(to).State, condition));
+        _anyTransitions.Add(new Transition(GetOrAddNode(to).State, conditionFunc));
     }
 
     private StateNode GetOrAddNode(State state)
@@ -85,8 +86,8 @@ internal class StateNode(State state)
 
     public HashSet<ITransition> Transitions { get; } = new();
 
-    public void AddTransition(State state, Condition condition)
+    public void AddTransition(State state, Func<bool> conditionFunc)
     {
-        Transitions.Add(new Transition(state, condition));
+        Transitions.Add(new Transition(state, conditionFunc));
     }
 }

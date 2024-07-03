@@ -1,24 +1,10 @@
 using System;
 using System.Collections.Generic;
+using BraveStory.Player;
 using Godot;
-using GPC;
-using GPC.Condition;
+using GPC.Evaluator;
 using GPC.Scheduler;
 using GPC.States;
-
-public class CommonConditions
-{
-    public static bool IsJumpKeyDown()
-    {
-        return Input.IsActionJustPressed("jump");
-    }
-    
-    public static bool IsMoveKeyDown()
-    {
-        return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
-    }
-}
-
 
 
 public struct PlayerParams
@@ -34,15 +20,12 @@ public partial class Player : CharacterBody2D
 {
     private ConditionMachine _cm;
     
-    
     public override void _Ready()
     {
-        Evaluator<bool> getVelocityValue = new (() => Velocity.Y >= 0f);
-        Evaluator<bool> getIsOnFloor = new(IsOnFloor);
+        Evaluator<bool> isVelocityYPositive = new (() => Velocity.Y >= 0f);
+        Evaluator<bool> isOnFloor = new(IsOnFloor);
         
-        BoolCondition isVelocityYPositive = new BoolCondition(getVelocityValue, true);
-        
-        var p = new PlayerParams
+        var playerParams = new PlayerParams
         {
             ConditionMachine = _cm,
             Host = this,
@@ -50,64 +33,52 @@ public partial class Player : CharacterBody2D
             Sprite = GetNode<Sprite2D>("Sprite")
         };
 
-        var ss = new StateSpace();
-        ss.Add(new PlayerState(p)
+        var stateSet = new StateSet();
+        stateSet.Add(new PlayerState(playerParams)
         {
             Id = "1",
             Type = typeof(Move),
             Name = "Run",
             Priority = 2,
-            PreCondition =
-            [
-                isVelocityYPositive
-                //new BoolCondition(IsOnFloor, true)
-            ],
-            FailedCondition = 
-            [
-                new BoolCondition(CommonConditions.IsMoveKeyDown,false)
-            ]
-        }).Add(new PlayerState(p)
+            Layer = "default",
+            IsPreparedFunc = () =>isVelocityYPositive.Invoke(true) &&
+                                isOnFloor.Invoke(true),
+            IsFailedFunc = ()=> Evaluators.IsMoveKeyDown.Invoke(false),
+
+        }).Add(new PlayerState(playerParams)
         {
             Id = "2",
             Name = "Idle",
             Priority = 1,
+            Layer = "default",
             Type = typeof(Idle),
-            PreCondition = 
-                [
-                    new BoolCondition(CommonConditions.IsMoveKeyDown,false),
-                    new BoolCondition(IsOnFloor, true)
-                ]
-        }).Add(new PlayerState(p)
-            {
-                Id = "3",
-                Name = "Jump",
-                Priority = 3,
-                Type = typeof(Jump),
-                PreCondition = 
-                [
-                    new BoolCondition(CommonConditions.IsJumpKeyDown,true),
-                    new BoolCondition(IsOnFloor, true)
-                ]
-            }
-        ).Add(new PlayerState(p)
+            IsPreparedFunc = ()=>Evaluators.IsMoveKeyDown.Invoke(false) &&
+                               isOnFloor.Invoke(true),
+      
+        }).Add(new PlayerState(playerParams)
+        {
+            Id = "3",
+            Name = "Jump",
+            Priority = 3,
+            Layer = "default",
+            Type = typeof(Jump),
+            IsPreparedFunc = ()=>Evaluators.IsJumpKeyDown.Invoke(true) &&
+                               isOnFloor.Invoke(true),
+        }
+        ).Add(new PlayerState(playerParams)
         {
             Id = "4",
             Name = "Fall",
             Priority = 9,
+            Layer = "default",
             Type = typeof(Fall),
-            PreCondition = 
-            [
-                new BoolCondition(IsVelocityYPositive,true),
-                new BoolCondition(IsOnFloor, false)
-            ],
-            FailedCondition =
-            [
-                new BoolCondition(IsOnFloor, true)
-            ],
+            IsPreparedFunc = ()=> isVelocityYPositive.Invoke(true) &&
+                                isOnFloor.Invoke(false),
+            IsFailedFunc = ()=> isOnFloor.Invoke(true)
         });
 
 
-        _cm = new ConditionMachine(this,ss);
+        _cm = new ConditionMachine(stateSet);
     }
 
     public override void _Process(double delta)

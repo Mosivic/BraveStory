@@ -11,14 +11,13 @@ public interface IScheduler
 public abstract class AbsScheduler : IScheduler
 {
     protected JobWrapper JobWrapper = new();
-    protected StateSpace StateSpace;
+    protected StateSet StateSet;
 
-    public AbsScheduler(Node host, StateSpace stateSpace)
+    public AbsScheduler(StateSet stateSet)
     {
-        StateSpace = stateSpace;
-        foreach (var state in StateSpace.States)
+        StateSet = stateSet;
+        foreach (var state in StateSet.States)
         {
-            (state as IStateGeneric<Node>).Host = host;
             state.Scheduler = this;
         }
     }

@@ -16,17 +16,17 @@ public class JobWrapper
         return job;
     }
 
-    public void Enter(State state)
+    public void Enter(AbsState state)
     {
         _GetJob(state.Type).Enter();
     }
 
-    public void Exit(State state)
+    public void Exit(AbsState state)
     {
         _GetJob(state.Type).Exit();
     }
 
-    public void Pause(State state)
+    public void Pause(AbsState state)
     {
         _GetJob(state.Type).Pause();
     }
@@ -36,32 +36,32 @@ public class JobWrapper
         _GetJob(state.Type).Resume();
     }
 
-    public bool IsSucceed(State state)
+    public bool IsSucceed(AbsState state)
     {
         return _GetJob(state.Type).IsSucceed();
     }
 
-    public bool IsFailed(State state)
+    public bool IsFailed(AbsState state)
     {
         return _GetJob(state.Type).IsFailed();
     }
 
-    public bool IsPrepared(State state)
+    public bool IsPrepared(AbsState state)
     {
         return _GetJob(state.Type).IsPrepared();
     }
 
-    public bool CanExecute(State state)
+    public bool CanExecute(AbsState state)
     {
         return _GetJob(state.Type).CanExecute();
     }
 
-    public void Update(State state, double delta)
+    public void Update(AbsState state, double delta)
     {
         _GetJob(state.Type).Update(delta);
     }
 
-    public void PhysicsUpdate(State state, double delta)
+    public void PhysicsUpdate(AbsState state, double delta)
     {
         _GetJob(state.Type).PhysicsUpdate(delta);
     }

@@ -27,27 +27,21 @@ public abstract class AbsJob(State state)
     protected virtual bool _IsPrepared()
     {
         if (state.IsPreparedFunc != null)
-            return state.IsPreparedFunc.Invoke(state);
-        if (state.PreCondition != null)
-            return state.PreCondition.IsAllSatisfy(state);
+            return state.IsPreparedFunc.Invoke();
         return true;
     }
 
     protected virtual bool _IsSucceed()
     {
         if (state.IsSucceedFunc != null)
-            return state.IsSucceedFunc.Invoke(state);
-        if (state.SuccessedCondition != null)
-            return state.SuccessedCondition.IsAllSatisfy(state);
+            return state.IsSucceedFunc.Invoke();
         return false;
     }
 
     protected virtual bool _IsFailed()
     {
         if (state.IsFailedFunc != null)
-            return state.IsFailedFunc.Invoke(state);
-        if (state.FailedCondition != null)
-            return state.FailedCondition.IsAnySatisfy(state);
+            return state.IsFailedFunc.Invoke();
         return false;
     }
 

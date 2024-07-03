@@ -1,18 +1,20 @@
 ﻿using System;
 using Godot;
 
-namespace GPC.Condition;
+namespace GPC.Evaluator;
 
 
-public class Evaluator<T>(Func<T> func)
+public abstract class AbsEvaluator{}
+
+public class Evaluator<T>(Func<T> func):AbsEvaluator
     where T : IComparable
 {
     public bool Involved { get; set; }
     public ulong Checksum { get; set; }
     public Func<T> Func { get; set; } = func;
+
     
-    
-    public bool Invoke(T expectValue,CompareType type)
+    public bool Invoke(T expectValue,CompareType type = CompareType.Equals)
     {
         var frames = Engine.GetProcessFrames();
         if (Checksum.Equals(frames))

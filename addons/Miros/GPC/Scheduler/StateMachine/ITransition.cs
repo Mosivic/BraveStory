@@ -1,9 +1,10 @@
-﻿using GPC.States;
+﻿using System;
+using GPC.States;
 
 namespace GPC.Scheduler;
 
 public interface ITransition
 {
-    State To { get; }
-    Condition Condition { get; }
+    AbsState To { get; }
+    Func<bool> ConditionFunc { get; }
 }
