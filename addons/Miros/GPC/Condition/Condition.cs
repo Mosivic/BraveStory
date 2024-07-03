@@ -11,29 +11,52 @@ public enum CompareType
     Less
 }
 
-public class ConditionBase(CompareType type = CompareType.Equals)
+public interface ICondition<T>
 {
-    protected bool Involved { get; set; }
-    protected ulong Checksum { get; set; }
+    Evaluator<T> Evaluator { get; set; }
+    T ExpectValue { get; set; }
+    CompareType Type {get;set;}
 }
 
-
-
-public class BoolCondition(Func<bool> func, bool expect, CompareType type = CompareType.Equals):ConditionBase(type)
-{
-
-}
-
-public class IntCondition(Func<int> func, int expect, CompareType type = CompareType.Equals):ConditionBase(type)
+public class ConditionBase
 {
 }
 
-public class ttt
+public class BoolCondition(Evaluator<bool> evaluator, bool expectValue, CompareType type = CompareType.Equals)
+    : ConditionBase, ICondition<bool>
 {
-    private void CalcCompareResult<T>(T t)
+    public Evaluator<bool> Evaluator { get; set; } = evaluator;
+    public bool ExpectValue { get; set; } = expectValue;
+    public CompareType Type { get; set; } = type;
+    
+    private void Invoke()
     {
-        var value = t.func.Invoke();
-        switch (type)
+        bool value = Evaluator.Func.Invoke();
+        Evaluator.Involved = value == ExpectValue;
+    }
+    
+    public bool IsSatisfy()
+    {
+        var frames = Engine.GetProcessFrames();
+        if (Evaluator.Checksum.Equals(frames))
+            return Evaluator.Involved;
+
+        Invoke();
+        Evaluator.Checksum = frames;
+        return Evaluator.Involved;
+    }
+}
+
+public class Evaluator<T>(Func<T> func)
+{
+    public bool Involved { get; set; }
+    public ulong Checksum { get; set; }
+    public Func<T> Func { get; set; } = func;
+    
+    public void Invoke()
+    {
+        var value = Func.Invoke();
+        switch (Type)
         {
             case CompareType.Equals:
                 Involved = value == expect;
@@ -46,6 +69,14 @@ public class ttt
                 break;
         }
     }
+}
+
+
+public interface IEvaluatorFunc<T> 
+{
+    Func<T> Func{get;set;}
+}
+
     public bool IsSatisfy()
     {
         var frames = Engine.GetProcessFrames();

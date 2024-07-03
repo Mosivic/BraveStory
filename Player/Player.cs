@@ -41,6 +41,9 @@ public partial class Player : CharacterBody2D
     
     public override void _Ready()
     {
+        Evaluator<bool> getVelocityValue = new Evaluator<bool>((() => Velocity.Y >= 0f));
+        BoolCondition isVelocityYPositive = new BoolCondition(getVelocityValue, true);
+        
         var p = new PlayerParams
         {
             ConditionMachine = _cm,
@@ -58,8 +61,8 @@ public partial class Player : CharacterBody2D
             Priority = 2,
             PreCondition =
             [
-                new BoolCondition(IsVelocityYPositive, true),
-                new BoolCondition(IsOnFloor, true)
+                !isVelocityYPositive
+                //new BoolCondition(IsOnFloor, true)
             ],
             FailedCondition = 
             [
