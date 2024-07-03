@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using GPC;
+using GPC.Condition;
 using GPC.Scheduler;
 using GPC.States;
 
@@ -33,15 +34,12 @@ public partial class Player : CharacterBody2D
 {
     private ConditionMachine _cm;
     
-
-    private bool IsVelocityYPositive()
-    {
-        return Velocity.Y >= 0f;
-    }
     
     public override void _Ready()
     {
-        Evaluator<bool> getVelocityValue = new Evaluator<bool>((() => Velocity.Y >= 0f));
+        Evaluator<bool> getVelocityValue = new (() => Velocity.Y >= 0f);
+        Evaluator<bool> getIsOnFloor = new(IsOnFloor);
+        
         BoolCondition isVelocityYPositive = new BoolCondition(getVelocityValue, true);
         
         var p = new PlayerParams
@@ -61,7 +59,7 @@ public partial class Player : CharacterBody2D
             Priority = 2,
             PreCondition =
             [
-                !isVelocityYPositive
+                isVelocityYPositive
                 //new BoolCondition(IsOnFloor, true)
             ],
             FailedCondition = 
