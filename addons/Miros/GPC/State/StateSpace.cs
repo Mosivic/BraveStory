@@ -6,12 +6,12 @@ public class StateSpace
 {
     public StateSpace()
     {
-        States = new List<IState>();
+        States = new List<AbsState>();
     }
 
-    public List<IState> States { get; set; }
+    public List<AbsState> States { get; set; }
 
-    public StateSpace Add<S>(S s) where S : IState
+    public StateSpace Add<S>(S s) where S : AbsState
     {
         States.Add(s);
         return this;

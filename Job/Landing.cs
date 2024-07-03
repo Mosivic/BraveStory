@@ -1,7 +1,9 @@
-﻿internal class Landing<T> : JobSingle<T> where T : PlayerState
+﻿using GPC.Job;
+
+internal class Landing(PlayerState state) : JobSingle(state)
 {
-    protected override void _Enter(T state)
+    protected override void _Enter()
     {
-        state.AnimationPlayer.Play("landing");
+        state.Params.AnimationPlayer.Play("landing");
     }
 }

@@ -1,13 +1,14 @@
 using Godot;
+using GPC.Job;
 
-internal class Move<T> : JobSingle<T> where T : PlayerState
+internal class Move(PlayerState state) : JobSingle(state)
 {
-    protected override void _Enter(T state)
+    protected override void _Enter()
     {
-        state.AnimationPlayer.Play("run");
+        state.Params.AnimationPlayer.Play("run");
     }
 
-    protected override void _PhysicsUpdate(T state, double delta)
+    protected override void _PhysicsUpdate(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = state.Host.Velocity;

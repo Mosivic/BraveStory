@@ -2,29 +2,29 @@
 
 namespace GPC.Job;
 
-public abstract class AbsJob
+public abstract class AbsJob(State state)
 {
-    protected virtual void _Enter(State state)
+    protected virtual void _Enter()
     {
         state.EnterFunc?.Invoke(state);
     }
 
-    protected virtual void _Exit(State state)
+    protected virtual void _Exit()
     {
         state.ExitFunc?.Invoke(state);
     }
 
-    protected virtual void _Pause(State state)
+    protected virtual void _Pause()
     {
         state.PauseFunc?.Invoke(state);
     }
 
-    protected virtual void _Resume(State state)
+    protected virtual void _Resume()
     {
         state.ResumeFunc?.Invoke(state);
     }
 
-    protected virtual bool _IsPrepared(State state)
+    protected virtual bool _IsPrepared()
     {
         if (state.IsPreparedFunc != null)
             return state.IsPreparedFunc.Invoke(state);
@@ -33,7 +33,7 @@ public abstract class AbsJob
         return true;
     }
 
-    protected virtual bool _IsSucceed(State state)
+    protected virtual bool _IsSucceed()
     {
         if (state.IsSucceedFunc != null)
             return state.IsSucceedFunc.Invoke(state);
@@ -42,7 +42,7 @@ public abstract class AbsJob
         return false;
     }
 
-    protected virtual bool _IsFailed(State state)
+    protected virtual bool _IsFailed()
     {
         if (state.IsFailedFunc != null)
             return state.IsFailedFunc.Invoke(state);
@@ -51,18 +51,20 @@ public abstract class AbsJob
         return false;
     }
 
-    protected virtual void _PhysicsUpdate(State state, double delta)
+    protected virtual void _PhysicsUpdate(double delta)
     {
         state.RunningPhysicsFunc?.Invoke(state);
     }
 
-    protected virtual void _Update(State state, double delta)
+    protected virtual void _Update(double delta)
     {
         state.RunningFunc?.Invoke(state);
     }
 
-    protected virtual void _RunningInterval(State state)
+    protected virtual void _RunningInterval()
     {
         state.RunningInterval?.Invoke(state);
     }
+    
+    
 }

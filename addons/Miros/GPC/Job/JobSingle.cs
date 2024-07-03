@@ -3,83 +3,83 @@ using GPC.States;
 
 namespace GPC.Job;
 
-internal class JobSingle : AbsJob, IJob
+internal class JobSingle(State state) : AbsJob(state), IJob
 {
-    public void Enter(State state)
+    public void Enter()
     {
 #if DEBUG
         GD.Print($"{state.Name} Enter.");
 #endif
         state.Status = Status.Running;
-        _Enter(state);
+        _Enter();
         state.EnterAttachFunc?.Invoke(state);
     }
 
-    public void Exit(State state)
+    public void Exit()
     {
 #if DEBUG
         GD.Print($"{state.Name} Exit.");
 #endif
-        _Exit(state);
+        _Exit();
         state.ExitAttachFunc?.Invoke(state);
     }
 
-    public void Pause(State state)
+    public void Pause()
     {
         state.Status = Status.Pause;
-        _Pause(state);
+        _Pause();
         state.PauseAttachFunc?.Invoke(state);
     }
 
-    public void Resume(State state)
+    public void Resume()
     {
         state.Status = Status.Running;
-        _Resume(state);
+        _Resume();
         state.ResumeAttachFunc?.Invoke(state);
     }
 
-    public bool IsSucceed(State state)
+    public bool IsSucceed()
     {
-        return _IsSucceed(state);
+        return _IsSucceed();
     }
 
-    public bool IsPrepared(State state)
+    public bool IsPrepared()
     {
-        return _IsPrepared(state);
+        return _IsPrepared();
     }
 
-    public bool IsFailed(State state)
+    public bool IsFailed()
     {
-        return _IsFailed(state);
+        return _IsFailed();
     }
 
-    public bool CanExecute(State state)
+    public bool CanExecute()
     {
-        return _IsPrepared(state);
+        return _IsPrepared();
     }
 
-    public void Update(State state, double delta)
+    public void Update(double delta)
     {
         if (state.Status == Status.Pause) return;
 
-        _Update(state, delta);
+        _Update(delta);
         state.RunningAttachFunc?.Invoke(state);
-        _UpdateJob(state);
+        _UpdateJob();
     }
 
-    public void PhysicsUpdate(State state, double delta)
+    public void PhysicsUpdate(double delta)
     {
-        _PhysicsUpdate(state, delta);
+        _PhysicsUpdate(delta);
         state.RunningPhysicsAttachFunc?.Invoke(state);
     }
 
 
-    private void _UpdateJob(State state)
+    private void _UpdateJob()
     {
-        if (IsFailed(state))
+        if (IsFailed())
             state.Status = Status.Failed;
         //applyEffect()
-        else if (IsSucceed(state))
+        else if (IsSucceed())
             state.Status = Status.Successed;
         //applyEffect()
         else

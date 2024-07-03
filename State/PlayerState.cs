@@ -1,7 +1,7 @@
 using Godot;
 using GPC.States;
 
-public class PlayerState : State, IStateGeneric<CharacterBody2D>
+public class PlayerState : State
 {
     public PlayerState(PlayerParams param)
     {
@@ -9,7 +9,6 @@ public class PlayerState : State, IStateGeneric<CharacterBody2D>
     }
 
     public PlayerParams Params { get; set; }
-
     public float Gravity { get; } = 980;
     public float RunSpeed { get; } = 200;
     public float JumpVeocity { get; } = -300;

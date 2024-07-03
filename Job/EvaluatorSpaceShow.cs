@@ -1,13 +1,16 @@
-﻿namespace BraveStory.Job;
+﻿using GPC.Job;
+using GPC.States;
 
-internal class UIEvaluator<T> : JobSingle<T> where T : PlayerState
+namespace BraveStory.Job;
+
+internal class UIEvaluator(State state) : JobSingle(state)
 {
-    protected override void _Enter(T state)
+    protected override void _Enter()
     {
     }
 
-    protected override void _Update(T state, double delta)
+    protected override void _Update( double delta)
     {
-        base._Update(state, delta);
+        base._Update(delta);
     }
 }

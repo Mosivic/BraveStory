@@ -42,16 +42,16 @@ internal struct BuffArgs
     public float LeftTime;
 }
 
-internal class Buff : IState
+internal class Buff : AbsState
 {
     private BuffArgs args;
 
-    private List<IState> overflowBuffs = null; //层数溢出后调用的Buff
+    private List<AbsState> overflowBuffs = null; //层数溢出后调用的Buff
     private float period = 0;
     private PeriodicInhibitionPolicy periodicInhibitionPolicy = PeriodicInhibitionPolicy.Resume;
     private int stackMaxCount = 1;
-    private List<IState> succeedBuffs = null;
-    private List<IState> FailedBuffs { get; set; } = null;
+    private List<AbsState> succeedBuffs = null;
+    private List<AbsState> FailedBuffs { get; set; } = null;
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instand;
     public string Id { get; set; }
     public string Name { get; set; }

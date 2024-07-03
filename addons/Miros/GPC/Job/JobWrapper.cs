@@ -18,51 +18,51 @@ public class JobWrapper
 
     public void Enter(State state)
     {
-        _GetJob(state.Type).Enter(state);
+        _GetJob(state.Type).Enter();
     }
 
     public void Exit(State state)
     {
-        _GetJob(state.Type).Exit(state);
+        _GetJob(state.Type).Exit();
     }
 
     public void Pause(State state)
     {
-        _GetJob(state.Type).Pause(state);
+        _GetJob(state.Type).Pause();
     }
 
     public void Resume(State state)
     {
-        _GetJob(state.Type).Resume(state);
+        _GetJob(state.Type).Resume();
     }
 
     public bool IsSucceed(State state)
     {
-        return _GetJob(state.Type).IsSucceed(state);
+        return _GetJob(state.Type).IsSucceed();
     }
 
     public bool IsFailed(State state)
     {
-        return _GetJob(state.Type).IsFailed(state);
+        return _GetJob(state.Type).IsFailed();
     }
 
     public bool IsPrepared(State state)
     {
-        return _GetJob(state.Type).IsPrepared(state);
+        return _GetJob(state.Type).IsPrepared();
     }
 
     public bool CanExecute(State state)
     {
-        return _GetJob(state.Type).CanExecute(state);
+        return _GetJob(state.Type).CanExecute();
     }
 
     public void Update(State state, double delta)
     {
-        _GetJob(state.Type).Update(state, delta);
+        _GetJob(state.Type).Update(delta);
     }
 
     public void PhysicsUpdate(State state, double delta)
     {
-        _GetJob(state.Type).PhysicsUpdate(state, delta);
+        _GetJob(state.Type).PhysicsUpdate(delta);
     }
 }

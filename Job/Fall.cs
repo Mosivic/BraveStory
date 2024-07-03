@@ -1,13 +1,13 @@
 ﻿using Godot;
 using GPC.Job;
-internal class Fall<T> : JobSingle,
+internal class Fall(PlayerState state) : JobSingle(state)
 {
-    protected override void _Enter(T state)
+    protected override void _Enter()
     {
-        state.AnimationPlayer.Play("fall");
+        state.Params.AnimationPlayer.Play("fall");
     }
 
-    protected override void _PhysicsUpdate(T state, double delta)
+    protected override void _PhysicsUpdate(double delta)
     {
         var velocity = state.Host.Velocity;
         var direction = Input.GetAxis("move_left", "move_right");

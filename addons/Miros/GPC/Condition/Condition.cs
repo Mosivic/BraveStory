@@ -4,36 +4,55 @@ using Godot;
 using GPC;
 using GPC.States;
 
-
-
-public class Condition(Func<> func,object expect, CompareType type = CompareType.Equals)
+public enum CompareType
 {
-    private bool Involved { get; set; }
-    private ulong Checksum { get; set; }
-    private object Value { get; set; }
-    private void CalcCompareResult(object state)
+    Equals,
+    Greater,
+    Less
+}
+
+public class ConditionBase(CompareType type = CompareType.Equals)
+{
+    protected bool Involved { get; set; }
+    protected ulong Checksum { get; set; }
+}
+
+
+
+public class BoolCondition(Func<bool> func, bool expect, CompareType type = CompareType.Equals):ConditionBase(type)
+{
+
+}
+
+public class IntCondition(Func<int> func, int expect, CompareType type = CompareType.Equals):ConditionBase(type)
+{
+}
+
+public class ttt
+{
+    private void CalcCompareResult<T>(T t)
     {
-        Value = func.Invoke(state);
+        var value = t.func.Invoke();
         switch (type)
         {
             case CompareType.Equals:
-                Involved = Value == expect;
+                Involved = value == expect;
                 break;
             case CompareType.Greater:
-                Involved = ((IComparable)Value).CompareTo(expect as IComparable) > 0;
+                Involved = value.CompareTo(expect) > 0;
                 break;
             case CompareType.Less:
-                Involved = ((IComparable)Value).CompareTo(expect as IComparable) < 0;
+                Involved = value.CompareTo(expect) < 0;
                 break;
         }
     }
-    public bool IsSatisfy(object state)
+    public bool IsSatisfy()
     {
         var frames = Engine.GetProcessFrames();
         if (Checksum.Equals(frames))
             return Involved;
 
-        CalcCompareResult(state);
+        CalcCompareResult();
         Checksum = frames;
         return Involved;
     }
@@ -58,7 +77,7 @@ public class ConditionA(Dictionary<Evaluator<object, object>, object> evaluators
         return true;
     }
 
-    public bool IsAnySatisfy(IState state)
+    public bool IsAnySatisfy(AbsState state)
     {
         var frames = Engine.GetProcessFrames();
         foreach (var key in evaluators.Keys)

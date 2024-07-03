@@ -1,7 +1,11 @@
-internal class Idle<T> : JobSingle<T> where T : PlayerState
+using GPC;
+using GPC.Job;
+using GPC.States;
+
+internal class Idle(PlayerState state) : JobSingle(state)
 {
-    protected override void _Enter(T state)
+    protected override void _Enter() 
     {
-        state.AnimationPlayer.Play("idle");
+        state.Params.AnimationPlayer.Play("idle");
     }
 }

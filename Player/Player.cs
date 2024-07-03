@@ -5,24 +5,20 @@ using GPC;
 using GPC.Scheduler;
 using GPC.States;
 
-public class CommonLib : EvaluatorLib
+public class CommonConditions
 {
-    public readonly Evaluator IsJumpKeyDown =
-        new(_ => Input.IsActionJustPressed("jump"));
-
-    public readonly Evaluator IsMoveKeyDown =
-        new(_ => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")));
+    public static bool IsJumpKeyDown()
+    {
+        return Input.IsActionJustPressed("jump");
+    }
+    
+    public static bool IsMoveKeyDown()
+    {
+        return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
+    }
 }
 
 
-public class PlayerLib : EvaluatorLib
-{
-    public readonly Evaluator<PlayerState> IsOnFloor =
-        new(state => state.Host.IsOnFloor());
-
-    public readonly Evaluator<PlayerState> IsVelocityYPositive =
-        new(state => state.Host.Velocity.Y >= 0f);
-}
 
 public struct PlayerParams
 {
@@ -36,11 +32,15 @@ public struct PlayerParams
 public partial class Player : CharacterBody2D
 {
     private ConditionMachine _cm;
+    
 
+    private bool IsVelocityYPositive()
+    {
+        return Velocity.Y >= 0f;
+    }
+    
     public override void _Ready()
     {
-        EvaluatorSpace<CommonLib, PlayerLib> es = new(new CommonLib(), new PlayerLib());
-
         var p = new PlayerParams
         {
             ConditionMachine = _cm,
@@ -53,64 +53,60 @@ public partial class Player : CharacterBody2D
         ss.Add(new PlayerState(p)
         {
             Id = "1",
-            Type = typeof(Move<PlayerState>),
+            Type = typeof(Move),
             Name = "Run",
             Priority = 2,
             PreCondition =
             [
-                new Condition(es.Global.IsMoveKeyDown, true),
-                new Condition(es.Local.IsOnFloor, true)
+                new BoolCondition(IsVelocityYPositive, true),
+                new BoolCondition(IsOnFloor, true)
             ],
-            // {
-            // 	{ es.Global.IsMoveKeyDown, true }
-            // 	// { es.Private.IsOnFloor, true }
-            // }),
-            FailedCondition = new Condition(new Dictionary<Evaluator, bool>
-            {
-                { es.Global.IsMoveKeyDown, false }
-            })
+            FailedCondition = 
+            [
+                new BoolCondition(CommonConditions.IsMoveKeyDown,false)
+            ]
         }).Add(new PlayerState(p)
         {
             Id = "2",
             Name = "Idle",
             Priority = 1,
-            Type = typeof(Idle<PlayerState>),
-            PreCondition = new Condition(new Dictionary<Evaluator, bool>
-            {
-                { es.Global.IsMoveKeyDown, false },
-                { es.Local.IsOnFloor, true }
-            })
+            Type = typeof(Idle),
+            PreCondition = 
+                [
+                    new BoolCondition(CommonConditions.IsMoveKeyDown,false),
+                    new BoolCondition(IsOnFloor, true)
+                ]
         }).Add(new PlayerState(p)
             {
                 Id = "3",
                 Name = "Jump",
                 Priority = 3,
-                Type = typeof(Jump<PlayerState>),
-                PreCondition = new Condition(new Dictionary<Evaluator, bool>
-                {
-                    { es.Global.IsJumpKeyDown, true },
-                    { es.Local.IsOnFloor, true }
-                })
+                Type = typeof(Jump),
+                PreCondition = 
+                [
+                    new BoolCondition(CommonConditions.IsJumpKeyDown,true),
+                    new BoolCondition(IsOnFloor, true)
+                ]
             }
         ).Add(new PlayerState(p)
         {
             Id = "4",
             Name = "Fall",
             Priority = 9,
-            Type = typeof(Fall<PlayerState>),
-            PreCondition = new Condition(new Dictionary<Evaluator, bool>
-            {
-                { es.Local.IsOnFloor, false },
-                { es.Local.IsVelocityYPositive, true }
-            }),
-            FailedCondition = new Condition(new Dictionary<Evaluator, bool>
-            {
-                { es.Local.IsOnFloor, true }
-            })
+            Type = typeof(Fall),
+            PreCondition = 
+            [
+                new BoolCondition(IsVelocityYPositive,true),
+                new BoolCondition(IsOnFloor, false)
+            ],
+            FailedCondition =
+            [
+                new BoolCondition(IsOnFloor, true)
+            ],
         });
 
 
-        _cm = new ConditionMachine<PlayerState>(ss);
+        _cm = new ConditionMachine(this,ss);
     }
 
     public override void _Process(double delta)

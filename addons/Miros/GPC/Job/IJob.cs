@@ -4,14 +4,14 @@ namespace GPC.Job;
 
 public interface IJob
 {
-    void Enter(State cfg);
-    void Exit(State cfg);
-    void Pause(State cfg);
-    void Resume(State cfg);
-    bool IsSucceed(State cfg);
-    bool IsPrepared(State cfg);
-    bool IsFailed(State cfg);
-    bool CanExecute(State cfg);
-    void Update(State cfg, double delta);
-    void PhysicsUpdate(State cfg, double delta);
+    void Enter();
+    void Exit();
+    void Pause();
+    void Resume();
+    bool IsSucceed();
+    bool IsPrepared();
+    bool IsFailed();
+    bool CanExecute();
+    void Update(double delta);
+    void PhysicsUpdate(double delta);
 }
