@@ -3,7 +3,7 @@ namespace GPC;
 public enum Status
 {
     Running,
-    Successed,
+    Succeed,
     Failed,
     Pause
 }

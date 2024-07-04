@@ -77,7 +77,7 @@ internal class JobSingle(State state) : AbsJob(state), IJob
             _state.Status = Status.Failed;
         //applyEffect()
         else if (IsSucceed())
-            _state.Status = Status.Successed;
+            _state.Status = Status.Succeed;
         //applyEffect()
         else
             _state.Status = Status.Running;

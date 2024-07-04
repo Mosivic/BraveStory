@@ -18,18 +18,18 @@ public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
         if (transition != null)
             ChangeState(transition.To);
 
-        _jobWrapper.Update(_current.State, delta);
+        JobWrapper.Update(_current.State, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
-        _jobWrapper.PhysicsUpdate(_current.State, delta);
+        JobWrapper.PhysicsUpdate(_current.State, delta);
     }
 
     public void SetState(AbsState state)
     {
         _current = _nodes[state.Id];
-        _jobWrapper.Enter(state);
+        JobWrapper.Enter(state);
     }
 
     private void ChangeState(AbsState state)
@@ -39,8 +39,8 @@ public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
         var previousState = _current.State;
         var nextState = _nodes[state.Id].State;
 
-        _jobWrapper.Exit(previousState);
-        _jobWrapper.Enter(nextState);
+        JobWrapper.Exit(previousState);
+        JobWrapper.Enter(nextState);
         _current = _nodes[state.Id];
     }
 

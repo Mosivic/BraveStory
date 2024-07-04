@@ -41,7 +41,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
     {
         foreach (var childCfg in _state.SubJobs)
         {
-            if (childCfg.Status != Status.Successed) return false;
+            if (childCfg.Status != Status.Succeed) return false;
             _jobJobWrapper.Enter(childCfg);
         }
 
@@ -90,7 +90,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
             _state.Status = Status.Failed;
         //applyEffect()
         else if (IsSucceed())
-            _state.Status = Status.Successed;
+            _state.Status = Status.Succeed;
         //applyEffect()
         else
             _state.Status = Status.Running;

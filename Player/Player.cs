@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using BraveStory.Player;
+using BraveStory.Scripts;
 using Godot;
 using GPC.Evaluator;
 using GPC.Scheduler;
@@ -8,10 +9,10 @@ using GPC.States;
 public struct PlayerParams
 {
 	public ConditionMachine ConditionMachine { get; set; }
-	public AnimationPlayer AnimationPlayer { get; set; }
+	public AnimationPlayer AnimationPlayer { get; init; }
 	
 	public Panel EvaluatorSpacePanel { get; }
-	public Sprite2D Sprite { get; set; }
+	public Sprite2D Sprite { get; init; }
 }
 
 public partial class Player : CharacterBody2D
@@ -35,6 +36,7 @@ public partial class Player : CharacterBody2D
 		{
 			Id = "2",
 			Name = "Idle",
+			Layer = LayerMap.Behavior,
 			Priority = 5,
 			Type = typeof(Idle),
 			IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Invoke(false)
@@ -43,6 +45,7 @@ public partial class Player : CharacterBody2D
 		{
 			Id = "1",
 			Type = typeof(Move),
+			Layer = LayerMap.Behavior,
 			Name = "Run",
 			Priority = 2,
 			IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Invoke(true),

@@ -10,7 +10,7 @@ public interface IScheduler
 public abstract class AbsScheduler : IScheduler
 {
     protected readonly StateSet StateSet;
-    protected readonly JobWrapper _jobWrapper = new();
+    protected readonly JobWrapper JobWrapper = new();
     
     protected AbsScheduler(StateSet stateSet)
     {
