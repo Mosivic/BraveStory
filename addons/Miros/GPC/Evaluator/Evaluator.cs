@@ -9,9 +9,9 @@ public abstract class AbsEvaluator{}
 public class Evaluator<T>(Func<T> func):AbsEvaluator
     where T : IComparable
 {
-    public bool Involved { get; set; }
-    public ulong Checksum { get; set; }
-    public Func<T> Func { get; set; } = func;
+    private bool Involved { get; set; }
+    private ulong Checksum { get; set; }
+    private Func<T> Func { get; set; } = func;
 
     
     public bool Invoke(T expectValue,CompareType type = CompareType.Equals)

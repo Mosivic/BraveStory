@@ -5,40 +5,41 @@ namespace GPC.Job;
 internal class JobAll(State state) : AbsJob(state), IJob
 {
     private readonly JobWrapper _jobJobWrapper = new();
+    private readonly State _state = state;
 
     public void Enter()
     {
-        state.Status = Status.Running;
-        foreach (var childCfg in state.SubJobs) _jobJobWrapper.Enter(childCfg);
+        _state.Status = Status.Running;
+        foreach (var childCfg in _state.SubJobs) _jobJobWrapper.Enter(childCfg);
         _Enter();
-        state.EnterAttachFunc?.Invoke(state);
+        _state.EnterAttachFunc?.Invoke(_state);
     }
 
 
     public void Exit()
     {
-        foreach (var childCfg in state.SubJobs) _jobJobWrapper.Exit(childCfg);
-        state.ExitAttachFunc?.Invoke(state);
+        foreach (var childCfg in _state.SubJobs) _jobJobWrapper.Exit(childCfg);
+        _state.ExitAttachFunc?.Invoke(_state);
     }
 
 
     public void Pause()
     {
-        state.Status = Status.Pause;
-        state.PauseAttachFunc?.Invoke(state);
+        _state.Status = Status.Pause;
+        _state.PauseAttachFunc?.Invoke(_state);
     }
 
 
     public void Resume()
     {
-        state.Status = Status.Running;
-        state.ResumeAttachFunc?.Invoke(state);
+        _state.Status = Status.Running;
+        _state.ResumeAttachFunc?.Invoke(_state);
     }
 
 
     public bool IsSucceed()
     {
-        foreach (var childCfg in state.SubJobs)
+        foreach (var childCfg in _state.SubJobs)
         {
             if (childCfg.Status != Status.Successed) return false;
             _jobJobWrapper.Enter(childCfg);
@@ -50,7 +51,7 @@ internal class JobAll(State state) : AbsJob(state), IJob
 
     public bool IsFailed()
     {
-        foreach (var childCfg in state.SubJobs)
+        foreach (var childCfg in _state.SubJobs)
             if (childCfg.Status == Status.Failed)
                 return true;
         return false;
@@ -69,16 +70,16 @@ internal class JobAll(State state) : AbsJob(state), IJob
 
     public void Update(double delta)
     {
-        if (state.Status == Status.Pause) return;
+        if (_state.Status == Status.Pause) return;
 
-        foreach (var childCfg in state.SubJobs)
+        foreach (var childCfg in _state.SubJobs)
             _jobJobWrapper.Update(childCfg, delta);
         _UpdateJob();
     }
 
     public void PhysicsUpdate(double delta)
     {
-        foreach (var childCfg in state.SubJobs)
+        foreach (var childCfg in _state.SubJobs)
             _jobJobWrapper.PhysicsUpdate(childCfg, delta);
     }
 
@@ -86,12 +87,12 @@ internal class JobAll(State state) : AbsJob(state), IJob
     private void _UpdateJob()
     {
         if (IsFailed())
-            state.Status = Status.Failed;
+            _state.Status = Status.Failed;
         //applyEffect()
         else if (IsSucceed())
-            state.Status = Status.Successed;
+            _state.Status = Status.Successed;
         //applyEffect()
         else
-            state.Status = Status.Running;
+            _state.Status = Status.Running;
     }
 }

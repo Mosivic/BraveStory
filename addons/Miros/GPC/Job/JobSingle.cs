@@ -5,37 +5,39 @@ namespace GPC.Job;
 
 internal class JobSingle(State state) : AbsJob(state), IJob
 {
+    private readonly State _state = state;
+
     public void Enter()
     {
 #if DEBUG
-        GD.Print($"{state.Name} Enter.");
+        GD.Print($"{_state.Name} Enter.");
 #endif
-        state.Status = Status.Running;
+        _state.Status = Status.Running;
         _Enter();
-        state.EnterAttachFunc?.Invoke(state);
+        _state.EnterAttachFunc?.Invoke(_state);
     }
 
     public void Exit()
     {
 #if DEBUG
-        GD.Print($"{state.Name} Exit.");
+        GD.Print($"{_state.Name} Exit.");
 #endif
         _Exit();
-        state.ExitAttachFunc?.Invoke(state);
+        _state.ExitAttachFunc?.Invoke(_state);
     }
 
     public void Pause()
     {
-        state.Status = Status.Pause;
+        _state.Status = Status.Pause;
         _Pause();
-        state.PauseAttachFunc?.Invoke(state);
+        _state.PauseAttachFunc?.Invoke(_state);
     }
 
     public void Resume()
     {
-        state.Status = Status.Running;
+        _state.Status = Status.Running;
         _Resume();
-        state.ResumeAttachFunc?.Invoke(state);
+        _state.ResumeAttachFunc?.Invoke(_state);
     }
 
     public bool IsSucceed()
@@ -60,29 +62,29 @@ internal class JobSingle(State state) : AbsJob(state), IJob
 
     public void Update(double delta)
     {
-        if (state.Status == Status.Pause) return;
+        if (_state.Status == Status.Pause) return;
 
         _Update(delta);
-        state.RunningAttachFunc?.Invoke(state);
+        _state.RunningAttachFunc?.Invoke(_state);
         _UpdateJob();
     }
 
     public void PhysicsUpdate(double delta)
     {
         _PhysicsUpdate(delta);
-        state.RunningPhysicsAttachFunc?.Invoke(state);
+        _state.RunningPhysicsAttachFunc?.Invoke(_state);
     }
 
 
     private void _UpdateJob()
     {
         if (IsFailed())
-            state.Status = Status.Failed;
+            _state.Status = Status.Failed;
         //applyEffect()
         else if (IsSucceed())
-            state.Status = Status.Successed;
+            _state.Status = Status.Successed;
         //applyEffect()
         else
-            state.Status = Status.Running;
+            _state.Status = Status.Running;
     }
 }

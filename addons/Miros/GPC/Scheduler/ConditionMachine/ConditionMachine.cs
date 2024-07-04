@@ -6,44 +6,44 @@ namespace GPC.Scheduler;
 
 public class ConditionMachine : AbsScheduler
 {
-    protected Dictionary<string, State> JobsExecute = new();
+    private Dictionary<string, State> _jobsExecute = new();
 
     public ConditionMachine(StateSet stateSet) : base(stateSet)
     {
         foreach (var state in stateSet.States)
         {
             var layer = state.Layer;
-            JobsExecute.TryAdd(layer, null);
+            _jobsExecute.TryAdd(layer, null);
         }
     }
 
     public override void Update(double delta)
     {
         _UpdateJob();
-        foreach (var state in JobsExecute.Values)
+        foreach (var state in _jobsExecute.Values)
             if (state != null)
                 JobWrapper.Update(state, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var state in JobsExecute.Values)
+        foreach (var state in _jobsExecute.Values)
             if (state != null)
                 JobWrapper.PhysicsUpdate(state, delta);
     }
 
     private void _UpdateJob()
     {
-        foreach (var layer in JobsExecute.Keys)
+        foreach (var layer in _jobsExecute.Keys)
         {
-            var currentState = JobsExecute[layer];
+            var currentState = _jobsExecute[layer];
             var nextState = _GetBestState(layer);
 
             if (currentState == null)
             {
                 if (nextState == null) return;
 
-                JobsExecute[layer] = nextState;
+                _jobsExecute[layer] = nextState;
                 JobWrapper.Enter(nextState);
             }
             else
@@ -53,12 +53,12 @@ public class ConditionMachine : AbsScheduler
                     if (nextState == null)
                     {
                         JobWrapper.Exit(currentState);
-                        JobsExecute[layer] = null;
+                        _jobsExecute[layer] = null;
                     }
                     else
                     {
                         JobWrapper.Exit(currentState);
-                        JobsExecute[layer] = nextState;
+                        _jobsExecute[layer] = nextState;
                         JobWrapper.Enter(nextState);
                     }
                 }
@@ -69,7 +69,7 @@ public class ConditionMachine : AbsScheduler
                     if (nextState.Priority > currentState.Priority)
                     {
                         JobWrapper.Exit(currentState);
-                        JobsExecute[layer] = nextState;
+                        _jobsExecute[layer] = nextState;
                         JobWrapper.Enter(nextState);
                     }
                 }
