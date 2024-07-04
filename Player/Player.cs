@@ -40,7 +40,6 @@ public partial class Player : CharacterBody2D
             Type = typeof(Move),
             Name = "Run",
             Priority = 2,
-            Layer = "default",
             IsPreparedFunc = () =>isVelocityYPositive.Invoke(true) &&
                                 isOnFloor.Invoke(true),
             IsFailedFunc = ()=> Evaluators.IsMoveKeyDown.Invoke(false),
@@ -50,7 +49,6 @@ public partial class Player : CharacterBody2D
             Id = "2",
             Name = "Idle",
             Priority = 1,
-            Layer = "default",
             Type = typeof(Idle),
             IsPreparedFunc = ()=>Evaluators.IsMoveKeyDown.Invoke(false) &&
                                isOnFloor.Invoke(true),
@@ -60,7 +58,6 @@ public partial class Player : CharacterBody2D
             Id = "3",
             Name = "Jump",
             Priority = 3,
-            Layer = "default",
             Type = typeof(Jump),
             IsPreparedFunc = ()=>Evaluators.IsJumpKeyDown.Invoke(true) &&
                                isOnFloor.Invoke(true),
@@ -70,7 +67,6 @@ public partial class Player : CharacterBody2D
             Id = "4",
             Name = "Fall",
             Priority = 9,
-            Layer = "default",
             Type = typeof(Fall),
             IsPreparedFunc = ()=> isVelocityYPositive.Invoke(true) &&
                                 isOnFloor.Invoke(false),
