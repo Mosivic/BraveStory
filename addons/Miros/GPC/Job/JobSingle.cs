@@ -54,12 +54,7 @@ internal class JobSingle(State state) : AbsJob(state), IJob
     {
         return _IsFailed();
     }
-
-    public bool CanExecute()
-    {
-        return _IsPrepared();
-    }
-
+    
     public void Update(double delta)
     {
         if (_state.Status == Status.Pause) return;

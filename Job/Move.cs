@@ -17,7 +17,7 @@ internal class Move(PlayerState state) : JobSingle(state)
         state.Host.Velocity = velocity;
 
         if (!Mathf.IsZeroApprox(direction))
-            state.Host.GetNode<Sprite2D>("Sprite2D").FlipH = direction < 0;
+            state.Params.Sprite.FlipH = direction < 0;
 
         state.Host.MoveAndSlide();
     }

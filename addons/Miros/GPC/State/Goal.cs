@@ -1,7 +1,4 @@
-﻿using System;
-using GPC.Scheduler;
-
-namespace GPC.States;
+﻿namespace GPC.States;
 
 public class Goal : AbsState, IHubProvider
 {

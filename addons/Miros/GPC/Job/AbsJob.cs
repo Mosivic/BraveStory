@@ -59,6 +59,4 @@ public abstract class AbsJob(State state)
     {
         state.RunningInterval?.Invoke(state);
     }
-    
-    
 }

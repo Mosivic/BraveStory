@@ -1,5 +1,6 @@
 ﻿using Godot;
 using GPC.Job;
+
 internal class Fall(PlayerState state) : JobSingle(state)
 {
     protected override void _Enter()

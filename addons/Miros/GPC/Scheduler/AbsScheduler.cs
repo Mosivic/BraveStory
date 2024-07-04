@@ -1,5 +1,4 @@
-﻿using Godot;
-using GPC.Job;
+﻿using GPC.Job;
 using GPC.States;
 
 namespace GPC.Scheduler;
@@ -10,16 +9,13 @@ public interface IScheduler
 
 public abstract class AbsScheduler : IScheduler
 {
-    protected JobWrapper JobWrapper = new();
-    protected StateSet StateSet;
-
-    public AbsScheduler(StateSet stateSet)
+    protected readonly StateSet StateSet;
+    protected readonly JobWrapper _jobWrapper = new();
+    
+    protected AbsScheduler(StateSet stateSet)
     {
         StateSet = stateSet;
-        foreach (var state in StateSet.States)
-        {
-            state.Scheduler = this;
-        }
+        foreach (var state in StateSet.States) state.Scheduler = this;
     }
 
     public abstract void Update(double delta);

@@ -2,7 +2,6 @@
 
 namespace GPC.Evaluator;
 
-
 public enum CompareType
 {
     Equals,
@@ -11,11 +10,11 @@ public enum CompareType
 }
 
 public interface ICondition<T>
-where T : IComparable
+    where T : IComparable
 {
     Evaluator<T> Evaluator { get; set; }
     T ExpectValue { get; set; }
-    CompareType Type {get;set;}
+    CompareType Type { get; set; }
 }
 
 public abstract class ConditionBase
@@ -29,10 +28,10 @@ public class BoolCondition(Evaluator<bool> evaluator, bool expectValue, CompareT
     public Evaluator<bool> Evaluator { get; set; } = evaluator;
     public bool ExpectValue { get; set; } = expectValue;
     public CompareType Type { get; set; } = type;
-    
+
     public override bool IsSatisfy()
     {
-        return Evaluator.Invoke(ExpectValue,Type);
+        return Evaluator.Invoke(ExpectValue, Type);
     }
 }
 
@@ -42,9 +41,9 @@ public class FloatCondition(Evaluator<float> evaluator, float expectValue, Compa
     public Evaluator<float> Evaluator { get; set; } = evaluator;
     public float ExpectValue { get; set; } = expectValue;
     public CompareType Type { get; set; } = type;
-    
+
     public override bool IsSatisfy()
     {
-        return Evaluator.Invoke(ExpectValue,Type);
+        return Evaluator.Invoke(ExpectValue, Type);
     }
 }

@@ -9,7 +9,7 @@ internal class UIEvaluator(State state) : JobSingle(state)
     {
     }
 
-    protected override void _Update( double delta)
+    protected override void _Update(double delta)
     {
         base._Update(delta);
     }

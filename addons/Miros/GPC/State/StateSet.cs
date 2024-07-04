@@ -4,16 +4,11 @@ namespace GPC.States;
 
 public class StateSet
 {
-    public StateSet()
-    {
-        States = new List<AbsState>();
-    }
+    public List<AbsState> States { get; set; } = new();
 
-    public List<AbsState> States { get; set; }
-
-    public StateSet Add<S>(S s) where S : AbsState
+    public StateSet Add<TState>(TState state) where TState : AbsState
     {
-        States.Add(s);
+        States.Add(state);
         return this;
     }
 }
