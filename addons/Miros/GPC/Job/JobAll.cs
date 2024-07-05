@@ -1,12 +1,11 @@
-﻿using GPC.Scheduler;
+﻿using GPC.Job.Executor;
+using GPC.Scheduler;
 using GPC.States;
 
 namespace GPC.Job;
 
-internal class JobAll(AbsScheduler scheduler,CompoundState state) : AbsJob(scheduler,state), IJob
+internal class JobAll(CompoundState state) : AbsJob(state), IJob
 {
-    private readonly JobWrapper _jobJobWrapper = new();
-
     public void Enter()
     {
         state.Status = Status.Running;

@@ -2,7 +2,7 @@ using Godot;
 using GPC.Job;
 using GPC.Scheduler;
 
-internal class Jump(AbsScheduler scheduler,PlayerState state) : JobSingle(scheduler,state)
+internal class Jump(PlayerState state) : JobSingle(state)
 {
 	protected override void _Enter()
 	{

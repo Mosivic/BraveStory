@@ -4,7 +4,7 @@ using GPC.States;
 
 namespace GPC.Job;
 
-internal class JobSingle(AbsScheduler scheduler,AbsState state) : AbsJob(scheduler,state), IJob
+internal class JobSingle(AbsState state) : AbsJob(state), IJob
 {
     public void Enter()
     {

@@ -2,7 +2,7 @@
 using GPC.Job;
 using GPC.Scheduler;
 
-internal class Fall(AbsScheduler scheduler,PlayerState state) : JobSingle(scheduler,state)
+internal class Fall(PlayerState state) : JobSingle(state)
 {
     protected override void _Enter()
     {

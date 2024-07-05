@@ -3,10 +3,9 @@ using GPC.States;
 
 namespace GPC.Job;
 
-public abstract class AbsJob(AbsScheduler scheduler,AbsState state)
+public abstract class AbsJob(AbsState state)
 {
     protected readonly AbsState State = state;
-    public AbsScheduler Scheduler { get; set; }
     
     protected virtual void _Enter()
     {

@@ -2,7 +2,7 @@ using Godot;
 using GPC.Job;
 using GPC.Scheduler;
 
-internal class Move(AbsScheduler scheduler,PlayerState state) : JobSingle(scheduler,state)
+internal class Move(PlayerState state) : JobSingle(state)
 {
     protected override void _Enter()
     {
