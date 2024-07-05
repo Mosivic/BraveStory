@@ -7,7 +7,7 @@ namespace GPC.Job.Executor;
 public class StaticJobExecutor:AbsJobExecutor,IJobExecutor
 {
     private static readonly Dictionary<Type, IJob> Jobs = new();
-
+    
     private static IJob _GetJob(Type type, AbsState state)
     {
         if (Jobs.TryGetValue(type, out var value)) return value;
@@ -70,4 +70,6 @@ public class StaticJobExecutor:AbsJobExecutor,IJobExecutor
     {
         _GetJob(state.Type, state).IntervalUpdate();
     }
+
+
 }

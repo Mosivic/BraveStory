@@ -5,10 +5,11 @@ using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class ConditionMachine<T> : AbsScheduler,IJobExecutorProvider<T> where T : AbsJobExecutor,new()
+public class ConditionMachine : AbsScheduler 
 {
     private readonly Dictionary<Layer, AbsState> _jobsExecute = new();
-   
+    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
+    
     public ConditionMachine(StateSet stateSet) : base(stateSet)
     {
         foreach (var state in stateSet.States)
@@ -23,14 +24,14 @@ public class ConditionMachine<T> : AbsScheduler,IJobExecutorProvider<T> where T 
         _UpdateJob();
         foreach (var state in _jobsExecute.Values)
             if (state != null)
-                JobExecutor.Update(state, delta);
+                _provider.Executor.Update(state, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
         foreach (var state in _jobsExecute.Values)
             if (state != null)
-                JobExecutor.PhysicsUpdate(state, delta);
+                _provider.Executor.PhysicsUpdate(state, delta);
     }
 
     private void _UpdateJob()
@@ -45,7 +46,7 @@ public class ConditionMachine<T> : AbsScheduler,IJobExecutorProvider<T> where T 
                 if (nextState == null) return;
 
                 _jobsExecute[layer] = nextState;
-                JobExecutor.Enter(nextState);
+                _provider.Executor.Enter(nextState);
             }
             else
             {
@@ -53,14 +54,14 @@ public class ConditionMachine<T> : AbsScheduler,IJobExecutorProvider<T> where T 
                 {
                     if (nextState == null)
                     {
-                        JobExecutor.Exit(currentState);
+                        _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = null;
                     }
                     else
                     {
-                        JobExecutor.Exit(currentState);
+                        _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = nextState;
-                        JobExecutor.Enter(nextState);
+                        _provider.Executor.Enter(nextState);
                     }
                 }
                 else
@@ -69,9 +70,9 @@ public class ConditionMachine<T> : AbsScheduler,IJobExecutorProvider<T> where T 
 
                     if (nextState.Priority > currentState.Priority)
                     {
-                        JobExecutor.Exit(currentState);
+                        _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = nextState;
-                        JobExecutor.Enter(nextState);
+                        _provider.Executor.Enter(nextState);
                     }
                 }
             }
@@ -85,7 +86,7 @@ public class ConditionMachine<T> : AbsScheduler,IJobExecutorProvider<T> where T 
         {
             var jobLayer = state.Layer;
             if (jobLayer == layer) 
-                if(JobExecutor.IsPrepared(state))
+                if(_provider.Executor.IsPrepared(state))
                     candicateJobsCfg.Add(state);
         }
 

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using Godot;
+using GPC.Job.Executor;
 using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
-
+public class StateMachine(StateSet stateSet) : AbsScheduler(stateSet)
 {
+    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
+    
     private readonly HashSet<ITransition> _anyTransitions = new();
     private readonly Dictionary<string, StateNode> _nodes = new();
     private StateNode _current;
@@ -18,18 +20,18 @@ public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
         if (transition != null)
             ChangeState(transition.To);
 
-        JobExecutor.Update(_current.State, delta);
+        _provider.Executor.Update(_current.State, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
-        JobExecutor.PhysicsUpdate(_current.State, delta);
+        _provider.Executor.PhysicsUpdate(_current.State, delta);
     }
 
     public void SetState(AbsState state)
     {
         _current = _nodes[state.Id];
-        JobExecutor.Enter(state);
+        _provider.Executor.Enter(state);
     }
 
     private void ChangeState(AbsState state)
@@ -39,8 +41,8 @@ public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
         var previousState = _current.State;
         var nextState = _nodes[state.Id].State;
 
-        JobExecutor.Exit(previousState);
-        JobExecutor.Enter(nextState);
+        _provider.Executor.Exit(previousState);
+        _provider.Executor.Enter(nextState);
         _current = _nodes[state.Id];
     }
 

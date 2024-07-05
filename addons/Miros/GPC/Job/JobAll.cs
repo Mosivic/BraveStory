@@ -6,10 +6,13 @@ namespace GPC.Job;
 
 internal class JobAll(CompoundState state) : AbsJob(state), IJob
 {
+    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
+
     public void Enter()
     {
         state.Status = Status.Running;
-        foreach (var childCfg in state.SubJobs) _jobJobWrapper.Enter(childCfg);
+        foreach (var childCfg in state.SubJobs) 
+            _provider.Executor.Enter(childCfg);
         _Enter();
         state.EnterAttachFunc?.Invoke(state);
     }
@@ -17,7 +20,8 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
 
     public void Exit()
     {
-        foreach (var childCfg in state.SubJobs) _jobJobWrapper.Exit(childCfg);
+        foreach (var childCfg in state.SubJobs) 
+            _provider.Executor.Exit(childCfg);
         state.ExitAttachFunc?.Invoke(state);
     }
 
@@ -41,7 +45,7 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
         foreach (var childCfg in state.SubJobs)
         {
             if (childCfg.Status != Status.Succeed) return false;
-            _jobJobWrapper.Enter(childCfg);
+            _provider.Executor.Enter(childCfg);
         }
 
         return true;
@@ -72,20 +76,20 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
         if (state.Status == Status.Pause) return;
 
         foreach (var childCfg in state.SubJobs)
-            _jobJobWrapper.Update(childCfg, delta);
+            _provider.Executor.Update(childCfg, delta);
         _UpdateJob();
     }
 
     public void PhysicsUpdate(double delta)
     {
         foreach (var childCfg in state.SubJobs)
-            _jobJobWrapper.PhysicsUpdate(childCfg, delta);
+            _provider.Executor.PhysicsUpdate(childCfg, delta);
     }
 
     public void IntervalUpdate()
     {
         foreach (var childCfg in state.SubJobs)
-            _jobJobWrapper.IntervalUpdate(childCfg);
+            _provider.Executor.IntervalUpdate(childCfg);
     }
 
 
@@ -100,4 +104,6 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
         else
             state.Status = Status.Running;
     }
+
+    
 }

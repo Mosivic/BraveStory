@@ -1,6 +1,6 @@
 ﻿namespace GPC.Job.Executor;
 
-public interface IJobExecutorProvider<T> where T : AbsJobExecutor,new()
+public interface IJobExecutorProvider<out T> where T : AbsJobExecutor,new()
 {
-    public static T Executor { get; set; }
+    T Executor { get; }
 }
