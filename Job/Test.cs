@@ -1,9 +1,10 @@
 ﻿using Godot;
 using GPC.Job;
+using GPC.Scheduler;
 
 namespace BraveStory.Job;
 
-internal class Test(PlayerState state) : JobSingle(state)
+internal class Test(AbsScheduler scheduler,PlayerState state) : JobSingle(scheduler,state)
 {
     protected override void _Enter()
     {

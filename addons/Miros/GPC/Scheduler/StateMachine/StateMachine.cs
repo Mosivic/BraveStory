@@ -57,17 +57,17 @@ public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
         return null;
     }
 
-    public void AddTransition(State from, State to, Func<bool> conditionFunc)
+    public void AddTransition(CompoundState from, CompoundState to, Func<bool> conditionFunc)
     {
         GetOrAddNode(from).AddTransition(GetOrAddNode(to).State, conditionFunc);
     }
 
-    public void AddAnyTransition(State to, Func<bool> conditionFunc)
+    public void AddAnyTransition(CompoundState to, Func<bool> conditionFunc)
     {
         _anyTransitions.Add(new Transition(GetOrAddNode(to).State, conditionFunc));
     }
 
-    private StateNode GetOrAddNode(State state)
+    private StateNode GetOrAddNode(CompoundState state)
     {
         var node = _nodes.GetValueOrDefault(state.Id);
         if (node == null)
@@ -80,13 +80,13 @@ public class StateMachine(Node host, StateSet stateSet) : AbsScheduler(stateSet)
     }
 }
 
-internal class StateNode(State state)
+internal class StateNode(CompoundState state)
 {
-    public readonly State State = state;
+    public readonly CompoundState State = state;
 
     public HashSet<ITransition> Transitions { get; } = new();
 
-    public void AddTransition(State state, Func<bool> conditionFunc)
+    public void AddTransition(CompoundState state, Func<bool> conditionFunc)
     {
         Transitions.Add(new Transition(state, conditionFunc));
     }

@@ -1,62 +1,66 @@
-﻿using GPC.States;
+﻿using GPC.Scheduler;
+using GPC.States;
 
 namespace GPC.Job;
 
-public abstract class AbsJob(State state)
+public abstract class AbsJob(AbsScheduler scheduler,AbsState state)
 {
+    protected readonly AbsState State = state;
+    public AbsScheduler Scheduler { get; set; }
+    
     protected virtual void _Enter()
     {
-        state.EnterFunc?.Invoke(state);
+        State.EnterFunc?.Invoke(State);
     }
 
     protected virtual void _Exit()
     {
-        state.ExitFunc?.Invoke(state);
+        State.ExitFunc?.Invoke(State);
     }
 
     protected virtual void _Pause()
     {
-        state.PauseFunc?.Invoke(state);
+        State.PauseFunc?.Invoke(State);
     }
 
     protected virtual void _Resume()
     {
-        state.ResumeFunc?.Invoke(state);
+        State.ResumeFunc?.Invoke(State);
     }
 
     protected virtual bool _IsPrepared()
     {
-        if (state.IsPreparedFunc != null)
-            return state.IsPreparedFunc.Invoke();
+        if (State.IsPreparedFunc != null)
+            return State.IsPreparedFunc.Invoke();
         return true;
     }
 
     protected virtual bool _IsSucceed()
     {
-        if (state.IsSucceedFunc != null)
-            return state.IsSucceedFunc.Invoke();
+        if (State.IsSucceedFunc != null)
+            return State.IsSucceedFunc.Invoke();
         return false;
     }
 
     protected virtual bool _IsFailed()
     {
-        if (state.IsFailedFunc != null)
-            return state.IsFailedFunc.Invoke();
+        if (State.IsFailedFunc != null)
+            return State.IsFailedFunc.Invoke();
         return false;
     }
 
     protected virtual void _PhysicsUpdate(double delta)
     {
-        state.RunningPhysicsFunc?.Invoke(state);
+        State.RunningPhysicsFunc?.Invoke(State);
     }
 
     protected virtual void _Update(double delta)
     {
-        state.RunningFunc?.Invoke(state);
+        State.RunningFunc?.Invoke(State);
     }
 
-    protected virtual void _RunningInterval()
+    protected virtual void _IntervalUpdate()
     {
-        state.RunningInterval?.Invoke(state);
+        State.IntervalUpdateFunc?.Invoke(State);
     }
 }

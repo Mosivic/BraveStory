@@ -1,7 +1,7 @@
 using Godot;
 using GPC.States;
 
-public class PlayerState(CharacterBody2D host, PlayerParams param) : State
+public class PlayerState(CharacterBody2D host, PlayerParams param) : CompoundState
 {
     public PlayerParams Params { get; set; } = param;
     public float Gravity { get; } = 980;

@@ -1,6 +1,6 @@
-﻿namespace GPC.Job;
+﻿namespace GPC.Job.Executor;
 
-public interface IJob
+public interface IJobExecutor
 {
     void Enter();
     void Exit();

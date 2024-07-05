@@ -1,43 +1,42 @@
 using Godot;
+using GPC.Scheduler;
 using GPC.States;
 
 namespace GPC.Job;
 
-internal class JobSingle(State state) : AbsJob(state), IJob
+internal class JobSingle(AbsScheduler scheduler,AbsState state) : AbsJob(scheduler,state), IJob
 {
-    private readonly State _state = state;
-
     public void Enter()
     {
 #if DEBUG
-        GD.Print($"{_state.Name} Enter.");
+        GD.Print($"{State.Name} Enter.");
 #endif
-        _state.Status = Status.Running;
+        State.Status = Status.Running;
         _Enter();
-        _state.EnterAttachFunc?.Invoke(_state);
+        State.EnterAttachFunc?.Invoke(State);
     }
 
     public void Exit()
     {
 #if DEBUG
-        GD.Print($"{_state.Name} Exit.");
+        GD.Print($"{State.Name} Exit.");
 #endif
         _Exit();
-        _state.ExitAttachFunc?.Invoke(_state);
+        State.ExitAttachFunc?.Invoke(State);
     }
 
     public void Pause()
     {
-        _state.Status = Status.Pause;
+        State.Status = Status.Pause;
         _Pause();
-        _state.PauseAttachFunc?.Invoke(_state);
+        State.PauseAttachFunc?.Invoke(State);
     }
 
     public void Resume()
     {
-        _state.Status = Status.Running;
+        State.Status = Status.Running;
         _Resume();
-        _state.ResumeAttachFunc?.Invoke(_state);
+        State.ResumeAttachFunc?.Invoke(State);
     }
 
     public bool IsSucceed()
@@ -57,29 +56,43 @@ internal class JobSingle(State state) : AbsJob(state), IJob
     
     public void Update(double delta)
     {
-        if (_state.Status == Status.Pause) return;
+        if (State.Status == Status.Pause) return;
 
         _Update(delta);
-        _state.RunningAttachFunc?.Invoke(_state);
+        State.RunningAttachFunc?.Invoke(State);
+
+        State.ElapsedTime += delta;
+        if (State.ElapsedTime > State.IntervalTime)
+        {
+            IntervalUpdate();
+            State.ElapsedTime = 0;
+        }
+        
         _UpdateJob();
     }
 
     public void PhysicsUpdate(double delta)
     {
         _PhysicsUpdate(delta);
-        _state.RunningPhysicsAttachFunc?.Invoke(_state);
+        State.RunningPhysicsAttachFunc?.Invoke(State);
+    }
+
+    public void IntervalUpdate()
+    {
+        _IntervalUpdate();
+        State.AttachIntervalUpdateFunc?.Invoke(State);
     }
 
 
     private void _UpdateJob()
     {
         if (IsFailed())
-            _state.Status = Status.Failed;
+            State.Status = Status.Failed;
         //applyEffect()
         else if (IsSucceed())
-            _state.Status = Status.Succeed;
+            State.Status = Status.Succeed;
         //applyEffect()
         else
-            _state.Status = Status.Running;
+            State.Status = Status.Running;
     }
 }

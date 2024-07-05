@@ -15,7 +15,6 @@ public abstract class AbsScheduler : IScheduler
     protected AbsScheduler(StateSet stateSet)
     {
         StateSet = stateSet;
-        foreach (var state in StateSet.States) state.Scheduler = this;
     }
 
     public abstract void Update(double delta);

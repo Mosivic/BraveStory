@@ -31,7 +31,7 @@ public class JobWrapper
         _GetJob(state.Type, state).Pause();
     }
 
-    public void Resume(State state)
+    public void Resume(CompoundState state)
     {
         _GetJob(state.Type, state).Resume();
     }
@@ -59,5 +59,10 @@ public class JobWrapper
     public void PhysicsUpdate(AbsState state, double delta)
     {
         _GetJob(state.Type, state).PhysicsUpdate(delta);
+    }
+    
+    public void IntervalUpdate(AbsState state)
+    {
+        _GetJob(state.Type, state).IntervalUpdate();
     }
 }

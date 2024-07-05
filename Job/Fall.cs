@@ -1,7 +1,8 @@
 ﻿using Godot;
 using GPC.Job;
+using GPC.Scheduler;
 
-internal class Fall(PlayerState state) : JobSingle(state)
+internal class Fall(AbsScheduler scheduler,PlayerState state) : JobSingle(scheduler,state)
 {
     protected override void _Enter()
     {

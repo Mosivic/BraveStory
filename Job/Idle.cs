@@ -1,6 +1,7 @@
 using GPC.Job;
+using GPC.Scheduler;
 
-internal class Idle(PlayerState state) : JobSingle(state)
+internal class Idle(AbsScheduler scheduler,PlayerState state) : JobSingle(scheduler,state)
 {
     protected override void _Enter()
     {

@@ -5,7 +5,7 @@ namespace GPC.Scheduler;
 
 public class Transition : ITransition
 {
-    public Transition(State to, Func<bool> conditionFunc)
+    public Transition(CompoundState to, Func<bool> conditionFunc)
     {
         To = to;
         ConditionFunc = conditionFunc;

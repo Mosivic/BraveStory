@@ -15,8 +15,6 @@ public class ConditionMachine : AbsScheduler
             var layer = state.Layer;
             _jobsExecute.TryAdd(layer, null);
         }
-
-
     }
 
     public override void Update(double delta)
