@@ -3,14 +3,8 @@ using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class Transition : ITransition
+public class Transition(CompoundState to, Func<bool> conditionFunc) : ITransition
 {
-    public Transition(CompoundState to, Func<bool> conditionFunc)
-    {
-        To = to;
-        ConditionFunc = conditionFunc;
-    }
-
-    public AbsState To { get; }
-    public Func<bool> ConditionFunc { get; }
+    public AbsState To { get; } = to;
+    public Func<bool> ConditionFunc { get; } = conditionFunc;
 }

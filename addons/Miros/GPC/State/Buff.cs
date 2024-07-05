@@ -59,5 +59,5 @@ internal class Buff : AbsState
     public int Priority { get; set; }
     public Type Type { get; set; }
     public Status Status { get; set; }
-    public IScheduler Scheduler { get; set; }
+    public AbsScheduler Scheduler { get; set; }
 }
