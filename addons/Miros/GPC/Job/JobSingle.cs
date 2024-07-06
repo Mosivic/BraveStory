@@ -11,7 +11,8 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 #if DEBUG
         GD.Print($"{State.Name} Enter.");
 #endif
-        State.Status = Status.Running;
+        State.RunningStatus = JobRunningStatus.Running;
+        State.RunningResult = JobRunningResult.NoResult;
         _Enter();
         State.EnterAttachFunc?.Invoke(State);
     }
@@ -21,21 +22,22 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 #if DEBUG
         GD.Print($"{State.Name} Exit.");
 #endif
-        State.Status = Status.Pause;
+        State.RunningStatus = JobRunningStatus.NoRunning;
+        State.RunningResult = JobRunningResult.NoResult;
         _Exit();
         State.ExitAttachFunc?.Invoke(State);
     }
 
     public void Pause()
     {
-        State.Status = Status.Pause;
+        State.RunningStatus = JobRunningStatus.NoRunning;
         _Pause();
         State.PauseAttachFunc?.Invoke(State);
     }
 
     public void Resume()
     {
-        State.Status = Status.Running;
+        State.RunningStatus = JobRunningStatus.Running;
         _Resume();
         State.ResumeAttachFunc?.Invoke(State);
     }
@@ -57,7 +59,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
     
     public void Update(double delta)
     {
-        if (State.Status == Status.Pause) return;
+        if (State.RunningStatus == JobRunningStatus.NoRunning) return;
 
         _Update(delta);
         State.RunningAttachFunc?.Invoke(State);
@@ -88,12 +90,16 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
     private void _UpdateJob()
     {
         if (IsFailed())
-            State.Status = Status.Failed;
-        //applyEffect()
+        {
+            State.RunningStatus = JobRunningStatus.NoRunning;
+            State.RunningResult = JobRunningResult.Failed;
+            //applyEffect()
+        }
         else if (IsSucceed())
-            State.Status = Status.Succeed;
-        //applyEffect()
-        else
-            State.Status = Status.Running;
+        {
+            State.RunningStatus = JobRunningStatus.NoRunning;
+            State.RunningResult = JobRunningResult.Succeed;
+            //applyEffect()
+        }
     }
 }

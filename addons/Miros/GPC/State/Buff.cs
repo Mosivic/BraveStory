@@ -58,6 +58,6 @@ internal class Buff : AbsState
     public string Layer { get; set; }
     public int Priority { get; set; }
     public Type Type { get; set; }
-    public Status Status { get; set; }
+    public JobRunningStatus JobRunningStatus { get; set; }
     public AbsScheduler Scheduler { get; set; }
 }

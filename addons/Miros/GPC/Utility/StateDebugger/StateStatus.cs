@@ -23,7 +23,7 @@ public partial class StateStatus : HBoxContainer
 
 	public override void _Process(double delta)
 	{
-		if (State.Status == Status.Running)
+		if (State.RunningStatus == JobRunningStatus.Running)
 		{
 			_elapsedTime += delta;
 			_timeLabel.SetText(_elapsedTime.ToString("F2"));		
@@ -41,7 +41,7 @@ public partial class StateStatus : HBoxContainer
 	{
 		_nameLabel.SetText(State.Name);
 		
-		if (State.Status == Status.Running)
+		if (State.RunningStatus == JobRunningStatus.Running)
 		{
 			_isActiveRect.SetColor(_ActiveColor);
 		}

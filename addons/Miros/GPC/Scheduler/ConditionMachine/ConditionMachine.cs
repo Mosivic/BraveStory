@@ -42,7 +42,6 @@ public class ConditionMachine : AbsScheduler
         {
             var currentState = _jobsExecute[layer];
             var nextState = _GetBestState(layer);
-            GD.Print(currentState?.Status.ToString());
 
             if (currentState == null)
             {
@@ -55,7 +54,7 @@ public class ConditionMachine : AbsScheduler
             }
             else
             {
-                if (currentState.Status != Status.Running)
+                if (currentState.RunningStatus == JobRunningStatus.NoRunning)
                 {
                     if (nextState == null)
                     {

@@ -27,7 +27,7 @@ public partial class StateDebugger : MarginContainer
     
     public override void _Ready()
     {
-        _evaluatorStatus = GetNode<ItemList>("TabContainer/Evaluators/Status");
+        _evaluatorStatus = GetNode<ItemList>("TabContainer/Evaluators/JobRunningStatus");
         
         if (WatchNode != null)
         {
