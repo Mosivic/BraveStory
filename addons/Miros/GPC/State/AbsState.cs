@@ -10,7 +10,8 @@ public abstract class AbsState
     public Layer Layer { get; set; } = null;
     public int Priority { get; set; } = 0;
     public double IntervalTime { get; set; }
-    public double ElapsedTime { get; set; }
+    public double IntervalElapsedTime { get; set; }
+    public double DelayTime { get; set; }
     public Type Type { get; set; }
     public JobRunningStatus RunningStatus { get; set; } = JobRunningStatus.NoRunning;
     public JobRunningResult RunningResult { get; set; } = JobRunningResult.NoResult;

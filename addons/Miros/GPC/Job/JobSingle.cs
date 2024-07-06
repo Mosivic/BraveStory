@@ -63,11 +63,11 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
         _Update(delta);
         State.RunningAttachFunc?.Invoke(State);
 
-        State.ElapsedTime += delta;
-        if (State.ElapsedTime > State.IntervalTime)
+        State.IntervalElapsedTime += delta;
+        if (State.IntervalElapsedTime > State.IntervalTime)
         {
             IntervalUpdate();
-            State.ElapsedTime = 0;
+            State.IntervalElapsedTime = 0;
         }
 
         _UpdateJob();

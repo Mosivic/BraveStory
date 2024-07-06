@@ -1,7 +1,9 @@
-﻿namespace GPC;
+﻿using System.Collections.Generic;
 
-public class Layer(string name, Layer parentLayer)
+namespace GPC;
+
+public class Layer(string name, List<Layer> childrenLayer)
 {
     public string Name { get; set; } = name;
-    public Layer ParentLayer { get; set; } = parentLayer;
+    public List<Layer> ChildrenLayer { get; set; } = childrenLayer;
 }

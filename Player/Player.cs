@@ -22,6 +22,11 @@ public partial class Player : CharacterBody2D, IGpcToken
         return _scheduler;
     }
 
+    public Layer GetRootLayer()
+    {
+        return LayerMap.Root;
+    }
+
     public override void _Ready()
     {
         Evaluator<bool> isVelocityYPositive = new("isVelocityYPositive", () => Velocity.Y >= 0f);
