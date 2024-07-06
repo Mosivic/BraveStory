@@ -5,5 +5,4 @@ namespace GPC;
 public interface IGpcToken
 {
     AbsScheduler GetScheduler();
-    
 }

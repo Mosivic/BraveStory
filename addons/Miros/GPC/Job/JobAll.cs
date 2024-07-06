@@ -1,5 +1,4 @@
 ﻿using GPC.Job.Executor;
-using GPC.Scheduler;
 using GPC.States;
 
 namespace GPC.Job;
@@ -12,8 +11,8 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
     {
         state.RunningStatus = JobRunningStatus.Running;
         State.RunningResult = JobRunningResult.NoResult;
-        
-        foreach (var childCfg in state.SubJobs) 
+
+        foreach (var childCfg in state.SubJobs)
             _provider.Executor.Enter(childCfg);
         _Enter();
         state.EnterAttachFunc?.Invoke(state);
@@ -24,8 +23,8 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
     {
         state.RunningStatus = JobRunningStatus.NoRunning;
         State.RunningResult = JobRunningResult.NoResult;
-        
-        foreach (var childCfg in state.SubJobs) 
+
+        foreach (var childCfg in state.SubJobs)
             _provider.Executor.Exit(childCfg);
         state.ExitAttachFunc?.Invoke(state);
     }
@@ -71,11 +70,6 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
         return _IsPrepared();
     }
 
-    public bool CanExecute()
-    {
-        return IsPrepared();
-    }
-
     public void Update(double delta)
     {
         if (state.RunningStatus == JobRunningStatus.NoRunning) return;
@@ -97,6 +91,11 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
             _provider.Executor.IntervalUpdate(childCfg);
     }
 
+    public bool CanExecute()
+    {
+        return IsPrepared();
+    }
+
 
     private void _UpdateJob()
     {
@@ -113,6 +112,4 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
             //applyEffect()
         }
     }
-
-    
 }

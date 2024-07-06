@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Godot;
 using GPC.Job.Executor;
 using GPC.States;
 
@@ -8,10 +7,9 @@ namespace GPC.Scheduler;
 
 public class StateMachine(StateSet stateSet) : AbsScheduler(stateSet)
 {
-    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
-    
     private readonly HashSet<ITransition> _anyTransitions = new();
     private readonly Dictionary<string, StateNode> _nodes = new();
+    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
     private StateNode _current;
 
     public override void Update(double delta)

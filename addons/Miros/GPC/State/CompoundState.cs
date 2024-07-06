@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GPC.States;
 
@@ -10,6 +9,4 @@ public class CompoundState : AbsState
 
     public Dictionary<object, object> Desired { get; set; }
     public List<AbsState> SubJobs { get; set; }
-
-
 }

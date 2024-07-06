@@ -1,16 +1,14 @@
 using System.Collections.Generic;
-using Godot;
-using GPC.Job;
 using GPC.Job.Executor;
 using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class ConditionMachine : AbsScheduler 
+public class ConditionMachine : AbsScheduler
 {
     private readonly Dictionary<Layer, AbsState> _jobsExecute = new();
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
-    
+
     public ConditionMachine(StateSet stateSet) : base(stateSet)
     {
         foreach (var state in stateSet.States)
@@ -37,7 +35,6 @@ public class ConditionMachine : AbsScheduler
 
     private void _UpdateJob()
     {
-        
         foreach (var layer in _jobsExecute.Keys)
         {
             var currentState = _jobsExecute[layer];
@@ -49,8 +46,8 @@ public class ConditionMachine : AbsScheduler
 
                 _jobsExecute[layer] = nextState;
                 _provider.Executor.Enter(nextState);
-                
-                 StateChanged.Invoke(nextState);
+
+                StateChanged.Invoke(nextState);
             }
             else
             {
@@ -60,7 +57,7 @@ public class ConditionMachine : AbsScheduler
                     {
                         _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = null;
-                        
+
                         StateChanged.Invoke(currentState);
                     }
                     else
@@ -68,7 +65,7 @@ public class ConditionMachine : AbsScheduler
                         _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = nextState;
                         _provider.Executor.Enter(nextState);
-                        
+
                         StateChanged.Invoke(currentState);
                         StateChanged.Invoke(nextState);
                     }
@@ -82,7 +79,7 @@ public class ConditionMachine : AbsScheduler
                         _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = nextState;
                         _provider.Executor.Enter(nextState);
-                        
+
                         StateChanged.Invoke(currentState);
                         StateChanged.Invoke(nextState);
                     }
@@ -97,14 +94,13 @@ public class ConditionMachine : AbsScheduler
         foreach (var state in StateSet.States)
         {
             if (state.Layer != layer) continue;
-            if(_provider.Executor.IsPrepared(state))
+            if (_provider.Executor.IsPrepared(state))
                 candicateJobsCfg.Add(state);
         }
 
         if (candicateJobsCfg.Count == 0)
             return null;
         return GetHighestCfg(candicateJobsCfg);
-        
     }
 
 
@@ -117,8 +113,7 @@ public class ConditionMachine : AbsScheduler
             bestState ??= state;
             if (state.Priority > bestState.Priority) bestState = state;
         }
+
         return bestState;
     }
-
-  
 }

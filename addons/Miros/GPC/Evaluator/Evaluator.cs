@@ -13,15 +13,21 @@ public class Evaluator<T>(string name, Func<T> func) : IEvaluator
 {
     public string Name { get; set; } = name;
     private bool Result { get; set; }
-    private ulong Checksum { get; set; } 
+    private ulong Checksum { get; set; }
     private Func<T> Func { get; } = func;
     private T Value { get; set; }
+
+    public string GetFuncValueString()
+    {
+        CalcFuncValue();
+        return Value.ToString();
+    }
 
 
     public bool Is(T expectValue, CompareType type = CompareType.Equals)
     {
         CalcFuncValue();
-        
+
         switch (type)
         {
             case CompareType.Equals:
@@ -46,11 +52,5 @@ public class Evaluator<T>(string name, Func<T> func) : IEvaluator
 
         Value = Func.Invoke();
         Checksum = frames;
-    }
-    
-    public string GetFuncValueString()
-    {
-        CalcFuncValue();
-        return Value.ToString();
     }
 }

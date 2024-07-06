@@ -3,14 +3,14 @@ namespace GPC;
 public enum JobRunningStatus
 {
     NoRunning,
-    Running,
+    Running
 }
 
 public enum JobRunningResult
 {
     NoResult,
     Succeed,
-    Failed,
+    Failed
 }
 
 internal enum MsyType

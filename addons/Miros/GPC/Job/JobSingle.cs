@@ -1,5 +1,4 @@
 using Godot;
-using GPC.Scheduler;
 using GPC.States;
 
 namespace GPC.Job;
@@ -56,7 +55,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
     {
         return _IsFailed();
     }
-    
+
     public void Update(double delta)
     {
         if (State.RunningStatus == JobRunningStatus.NoRunning) return;
@@ -70,7 +69,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
             IntervalUpdate();
             State.ElapsedTime = 0;
         }
-        
+
         _UpdateJob();
     }
 

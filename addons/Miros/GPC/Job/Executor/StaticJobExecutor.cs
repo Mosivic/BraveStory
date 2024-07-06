@@ -4,17 +4,9 @@ using GPC.States;
 
 namespace GPC.Job.Executor;
 
-public class StaticJobExecutor:AbsJobExecutor,IJobExecutor
+public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
 {
     private static readonly Dictionary<Type, IJob> Jobs = new();
-    
-    private static IJob _GetJob(Type type, AbsState state)
-    {
-        if (Jobs.TryGetValue(type, out var value)) return value;
-        var job = (IJob)Activator.CreateInstance(type, [state]);
-        Jobs[type] = job;
-        return job;
-    }
 
     public void Enter(AbsState state)
     {
@@ -34,11 +26,6 @@ public class StaticJobExecutor:AbsJobExecutor,IJobExecutor
     public void Resume(AbsState state)
     {
         throw new NotImplementedException();
-    }
-
-    public void Resume(CompoundState state)
-    {
-        _GetJob(state.Type, state).Resume();
     }
 
     public bool IsSucceed(AbsState state)
@@ -65,11 +52,22 @@ public class StaticJobExecutor:AbsJobExecutor,IJobExecutor
     {
         _GetJob(state.Type, state).PhysicsUpdate(delta);
     }
-    
+
     public void IntervalUpdate(AbsState state)
     {
         _GetJob(state.Type, state).IntervalUpdate();
     }
 
+    private static IJob _GetJob(Type type, AbsState state)
+    {
+        if (Jobs.TryGetValue(type, out var value)) return value;
+        var job = (IJob)Activator.CreateInstance(type, [state]);
+        Jobs[type] = job;
+        return job;
+    }
 
+    public void Resume(CompoundState state)
+    {
+        _GetJob(state.Type, state).Resume();
+    }
 }

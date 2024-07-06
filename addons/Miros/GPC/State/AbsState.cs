@@ -5,7 +5,7 @@ namespace GPC.States;
 
 public abstract class AbsState
 {
-    public string Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; }
     public Layer Layer { get; set; } = null;
     public int Priority { get; set; } = 0;
@@ -14,10 +14,11 @@ public abstract class AbsState
     public Type Type { get; set; }
     public JobRunningStatus RunningStatus { get; set; } = JobRunningStatus.NoRunning;
     public JobRunningResult RunningResult { get; set; } = JobRunningResult.NoResult;
+    public bool UsePrepareFuncAsRunCondition { get; set; } = true;
     public Func<bool> IsPreparedFunc { get; set; }
     public Func<bool> IsSucceedFunc { get; set; }
     public Func<bool> IsFailedFunc { get; set; }
-    
+
     public Dictionary<object, bool> SucceedEffects { get; set; }
 
     public Dictionary<object, bool> FailedEffects { get; set; }

@@ -1,12 +1,11 @@
-﻿using GPC.Scheduler;
-using GPC.States;
+﻿using GPC.States;
 
 namespace GPC.Job;
 
 public abstract class AbsJob(AbsState state)
 {
     protected readonly AbsState State = state;
-    
+
     protected virtual void _Enter()
     {
         State.EnterFunc?.Invoke(State);
@@ -43,6 +42,13 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual bool _IsFailed()
     {
+        if (State.UsePrepareFuncAsRunCondition)
+        {
+            if (State.IsFailedFunc == null)
+                return !State.IsPreparedFunc.Invoke();
+            return State.IsFailedFunc.Invoke();
+        }
+
         if (State.IsFailedFunc != null)
             return State.IsFailedFunc.Invoke();
         return false;
