@@ -12,7 +12,7 @@ public abstract class AbsState
     public double IntervalTime { get; set; }
     public double ElapsedTime { get; set; }
     public Type Type { get; set; }
-    public Status Status { get; set; }
+    public Status Status { get; set; } = Status.Pause;
     public Func<bool> IsPreparedFunc { get; set; }
     public Func<bool> IsSucceedFunc { get; set; }
     public Func<bool> IsFailedFunc { get; set; }

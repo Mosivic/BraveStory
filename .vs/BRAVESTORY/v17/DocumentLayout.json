@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Administrator\\Documents\\Godot\\BraveStory\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E74B3295-08A9-491B-B391-8861C145E615}|BraveStory.csproj|c:\\users\\administrator\\documents\\godot\\bravestory\\addons\\miros\\gpc\\forgodot\\gpcnode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E74B3295-08A9-491B-B391-8861C145E615}|BraveStory.csproj|solutionrelative:addons\\miros\\gpc\\forgodot\\gpcnode.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GPCNode.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\Godot\\BraveStory\\addons\\Miros\\GPC\\ForGodot\\GPCNode.cs",
+              "RelativeDocumentMoniker": "addons\\Miros\\GPC\\ForGodot\\GPCNode.cs",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\Godot\\BraveStory\\addons\\Miros\\GPC\\ForGodot\\GPCNode.cs",
+              "RelativeToolTip": "addons\\Miros\\GPC\\ForGodot\\GPCNode.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-06T02:44:06.072Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

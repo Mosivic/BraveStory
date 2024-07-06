@@ -21,6 +21,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 #if DEBUG
         GD.Print($"{State.Name} Exit.");
 #endif
+        State.Status = Status.Pause;
         _Exit();
         State.ExitAttachFunc?.Invoke(State);
     }

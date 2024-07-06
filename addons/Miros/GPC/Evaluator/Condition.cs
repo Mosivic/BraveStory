@@ -31,7 +31,7 @@ public class BoolCondition(Evaluator<bool> evaluator, bool expectValue, CompareT
 
     public override bool IsSatisfy()
     {
-        return Evaluator.Invoke(ExpectValue, Type);
+        return Evaluator.Is(ExpectValue, Type);
     }
 }
 
@@ -44,6 +44,6 @@ public class FloatCondition(Evaluator<float> evaluator, float expectValue, Compa
 
     public override bool IsSatisfy()
     {
-        return Evaluator.Invoke(ExpectValue, Type);
+        return Evaluator.Is(ExpectValue, Type);
     }
 }

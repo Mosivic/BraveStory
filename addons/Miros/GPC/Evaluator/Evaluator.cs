@@ -3,39 +3,54 @@ using Godot;
 
 namespace GPC.Evaluator;
 
-public abstract class AbsEvaluator
+public interface IEvaluator
 {
+    string GetFuncValueString();
 }
 
-public class Evaluator<T>(Func<T> func) : AbsEvaluator
+public class Evaluator<T>(string name, Func<T> func) : IEvaluator
     where T : IComparable
 {
-    private bool Involved { get; set; }
+    public string Name { get; set; } = name;
+    private bool Result { get; set; }
     private ulong Checksum { get; set; } 
     private Func<T> Func { get; } = func;
+    private T Value { get; set; }
 
 
-    public bool Invoke(T expectValue, CompareType type = CompareType.Equals)
+    public bool Is(T expectValue, CompareType type = CompareType.Equals)
     {
-        var frames = Engine.GetProcessFrames();
-        if (Checksum.Equals(frames))
-            return Involved;
-
-        var value = Func.Invoke();
+        CalcFuncValue();
+        
         switch (type)
         {
             case CompareType.Equals:
-                Involved = value.Equals(expectValue);
+                Result = Value.Equals(expectValue);
                 break;
             case CompareType.Greater:
-                Involved = value.CompareTo(expectValue) > 0;
+                Result = Value.CompareTo(expectValue) > 0;
                 break;
             case CompareType.Less:
-                Involved = value.CompareTo(expectValue) < 0;
+                Result = Value.CompareTo(expectValue) < 0;
                 break;
         }
 
+        return Result;
+    }
+
+    private void CalcFuncValue()
+    {
+        var frames = Engine.GetProcessFrames();
+        if (Checksum.Equals(frames))
+            return;
+
+        Value = Func.Invoke();
         Checksum = frames;
-        return Involved;
+    }
+    
+    public string GetFuncValueString()
+    {
+        CalcFuncValue();
+        return Value.ToString();
     }
 }
