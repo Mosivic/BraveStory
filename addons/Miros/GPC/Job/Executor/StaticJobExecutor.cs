@@ -17,7 +17,12 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
     {
         _GetJob(state.Type, state).Exit();
     }
-
+    
+    public void Break(AbsState state)
+    {
+        _GetJob(state.Type, state).Break();
+    }
+    
     public void Pause(AbsState state)
     {
         _GetJob(state.Type, state).Pause();
@@ -25,19 +30,10 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
 
     public void Resume(AbsState state)
     {
-        throw new NotImplementedException();
+        _GetJob(state.Type, state).Resume();
     }
 
-    public bool IsSucceed(AbsState state)
-    {
-        return _GetJob(state.Type, state).IsSucceed();
-    }
-
-    public bool IsFailed(AbsState state)
-    {
-        return _GetJob(state.Type, state).IsFailed();
-    }
-
+    
     public bool IsPrepared(AbsState state)
     {
         return _GetJob(state.Type, state).IsPrepared();
@@ -66,8 +62,5 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         return job;
     }
 
-    public void Resume(CompoundState state)
-    {
-        _GetJob(state.Type, state).Resume();
-    }
+
 }

@@ -1,9 +1,10 @@
-﻿using Godot;
+﻿using BraveStory.State;
+using Godot;
 using GPC.Job;
 
 namespace BraveStory.Job;
 
-internal class Test(PlayerState state) : JobSingle(state)
+internal class Test(PlayerState state) : JobBase(state)
 {
     protected override void _Enter()
     {

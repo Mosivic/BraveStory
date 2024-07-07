@@ -3,47 +3,26 @@ using GPC.States;
 
 namespace GPC.Job;
 
-internal class JobAll(CompoundState state) : AbsJob(state), IJob
+internal class JobAll(CompoundState state) : JobBase(state)
 {
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
 
-    public void Enter()
+    public override void Enter()
     {
-        state.IsRunning = true;
-        State.RunningResult = JobRunningResult.NoResult;
-
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Enter(childCfg);
         _Enter();
-        state.EnterAttachFunc?.Invoke(state);
     }
 
 
-    public void Exit()
+    public override void Exit()
     {
-        state.IsRunning = false;
-        State.RunningResult = JobRunningResult.NoResult;
-
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Exit(childCfg);
-        state.ExitAttachFunc?.Invoke(state);
     }
 
 
-    public void Pause()
-    {
-        state.IsRunning = false;
-        state.PauseAttachFunc?.Invoke(state);
-    }
-
-
-    public void Resume()
-    {
-        state.IsRunning = true;
-        state.ResumeAttachFunc?.Invoke(state);
-    }
-
-
+    
     public bool IsSucceed()
     {
         foreach (var childCfg in state.SubJobs)
@@ -64,51 +43,26 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
         return false;
     }
 
-
-    public bool IsPrepared()
-    {
-        return _IsPrepared();
-    }
-
-    public void Update(double delta)
+    
+    public override void Update(double delta)
     {
         if (!state.IsRunning) return;
-
+        
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Update(childCfg, delta);
-        _UpdateJob();
+  
     }
 
-    public void PhysicsUpdate(double delta)
+    public override void PhysicsUpdate(double delta)
     {
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.PhysicsUpdate(childCfg, delta);
     }
 
-    public void IntervalUpdate()
+    public override void IntervalUpdate()
     {
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.IntervalUpdate(childCfg);
     }
-
-    public bool CanExecute()
-    {
-        return IsPrepared();
-    }
-
-
-    private void _UpdateJob()
-    {
-        if (IsFailed())
-        {
-            state.IsRunning = false;
-            State.RunningResult = JobRunningResult.Failed;
-            //applyEffect()
-        }
-        else if (IsSucceed())
-        {
-            State.RunningResult = JobRunningResult.Succeed;
-            //applyEffect()
-        }
-    }
+    
 }

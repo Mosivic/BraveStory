@@ -1,13 +1,13 @@
+using BraveStory.Player;
 using Godot;
+using GPC;
 using GPC.States;
 
-public class PlayerState(CharacterBody2D host, PlayerParams param) : CompoundState
+namespace BraveStory.State;
+
+public class PlayerState(CharacterBody2D host, PlayerNodes node,PlayerProperties properties) : CompoundState
 {
-    public PlayerParams Params { get; set; } = param;
-    public float Gravity { get; } = 980;
-    public float RunSpeed { get; } = 200;
-    public float JumpVelocity { get; } = -300;
-    public float FloorAcceleration { get; } = 200 * 5;
-    public float AirAcceleration { get; } = 200 * 50;
+    public PlayerNodes Nodes { get; set; } = node;
+    public PlayerProperties Properties { get; set; } = properties;
     public CharacterBody2D Host { get; set; } = host;
 }

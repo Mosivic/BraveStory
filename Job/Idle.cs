@@ -1,9 +1,11 @@
+using BraveStory.State;
 using GPC.Job;
+using GPC.States;
 
-internal class Idle(PlayerState state) : JobSingle(state)
+internal class Idle(PlayerState state) : JobBase(state)
 {
     protected override void _Enter()
     {
-        state.Params.AnimationPlayer.Play("idle");
+        state.Nodes.AnimationPlayer.Play("idle");
     }
 }

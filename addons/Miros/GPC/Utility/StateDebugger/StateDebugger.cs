@@ -108,7 +108,7 @@ public partial class StateDebugger : MarginContainer
 
     private void UpdateHistoryDisplay(AbsState state,JobRunningStatus status)
     {
-        var info = $"[{Engine.GetProcessFrames().ToString()}] {state.Name}({state.Layer.Name}) : {status}";
+        var info = $"[{Engine.GetProcessFrames().ToString()}] [color=green] {state.Name}[/color]({state.Layer.Name}) : {status}";
         _historyInfo += info + "\n";
         _historyLabel.SetText(_historyInfo);
     }

@@ -1,9 +1,10 @@
-﻿using GPC.Job;
+﻿using BraveStory.State;
+using GPC.Job;
 
-internal class Landing(PlayerState state) : JobSingle(state)
+internal class Landing(PlayerState state) : JobBase(state)
 {
     protected override void _Enter()
     {
-        state.Params.AnimationPlayer.Play("landing");
+        state.Nodes.AnimationPlayer.Play("landing");
     }
 }

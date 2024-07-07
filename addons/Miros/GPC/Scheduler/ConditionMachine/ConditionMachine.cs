@@ -40,7 +40,7 @@ public class ConditionMachine : AbsScheduler
             var currentState = _jobsExecute[layer];
             var nextState = _GetBestState(layer);
 
-            if (currentState == null)
+            if (currentState == null) //当前层无State
             {
                 if (nextState == null) return;
 
@@ -49,9 +49,9 @@ public class ConditionMachine : AbsScheduler
 
                 StateChanged.Invoke(nextState,JobRunningStatus.Enter);
             }
-            else
+            else //当前层有State
             {
-                if (currentState.IsRunning == false)
+                if (currentState.IsRunning == false) //当前层State自运行结束
                 {
                     if (nextState == null)
                     {
@@ -69,14 +69,13 @@ public class ConditionMachine : AbsScheduler
                         StateChanged.Invoke(currentState,JobRunningStatus.Exit);
                         StateChanged.Invoke(nextState,JobRunningStatus.Enter);
                     }
-                }
-                else
+                }else //当前层State运行未结束
                 {
                     if (nextState == null) return;
 
-                    if (nextState.Priority > currentState.Priority)
+                    if (nextState.Priority > currentState.Priority) //当前层有更高优先级State
                     {
-                        _provider.Executor.Exit(currentState);
+                        _provider.Executor.Break(currentState);
                         _jobsExecute[layer] = nextState;
                         _provider.Executor.Enter(nextState);
 

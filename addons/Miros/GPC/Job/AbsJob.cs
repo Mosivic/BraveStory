@@ -7,7 +7,7 @@ public abstract class AbsJob(AbsState state)
     protected readonly AbsState State = state;
 
     protected virtual void _Enter()
-    {
+    { 
         State.EnterFunc?.Invoke(State);
     }
 
@@ -16,6 +16,11 @@ public abstract class AbsJob(AbsState state)
         State.ExitFunc?.Invoke(State);
     }
 
+    protected virtual void _Break()
+    {
+        State.BreakFunc?.Invoke(State);
+    }
+    
     protected virtual void _Pause()
     {
         State.PauseFunc?.Invoke(State);
@@ -35,23 +40,33 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual bool _IsSucceed()
     {
+        var isSucceed = false;
         if (State.IsSucceedFunc != null)
-            return State.IsSucceedFunc.Invoke();
-        return false;
+            isSucceed =  State.IsSucceedFunc.Invoke();
+        
+        if (isSucceed)
+            State.RunningResult = JobRunningResult.Succeed;
+        return isSucceed;
     }
 
     protected virtual bool _IsFailed()
     {
+        var isFailed = false;
         if (State.UsePrepareFuncAsRunCondition)
         {
             if (State.IsFailedFunc == null)
-                return !State.IsPreparedFunc.Invoke();
-            return State.IsFailedFunc.Invoke();
+                isFailed =  !State.IsPreparedFunc.Invoke();
+            else
+                isFailed =  State.IsFailedFunc.Invoke();
+        }
+        else if(State.IsFailedFunc != null)
+        {
+            isFailed = State.IsFailedFunc.Invoke();
         }
 
-        if (State.IsFailedFunc != null)
-            return State.IsFailedFunc.Invoke();
-        return false;
+        if (isFailed)
+            State.RunningResult = JobRunningResult.Failed;
+        return isFailed;
     }
 
     protected virtual void _PhysicsUpdate(double delta)
@@ -62,10 +77,12 @@ public abstract class AbsJob(AbsState state)
     protected virtual void _Update(double delta)
     {
         State.RunningFunc?.Invoke(State);
+
     }
 
     protected virtual void _IntervalUpdate()
     {
         State.IntervalUpdateFunc?.Invoke(State);
     }
+    
 }
