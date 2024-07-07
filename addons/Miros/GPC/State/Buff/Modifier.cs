@@ -1,4 +1,5 @@
 ﻿using BraveStory.Player;
+using Godot;
 
 namespace GPC.States.Buff;
 
@@ -25,7 +26,7 @@ public struct ModifierMagnitude
 
 public struct Modifier
 {
-    public float Property { get; set; }
+    public BindableProperty<float> Property { get; set; }
     public float Affect { get; set; }
     public BuffModifierOperator Operator { get; set; }
     public ModifierMagnitude Magnitude { get; set; }

@@ -19,19 +19,18 @@ public class PlayerNodes:INodes
 
 public class PlayerProperties() : AbsProperties
 {
-    public Range<float> Gravity { get; } = new(980f);
-    public Range<float> RunSpeed { get; } = new(200f);
-    public Range<float> JumpVelocity { get; } = new(-300f);
-    public Range<float> FloorAcceleration { get; } = new(200f * 5);
-    public Range<float> AirAcceleration { get; } = new(200 * 50);
+    public BindableProperty<float> Gravity { get; } = new(980f);
+    public BindableProperty<float> RunSpeed { get; } = new(200f);
+    public BindableProperty<float> JumpVelocity { get; } = new(-300f);
+    public BindableProperty<float> FloorAcceleration { get; } = new(200f * 5);
+    public BindableProperty<float> AirAcceleration { get; } = new(200 * 50);
 }
 
-public class Range<T>(T value)
+public class BindableProperty<T>(T value)
 {
-    public T Current { get; set; } = value;
-    public T Min { get; set; } = value;
-    public T Max { get; set; } = value;
+    public T Value { get; set; } = value;
 }
+
 public partial class Player : CharacterBody2D, IGpcToken
 {
     private ConditionMachine _scheduler;
@@ -86,7 +85,7 @@ public partial class Player : CharacterBody2D, IGpcToken
             Layer = LayerMap.Buff,
             Modifiers = [new Modifier()
             {
-                Property = _properties.RunSpeed.Current,
+                Property = _properties.RunSpeed,
                 Operator = BuffModifierOperator.Add,
                 Affect = 100,
             }],
@@ -101,6 +100,7 @@ public partial class Player : CharacterBody2D, IGpcToken
     public override void _Process(double delta)
     {
         _scheduler.Update(delta);
+        GD.Print(_properties.RunSpeed.Value);
     }
 
     public override void _PhysicsProcess(double delta)

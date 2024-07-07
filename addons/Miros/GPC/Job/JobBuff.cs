@@ -1,4 +1,5 @@
-﻿using GPC.States;
+﻿using Godot;
+using GPC.States;
 using GPC.States.Buff;
 
 namespace GPC.Job;
@@ -19,16 +20,16 @@ public class JobBuff(Buff buff) : JobBase(buff)
                     switch (modifier.Operator)
                     {
                         case BuffModifierOperator.Add:
-                                modifier.Property+= modifier.Affect;
+                                modifier.Property.Value+= modifier.Affect;
                             break;
                         case BuffModifierOperator.Multiply:
-                                modifier.Property *= modifier.Affect;
+                                modifier.Property.Value *= modifier.Affect;
                             break;
                         case BuffModifierOperator.Divide:
-                                modifier.Property /= modifier.Affect;
+                                modifier.Property.Value /= modifier.Affect;
                             break;
                         case BuffModifierOperator.Override:
-                                modifier.Property = modifier.Affect; ;
+                                modifier.Property.Value = modifier.Affect; ;
                             break;
                     }
                 }
