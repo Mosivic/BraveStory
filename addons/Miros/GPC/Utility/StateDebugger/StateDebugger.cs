@@ -29,7 +29,9 @@ public partial class StateDebugger : MarginContainer
     private Texture2D _redPointTexture = 
         GD.Load<Texture2D>("addons/Miros/Material/Icon/red_point.svg");
     private Texture2D _greenPointTexture =
-        GD.Load<Texture2D>("addons/Miros/Material/Icon/green_point.svg");
+        GD.Load<Texture2D>("addons/Miros/Material/Icon/green_point.svg");   
+    private Texture2D _orangePointTexture =
+        GD.Load<Texture2D>("addons/Miros/Material/Icon/orange_point.svg");
     
 
     public override void _Ready()
@@ -47,6 +49,7 @@ public partial class StateDebugger : MarginContainer
         
         if (_scheduler != null)
         {
+            _scheduler.StatePrepared += OnStatePrepared;
             _scheduler.StateChanged += OnStateChanged;
             _states = _scheduler.StateSet.States;
 
@@ -72,6 +75,8 @@ public partial class StateDebugger : MarginContainer
             }
         }
     }
+
+
 
     // public override void _Process(double delta)
     // {
@@ -112,10 +117,17 @@ public partial class StateDebugger : MarginContainer
         _historyInfo += info + "\n";
         _historyLabel.SetText(_historyInfo);
     }
-    
-    public void OnStateChanged(AbsState state,JobRunningStatus status)
+
+    private void OnStateChanged(AbsState state,JobRunningStatus status)
     {
         UpdateStateDisplay(state);
         UpdateHistoryDisplay(state, status);
     }
+    private void OnStatePrepared(AbsState state)
+    {
+        var treeItem = _stateTreeItemDict[state];
+        if(state.IsRunning == false)
+            treeItem.SetIcon(1,_orangePointTexture);
+    }
+    
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GPC.Job.Executor;
 using GPC.States;
 
@@ -6,100 +7,104 @@ namespace GPC.Scheduler;
 
 public class ConditionMachine : AbsScheduler
 {
-    private readonly Dictionary<Layer, AbsState> _jobsExecute = new();
+    private readonly Dictionary<Layer, List<AbsState>> _runningStates = new();
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
-
+    
     public ConditionMachine(StateSet stateSet) : base(stateSet)
     {
-        foreach (var state in stateSet.States)
+        foreach (var layer in stateSet.States.Select(state => state.Layer))
         {
-            var layer = state.Layer;
-            _jobsExecute.TryAdd(layer, null);
+            _runningStates[layer] = [];
         }
     }
 
     public override void Update(double delta)
     {
-        _UpdateJob();
-        foreach (var state in _jobsExecute.Values)
-            if (state != null)
-                _provider.Executor.Update(state, delta);
+        _UpdateState();
+        foreach (var state in _runningStates.Values.SelectMany(states => states.Where(state => state != null)))
+            _provider.Executor.Update(state, delta);
     }
 
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var state in _jobsExecute.Values)
-            if (state != null)
-                _provider.Executor.PhysicsUpdate(state, delta);
+        foreach (var state in _runningStates.Values.SelectMany(states => states.Where(state => state != null)))
+            _provider.Executor.PhysicsUpdate(state, delta);
     }
 
-    private void _UpdateJob()
+    private void _UpdateState()
     {
-        foreach (var layer in _jobsExecute.Keys)
+        foreach (var layer in _runningStates.Keys)
         {
-            var currentState = _jobsExecute[layer];
-            var nextState = _GetBestState(layer);
-
-            if (currentState == null) //当前层无State
+            var layerStates = _runningStates[layer];
+            
+            var layerStateMaxCount = layer.JobMaxCount;
+            var layerStateCount = layerStates.Count();
+            
+            //结束运行完成的State
+            if (layerStateCount != 0) 
             {
-                if (nextState == null) return;
-
-                _jobsExecute[layer] = nextState;
-                _provider.Executor.Enter(nextState);
-
-                StateChanged.Invoke(nextState,JobRunningStatus.Enter);
-            }
-            else //当前层有State
-            {
-                if (currentState.IsRunning == false) //当前层State自运行结束
+                for (int i = 0; i < layerStateCount; i++) 
                 {
-                    if (nextState == null)
+                    var layerJob = layerStates[i];
+                    if (!layerJob.IsRunning)
                     {
-                        _provider.Executor.Exit(currentState);
-                        _jobsExecute[layer] = null;
-
-                        StateChanged.Invoke(currentState,JobRunningStatus.Exit);
-                    }
-                    else
-                    {
-                        _provider.Executor.Exit(currentState);
-                        _jobsExecute[layer] = nextState;
-                        _provider.Executor.Enter(nextState);
-
-                        StateChanged.Invoke(currentState,JobRunningStatus.Exit);
-                        StateChanged.Invoke(nextState,JobRunningStatus.Enter);
-                    }
-                }else //当前层State运行未结束
-                {
-                    if (nextState == null) return;
-
-                    if (nextState.Priority > currentState.Priority) //当前层有更高优先级State
-                    {
-                        _provider.Executor.Break(currentState);
-                        _jobsExecute[layer] = nextState;
-                        _provider.Executor.Enter(nextState);
-
-                        StateChanged.Invoke(currentState,JobRunningStatus.Exit);
-                        StateChanged.Invoke(nextState,JobRunningStatus.Enter);
+                        StateChanged.Invoke(layerJob,JobRunningStatus.Exit);
+                        _provider.Executor.Exit(layerJob);
+                        layerStates.RemoveAt(i);
                     }
                 }
+                layerStateCount = layerStates.Count();
+            }
+            
+            if(layerStateMaxCount < 1) continue;
+            var nextState = _GetBestState(layer);
+            if (nextState == null) continue;
+            
+            //考虑加入NextState
+            //当前层无State
+            if (layerStateCount == 0) 
+            {
+                StateChanged.Invoke(nextState,JobRunningStatus.Enter);
+                _provider.Executor.Enter(nextState);
+                layerStates.Add(nextState);
+            }
+            //当前层有未满，可加入NextState
+            else if (layerStateCount < layerStateMaxCount)
+            {
+                StateChanged.Invoke(nextState, JobRunningStatus.Enter);
+                _provider.Executor.Enter(nextState);
+                
+                layerStates.Add(nextState);
+                layerStates = layerStates.OrderBy(state => state.Priority).ToList();
+            }
+            //当前层已满，加入高优先State
+            else if(layerStateCount == layerStateMaxCount && nextState.Priority > layerStates[0].Priority) 
+            {
+                StateChanged.Invoke(layerStates[0],JobRunningStatus.Exit);
+                _provider.Executor.Exit(layerStates[0]);
+                layerStates.RemoveAt(0);
+                
+                StateChanged.Invoke(nextState,JobRunningStatus.Enter);
+                _provider.Executor.Enter(nextState);
+                layerStates.Add(nextState);
+                layerStates = layerStates.OrderBy(state => state.Priority).ToList();
             }
         }
     }
 
     private AbsState _GetBestState(Layer layer)
     {
-        List<AbsState> candicateJobsCfg = [];
-        foreach (var state in StateSet.States)
+        var states = new List<AbsState>();
+        
+        foreach (var state in StateSet.States.Where(state => state.Layer == layer).Where(state => _provider.Executor.IsPrepared(state)))
         {
-            if (state.Layer != layer) continue;
-            if (_provider.Executor.IsPrepared(state))
-                candicateJobsCfg.Add(state);
+            StatePrepared.Invoke(state);
+            states.Add(state);
         }
 
-        if (candicateJobsCfg.Count == 0)
+        if (states.Count == 0)
             return null;
-        return GetHighestCfg(candicateJobsCfg);
+        return GetHighestCfg(states);
     }
 
 

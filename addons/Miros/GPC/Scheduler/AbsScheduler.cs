@@ -6,6 +6,7 @@ namespace GPC.Scheduler;
 public abstract class AbsScheduler(StateSet stateSet)
 {
     public Action<AbsState,JobRunningStatus> StateChanged;
+    public Action<AbsState> StatePrepared;
     
     public StateSet StateSet = stateSet;
     public abstract void Update(double delta);

@@ -14,10 +14,9 @@ metadata/_edit_use_anchors_ = true
 
 [node name="TabContainer" type="TabContainer" parent="."]
 layout_mode = 2
-current_tab = 1
+current_tab = 0
 
 [node name="States" type="MarginContainer" parent="TabContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
@@ -31,6 +30,7 @@ columns = 2
 allow_search = false
 
 [node name="History" type="MarginContainer" parent="TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 5
@@ -47,19 +47,6 @@ shortcut_keys_enabled = false
 deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
 
-[node name="Evaluators" type="MarginContainer" parent="TabContainer"]
-visible = false
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-metadata/_tab_index = 2
-
-[node name="Status" type="ItemList" parent="TabContainer/Evaluators"]
-layout_mode = 2
-allow_search = false
-
 [node name="Settings" type="MarginContainer" parent="TabContainer"]
 visible = false
 layout_mode = 2
@@ -67,4 +54,4 @@ theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
-metadata/_tab_index = 3
+metadata/_tab_index = 2

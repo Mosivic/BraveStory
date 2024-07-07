@@ -87,7 +87,7 @@ public partial class Player : CharacterBody2D, IGpcToken
             {
                 Property = _properties.RunSpeed,
                 Operator = BuffModifierOperator.Add,
-                Affect = 100,
+                Affect = -10,
             }],
             Type = typeof(JobBuff),
             IsPreparedFunc = ()=>Evaluators.IsJumpKeyDown.Is(true) 

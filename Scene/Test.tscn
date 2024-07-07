@@ -543,5 +543,5 @@ region_rect = Rect2(112, 0, 96, 256)
 offset_left = -16.0
 offset_top = 56.0
 offset_right = 284.0
-offset_bottom = 256.0
+offset_bottom = 356.0
 WatchNode = NodePath("../Player")
