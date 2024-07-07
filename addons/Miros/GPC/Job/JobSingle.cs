@@ -10,7 +10,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 #if DEBUG
         GD.Print($"{State.Name} Enter.");
 #endif
-        State.RunningStatus = JobRunningStatus.Running;
+        state.IsRunning = true;
         State.RunningResult = JobRunningResult.NoResult;
         _Enter();
         State.EnterAttachFunc?.Invoke(State);
@@ -21,7 +21,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 #if DEBUG
         GD.Print($"{State.Name} Exit.");
 #endif
-        State.RunningStatus = JobRunningStatus.NoRunning;
+        state.IsRunning = false;
         State.RunningResult = JobRunningResult.NoResult;
         _Exit();
         State.ExitAttachFunc?.Invoke(State);
@@ -29,14 +29,14 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 
     public void Pause()
     {
-        State.RunningStatus = JobRunningStatus.NoRunning;
+        state.IsRunning = false;
         _Pause();
         State.PauseAttachFunc?.Invoke(State);
     }
 
     public void Resume()
     {
-        State.RunningStatus = JobRunningStatus.Running;
+        state.IsRunning = true;
         _Resume();
         State.ResumeAttachFunc?.Invoke(State);
     }
@@ -58,7 +58,7 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
 
     public void Update(double delta)
     {
-        if (State.RunningStatus == JobRunningStatus.NoRunning) return;
+        if (!state.IsRunning) return;
 
         _Update(delta);
         State.RunningAttachFunc?.Invoke(State);
@@ -90,13 +90,12 @@ internal class JobSingle(AbsState state) : AbsJob(state), IJob
     {
         if (IsFailed())
         {
-            State.RunningStatus = JobRunningStatus.NoRunning;
+            state.IsRunning = false;
             State.RunningResult = JobRunningResult.Failed;
             //applyEffect()
         }
         else if (IsSucceed())
         {
-            State.RunningStatus = JobRunningStatus.NoRunning;
             State.RunningResult = JobRunningResult.Succeed;
             //applyEffect()
         }

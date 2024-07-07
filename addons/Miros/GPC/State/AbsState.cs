@@ -11,10 +11,10 @@ public abstract class AbsState
     public int Priority { get; set; } = 0;
     public double IntervalTime { get; set; }
     public double IntervalElapsedTime { get; set; }
-    public double DelayTime { get; set; }
     public Type Type { get; set; }
-    public JobRunningStatus RunningStatus { get; set; } = JobRunningStatus.NoRunning;
+    
     public JobRunningResult RunningResult { get; set; } = JobRunningResult.NoResult;
+    public bool IsRunning { get; set; }
     public bool UsePrepareFuncAsRunCondition { get; set; } = true;
     public Func<bool> IsPreparedFunc { get; set; }
     public Func<bool> IsSucceedFunc { get; set; }

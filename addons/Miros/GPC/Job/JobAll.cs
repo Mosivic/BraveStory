@@ -9,7 +9,7 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
 
     public void Enter()
     {
-        state.RunningStatus = JobRunningStatus.Running;
+        state.IsRunning = true;
         State.RunningResult = JobRunningResult.NoResult;
 
         foreach (var childCfg in state.SubJobs)
@@ -21,7 +21,7 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
 
     public void Exit()
     {
-        state.RunningStatus = JobRunningStatus.NoRunning;
+        state.IsRunning = false;
         State.RunningResult = JobRunningResult.NoResult;
 
         foreach (var childCfg in state.SubJobs)
@@ -32,14 +32,14 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
 
     public void Pause()
     {
-        state.RunningStatus = JobRunningStatus.NoRunning;
+        state.IsRunning = false;
         state.PauseAttachFunc?.Invoke(state);
     }
 
 
     public void Resume()
     {
-        state.RunningStatus = JobRunningStatus.Running;
+        state.IsRunning = true;
         state.ResumeAttachFunc?.Invoke(state);
     }
 
@@ -72,7 +72,7 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
 
     public void Update(double delta)
     {
-        if (state.RunningStatus == JobRunningStatus.NoRunning) return;
+        if (!state.IsRunning) return;
 
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Update(childCfg, delta);
@@ -101,13 +101,12 @@ internal class JobAll(CompoundState state) : AbsJob(state), IJob
     {
         if (IsFailed())
         {
-            State.RunningStatus = JobRunningStatus.NoRunning;
+            state.IsRunning = false;
             State.RunningResult = JobRunningResult.Failed;
             //applyEffect()
         }
         else if (IsSucceed())
         {
-            State.RunningStatus = JobRunningStatus.NoRunning;
             State.RunningResult = JobRunningResult.Succeed;
             //applyEffect()
         }

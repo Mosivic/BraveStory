@@ -47,18 +47,18 @@ public class ConditionMachine : AbsScheduler
                 _jobsExecute[layer] = nextState;
                 _provider.Executor.Enter(nextState);
 
-                StateChanged.Invoke(nextState);
+                StateChanged.Invoke(nextState,JobRunningStatus.Enter);
             }
             else
             {
-                if (currentState.RunningStatus == JobRunningStatus.NoRunning)
+                if (currentState.IsRunning == false)
                 {
                     if (nextState == null)
                     {
                         _provider.Executor.Exit(currentState);
                         _jobsExecute[layer] = null;
 
-                        StateChanged.Invoke(currentState);
+                        StateChanged.Invoke(currentState,JobRunningStatus.Exit);
                     }
                     else
                     {
@@ -66,8 +66,8 @@ public class ConditionMachine : AbsScheduler
                         _jobsExecute[layer] = nextState;
                         _provider.Executor.Enter(nextState);
 
-                        StateChanged.Invoke(currentState);
-                        StateChanged.Invoke(nextState);
+                        StateChanged.Invoke(currentState,JobRunningStatus.Exit);
+                        StateChanged.Invoke(nextState,JobRunningStatus.Enter);
                     }
                 }
                 else
@@ -80,8 +80,8 @@ public class ConditionMachine : AbsScheduler
                         _jobsExecute[layer] = nextState;
                         _provider.Executor.Enter(nextState);
 
-                        StateChanged.Invoke(currentState);
-                        StateChanged.Invoke(nextState);
+                        StateChanged.Invoke(currentState,JobRunningStatus.Exit);
+                        StateChanged.Invoke(nextState,JobRunningStatus.Enter);
                     }
                 }
             }

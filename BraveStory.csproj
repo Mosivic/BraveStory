@@ -7,9 +7,11 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="addons\Miros\GPC\Scheduler\OldGOAP\**"/>
+        <Compile Remove="addons\Miros\Material\**" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Remove="addons\Miros\GPC\Scheduler\OldGOAP\**"/>
+        <EmbeddedResource Remove="addons\Miros\Material\**" />
     </ItemGroup>
     <ItemGroup>
         <Folder Include="addons\Miros\GPC\Debug\"/>

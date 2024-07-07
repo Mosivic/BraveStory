@@ -1,9 +1,17 @@
 namespace GPC;
 
+public enum CompareType
+{
+    Equals,
+    Greater,
+    Less
+}
+
 public enum JobRunningStatus
 {
-    NoRunning,
-    Running
+    Enter,
+    Update,
+    Exit,
 }
 
 public enum JobRunningResult

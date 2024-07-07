@@ -542,6 +542,6 @@ region_rect = Rect2(112, 0, 96, 256)
 [node name="StateDebugger" parent="." node_paths=PackedStringArray("WatchNode") instance=ExtResource("6_hh0aq")]
 offset_left = -16.0
 offset_top = 56.0
-offset_right = 234.0
+offset_right = 284.0
 offset_bottom = 256.0
 WatchNode = NodePath("../Player")
