@@ -9,7 +9,8 @@ public interface IJob
     void OnFailed();
     void OnPause();
     void OnResume();
-    void OnStack();
+    void OnStack(AbsState state);
+    void OnStackOverflow(AbsState state);
     bool IsPrepared();
     void Update(double delta);
     void PhysicsUpdate(double delta);

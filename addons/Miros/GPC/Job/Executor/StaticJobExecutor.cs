@@ -28,11 +28,16 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         _GetJob(state.Type, state).OnResume();
     }
 
-    public void Stack(AbsState state)
+    public void Stack(AbsState originState,AbsState stackState)
     {
-        _GetJob(state.Type, state).OnStack();
+        _GetJob(originState.Type, originState).OnStack(stackState);
     }
-    
+
+    public void StackOverflow(AbsState originState,AbsState stackState)
+    {
+        _GetJob(originState.Type, originState).OnStackOverflow(stackState);
+    }
+
     public bool IsPrepared(AbsState state)
     {
         return _GetJob(state.Type, state).IsPrepared();

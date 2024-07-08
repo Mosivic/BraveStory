@@ -40,7 +40,12 @@ public abstract class AbsJob(AbsState state)
     {
         State.StackFunc?.Invoke(State);
     }
-
+    
+    protected virtual void _OnStackOverflow()
+    {
+        State.StackOverflowFunc?.Invoke(State);
+    }
+    
     protected virtual bool _IsPrepared()
     {
         if (State.IsPreparedFunc != null)
@@ -89,8 +94,5 @@ public abstract class AbsJob(AbsState state)
         State.RunningFunc?.Invoke(State);
     }
 
-    protected virtual void _IntervalUpdate()
-    {
-        State.IntervalUpdateFunc?.Invoke(State);
-    }
+
 }

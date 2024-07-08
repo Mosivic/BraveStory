@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GPC.States;
 using GPC.States.Buff;
 
@@ -88,11 +89,17 @@ public class JobBuff(Buff buff) : JobBase(buff)
     }
 
 
-    public override void OnStack()
+    public override void OnStack(AbsState stackState)
     {
         
+        _OnStack();
     }
-    
+
+    public override void OnStackOverflow(AbsState stackState)
+    {
+        _OnStackOverflow();
+    }
+
     private void ApplyModifiers()
     {
         var random = new Random();

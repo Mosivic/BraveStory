@@ -32,9 +32,14 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         _OnResume();
     }
 
-    public virtual void OnStack()
+    public virtual void OnStack(AbsState state)
     {
         _OnStack();
+    }
+
+    public virtual void OnStackOverflow(AbsState state)
+    {
+        _OnStackOverflow();
     }
 
     protected virtual void OnPeriod()

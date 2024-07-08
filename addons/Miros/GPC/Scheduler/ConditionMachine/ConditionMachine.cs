@@ -55,20 +55,26 @@ public class ConditionMachine : AbsScheduler
                     if (!livedState.StackSourceCountDict.ContainsKey(state.Source))
                     {
                         livedState.StackSourceCountDict.Add(state.Source,1);
-                        _provider.Executor.Stack(livedState);
+                        _provider.Executor.Stack(livedState,state);
                     }
                     else if(livedState.StackSourceCountDict[state.Source] < livedState.StackMaxCount)
                     {
                         livedState.StackSourceCountDict.Add(state.Source,1);
-                        _provider.Executor.Stack(livedState);
+                        _provider.Executor.Stack(livedState,state);
                     }
+                    else
+                        _provider.Executor.StackOverflow(livedState,state);
                     break;
                 // Stack by Target
                 case StateStackType.Target:
                     if (livedState.StackCurrentCount < livedState.StackMaxCount)
                     {
-                        _provider.Executor.Stack(livedState);
+                        livedState.StackCurrentCount += 1;
+                        _provider.Executor.Stack(livedState,state);
                     }
+                    else
+                        _provider.Executor.StackOverflow(livedState,state);
+                    
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -94,7 +100,8 @@ public class ConditionMachine : AbsScheduler
         foreach (var state in _runningStates.Values.SelectMany(states => states.Where(state => state != null)))
             _provider.Executor.PhysicsUpdate(state, delta);
     }
-
+    
+    
     
     private void UpdateRunningStates()
     {

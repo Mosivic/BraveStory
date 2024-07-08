@@ -34,8 +34,8 @@ public abstract class AbsState
     public Action<AbsState> PauseFunc { get; set; }
     public Action<AbsState> ResumeFunc { get; set; }
     public Action<AbsState> StackFunc { get; set; }
+    public Action<AbsState> StackOverflowFunc { get; set; }
     public Action<AbsState> PeriodFunc { get; set; }
     public Action<AbsState> RunningFunc { get; set; }
     public Action<AbsState> RunningPhysicsFunc { get; set; }
-    public Action<AbsState> IntervalUpdateFunc { get; set; }
 }
