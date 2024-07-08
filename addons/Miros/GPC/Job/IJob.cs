@@ -2,13 +2,12 @@
 
 public interface IJob
 {
-    void Start();
-    void Succeed();
-    void Failed();
-    void Pause();
-    void Resume();
+    void OnStart();
+    void OnSucceed();
+    void OnFailed();
+    void OnPause();
+    void OnResume();
     bool IsPrepared();
     void Update(double delta);
     void PhysicsUpdate(double delta);
-    void IntervalUpdate();
 }

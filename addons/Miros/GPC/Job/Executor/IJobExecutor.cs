@@ -11,5 +11,4 @@ public interface IJobExecutor
     bool IsPrepared(AbsState state);
     void Update(AbsState state, double delta);
     void PhysicsUpdate(AbsState state, double delta);
-    void IntervalUpdate(AbsState state);
 }

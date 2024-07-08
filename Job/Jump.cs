@@ -4,7 +4,7 @@ using GPC.Job;
 
 internal class Jump(PlayerState state) : JobBase(state)
 {
-    protected override void _Start()
+    protected override void _OnStart()
     {
         var velocity = state.Host.Velocity;
         state.Host.Velocity = new Vector2(velocity.X, state.Properties.JumpVelocity.Value);

@@ -6,29 +6,34 @@ public abstract class AbsJob(AbsState state)
 {
     protected readonly AbsState State = state;
 
-    protected virtual void _Start()
+    protected virtual void _OnStart()
     {
         State.StartFunc?.Invoke(State);
     }
 
-    protected virtual void _Succeed()
+    protected virtual void _OnSucceed()
     {
         State.SucceedFunc?.Invoke(State);
     }
 
-    protected virtual void _Failed()
+    protected virtual void _OnFailed()
     {
         State.FailedFunc?.Invoke(State);
     }
 
-    protected virtual void _Pause()
+    protected virtual void _OnPause()
     {
         State.PauseFunc?.Invoke(State);
     }
 
-    protected virtual void _Resume()
+    protected virtual void _OnResume()
     {
         State.ResumeFunc?.Invoke(State);
+    }
+
+    protected virtual void _OnPeriod()
+    {
+        State.PeriodFunc?.Invoke(State);
     }
 
     protected virtual bool _IsPrepared()

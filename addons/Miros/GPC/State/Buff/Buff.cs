@@ -42,6 +42,7 @@ public enum BuffStackPeriodResetPolicy
 
 public enum BuffStackingType
 {
+    None,
     Source, //对Buff Source 限制层数
     Target, //对Buff Target 限制层数
 }
@@ -67,27 +68,27 @@ public class Buff : AbsState
     public List<Modifier> Modifiers { get; set; }
 
     // Period 
-    public float Period { get; set; }
-    public bool IsExecutePeridodicEffectOnStart { get; set; } = true;
+    public bool IsExecutePeriodicEffectOnStart { get; set; } = true;
     public BuffPeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = BuffPeriodicInhibitionPolicy.Resume;
 
     // Chance
-    public float Chance { get; set; }
+    public float Chance { get; set; } //0.0 ~ 1.0
     
     // Stacking
     public int StackMaxCount { get; set; } = 1;
+    public int StackCurrentCount { get; set; } = 1;
     public BuffStackingType StackingType { get; set; } 
     public BuffStackDurationRefreshPolicy StackDurationRefreshPolicy { get; set; }
     public BuffStackPeriodResetPolicy StackPeriodResetPolicy { get; set; }
     public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }
    
     // Stacking Overflow
-    public List<Buff> OnStackOverflowBuffs { get; set; }
+    public List<AbsState> OnStackOverflowStates { get; set; }
     public bool IsClearStackOnOverflow { get; set; }
     
     // Expiration
-    public List<Buff> OnSucceedBuffs { get; set; }
-    public List<Buff> OnFailedBuffs { get; set; }
+    public List<AbsState> OnSucceedStates { get; set; }
+    public List<AbsState> OnFailedStates { get; set; }
     
     // Immunity
 }

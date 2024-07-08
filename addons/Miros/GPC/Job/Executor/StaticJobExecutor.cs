@@ -10,22 +10,22 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
 
     public void Start(AbsState state)
     {
-        _GetJob(state.Type, state).Start();
+        _GetJob(state.Type, state).OnStart();
     }
 
     public void Succeed(AbsState state)
     {
-        _GetJob(state.Type, state).Succeed();
+        _GetJob(state.Type, state).OnSucceed();
     }
 
     public void Pause(AbsState state)
     {
-        _GetJob(state.Type, state).Pause();
+        _GetJob(state.Type, state).OnPause();
     }
 
     public void Resume(AbsState state)
     {
-        _GetJob(state.Type, state).Resume();
+        _GetJob(state.Type, state).OnResume();
     }
 
 
@@ -44,14 +44,10 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         _GetJob(state.Type, state).PhysicsUpdate(delta);
     }
 
-    public void IntervalUpdate(AbsState state)
-    {
-        _GetJob(state.Type, state).IntervalUpdate();
-    }
-
+    
     public void Failed(AbsState state)
     {
-        _GetJob(state.Type, state).Failed();
+        _GetJob(state.Type, state).OnFailed();
     }
 
     private static IJob _GetJob(Type type, AbsState state)

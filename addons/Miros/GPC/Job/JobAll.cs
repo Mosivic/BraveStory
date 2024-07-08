@@ -7,15 +7,15 @@ internal class JobAll(CompoundState state) : JobBase(state)
 {
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
 
-    public override void Start()
+    public override void OnStart()
     {
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Start(childCfg);
-        _Start();
+        _OnStart();
     }
 
 
-    public override void Succeed()
+    public override void OnSucceed()
     {
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Succeed(childCfg);
@@ -55,9 +55,6 @@ internal class JobAll(CompoundState state) : JobBase(state)
             _provider.Executor.PhysicsUpdate(childCfg, delta);
     }
 
-    public override void IntervalUpdate()
-    {
-        foreach (var childCfg in state.SubJobs)
-            _provider.Executor.IntervalUpdate(childCfg);
-    }
+    
+
 }

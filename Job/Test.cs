@@ -6,7 +6,7 @@ namespace BraveStory.Job;
 
 internal class Test(PlayerState state) : JobBase(state)
 {
-    protected override void _Start()
+    protected override void _OnStart()
     {
         GD.Print("This is Test.");
     }

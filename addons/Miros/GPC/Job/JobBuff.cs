@@ -1,62 +1,104 @@
-﻿using GPC.States.Buff;
+﻿using System;
+using GPC.States.Buff;
 
 namespace GPC.Job;
 
 public class JobBuff(Buff buff) : JobBase(buff)
 {
-    public override void Start()
+    protected virtual void _OnStack() { }
+    
+    protected virtual void _OnStackOverflow(){}
+    
+    protected virtual void _OnExpiration(){}
+    
+    
+    public override void OnStart()
     {
-        State.Status = JobRunningStatus.Running;
+        buff.Status = JobRunningStatus.Running;
 
-        switch (buff.DurationPolicy)
+        if (buff.DurationPolicy == BuffDurationPolicy.Instant)
         {
-            case BuffDurationPolicy.Instant:
-                ApplyModifiers();
-                State.Status = JobRunningStatus.Succeed;
-                break;
-            case BuffDurationPolicy.Infinite:
-                ApplyModifiers();
-                break;
-            case BuffDurationPolicy.Duration:
-                break;
+            ApplyModifiers();
+            buff.Status = JobRunningStatus.Succeed;
         }
+        else if (buff.DurationPolicy == BuffDurationPolicy.Infinite)
+        {
+            if(buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
+            ApplyModifiers();
+        }
+        else if (buff.DurationPolicy == BuffDurationPolicy.Duration)
+        {
+            if(buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
+            ApplyModifiers();
+        }
+        _OnStart();
     }
 
-    public override void Succeed()
+    public override void OnSucceed()
     {
-        State.Status = JobRunningStatus.Succeed;
-
-        switch (buff.DurationPolicy)
+        if (buff.DurationPolicy == BuffDurationPolicy.Instant)
         {
-            case BuffDurationPolicy.Instant:
-                break;
-            case BuffDurationPolicy.Infinite:
-                CancelModifiers();
-                break;
-            case BuffDurationPolicy.Duration:
-                break;
+
         }
+        else if (buff.DurationPolicy == BuffDurationPolicy.Infinite)
+        {
+            CancelModifiers();
+        }
+        else if (buff.DurationPolicy == BuffDurationPolicy.Duration)
+        {
+
+        }
+        _OnSucceed();
     }
 
-    public override void Failed()
+    public override void OnFailed()
     {
-        State.Status = JobRunningStatus.Failed;
-
-        switch (buff.DurationPolicy)
+        if (buff.DurationPolicy == BuffDurationPolicy.Instant)
         {
-            case BuffDurationPolicy.Instant:
-                break;
-            case BuffDurationPolicy.Infinite:
-                CancelModifiers();
-                break;
-            case BuffDurationPolicy.Duration:
-                break;
+
         }
+        else if (buff.DurationPolicy == BuffDurationPolicy.Infinite)
+        {
+            CancelModifiers();
+        }
+        else if (buff.DurationPolicy == BuffDurationPolicy.Duration)
+        {
+
+        }
+        _OnFailed();
+    }
+
+    protected override void OnPeriod()
+    {
+        ApplyModifiers();
+        _OnPeriod();
+    }
+
+    public override void OnPause()
+    {
+        _OnPause();
+    }
+
+    public override void OnResume()
+    {
+        if (buff.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.Reset)
+        {
+            buff.PeriodElapsed = 0;
+        }
+        else if(buff.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.ExecuteAndReset)
+        {
+             ApplyModifiers();
+             buff.PeriodElapsed = 0;
+        }
+        _OnResume();
     }
 
 
     private void ApplyModifiers()
     {
+        var random = new Random();
+        if(random.NextDouble() > buff.Chance) return;
+        
         for (var i = 0; i < buff.Modifiers.Count; i++)
         {
             var modifier = buff.Modifiers[i];
@@ -78,7 +120,6 @@ public class JobBuff(Buff buff) : JobBase(buff)
             }
         }
     }
-
 
     private void CancelModifiers()
     {

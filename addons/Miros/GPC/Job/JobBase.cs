@@ -4,34 +4,37 @@ namespace GPC.Job;
 
 public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
-    public virtual void Start()
+    public virtual void OnStart()
     {
         State.Status = JobRunningStatus.Running;
-        _Start();
+        _OnStart();
     }
 
-    public virtual void Succeed()
+    public virtual void OnSucceed()
+    {
+        _OnSucceed();
+    }
+
+    public virtual void OnFailed()
+    {
+        _OnFailed();
+    }
+
+    public virtual void OnPause()
     {
         State.Status = JobRunningStatus.NoRun;
-        _Succeed();
+        _OnPause();
     }
 
-    public virtual void Failed()
-    {
-        State.Status = JobRunningStatus.Failed;
-        _Failed();
-    }
-
-    public virtual void Pause()
-    {
-        State.Status = JobRunningStatus.NoRun;
-        _Pause();
-    }
-
-    public virtual void Resume()
+    public virtual void OnResume()
     {
         State.Status = JobRunningStatus.Running;
-        _Resume();
+        _OnResume();
+    }
+
+    protected virtual void OnPeriod()
+    {
+        _OnPeriod();
     }
 
     public virtual bool IsPrepared()
@@ -39,18 +42,36 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         return _IsPrepared();
     }
 
+    protected virtual bool IsSucceed()
+    {
+        return _IsSucceed();
+    }
 
+    protected virtual bool IsFailed()
+    {
+        return _IsFailed();
+    }
+    
+    
     public virtual void Update(double delta)
     {
-        if (_IsFailed())
+        if (IsFailed())
             State.Status = JobRunningStatus.Failed;
-        else if (_IsSucceed()) State.Status = JobRunningStatus.Succeed;
+        else if (IsSucceed()) 
+            State.Status = JobRunningStatus.Succeed;
 
-        State.IntervalElapsedTime += delta;
-        if (State.IntervalElapsedTime > State.IntervalTime)
+        State.DurationElapsed += delta;
+        State.PeriodElapsed += delta;
+        
+        if (State.Duration > 0 && State.DurationElapsed > State.Duration)
         {
-            _IntervalUpdate();
-            State.IntervalElapsedTime = 0;
+            State.Status = JobRunningStatus.Succeed;
+            State.DurationElapsed = 0;
+        }
+        if (State.Period > 0 && State.PeriodElapsed > State.Period)
+        {
+            OnPeriod();
+            State.PeriodElapsed = 0;
         }
 
         _Update(delta);
@@ -60,9 +81,5 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     {
         _PhysicsUpdate(delta);
     }
-
-    public virtual void IntervalUpdate()
-    {
-        _IntervalUpdate();
-    }
+    
 }

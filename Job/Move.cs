@@ -4,7 +4,7 @@ using GPC.Job;
 
 internal class Move(PlayerState state) : JobBase(state)
 {
-    protected override void _Start()
+    protected override void _OnStart()
     {
         state.Nodes.AnimationPlayer.Play("run");
     }
@@ -13,7 +13,7 @@ internal class Move(PlayerState state) : JobBase(state)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = state.Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * state.Properties.RunSpeed.Value,
+        velocity.X = Mathf.MoveToward(velocity.X, direction * state.Properties.RunSpeed.Value, 
             state.Properties.FloorAcceleration.Value);
         velocity.Y += (float)delta * state.Properties.Gravity.Value;
         state.Host.Velocity = velocity;
