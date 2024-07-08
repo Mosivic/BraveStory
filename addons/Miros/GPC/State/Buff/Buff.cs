@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using GPC.Scheduler;
+﻿using System.Collections.Generic;
 
 namespace GPC.States.Buff;
 
 /// <summary>
-/// 持续策略
+///     持续策略
 /// </summary>
 public enum BuffDurationPolicy //持续策略
 {
-    Instand, //立即生效
+    Instant, //立即生效
     Infinite, //永久生效
-    Interval //规定时长
+    Duration //规定时长
 }
 
 /// <summary>
-/// Buff中断并恢复的处理策略
+///     Buff中断并恢复的处理策略
 /// </summary>
-public enum BuffPeriodicInhibitionPolicy 
+public enum BuffPeriodicInhibitionPolicy
 {
     Resume, //恢复衔接
     Reset, //重置
@@ -25,44 +23,71 @@ public enum BuffPeriodicInhibitionPolicy
 }
 
 /// <summary>
-/// 叠加新buff时持续时间的更新策略
+///     叠加新buff时持续时间的更新策略
 /// </summary>
-internal enum BuffStackDurationRefreshPolicy 
+public enum BuffStackDurationRefreshPolicy
 {
     Reset, //重置
     Delay //延长
 }
 
 /// <summary>
-/// 叠加新buff时周期的更新策略
+///     叠加新buff时周期的更新策略
 /// </summary>
-internal enum BuffStackPeriodResetPolicy 
+public enum BuffStackPeriodResetPolicy
 {
-    Reset,
-    Delay
+    Reset,//重置
+    Delay 
 }
-/// <summary>
-/// 当一层buff到期后的处理策略
-/// </summary>
-internal enum BuffStackExpirationPolicy 
+
+public enum BuffStackingType
 {
-    ClearAllStack,
+    Source, //对Buff Source 限制层数
+    Target, //对Buff Target 限制层数
+}
+
+/// <summary>
+///     当一层buff到期后的处理策略
+/// </summary>
+public enum BuffStackExpirationPolicy
+{
+    ClearAllStack, 
     RemoveOneStackAndRefreshDuration,
     RefreshDuration
 }
 
+
 public class Buff : AbsState
 {
-    public int StackMaxCount { get; set; }= 1;
-    public float Period { get; set; }
-    
     public IGpcToken Source { get; set; }
     public IGpcToken Target { get; set; }
+    
+    // Core
+    public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
     public List<Modifier> Modifiers { get; set; }
-    
+
+    // Period 
+    public float Period { get; set; }
+    public bool IsExecutePeridodicEffectOnStart { get; set; } = true;
     public BuffPeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = BuffPeriodicInhibitionPolicy.Resume;
-    public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instand;
-    //层数溢出后调用的Buff
-    public List<Buff> OverflowBuffs { get; set; } 
+
+    // Chance
+    public float Chance { get; set; }
     
+    // Stacking
+    public int StackMaxCount { get; set; } = 1;
+    public BuffStackingType StackingType { get; set; } 
+    public BuffStackDurationRefreshPolicy StackDurationRefreshPolicy { get; set; }
+    public BuffStackPeriodResetPolicy StackPeriodResetPolicy { get; set; }
+    public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }
+   
+    // Stacking Overflow
+    public List<Buff> OnStackOverflowBuffs { get; set; }
+    public bool IsClearStackOnOverflow { get; set; }
+    
+    // Expiration
+    public List<Buff> OnSucceedBuffs { get; set; }
+    public List<Buff> OnFailedBuffs { get; set; }
+    
+    // Immunity
 }

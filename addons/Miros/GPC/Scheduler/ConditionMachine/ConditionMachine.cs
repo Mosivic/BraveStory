@@ -7,15 +7,12 @@ namespace GPC.Scheduler;
 
 public class ConditionMachine : AbsScheduler
 {
-    private readonly Dictionary<Layer, List<AbsState>> _runningStates = new();
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
-    
+    private readonly Dictionary<Layer, List<AbsState>> _runningStates = new();
+
     public ConditionMachine(StateSet stateSet) : base(stateSet)
     {
-        foreach (var layer in stateSet.States.Select(state => state.Layer))
-        {
-            _runningStates[layer] = [];
-        }
+        foreach (var layer in stateSet.States.Select(state => state.Layer)) _runningStates[layer] = [];
     }
 
     public override void Update(double delta)
@@ -36,14 +33,14 @@ public class ConditionMachine : AbsScheduler
         foreach (var layer in _runningStates.Keys)
         {
             var layerStates = _runningStates[layer];
-            
+
             var layerStateMaxCount = layer.JobMaxCount;
             var layerStateCount = layerStates.Count();
-            
+
             //结束运行完成的State
-            if (layerStateCount != 0) 
+            if (layerStateCount != 0)
             {
-                for (int i = 0; i < layerStateCount; i++) 
+                for (var i = 0; i < layerStateCount; i++)
                 {
                     var layerJob = layerStates[i];
                     if (layerJob.Status is JobRunningStatus.Succeed)
@@ -51,24 +48,26 @@ public class ConditionMachine : AbsScheduler
                         StateChanged.Invoke(layerJob);
                         _provider.Executor.Succeed(layerJob);
                         layerStates.RemoveAt(i);
-                    }else if(layerJob.Status is JobRunningStatus.Failed)
+                    }
+                    else if (layerJob.Status is JobRunningStatus.Failed)
                     {
                         StateChanged.Invoke(layerJob);
                         _provider.Executor.Failed(layerJob);
                         layerStates.RemoveAt(i);
                     }
                 }
+
                 layerStateCount = layerStates.Count();
             }
-            
-            if(layerStateMaxCount < 1) continue;
-            
+
+            if (layerStateMaxCount < 1) continue;
+
             var nextState = _GetBestState(layer);
             if (nextState == null) continue;
-            
+
             //考虑加入NextState
             //当前层无State
-            if (layerStateCount == 0) 
+            if (layerStateCount == 0)
             {
                 StateChanged.Invoke(nextState);
                 _provider.Executor.Start(nextState);
@@ -79,29 +78,28 @@ public class ConditionMachine : AbsScheduler
             {
                 StateChanged.Invoke(nextState);
                 _provider.Executor.Start(nextState);
-                
-                var insertIndex = layerStates.FindIndex(state =>nextState.Priority < state.Priority );
-                if(insertIndex == -1)
+
+                var insertIndex = layerStates.FindIndex(state => nextState.Priority < state.Priority);
+                if (insertIndex == -1)
                     layerStates.Add(nextState);
                 else
-                    layerStates.Insert(insertIndex,nextState);
-           
+                    layerStates.Insert(insertIndex, nextState);
             }
             //当前层已满，加入高优先State
-            else if(layerStateCount == layerStateMaxCount && nextState.Priority > layerStates[0].Priority) 
+            else if (layerStateCount == layerStateMaxCount && nextState.Priority > layerStates[0].Priority)
             {
                 StateChanged.Invoke(layerStates[0]);
                 _provider.Executor.Failed(layerStates[0]);
                 layerStates.RemoveAt(0);
-                
+
                 StateChanged.Invoke(nextState);
                 _provider.Executor.Start(nextState);
-                
-                var insertIndex = layerStates.FindIndex(state =>nextState.Priority < state.Priority );
-                if(insertIndex == -1)
+
+                var insertIndex = layerStates.FindIndex(state => nextState.Priority < state.Priority);
+                if (insertIndex == -1)
                     layerStates.Add(nextState);
                 else
-                    layerStates.Insert(insertIndex,nextState);
+                    layerStates.Insert(insertIndex, nextState);
             }
         }
     }
@@ -109,8 +107,9 @@ public class ConditionMachine : AbsScheduler
     private AbsState _GetBestState(Layer layer)
     {
         var states = new List<AbsState>();
-        
-        foreach (var state in StateSet.States.Where(state => state.Layer == layer).Where(state => _provider.Executor.IsPrepared(state)))
+
+        foreach (var state in StateSet.States.Where(state => state.Layer == layer)
+                     .Where(state => _provider.Executor.IsPrepared(state)))
         {
             StatePrepared.Invoke(state);
             states.Add(state);

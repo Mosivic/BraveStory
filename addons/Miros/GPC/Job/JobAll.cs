@@ -22,7 +22,6 @@ internal class JobAll(CompoundState state) : JobBase(state)
     }
 
 
-    
     public bool IsSucceed()
     {
         foreach (var childCfg in state.SubJobs)
@@ -43,7 +42,7 @@ internal class JobAll(CompoundState state) : JobBase(state)
         return false;
     }
 
-    
+
     public override void Update(double delta)
     {
         foreach (var childCfg in state.SubJobs)
@@ -61,5 +60,4 @@ internal class JobAll(CompoundState state) : JobBase(state)
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.IntervalUpdate(childCfg);
     }
-    
 }

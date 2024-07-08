@@ -7,7 +7,7 @@ public abstract class AbsJob(AbsState state)
     protected readonly AbsState State = state;
 
     protected virtual void _Start()
-    { 
+    {
         State.StartFunc?.Invoke(State);
     }
 
@@ -20,7 +20,7 @@ public abstract class AbsJob(AbsState state)
     {
         State.FailedFunc?.Invoke(State);
     }
-    
+
     protected virtual void _Pause()
     {
         State.PauseFunc?.Invoke(State);
@@ -42,7 +42,7 @@ public abstract class AbsJob(AbsState state)
     {
         var isSucceed = false;
         if (State.IsSucceedFunc != null)
-            isSucceed =  State.IsSucceedFunc.Invoke();
+            isSucceed = State.IsSucceedFunc.Invoke();
 
         if (isSucceed)
             State.Status = JobRunningStatus.Succeed;
@@ -55,11 +55,11 @@ public abstract class AbsJob(AbsState state)
         if (State.UsePrepareFuncAsRunCondition)
         {
             if (State.IsFailedFunc == null)
-                isFailed =  !State.IsPreparedFunc.Invoke();
+                isFailed = !State.IsPreparedFunc.Invoke();
             else
-                isFailed =  State.IsFailedFunc.Invoke();
+                isFailed = State.IsFailedFunc.Invoke();
         }
-        else if(State.IsFailedFunc != null)
+        else if (State.IsFailedFunc != null)
         {
             isFailed = State.IsFailedFunc.Invoke();
         }
@@ -77,12 +77,10 @@ public abstract class AbsJob(AbsState state)
     protected virtual void _Update(double delta)
     {
         State.RunningFunc?.Invoke(State);
-
     }
 
     protected virtual void _IntervalUpdate()
     {
         State.IntervalUpdateFunc?.Invoke(State);
     }
-    
 }

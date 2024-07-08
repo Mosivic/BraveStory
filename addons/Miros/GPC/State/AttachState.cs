@@ -2,7 +2,7 @@
 
 namespace GPC.States;
 
-public class AttachState:AbsState
+public class AttachState : AbsState
 {
     public Action<AbsState> StartAttachFunc { get; set; }
     public Action<AbsState> SucceedAttachFunc { get; set; }

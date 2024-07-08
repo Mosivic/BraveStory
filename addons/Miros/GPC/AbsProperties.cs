@@ -1,9 +1,5 @@
-﻿using System;
-
-namespace GPC;
-
+﻿namespace GPC;
 
 public abstract class AbsProperties
 {
-
 }

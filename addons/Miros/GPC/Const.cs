@@ -12,7 +12,5 @@ public enum JobRunningStatus
     NoRun,
     Running,
     Succeed,
-    Failed,
+    Failed
 }
-
-

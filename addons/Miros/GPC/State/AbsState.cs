@@ -29,5 +29,4 @@ public abstract class AbsState
     public Action<AbsState> RunningFunc { get; set; }
     public Action<AbsState> RunningPhysicsFunc { get; set; }
     public Action<AbsState> IntervalUpdateFunc { get; set; }
-
 }

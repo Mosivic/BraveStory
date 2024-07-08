@@ -10,14 +10,14 @@ using GPC.States.Buff;
 
 namespace BraveStory.Player;
 
-public class PlayerNodes:INodes
+public class PlayerNodes : INodes
 {
     public ConditionMachine ConditionMachine { get; set; }
     public AnimationPlayer AnimationPlayer { get; init; }
     public Sprite2D Sprite { get; init; }
 }
 
-public class PlayerProperties() : AbsProperties
+public class PlayerProperties : AbsProperties
 {
     public BindableProperty<float> Gravity { get; } = new(980f);
     public BindableProperty<float> RunSpeed { get; } = new(200f);
@@ -33,13 +33,20 @@ public class BindableProperty<T>(T value)
 
 public partial class Player : CharacterBody2D, IGpcToken
 {
-    private ConditionMachine _scheduler;
     private PlayerNodes _nodes;
     private PlayerProperties _properties;
+    private ConditionMachine _scheduler;
 
-    public AbsScheduler GetScheduler() => _scheduler;
-    public Layer GetRootLayer() => LayerMap.Root;
-    
+    public AbsScheduler GetScheduler()
+    {
+        return _scheduler;
+    }
+
+    public Layer GetRootLayer()
+    {
+        return LayerMap.Root;
+    }
+
     public override void _Ready()
     {
         Evaluator<bool> isVelocityYPositive = new("isVelocityYPositive", () => Velocity.Y >= 0f);
@@ -51,9 +58,9 @@ public partial class Player : CharacterBody2D, IGpcToken
             AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer"),
             Sprite = GetNode<Sprite2D>("Sprite")
         };
-        _properties = new();
-        
-        
+        _properties = new PlayerProperties();
+
+
         var stateSet = new StateSet();
         stateSet.Add(new PlayerState(this, _nodes, _properties)
         {
@@ -78,20 +85,23 @@ public partial class Player : CharacterBody2D, IGpcToken
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
                                    isOnFloor.Is(true),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
-        }).Add(new Buff()
+        }).Add(new Buff
         {
             Name = "AddHp",
             Layer = LayerMap.Buff,
-            Modifiers = [new Modifier()
-            {
-                Property = _properties.RunSpeed,
-                Operator = BuffModifierOperator.Add,
-                Affect = -10,
-            }],
+            Modifiers =
+            [
+                new Modifier
+                {
+                    Property = _properties.RunSpeed,
+                    Operator = BuffModifierOperator.Add,
+                    Affect = -10
+                }
+            ],
             Type = typeof(JobBuff),
-            IsPreparedFunc = ()=>Evaluators.IsJumpKeyDown.Is(true) 
+            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
         });
-        
+
 
         _scheduler = new ConditionMachine(stateSet);
     }

@@ -17,12 +17,7 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
     {
         _GetJob(state.Type, state).Succeed();
     }
-    
-    public void Failed(AbsState state)
-    {
-        _GetJob(state.Type, state).Failed();
-    }
-    
+
     public void Pause(AbsState state)
     {
         _GetJob(state.Type, state).Pause();
@@ -33,7 +28,7 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         _GetJob(state.Type, state).Resume();
     }
 
-    
+
     public bool IsPrepared(AbsState state)
     {
         return _GetJob(state.Type, state).IsPrepared();
@@ -54,6 +49,11 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         _GetJob(state.Type, state).IntervalUpdate();
     }
 
+    public void Failed(AbsState state)
+    {
+        _GetJob(state.Type, state).Failed();
+    }
+
     private static IJob _GetJob(Type type, AbsState state)
     {
         if (Jobs.TryGetValue(type, out var value)) return value;
@@ -61,6 +61,4 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         Jobs[type] = job;
         return job;
     }
-
-
 }

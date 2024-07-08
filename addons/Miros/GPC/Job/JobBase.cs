@@ -2,7 +2,7 @@
 
 namespace GPC.Job;
 
-public abstract class JobBase(AbsState state) :AbsJob(state),IJob
+public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
     public virtual void Start()
     {
@@ -33,30 +33,26 @@ public abstract class JobBase(AbsState state) :AbsJob(state),IJob
         State.Status = JobRunningStatus.Running;
         _Resume();
     }
-    
+
     public virtual bool IsPrepared()
     {
         return _IsPrepared();
     }
-    
-    
+
+
     public virtual void Update(double delta)
     {
         if (_IsFailed())
-        {
             State.Status = JobRunningStatus.Failed;
-        }else if (_IsSucceed())
-        {
-            State.Status = JobRunningStatus.Succeed;
-        }
-        
+        else if (_IsSucceed()) State.Status = JobRunningStatus.Succeed;
+
         State.IntervalElapsedTime += delta;
         if (State.IntervalElapsedTime > State.IntervalTime)
         {
             _IntervalUpdate();
             State.IntervalElapsedTime = 0;
         }
-        
+
         _Update(delta);
     }
 

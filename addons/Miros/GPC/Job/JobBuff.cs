@@ -1,6 +1,4 @@
-﻿using Godot;
-using GPC.States;
-using GPC.States.Buff;
+﻿using GPC.States.Buff;
 
 namespace GPC.Job;
 
@@ -9,17 +7,17 @@ public class JobBuff(Buff buff) : JobBase(buff)
     public override void Start()
     {
         State.Status = JobRunningStatus.Running;
-        
+
         switch (buff.DurationPolicy)
         {
-            case BuffDurationPolicy.Instand:
+            case BuffDurationPolicy.Instant:
                 ApplyModifiers();
                 State.Status = JobRunningStatus.Succeed;
                 break;
             case BuffDurationPolicy.Infinite:
                 ApplyModifiers();
                 break;
-            case BuffDurationPolicy.Interval:
+            case BuffDurationPolicy.Duration:
                 break;
         }
     }
@@ -27,15 +25,15 @@ public class JobBuff(Buff buff) : JobBase(buff)
     public override void Succeed()
     {
         State.Status = JobRunningStatus.Succeed;
-        
+
         switch (buff.DurationPolicy)
         {
-            case BuffDurationPolicy.Instand:
+            case BuffDurationPolicy.Instant:
                 break;
             case BuffDurationPolicy.Infinite:
                 CancelModifiers();
                 break;
-            case BuffDurationPolicy.Interval:
+            case BuffDurationPolicy.Duration:
                 break;
         }
     }
@@ -43,15 +41,15 @@ public class JobBuff(Buff buff) : JobBase(buff)
     public override void Failed()
     {
         State.Status = JobRunningStatus.Failed;
-        
+
         switch (buff.DurationPolicy)
         {
-            case BuffDurationPolicy.Instand:
+            case BuffDurationPolicy.Instant:
                 break;
             case BuffDurationPolicy.Infinite:
                 CancelModifiers();
                 break;
-            case BuffDurationPolicy.Interval:
+            case BuffDurationPolicy.Duration:
                 break;
         }
     }
@@ -59,7 +57,7 @@ public class JobBuff(Buff buff) : JobBase(buff)
 
     private void ApplyModifiers()
     {
-        for (int i = 0; i < buff.Modifiers.Count; i++)
+        for (var i = 0; i < buff.Modifiers.Count; i++)
         {
             var modifier = buff.Modifiers[i];
             modifier.Recored = modifier.Property.Value;
@@ -81,10 +79,10 @@ public class JobBuff(Buff buff) : JobBase(buff)
         }
     }
 
-    
+
     private void CancelModifiers()
     {
-        for (int i = 0; i < buff.Modifiers.Count; i++)
+        for (var i = 0; i < buff.Modifiers.Count; i++)
         {
             var modifier = buff.Modifiers[i];
             modifier.Property.Value = modifier.Recored;
