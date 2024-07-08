@@ -36,6 +36,11 @@ public abstract class AbsJob(AbsState state)
         State.PeriodFunc?.Invoke(State);
     }
 
+    protected virtual void _OnStack()
+    {
+        State.StackFunc?.Invoke(State);
+    }
+
     protected virtual bool _IsPrepared()
     {
         if (State.IsPreparedFunc != null)

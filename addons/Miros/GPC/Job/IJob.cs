@@ -1,4 +1,6 @@
-﻿namespace GPC.Job;
+﻿using GPC.States;
+
+namespace GPC.Job;
 
 public interface IJob
 {
@@ -7,6 +9,7 @@ public interface IJob
     void OnFailed();
     void OnPause();
     void OnResume();
+    void OnStack();
     bool IsPrepared();
     void Update(double delta);
     void PhysicsUpdate(double delta);

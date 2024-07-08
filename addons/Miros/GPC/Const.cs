@@ -14,3 +14,10 @@ public enum JobRunningStatus
     Succeed,
     Failed
 }
+
+public enum StateStackType
+{
+    None,
+    Source, //对Buff Source 限制层数
+    Target, //对Buff Target 限制层数
+}

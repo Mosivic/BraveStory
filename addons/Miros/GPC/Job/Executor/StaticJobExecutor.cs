@@ -28,7 +28,11 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
         _GetJob(state.Type, state).OnResume();
     }
 
-
+    public void Stack(AbsState state)
+    {
+        _GetJob(state.Type, state).OnStack();
+    }
+    
     public bool IsPrepared(AbsState state)
     {
         return _GetJob(state.Type, state).IsPrepared();

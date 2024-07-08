@@ -29,7 +29,6 @@ public partial class StateDebugger : MarginContainer
     private Layer _rootLayer;
 
     private AbsScheduler _scheduler;
-    private List<AbsState> _states;
     private Tree _stateTree;
     private readonly Dictionary<AbsState, TreeItem> _stateTreeItemDict = new();
     [Export] public bool Enabled = true;
@@ -38,7 +37,6 @@ public partial class StateDebugger : MarginContainer
 
     public override void _Ready()
     {
-        _evaluatorStatus = GetNode<ItemList>("TabContainer/Evaluators/Status");
         _stateTree = GetNode<Tree>("TabContainer/States/Tree");
         _historyLabel = GetNode<RichTextLabel>("TabContainer/History/Label");
 
@@ -53,23 +51,24 @@ public partial class StateDebugger : MarginContainer
         {
             _scheduler.StatePrepared += OnStatePrepared;
             _scheduler.StateChanged += OnStateChanged;
-            _states = _scheduler.StateSet.States;
-
+            
             var root = _stateTree.CreateItem();
             root.SetText(1, _rootLayer.Name);
             _layerTreeItemDict[_rootLayer] = root;
 
             foreach (var childLayer in _rootLayer.ChildrenLayer) CreateTreeChild(root, childLayer);
 
-            foreach (var state in _states)
+            foreach (var layer in _scheduler.States.Keys)
             {
-                var layer = state.Layer;
-                var treeItem = _layerTreeItemDict[layer];
-                var layerTreeItem = _stateTree.CreateItem(treeItem);
-                _stateTreeItemDict[state] = layerTreeItem;
+                foreach (var state in _scheduler.States[layer])
+                {
+                    var treeItem = _layerTreeItemDict[layer];
+                    var layerTreeItem = _stateTree.CreateItem(treeItem);
+                    _stateTreeItemDict[state] = layerTreeItem;
 
-                layerTreeItem.SetText(0, state.Name);
-                layerTreeItem.SetIcon(1, _redPointTexture);
+                    layerTreeItem.SetText(0, state.Name);
+                    layerTreeItem.SetIcon(1, _redPointTexture);
+                }
             }
         }
     }

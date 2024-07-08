@@ -1,17 +1,11 @@
 ﻿using System;
+using GPC.States;
 using GPC.States.Buff;
 
 namespace GPC.Job;
 
 public class JobBuff(Buff buff) : JobBase(buff)
 {
-    protected virtual void _OnStack() { }
-    
-    protected virtual void _OnStackOverflow(){}
-    
-    protected virtual void _OnExpiration(){}
-    
-    
     public override void OnStart()
     {
         buff.Status = JobRunningStatus.Running;
@@ -94,6 +88,11 @@ public class JobBuff(Buff buff) : JobBase(buff)
     }
 
 
+    public override void OnStack()
+    {
+        
+    }
+    
     private void ApplyModifiers()
     {
         var random = new Random();
@@ -123,9 +122,8 @@ public class JobBuff(Buff buff) : JobBase(buff)
 
     private void CancelModifiers()
     {
-        for (var i = 0; i < buff.Modifiers.Count; i++)
+        foreach (var modifier in buff.Modifiers)
         {
-            var modifier = buff.Modifiers[i];
             modifier.Property.Value = modifier.Recored;
         }
     }

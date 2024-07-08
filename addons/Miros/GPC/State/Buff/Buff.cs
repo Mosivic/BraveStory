@@ -40,12 +40,7 @@ public enum BuffStackPeriodResetPolicy
     Delay 
 }
 
-public enum BuffStackingType
-{
-    None,
-    Source, //对Buff Source 限制层数
-    Target, //对Buff Target 限制层数
-}
+
 
 /// <summary>
 ///     当一层buff到期后的处理策略
@@ -61,7 +56,6 @@ public enum BuffStackExpirationPolicy
 public class Buff : AbsState
 {
     public IGpcToken Source { get; set; }
-    public IGpcToken Target { get; set; }
     
     // Core
     public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
@@ -75,9 +69,6 @@ public class Buff : AbsState
     public float Chance { get; set; } //0.0 ~ 1.0
     
     // Stacking
-    public int StackMaxCount { get; set; } = 1;
-    public int StackCurrentCount { get; set; } = 1;
-    public BuffStackingType StackingType { get; set; } 
     public BuffStackDurationRefreshPolicy StackDurationRefreshPolicy { get; set; }
     public BuffStackPeriodResetPolicy StackPeriodResetPolicy { get; set; }
     public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }

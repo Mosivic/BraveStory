@@ -5,7 +5,7 @@ using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class StateMachine(StateSet stateSet) : AbsScheduler(stateSet)
+public class StateMachine(StateSet stateSet) : AbsScheduler()
 {
     private readonly HashSet<ITransition> _anyTransitions = new();
     private readonly Dictionary<string, StateNode> _nodes = new();

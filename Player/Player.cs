@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BraveStory.Scripts;
 using BraveStory.State;
 using Godot;
@@ -31,6 +32,18 @@ public class BindableProperty<T>(T value)
     public T Value { get; set; } = value;
 }
 
+class PlayerIdleState : PlayerState
+{
+    public PlayerIdleState(CharacterBody2D host, PlayerNodes node, PlayerProperties properties) : base(host, node, properties)
+    {
+        Name = "Idle";
+        Layer = LayerMap.Movement;
+        Priority = 5;
+        Type = typeof(Idle);
+        IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false);
+    }
+}
+
 public partial class Player : CharacterBody2D, IGpcToken
 {
     private PlayerNodes _nodes;
@@ -61,55 +74,57 @@ public partial class Player : CharacterBody2D, IGpcToken
         _properties = new PlayerProperties();
 
 
-        var stateSet = new StateSet();
-        stateSet.Add(new PlayerState(this, _nodes, _properties)
-        {
-            Name = "Idle",
-            Layer = LayerMap.Movement,
-            Priority = 5,
-            Type = typeof(Idle),
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
-        }).Add(new PlayerState(this, _nodes, _properties)
-        {
-            Type = typeof(Move),
-            Layer = LayerMap.Movement,
-            Name = "Run",
-            Priority = 2,
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
-        }).Add(new PlayerState(this, _nodes, _properties)
-        {
-            Name = "Jump",
-            Priority = 10,
-            Layer = LayerMap.Movement,
-            Type = typeof(Jump),
-            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
-                                   isOnFloor.Is(true),
-            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
-        }).Add(new Buff
-        {
-            Name = "AddHp",
-            Layer = LayerMap.Buff,
-            Modifiers =
-            [
-                new Modifier
-                {
-                    Property = _properties.RunSpeed,
-                    Operator = BuffModifierOperator.Add,
-                    Affect = -10
-                }
-            ],
-            Type = typeof(JobBuff),
-            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
-        });
+        _scheduler = new ConditionMachine([
+            new PlayerState(this, _nodes, _properties)
+            {
+                Name = "Idle",
+                Layer = LayerMap.Movement,
+                Priority = 5,
+                Type = typeof(Idle),
+                IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
+            },
+            new PlayerState(this, _nodes, _properties)
+            {
+                Type = typeof(Move),
+                Layer = LayerMap.Movement,
+                Name = "Run",
+                Priority = 2,
+                IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
+            },
+            new PlayerState(this, _nodes, _properties)
+            {
+                Name = "Jump",
+                Priority = 10,
+                Layer = LayerMap.Movement,
+                Type = typeof(Jump),
+                IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
+                                       isOnFloor.Is(true),
+                IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
+            },
+            new Buff()
+            {
+                Name = "AddHp",
+                Layer = LayerMap.Buff,
+                Modifiers =
+                [
+                    new Modifier
+                    {
+                        Property = _properties.RunSpeed,
+                        Operator = BuffModifierOperator.Add,
+                        Affect = -10
+                    }
+                ],
+                Type = typeof(JobBuff),
+                IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
+            }
+        ]);
 
 
-        _scheduler = new ConditionMachine(stateSet);
     }
 
     public override void _Process(double delta)
     {
         _scheduler.Update(delta);
-        GD.Print(_properties.RunSpeed.Value);
     }
 
     public override void _PhysicsProcess(double delta)
