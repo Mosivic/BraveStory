@@ -6,5 +6,4 @@ public interface IGpcToken
 {
     AbsScheduler GetScheduler();
     Layer GetRootLayer();
-    AbsProperties GetProperties();
 }

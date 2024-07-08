@@ -57,6 +57,7 @@ public class ConditionMachine : AbsScheduler
             }
             
             if(layerStateMaxCount < 1) continue;
+            
             var nextState = _GetBestState(layer);
             if (nextState == null) continue;
             
@@ -74,8 +75,12 @@ public class ConditionMachine : AbsScheduler
                 StateChanged.Invoke(nextState, JobRunningStatus.Enter);
                 _provider.Executor.Enter(nextState);
                 
-                layerStates.Add(nextState);
-                layerStates = layerStates.OrderBy(state => state.Priority).ToList();
+                var insertIndex = layerStates.FindIndex(state =>nextState.Priority < state.Priority );
+                if(insertIndex == -1)
+                    layerStates.Add(nextState);
+                else
+                    layerStates.Insert(insertIndex,nextState);
+           
             }
             //当前层已满，加入高优先State
             else if(layerStateCount == layerStateMaxCount && nextState.Priority > layerStates[0].Priority) 
@@ -86,8 +91,12 @@ public class ConditionMachine : AbsScheduler
                 
                 StateChanged.Invoke(nextState,JobRunningStatus.Enter);
                 _provider.Executor.Enter(nextState);
-                layerStates.Add(nextState);
-                layerStates = layerStates.OrderBy(state => state.Priority).ToList();
+                
+                var insertIndex = layerStates.FindIndex(state =>nextState.Priority < state.Priority );
+                if(insertIndex == -1)
+                    layerStates.Add(nextState);
+                else
+                    layerStates.Insert(insertIndex,nextState);
             }
         }
     }

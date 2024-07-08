@@ -121,7 +121,7 @@ public partial class StateDebugger : MarginContainer
     private void OnStateChanged(AbsState state,JobRunningStatus status)
     {
         UpdateStateDisplay(state);
-        UpdateHistoryDisplay(state, status);
+        //UpdateHistoryDisplay(state, status);
     }
     private void OnStatePrepared(AbsState state)
     {

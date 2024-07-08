@@ -39,7 +39,6 @@ public partial class Player : CharacterBody2D, IGpcToken
 
     public AbsScheduler GetScheduler() => _scheduler;
     public Layer GetRootLayer() => LayerMap.Root;
-    public AbsProperties GetProperties() => _properties;
     
     public override void _Ready()
     {
