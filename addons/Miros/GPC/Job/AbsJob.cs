@@ -6,19 +6,19 @@ public abstract class AbsJob(AbsState state)
 {
     protected readonly AbsState State = state;
 
-    protected virtual void _Enter()
+    protected virtual void _Start()
     { 
-        State.EnterFunc?.Invoke(State);
+        State.StartFunc?.Invoke(State);
     }
 
-    protected virtual void _Exit()
+    protected virtual void _Succeed()
     {
-        State.ExitFunc?.Invoke(State);
+        State.SucceedFunc?.Invoke(State);
     }
 
-    protected virtual void _Break()
+    protected virtual void _Failed()
     {
-        State.BreakFunc?.Invoke(State);
+        State.FailedFunc?.Invoke(State);
     }
     
     protected virtual void _Pause()
@@ -43,9 +43,9 @@ public abstract class AbsJob(AbsState state)
         var isSucceed = false;
         if (State.IsSucceedFunc != null)
             isSucceed =  State.IsSucceedFunc.Invoke();
-        
+
         if (isSucceed)
-            State.RunningResult = JobRunningResult.Succeed;
+            State.Status = JobRunningStatus.Succeed;
         return isSucceed;
     }
 
@@ -65,7 +65,7 @@ public abstract class AbsJob(AbsState state)
         }
 
         if (isFailed)
-            State.RunningResult = JobRunningResult.Failed;
+            State.Status = JobRunningStatus.Failed;
         return isFailed;
     }
 

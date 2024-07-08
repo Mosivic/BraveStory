@@ -12,8 +12,7 @@ public abstract class AbsState
     public double IntervalTime { get; set; }
     public double IntervalElapsedTime { get; set; }
     public Type Type { get; set; }
-    public JobRunningResult RunningResult { get; set; } = JobRunningResult.NoResult;
-    public bool IsRunning { get; set; }
+    public JobRunningStatus Status { get; set; } = JobRunningStatus.NoRun;
     public bool UsePrepareFuncAsRunCondition { get; set; } = true;
     public Func<bool> IsPreparedFunc { get; set; }
     public Func<bool> IsSucceedFunc { get; set; }
@@ -22,9 +21,9 @@ public abstract class AbsState
     public Dictionary<object, bool> SucceedEffects { get; set; }
 
     public Dictionary<object, bool> FailedEffects { get; set; }
-    public Action<AbsState> EnterFunc { get; set; }
-    public Action<AbsState> ExitFunc { get; set; }
-    public Action<AbsState> BreakFunc { get; set; }
+    public Action<AbsState> StartFunc { get; set; }
+    public Action<AbsState> SucceedFunc { get; set; }
+    public Action<AbsState> FailedFunc { get; set; }
     public Action<AbsState> PauseFunc { get; set; }
     public Action<AbsState> ResumeFunc { get; set; }
     public Action<AbsState> RunningFunc { get; set; }

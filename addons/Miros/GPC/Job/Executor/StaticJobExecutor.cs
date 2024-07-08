@@ -8,19 +8,19 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
 {
     private static readonly Dictionary<Type, IJob> Jobs = new();
 
-    public void Enter(AbsState state)
+    public void Start(AbsState state)
     {
-        _GetJob(state.Type, state).Enter();
+        _GetJob(state.Type, state).Start();
     }
 
-    public void Exit(AbsState state)
+    public void Succeed(AbsState state)
     {
-        _GetJob(state.Type, state).Exit();
+        _GetJob(state.Type, state).Succeed();
     }
     
-    public void Break(AbsState state)
+    public void Failed(AbsState state)
     {
-        _GetJob(state.Type, state).Break();
+        _GetJob(state.Type, state).Failed();
     }
     
     public void Pause(AbsState state)

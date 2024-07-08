@@ -101,7 +101,7 @@ public partial class StateDebugger : MarginContainer
     private void UpdateStateDisplay(AbsState state)
     {
         var treeItem = _stateTreeItemDict[state];
-        if (state.IsRunning)
+        if (state.Status == JobRunningStatus.Running)
         {
             treeItem.SetIcon(1,_greenPointTexture);
         }
@@ -111,14 +111,14 @@ public partial class StateDebugger : MarginContainer
         }
     }
 
-    private void UpdateHistoryDisplay(AbsState state,JobRunningStatus status)
+    private void UpdateHistoryDisplay(AbsState state)
     {
-        var info = $"[{Engine.GetProcessFrames().ToString()}] [color=green] {state.Name}[/color]({state.Layer.Name}) : {status}";
+        var info = $"[{Engine.GetProcessFrames().ToString()}] [color=green] {state.Name}[/color]({state.Layer.Name}) : {state.Status}";
         _historyInfo += info + "\n";
         _historyLabel.SetText(_historyInfo);
     }
 
-    private void OnStateChanged(AbsState state,JobRunningStatus status)
+    private void OnStateChanged(AbsState state)
     {
         UpdateStateDisplay(state);
         //UpdateHistoryDisplay(state, status);
@@ -126,7 +126,7 @@ public partial class StateDebugger : MarginContainer
     private void OnStatePrepared(AbsState state)
     {
         var treeItem = _stateTreeItemDict[state];
-        if(state.IsRunning == false)
+        if(state.Status == JobRunningStatus.NoRun)
             treeItem.SetIcon(1,_orangePointTexture);
     }
     

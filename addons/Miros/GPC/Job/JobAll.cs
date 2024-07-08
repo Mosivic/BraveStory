@@ -7,18 +7,18 @@ internal class JobAll(CompoundState state) : JobBase(state)
 {
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
 
-    public override void Enter()
+    public override void Start()
     {
         foreach (var childCfg in state.SubJobs)
-            _provider.Executor.Enter(childCfg);
-        _Enter();
+            _provider.Executor.Start(childCfg);
+        _Start();
     }
 
 
-    public override void Exit()
+    public override void Succeed()
     {
         foreach (var childCfg in state.SubJobs)
-            _provider.Executor.Exit(childCfg);
+            _provider.Executor.Succeed(childCfg);
     }
 
 
@@ -27,8 +27,8 @@ internal class JobAll(CompoundState state) : JobBase(state)
     {
         foreach (var childCfg in state.SubJobs)
         {
-            if (childCfg.RunningResult != JobRunningResult.Succeed) return false;
-            _provider.Executor.Enter(childCfg);
+            if (childCfg.Status != JobRunningStatus.Succeed) return false;
+            _provider.Executor.Start(childCfg);
         }
 
         return true;
@@ -38,7 +38,7 @@ internal class JobAll(CompoundState state) : JobBase(state)
     public bool IsFailed()
     {
         foreach (var childCfg in state.SubJobs)
-            if (childCfg.RunningResult == JobRunningResult.Failed)
+            if (childCfg.Status == JobRunningStatus.Failed)
                 return true;
         return false;
     }
@@ -46,11 +46,8 @@ internal class JobAll(CompoundState state) : JobBase(state)
     
     public override void Update(double delta)
     {
-        if (!state.IsRunning) return;
-        
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Update(childCfg, delta);
-  
     }
 
     public override void PhysicsUpdate(double delta)

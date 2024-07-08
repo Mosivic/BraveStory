@@ -4,8 +4,8 @@ namespace GPC.Job.Executor;
 
 public interface IJobExecutor
 {
-    void Enter(AbsState state);
-    void Exit(AbsState state);
+    void Start(AbsState state);
+    void Succeed(AbsState state);
     void Pause(AbsState state);
     void Resume(AbsState state);
     bool IsPrepared(AbsState state);

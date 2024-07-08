@@ -5,7 +5,7 @@ namespace GPC.Scheduler;
 
 public abstract class AbsScheduler(StateSet stateSet)
 {
-    public Action<AbsState,JobRunningStatus> StateChanged;
+    public Action<AbsState> StateChanged;
     public Action<AbsState> StatePrepared;
     
     public StateSet StateSet = stateSet;

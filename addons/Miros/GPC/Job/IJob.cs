@@ -2,9 +2,9 @@
 
 public interface IJob
 {
-    void Enter();
-    void Exit();
-    void Break();
+    void Start();
+    void Succeed();
+    void Failed();
     void Pause();
     void Resume();
     bool IsPrepared();

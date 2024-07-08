@@ -4,35 +4,33 @@ namespace GPC.Job;
 
 public abstract class JobBase(AbsState state) :AbsJob(state),IJob
 {
-    public virtual void Enter()
+    public virtual void Start()
     {
-        State.IsRunning = true;
-        State.RunningResult = JobRunningResult.NoResult;
-        _Enter();
+        State.Status = JobRunningStatus.Running;
+        _Start();
     }
 
-    public virtual void Exit()
+    public virtual void Succeed()
     {
-        State.IsRunning = false;
-        _Exit();
+        State.Status = JobRunningStatus.NoRun;
+        _Succeed();
     }
 
-    public virtual void Break()
+    public virtual void Failed()
     {
-        State.IsRunning = false;
-        State.RunningResult = JobRunningResult.NoResult;
-        _Break();
+        State.Status = JobRunningStatus.Failed;
+        _Failed();
     }
 
     public virtual void Pause()
     {
-        State.IsRunning = false;
+        State.Status = JobRunningStatus.NoRun;
         _Pause();
     }
 
     public virtual void Resume()
     {
-        State.IsRunning = true;
+        State.Status = JobRunningStatus.Running;
         _Resume();
     }
     
@@ -44,11 +42,12 @@ public abstract class JobBase(AbsState state) :AbsJob(state),IJob
     
     public virtual void Update(double delta)
     {
-        if (!state.IsRunning) return;
-
-        if (_IsFailed() || _IsSucceed())
+        if (_IsFailed())
         {
-            state.IsRunning = false;
+            State.Status = JobRunningStatus.Failed;
+        }else if (_IsSucceed())
+        {
+            State.Status = JobRunningStatus.Succeed;
         }
         
         State.IntervalElapsedTime += delta;
@@ -63,7 +62,6 @@ public abstract class JobBase(AbsState state) :AbsJob(state),IJob
 
     public virtual void PhysicsUpdate(double delta)
     {
-        if (!state.IsRunning) return;
         _PhysicsUpdate(delta);
     }
 

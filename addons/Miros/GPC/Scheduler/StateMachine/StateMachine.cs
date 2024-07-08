@@ -29,7 +29,7 @@ public class StateMachine(StateSet stateSet) : AbsScheduler(stateSet)
     public void SetState(AbsState state)
     {
         _current = _nodes[state.Id];
-        _provider.Executor.Enter(state);
+        _provider.Executor.Start(state);
     }
 
     private void ChangeState(AbsState state)
@@ -39,8 +39,8 @@ public class StateMachine(StateSet stateSet) : AbsScheduler(stateSet)
         var previousState = _current.State;
         var nextState = _nodes[state.Id].State;
 
-        _provider.Executor.Exit(previousState);
-        _provider.Executor.Enter(nextState);
+        _provider.Executor.Succeed(previousState);
+        _provider.Executor.Start(nextState);
         _current = _nodes[state.Id];
     }
 

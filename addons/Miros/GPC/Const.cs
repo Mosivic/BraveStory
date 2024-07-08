@@ -9,29 +9,10 @@ public enum CompareType
 
 public enum JobRunningStatus
 {
-    Enter,
-    Update,
-    Exit,
-}
-
-public enum JobRunningResult
-{
-    NoResult,
+    NoRun,
+    Running,
     Succeed,
-    Failed
+    Failed,
 }
 
-internal enum MsyType
-{
-    Property,
-    Memory,
-    Result,
-    Sound
-}
 
-internal enum MsgState
-{
-    Accepted,
-    Refused,
-    NotFound
-}

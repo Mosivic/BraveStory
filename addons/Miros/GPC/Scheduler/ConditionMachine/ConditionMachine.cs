@@ -46,10 +46,15 @@ public class ConditionMachine : AbsScheduler
                 for (int i = 0; i < layerStateCount; i++) 
                 {
                     var layerJob = layerStates[i];
-                    if (!layerJob.IsRunning)
+                    if (layerJob.Status is JobRunningStatus.Succeed)
                     {
-                        StateChanged.Invoke(layerJob,JobRunningStatus.Exit);
-                        _provider.Executor.Exit(layerJob);
+                        StateChanged.Invoke(layerJob);
+                        _provider.Executor.Succeed(layerJob);
+                        layerStates.RemoveAt(i);
+                    }else if(layerJob.Status is JobRunningStatus.Failed)
+                    {
+                        StateChanged.Invoke(layerJob);
+                        _provider.Executor.Failed(layerJob);
                         layerStates.RemoveAt(i);
                     }
                 }
@@ -65,15 +70,15 @@ public class ConditionMachine : AbsScheduler
             //当前层无State
             if (layerStateCount == 0) 
             {
-                StateChanged.Invoke(nextState,JobRunningStatus.Enter);
-                _provider.Executor.Enter(nextState);
+                StateChanged.Invoke(nextState);
+                _provider.Executor.Start(nextState);
                 layerStates.Add(nextState);
             }
             //当前层有未满，可加入NextState
             else if (layerStateCount < layerStateMaxCount)
             {
-                StateChanged.Invoke(nextState, JobRunningStatus.Enter);
-                _provider.Executor.Enter(nextState);
+                StateChanged.Invoke(nextState);
+                _provider.Executor.Start(nextState);
                 
                 var insertIndex = layerStates.FindIndex(state =>nextState.Priority < state.Priority );
                 if(insertIndex == -1)
@@ -85,12 +90,12 @@ public class ConditionMachine : AbsScheduler
             //当前层已满，加入高优先State
             else if(layerStateCount == layerStateMaxCount && nextState.Priority > layerStates[0].Priority) 
             {
-                StateChanged.Invoke(layerStates[0],JobRunningStatus.Exit);
-                _provider.Executor.Exit(layerStates[0]);
+                StateChanged.Invoke(layerStates[0]);
+                _provider.Executor.Failed(layerStates[0]);
                 layerStates.RemoveAt(0);
                 
-                StateChanged.Invoke(nextState,JobRunningStatus.Enter);
-                _provider.Executor.Enter(nextState);
+                StateChanged.Invoke(nextState);
+                _provider.Executor.Start(nextState);
                 
                 var insertIndex = layerStates.FindIndex(state =>nextState.Priority < state.Priority );
                 if(insertIndex == -1)

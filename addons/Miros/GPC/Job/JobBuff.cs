@@ -6,17 +6,15 @@ namespace GPC.Job;
 
 public class JobBuff(Buff buff) : JobBase(buff)
 {
-    public override void Enter()
+    public override void Start()
     {
-        State.IsRunning = true;
-        State.RunningResult = JobRunningResult.NoResult;
+        State.Status = JobRunningStatus.Running;
         
         switch (buff.DurationPolicy)
         {
             case BuffDurationPolicy.Instand:
                 ApplyModifiers();
-                State.IsRunning = false;
-                State.RunningResult = JobRunningResult.Succeed;
+                State.Status = JobRunningStatus.Succeed;
                 break;
             case BuffDurationPolicy.Infinite:
                 ApplyModifiers();
@@ -26,8 +24,10 @@ public class JobBuff(Buff buff) : JobBase(buff)
         }
     }
 
-    public override void Exit()
+    public override void Succeed()
     {
+        State.Status = JobRunningStatus.Succeed;
+        
         switch (buff.DurationPolicy)
         {
             case BuffDurationPolicy.Instand:
@@ -40,10 +40,9 @@ public class JobBuff(Buff buff) : JobBase(buff)
         }
     }
 
-    public override void Break()
+    public override void Failed()
     {
-        State.IsRunning = false;
-        State.RunningResult = JobRunningResult.Failed;
+        State.Status = JobRunningStatus.Failed;
         
         switch (buff.DurationPolicy)
         {
