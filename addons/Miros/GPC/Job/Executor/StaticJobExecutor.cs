@@ -12,12 +12,12 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
     {
         _GetJob(state.Type, state).Start();
     }
-
-    public void Succeed(AbsState state)
+    
+    public void Over(AbsState state)
     {
-        _GetJob(state.Type, state).OnSucceed();
+        _GetJob(state.Type, state).Over();
     }
-
+    
     public void Pause(AbsState state)
     {
         _GetJob(state.Type, state).Pause();
@@ -32,11 +32,7 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
     {
         _GetJob(originState.Type, originState).Stack(stackState);
     }
-
-    public void StackOverflow(AbsState originState,AbsState stackState)
-    {
-        _GetJob(originState.Type, originState).OnStackOverflow(stackState);
-    }
+    
 
     public bool IsPrepared(AbsState state)
     {
@@ -52,12 +48,7 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
     {
         _GetJob(state.Type, state).PhysicsUpdate(delta);
     }
-
     
-    public void Failed(AbsState state)
-    {
-        _GetJob(state.Type, state).OnFailed();
-    }
 
     private static IJob _GetJob(Type type, AbsState state)
     {

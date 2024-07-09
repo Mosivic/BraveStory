@@ -14,6 +14,24 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public void Over()
     {
+        switch (state.Status)
+        {
+            case JobRunningStatus.NoRun:
+                break;
+            case JobRunningStatus.Running:
+                OnFailed();
+                break;
+            case JobRunningStatus.Succeed:
+                OnSucceed();;
+                break;
+            case JobRunningStatus.Failed:
+                OnFailed();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        state.Status = JobRunningStatus.NoRun;
         _Over();
     }
     
@@ -37,61 +55,68 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
             case StateStackType.Source:
                 state.StackSourceCountDict ??= new Dictionary<IGpcToken, int>
                     { { state.Source, 1 } };
-
+                
+                //Not have stackState in Dict
                 if (!state.StackSourceCountDict.ContainsKey(stackState.Source))
                 {
                     state.StackSourceCountDict.Add(stackState.Source,1);
-                    //Stack
+                    state.StackCurrentCount += 1;
+                    OnStack();
                 }
+                //Have stackState in Dict AND stackStactCount less than maxCount
                 else if(state.StackSourceCountDict[state.Source] < state.StackMaxCount)
                 {
-                    state.StackSourceCountDict.Add(state.Source,1);
-                    //Stack
+                    state.StackSourceCountDict.Add(stackState.Source,1);
+                    state.StackCurrentCount += 1;
+                    OnStack();
                 }
+                //Have stackState in Dict AND Overflow
                 else
-                    //StackOverflow
-                break;
-
+                    OnStackOverflow();
                 break;
             case StateStackType.Target:
                 if (state.StackCurrentCount < state.StackMaxCount)
                 {
                     state.StackCurrentCount += 1;
-                    //Stack
+                    OnStack();
                 }
                 else
-                   //StackOverflow
-                
-                break;
-
+                    OnStackOverflow();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        _Stack();
+        _Stack(stackState);
     }
     
     protected virtual void OnSucceed()
     {
-        State.Status = JobRunningStatus.Succeed;
         _OnSucceed();
     }
     
     protected virtual void OnFailed()
     {
-        State.Status = JobRunningStatus.Failed;
         _OnFailed();
     }
+
+    protected virtual void OnStack()
+    {
+        
+    }
     
-    protected virtual void OnStackOverflow(AbsState state)
+    protected virtual void OnStackOverflow()
     {
         _OnStackOverflow();
     }
     
-    protected virtual void OnExpiration()
+    protected virtual void OnStackExpiration()
     {
-        State.Status = JobRunningStatus.Succeed;
-        State.DurationElapsed = 0;
+        state.StackCurrentCount -= 1;
+        state.DurationElapsed = 0;
+        
+        if (state.StackCurrentCount == 0)
+            state.Status = JobRunningStatus.Succeed;
+           
         _OnStackExpiration();
     }
     
@@ -118,15 +143,15 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     
     public virtual void Update(double delta)
     {
-        if (IsFailed()) OnFailed();
-        if (IsSucceed()) OnSucceed();
+        if (IsFailed()) state.Status = JobRunningStatus.Failed;
+        if (IsSucceed()) state.Status = JobRunningStatus.Succeed;
 
         State.DurationElapsed += delta;
         State.PeriodElapsed += delta;
         
         if (State.Duration > 0 && State.DurationElapsed > State.Duration)
         {
-            OnExpiration();
+            OnStackExpiration();
         }
         if (State.Period > 0 && State.PeriodElapsed > State.Period)
         {
@@ -140,6 +165,4 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     {
         _PhysicsUpdate(delta);
     }
-
-
 }

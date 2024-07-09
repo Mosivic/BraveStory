@@ -93,17 +93,17 @@ public class JobBuff(Buff buff) : JobBase(buff)
         if (buff.StackIsResetPeriod)
             buff.PeriodElapsed = 0;
 
-        _Stack();
+        base.Stack(stackState);
     }
 
-    public override void OnStackOverflow(AbsState stackState)
+    protected override void OnStackOverflow()
     {
-        _OnStackOverflow();
+        base.OnStackOverflow();
     }
 
-    protected override void OnExpiration()
+    protected override void OnStackExpiration()
     {
-        _OnStackExpiration();
+        base.OnStackExpiration();
     }
 
     private void ApplyModifiers()

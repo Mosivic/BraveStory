@@ -13,7 +13,7 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _Over()
     {
-        
+        State.OverFunc?.Invoke(State);
     }
     
     protected virtual void _Pause()
@@ -26,10 +26,11 @@ public abstract class AbsJob(AbsState state)
         State.ResumeFunc?.Invoke(State);
     }
     
-    protected virtual void _Stack()
+    protected virtual void _Stack(AbsState stackState)
     {
-        State.StackFunc?.Invoke(State);
+        State.StackFunc?.Invoke(State,stackState);
     }
+    
     
     protected virtual bool _IsPrepared()
     {
@@ -48,12 +49,12 @@ public abstract class AbsJob(AbsState state)
         State.FailedFunc?.Invoke(State);
     }
 
-
-
+    
     protected virtual void _OnPeriod()
     {
         State.PeriodFunc?.Invoke(State);
     }
+
 
     
     protected virtual void _OnStackOverflow()

@@ -30,11 +30,12 @@ public abstract class AbsState
     public Func<bool> IsSucceedFunc { get; init; }
     public Func<bool> IsFailedFunc { get; init; }
     public Action<AbsState> StartFunc { get; init; }
+    public Action<AbsState> OverFunc { get; init; }
     public Action<AbsState> SucceedFunc { get; init; }
     public Action<AbsState> FailedFunc { get; init; }
     public Action<AbsState> PauseFunc { get; init; }
     public Action<AbsState> ResumeFunc { get; init; }
-    public Action<AbsState> StackFunc { get; init; }
+    public Action<AbsState,AbsState> StackFunc { get; init; }
     public Action<AbsState> StackOverflowFunc { get; init; }
     public Action<AbsState> StackExpirationFunc { get; init; }
     public Action<AbsState> PeriodFunc { get; init; }

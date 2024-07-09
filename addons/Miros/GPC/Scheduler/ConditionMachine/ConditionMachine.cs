@@ -89,17 +89,16 @@ public class ConditionMachine : AbsScheduler
         
         for (var i = 0; i < layerStateCount; i++)
         {
-            var layerJob = layerStates[i];
-            if (layerJob.Status is JobRunningStatus.Succeed)
+            var state = layerStates[i];
+            if (state.Status is JobRunningStatus.Succeed)
             {
-                StateChanged.Invoke(layerJob);
-                _provider.Executor.Succeed(layerJob);
+                StateChanged.Invoke(state);
+                _provider.Executor.Over(state);
                 layerStates.RemoveAt(i);
             }
-            else if (layerJob.Status is JobRunningStatus.Failed)
+            else if (state.Status is JobRunningStatus.Failed)
             {
-                StateChanged.Invoke(layerJob);
-                _provider.Executor.Failed(layerJob);
+                StateChanged.Invoke(state);
                 layerStates.RemoveAt(i);
             }
         }
@@ -136,7 +135,7 @@ public class ConditionMachine : AbsScheduler
         else if (layerStateCount == layer.JobMaxCount && state.Priority > layerStates[0].Priority)
         {
             StateChanged.Invoke(layerStates[0]);
-            _provider.Executor.Failed(layerStates[0]);
+            _provider.Executor.Over(layerStates[0]);
             layerStates.RemoveAt(0);
 
             StateChanged.Invoke(state);

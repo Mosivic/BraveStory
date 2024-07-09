@@ -11,16 +11,10 @@ internal class JobAll(CompoundState state) : JobBase(state)
     {
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Start(childCfg);
-        _OnStart();
+        _Start();
     }
 
-
-    public override void OnSucceed()
-    {
-        foreach (var childCfg in state.SubJobs)
-            _provider.Executor.Succeed(childCfg);
-    }
-
+    
 
     public bool IsSucceed()
     {
@@ -32,8 +26,7 @@ internal class JobAll(CompoundState state) : JobBase(state)
 
         return true;
     }
-
-
+    
     public bool IsFailed()
     {
         foreach (var childCfg in state.SubJobs)

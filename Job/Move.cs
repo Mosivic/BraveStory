@@ -4,7 +4,7 @@ using GPC.Job;
 
 internal class Move(PlayerState state) : JobBase(state)
 {
-    protected override void _OnStart()
+    protected override void _Start()
     {
         state.Nodes.AnimationPlayer.Play("run");
     }
