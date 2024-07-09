@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GPC.States.Buff;
 
@@ -22,25 +23,6 @@ public enum BuffPeriodicInhibitionPolicy
     ExecuteAndReset //执行一次后再重置
 }
 
-/// <summary>
-///     叠加新buff时持续时间的更新策略
-/// </summary>
-public enum BuffStackDurationRefreshPolicy
-{
-    Reset, //重置
-    Delay //延长
-}
-
-/// <summary>
-///     叠加新buff时周期的更新策略
-/// </summary>
-public enum BuffStackPeriodResetPolicy
-{
-    Reset,//重置
-    Delay 
-}
-
-
 
 /// <summary>
 ///     当一层buff到期后的处理策略
@@ -55,7 +37,7 @@ public enum BuffStackExpirationPolicy
 
 public class Buff : AbsState
 {
-    public IGpcToken Source { get; set; }
+    public  IGpcToken Source { get; set; }
     
     // Core
     public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
@@ -69,8 +51,8 @@ public class Buff : AbsState
     public float Chance { get; set; } //0.0 ~ 1.0
     
     // Stacking
-    public BuffStackDurationRefreshPolicy StackDurationRefreshPolicy { get; set; }
-    public BuffStackPeriodResetPolicy StackPeriodResetPolicy { get; set; }
+    public bool StackIsRefreshDuration { get; set; } = false;
+    public bool StackIsResetPeriod { get; set; } = false;
     public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }
    
     // Stacking Overflow
@@ -82,4 +64,5 @@ public class Buff : AbsState
     public List<AbsState> OnFailedStates { get; set; }
     
     // Immunity
+
 }

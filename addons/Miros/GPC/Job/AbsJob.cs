@@ -6,9 +6,36 @@ public abstract class AbsJob(AbsState state)
 {
     protected readonly AbsState State = state;
 
-    protected virtual void _OnStart()
+    protected virtual void _Start()
     {
         State.StartFunc?.Invoke(State);
+    }
+
+    protected virtual void _Over()
+    {
+        
+    }
+    
+    protected virtual void _Pause()
+    {
+        State.PauseFunc?.Invoke(State);
+    }
+
+    protected virtual void _Resume()
+    {
+        State.ResumeFunc?.Invoke(State);
+    }
+    
+    protected virtual void _Stack()
+    {
+        State.StackFunc?.Invoke(State);
+    }
+    
+    protected virtual bool _IsPrepared()
+    {
+        if (State.IsPreparedFunc != null)
+            return State.IsPreparedFunc.Invoke();
+        return true;
     }
 
     protected virtual void _OnSucceed()
@@ -21,38 +48,25 @@ public abstract class AbsJob(AbsState state)
         State.FailedFunc?.Invoke(State);
     }
 
-    protected virtual void _OnPause()
-    {
-        State.PauseFunc?.Invoke(State);
-    }
 
-    protected virtual void _OnResume()
-    {
-        State.ResumeFunc?.Invoke(State);
-    }
 
     protected virtual void _OnPeriod()
     {
         State.PeriodFunc?.Invoke(State);
     }
 
-    protected virtual void _OnStack()
-    {
-        State.StackFunc?.Invoke(State);
-    }
     
     protected virtual void _OnStackOverflow()
     {
         State.StackOverflowFunc?.Invoke(State);
     }
-    
-    protected virtual bool _IsPrepared()
-    {
-        if (State.IsPreparedFunc != null)
-            return State.IsPreparedFunc.Invoke();
-        return true;
-    }
 
+    protected virtual void _OnStackExpiration()
+    {
+        State.StackExpirationFunc?.Invoke(State);
+    }
+    
+    
     protected virtual bool _IsSucceed()
     {
         var isSucceed = false;

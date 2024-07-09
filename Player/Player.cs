@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BraveStory.Scripts;
 using BraveStory.State;
 using Godot;
@@ -6,7 +5,6 @@ using GPC;
 using GPC.Evaluator;
 using GPC.Job;
 using GPC.Scheduler;
-using GPC.States;
 using GPC.States.Buff;
 
 namespace BraveStory.Player;
@@ -73,51 +71,50 @@ public partial class Player : CharacterBody2D, IGpcToken
         };
         _properties = new PlayerProperties();
 
-
-        _scheduler = new ConditionMachine([
-            new PlayerState(this, _nodes, _properties)
-            {
-                Name = "Idle",
-                Layer = LayerMap.Movement,
-                Priority = 5,
-                Type = typeof(Idle),
-                IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
-            },
-            new PlayerState(this, _nodes, _properties)
-            {
-                Type = typeof(Move),
-                Layer = LayerMap.Movement,
-                Name = "Run",
-                Priority = 2,
-                IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
-            },
-            new PlayerState(this, _nodes, _properties)
-            {
-                Name = "Jump",
-                Priority = 10,
-                Layer = LayerMap.Movement,
-                Type = typeof(Jump),
-                IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
-                                       isOnFloor.Is(true),
-                IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
-            },
-            new Buff()
-            {
-                Name = "AddHp",
-                Layer = LayerMap.Buff,
-                Modifiers =
-                [
-                    new Modifier
-                    {
-                        Property = _properties.RunSpeed,
-                        Operator = BuffModifierOperator.Add,
-                        Affect = -10
-                    }
-                ],
-                Type = typeof(JobBuff),
-                IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
-            }
-        ]);
+        var idle = new PlayerState(this, _nodes, _properties)
+        {
+            Name = "Idle",
+            Layer = LayerMap.Movement,
+            Priority = 5,
+            Type = typeof(Idle),
+            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
+        };
+        var jump = new PlayerState(this, _nodes, _properties)
+        {
+            Name = "Jump",
+            Priority = 10,
+            Layer = LayerMap.Movement,
+            Type = typeof(Jump),
+            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
+                                   isOnFloor.Is(true),
+            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
+        };
+        var run = new PlayerState(this, _nodes, _properties)
+        {
+            Type = typeof(Move),
+            Layer = LayerMap.Movement,
+            Name = "Run",
+            Priority = 2,
+            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
+        };
+        var testBuff = new Buff()
+        {
+            Name = "AddHp",
+            Layer = LayerMap.Buff,
+            Modifiers =
+            [
+                new Modifier
+                {
+                    Property = _properties.RunSpeed,
+                    Operator = BuffModifierOperator.Add,
+                    Affect = -10
+                }
+            ],
+            Type = typeof(JobBuff),
+            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
+        };
+        
+        _scheduler = new ConditionMachine([testBuff]);
 
 
     }

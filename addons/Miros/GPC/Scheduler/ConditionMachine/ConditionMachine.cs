@@ -36,50 +36,13 @@ public class ConditionMachine : AbsScheduler
         if (result == -1)
         {
             states.Add(state);
+            return;
         }
         // State Stack
-        else
-        {
-            var livedState = states[result];
-            switch (state.StackType)
-            {
-                //No Stack
-                case StateStackType.None:
-                    states.Add(state);
-                    break;
-                // Stack by Source
-                case StateStackType.Source:
-                    livedState.StackSourceCountDict ??= new Dictionary<IGpcToken, int>
-                        { { livedState.Source, 1 } };
-
-                    if (!livedState.StackSourceCountDict.ContainsKey(state.Source))
-                    {
-                        livedState.StackSourceCountDict.Add(state.Source,1);
-                        _provider.Executor.Stack(livedState,state);
-                    }
-                    else if(livedState.StackSourceCountDict[state.Source] < livedState.StackMaxCount)
-                    {
-                        livedState.StackSourceCountDict.Add(state.Source,1);
-                        _provider.Executor.Stack(livedState,state);
-                    }
-                    else
-                        _provider.Executor.StackOverflow(livedState,state);
-                    break;
-                // Stack by Target
-                case StateStackType.Target:
-                    if (livedState.StackCurrentCount < livedState.StackMaxCount)
-                    {
-                        livedState.StackCurrentCount += 1;
-                        _provider.Executor.Stack(livedState,state);
-                    }
-                    else
-                        _provider.Executor.StackOverflow(livedState,state);
-                    
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+        var livedState = states[result];
+        
+        if (!livedState.IsStack) states.Add(state);
+        else _provider.Executor.Stack(livedState,state);
     }
 
     public void RemoveState(AbsState state)

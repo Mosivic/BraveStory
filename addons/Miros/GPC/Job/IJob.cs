@@ -4,13 +4,11 @@ namespace GPC.Job;
 
 public interface IJob
 {
-    void OnStart();
-    void OnSucceed();
-    void OnFailed();
-    void OnPause();
-    void OnResume();
-    void OnStack(AbsState state);
-    void OnStackOverflow(AbsState state);
+    void Start();
+    void Over();
+    void Pause();
+    void Resume();
+    void Stack(AbsState state);
     bool IsPrepared();
     void Update(double delta);
     void PhysicsUpdate(double delta);

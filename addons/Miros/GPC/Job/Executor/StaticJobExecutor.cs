@@ -10,7 +10,7 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
 
     public void Start(AbsState state)
     {
-        _GetJob(state.Type, state).OnStart();
+        _GetJob(state.Type, state).Start();
     }
 
     public void Succeed(AbsState state)
@@ -20,17 +20,17 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
 
     public void Pause(AbsState state)
     {
-        _GetJob(state.Type, state).OnPause();
+        _GetJob(state.Type, state).Pause();
     }
 
     public void Resume(AbsState state)
     {
-        _GetJob(state.Type, state).OnResume();
+        _GetJob(state.Type, state).Resume();
     }
 
     public void Stack(AbsState originState,AbsState stackState)
     {
-        _GetJob(originState.Type, originState).OnStack(stackState);
+        _GetJob(originState.Type, originState).Stack(stackState);
     }
 
     public void StackOverflow(AbsState originState,AbsState stackState)

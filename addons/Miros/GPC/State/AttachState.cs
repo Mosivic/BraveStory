@@ -12,4 +12,5 @@ public class AttachState : AbsState
     public Action<AbsState> RunningAttachFunc { get; set; }
     public Action<AbsState> RunningPhysicsAttachFunc { get; set; }
     public Action<AbsState> AttachIntervalUpdateFunc { get; set; }
+
 }

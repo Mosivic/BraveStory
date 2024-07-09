@@ -7,7 +7,7 @@ internal class JobAll(CompoundState state) : JobBase(state)
 {
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
 
-    public override void OnStart()
+    public override void Start()
     {
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.Start(childCfg);

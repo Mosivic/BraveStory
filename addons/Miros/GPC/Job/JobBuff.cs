@@ -7,7 +7,7 @@ namespace GPC.Job;
 
 public class JobBuff(Buff buff) : JobBase(buff)
 {
-    public override void OnStart()
+    public override void Start()
     {
         buff.Status = JobRunningStatus.Running;
 
@@ -26,10 +26,10 @@ public class JobBuff(Buff buff) : JobBase(buff)
             if(buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
-        _OnStart();
+        _Start();
     }
 
-    public override void OnSucceed()
+    protected override void OnSucceed()
     {
         if (buff.DurationPolicy == BuffDurationPolicy.Instant)
         {
@@ -46,36 +46,33 @@ public class JobBuff(Buff buff) : JobBase(buff)
         _OnSucceed();
     }
 
-    public override void OnFailed()
+    protected override void OnFailed()
     {
-        if (buff.DurationPolicy == BuffDurationPolicy.Instant)
+        switch (buff.DurationPolicy)
         {
+            case BuffDurationPolicy.Instant:
+                break;
+            case BuffDurationPolicy.Infinite:
+                CancelModifiers();
+                break;
+            case BuffDurationPolicy.Duration:
+                break;
+        }
 
-        }
-        else if (buff.DurationPolicy == BuffDurationPolicy.Infinite)
-        {
-            CancelModifiers();
-        }
-        else if (buff.DurationPolicy == BuffDurationPolicy.Duration)
-        {
-
-        }
         _OnFailed();
     }
 
     protected override void OnPeriod()
     {
+        State.PeriodElapsed = 0;
         ApplyModifiers();
         _OnPeriod();
     }
+    
 
-    public override void OnPause()
+    public override void Resume()
     {
-        _OnPause();
-    }
-
-    public override void OnResume()
-    {
+        buff.Status = JobRunningStatus.Running;
         if (buff.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.Reset)
         {
             buff.PeriodElapsed = 0;
@@ -85,19 +82,28 @@ public class JobBuff(Buff buff) : JobBase(buff)
              ApplyModifiers();
              buff.PeriodElapsed = 0;
         }
-        _OnResume();
+        _Resume();
     }
 
 
-    public override void OnStack(AbsState stackState)
+    public override void Stack(AbsState stackState)
     {
-        
-        _OnStack();
+        if (buff.StackIsRefreshDuration)
+            buff.DurationElapsed = 0;
+        if (buff.StackIsResetPeriod)
+            buff.PeriodElapsed = 0;
+
+        _Stack();
     }
 
     public override void OnStackOverflow(AbsState stackState)
     {
         _OnStackOverflow();
+    }
+
+    protected override void OnExpiration()
+    {
+        _OnStackExpiration();
     }
 
     private void ApplyModifiers()
