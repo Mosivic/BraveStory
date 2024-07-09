@@ -58,9 +58,9 @@ public partial class StateDebugger : MarginContainer
 
             foreach (var childLayer in _rootLayer.ChildrenLayer) CreateTreeChild(root, childLayer);
 
-            foreach (var layer in _scheduler.States.Keys)
+            foreach (var layer in _scheduler.LayerStates.Keys)
             {
-                foreach (var state in _scheduler.States[layer])
+                foreach (var state in _scheduler.LayerStates[layer])
                 {
                     var treeItem = _layerTreeItemDict[layer];
                     var layerTreeItem = _stateTree.CreateItem(treeItem);

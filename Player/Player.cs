@@ -113,10 +113,19 @@ public partial class Player : CharacterBody2D, IGpcToken
             Type = typeof(JobBuff),
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
         };
+
+        var test = new PlayerState(this, _nodes, _properties)
+        {
+            Name = "Test",
+            Type = typeof(Idle),
+            Layer = LayerMap.Buff,
+            Duration = 10,
+            Period = 1,
+            PeriodFunc = (state =>GD.Print("One Period") )
+        };
         
-        _scheduler = new ConditionMachine([testBuff]);
-
-
+        _scheduler = new ConditionMachine([test]);
+        
     }
 
     public override void _Process(double delta)

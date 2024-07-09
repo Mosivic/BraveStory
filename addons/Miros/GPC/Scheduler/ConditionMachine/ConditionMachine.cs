@@ -10,41 +10,65 @@ namespace GPC.Scheduler;
 public class ConditionMachine : AbsScheduler
 {
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
-    private readonly Dictionary<Layer, List<AbsState>> _runningStates = new();
     
     public ConditionMachine(List<AbsState> states)
     {
         foreach (var state in states)
         {
-            AddState(state);
+            AddLayerState(state);
         }
         
     }
     
-    public void AddState(AbsState state) 
+    public void AddLayerState(AbsState state)
     {
         var layer = state.Layer;
-        if (!States.ContainsKey(layer))
-        {
-            States.TryAdd(layer, []);
-            _runningStates.TryAdd(layer, []);
-        }
+        if (!LayerStates.ContainsKey(layer))
+            LayerStates.TryAdd(layer, []);
         
-        var states = States[layer];
-        var result = states.FindIndex((s => s.Name == state.Name));
-        
-        if (result == -1)
-        {
-            states.Add(state);
-            return;
-        }
-        // State Stack
-        var livedState = states[result];
-        
-        if (!livedState.IsStack) states.Add(state);
-        else _provider.Executor.Stack(livedState,state);
+        LayerStates[layer].Add(state);
     }
 
+
+    public void AddRunningLayerState(AbsState state)
+    {
+        var layer = state.Layer;
+        if (!RunningLayerStates.ContainsKey(layer)){}
+            RunningLayerStates.TryAdd(layer, []);
+        
+        //CurrentLayer no state
+        if (RunningLayerStates[layer].Count == 0)
+        {
+            RunningLayerStates[layer].Add(state);
+            return;
+        }
+        
+        //State can't stack
+        if (!state.IsStack)
+        {
+            var insertIndex = RunningLayerStates[layer].FindIndex(s => state.Priority < s.Priority);
+            if (insertIndex == -1)
+                RunningLayerStates[layer].Add(state);
+            else
+                RunningLayerStates[layer].Insert(insertIndex, state);
+            return;
+        }
+        
+        //Find the same state AND Judge to stack
+        var result = RunningLayerStates[layer].FindIndex((s => s.Name == state.Name));
+        if (result == -1)
+        {
+            var insertIndex = RunningLayerStates[layer].FindIndex(s => state.Priority < s.Priority);
+            if (insertIndex == -1)
+                RunningLayerStates[layer].Add(state);
+            else
+                RunningLayerStates[layer].Insert(insertIndex, state);
+        }
+        else 
+            _provider.Executor.Stack(RunningLayerStates[layer][result],state);
+        
+    }
+    
     public void RemoveState(AbsState state)
     {
         
@@ -53,14 +77,14 @@ public class ConditionMachine : AbsScheduler
     public override void Update(double delta)
     {
         UpdateRunningStates();
-        foreach (var state in _runningStates.Values.SelectMany(states => states.Where(state => state != null)))
+        foreach (var state in RunningLayerStates.Values.SelectMany(states => states.Where(state => state != null)))
             _provider.Executor.Update(state, delta);
     }
 
     
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var state in _runningStates.Values.SelectMany(states => states.Where(state => state != null)))
+        foreach (var state in RunningLayerStates.Values.SelectMany(states => states.Where(state => state != null)))
             _provider.Executor.PhysicsUpdate(state, delta);
     }
     
@@ -68,7 +92,7 @@ public class ConditionMachine : AbsScheduler
     
     private void UpdateRunningStates()
     {
-        foreach (var layer in _runningStates.Keys)
+        foreach (var layer in RunningLayerStates.Keys)
         {
             RemoveRunOverState(layer);
             
@@ -83,22 +107,17 @@ public class ConditionMachine : AbsScheduler
     
     private void RemoveRunOverState(Layer layer)
     {
-        var layerStates = _runningStates[layer];
+        var layerStates = RunningLayerStates[layer];
         var layerStateCount = layerStates.Count();
         if (layerStateCount == 0) return;
         
         for (var i = 0; i < layerStateCount; i++)
         {
             var state = layerStates[i];
-            if (state.Status is JobRunningStatus.Succeed)
+            if (state.Status is JobRunningStatus.Succeed or JobRunningStatus.Failed)
             {
                 StateChanged.Invoke(state);
-                _provider.Executor.Over(state);
-                layerStates.RemoveAt(i);
-            }
-            else if (state.Status is JobRunningStatus.Failed)
-            {
-                StateChanged.Invoke(state);
+                _provider.Executor.Exit(state);
                 layerStates.RemoveAt(i);
             }
         }
@@ -108,7 +127,7 @@ public class ConditionMachine : AbsScheduler
     private void AddPreparedState(AbsState state)
     {
         var layer = state.Layer;
-        var layerStates = _runningStates[layer];
+        var layerStates = RunningLayerStates[layer];
         var layerStateCount = layerStates.Count();
         
         //考虑加入NextState
@@ -116,36 +135,26 @@ public class ConditionMachine : AbsScheduler
         if (layerStateCount == 0)
         {
             StateChanged.Invoke(state);
-            _provider.Executor.Start(state);
-            layerStates.Add(state);
+            _provider.Executor.Enter(state);
+            AddRunningLayerState(state);
         }
         //当前层有未满，可加入NextState
         else if (layerStateCount < layer.JobMaxCount)
         {
             StateChanged.Invoke(state);
-            _provider.Executor.Start(state);
-
-            var insertIndex = layerStates.FindIndex(s => state.Priority < s.Priority);
-            if (insertIndex == -1)
-                layerStates.Add(state);
-            else
-                layerStates.Insert(insertIndex, state);
+            _provider.Executor.Enter(state);
+            AddRunningLayerState(state);
         }
         //当前层已满，加入高优先State
         else if (layerStateCount == layer.JobMaxCount && state.Priority > layerStates[0].Priority)
         {
             StateChanged.Invoke(layerStates[0]);
-            _provider.Executor.Over(layerStates[0]);
+            _provider.Executor.Exit(layerStates[0]);
             layerStates.RemoveAt(0);
 
             StateChanged.Invoke(state);
-            _provider.Executor.Start(state);
-
-            var insertIndex = layerStates.FindIndex(s => state.Priority < s.Priority);
-            if (insertIndex == -1)
-                layerStates.Add(state);
-            else
-                layerStates.Insert(insertIndex, state);
+            _provider.Executor.Enter(state);
+            AddRunningLayerState(state);
         }
     }
 
@@ -154,7 +163,7 @@ public class ConditionMachine : AbsScheduler
     {
         var states = new List<AbsState>();
 
-        foreach (var state in States[layer])
+        foreach (var state in LayerStates[layer])
         {
             if (_provider.Executor.IsPrepared(state))
             {

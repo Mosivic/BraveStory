@@ -4,8 +4,8 @@ namespace GPC.Job;
 
 public interface IJob
 {
-    void Start();
-    void Over();
+    void Enter();
+    void Exit();
     void Pause();
     void Resume();
     void Stack(AbsState state);

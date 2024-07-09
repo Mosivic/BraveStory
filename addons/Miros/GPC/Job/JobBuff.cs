@@ -7,7 +7,7 @@ namespace GPC.Job;
 
 public class JobBuff(Buff buff) : JobBase(buff)
 {
-    public override void Start()
+    public override void Enter()
     {
         buff.Status = JobRunningStatus.Running;
 
@@ -26,7 +26,7 @@ public class JobBuff(Buff buff) : JobBase(buff)
             if(buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
-        _Start();
+        _Enter();
     }
 
     protected override void OnSucceed()

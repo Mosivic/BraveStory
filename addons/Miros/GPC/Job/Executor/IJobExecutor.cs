@@ -4,8 +4,8 @@ namespace GPC.Job.Executor;
 
 public interface IJobExecutor
 {
-    void Start(AbsState state);
-    void Over(AbsState state);
+    void Enter(AbsState state);
+    void Exit(AbsState state);
     void Pause(AbsState state);
     void Resume(AbsState state);
     void Stack(AbsState originState,AbsState stackState);

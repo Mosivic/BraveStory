@@ -7,11 +7,11 @@ internal class JobAll(CompoundState state) : JobBase(state)
 {
     private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
 
-    public override void Start()
+    public override void Enter()
     {
         foreach (var childCfg in state.SubJobs)
-            _provider.Executor.Start(childCfg);
-        _Start();
+            _provider.Executor.Enter(childCfg);
+        _Enter();
     }
 
     
@@ -21,7 +21,7 @@ internal class JobAll(CompoundState state) : JobBase(state)
         foreach (var childCfg in state.SubJobs)
         {
             if (childCfg.Status != JobRunningStatus.Succeed) return false;
-            _provider.Executor.Start(childCfg);
+            _provider.Executor.Enter(childCfg);
         }
 
         return true;

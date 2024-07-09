@@ -6,33 +6,17 @@ namespace GPC.Job;
 
 public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
-    public virtual void Start()
+    public virtual void Enter()
     {
         State.Status = JobRunningStatus.Running;
-        _Start();
+        _Enter();
     }
 
-    public void Over()
+    public void Exit()
     {
-        switch (state.Status)
-        {
-            case JobRunningStatus.NoRun:
-                break;
-            case JobRunningStatus.Running:
-                OnFailed();
-                break;
-            case JobRunningStatus.Succeed:
-                OnSucceed();;
-                break;
-            case JobRunningStatus.Failed:
-                OnFailed();
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        state.Status = JobRunningStatus.NoRun;
-        _Over();
+        if (state.Status == JobRunningStatus.Running) 
+            OnFailed();
+        _Exit();
     }
     
 
@@ -91,11 +75,13 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     
     protected virtual void OnSucceed()
     {
+        State.Status = JobRunningStatus.Succeed;
         _OnSucceed();
     }
     
     protected virtual void OnFailed()
     {
+        State.Status = JobRunningStatus.Failed;
         _OnFailed();
     }
 
@@ -143,8 +129,8 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     
     public virtual void Update(double delta)
     {
-        if (IsFailed()) state.Status = JobRunningStatus.Failed;
-        if (IsSucceed()) state.Status = JobRunningStatus.Succeed;
+        if (IsFailed()) OnSucceed();
+        if (IsSucceed()) OnFailed();
 
         State.DurationElapsed += delta;
         State.PeriodElapsed += delta;

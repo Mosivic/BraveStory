@@ -6,9 +6,9 @@ namespace GPC.States;
 public abstract class AbsState
 {
     // Core
-    public string Name { get; init; }
-    public Layer Layer { get; init; }
-    public Type Type { get; init; }
+    public required string Name { get; init; }
+    public required Layer Layer { get; init; }
+    public required Type Type { get; init; }
     public int Priority { get; init; }
     public IGpcToken Source { get; init; }
     public JobRunningStatus Status { get; set; } = JobRunningStatus.NoRun;
