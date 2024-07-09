@@ -119,9 +119,15 @@ public partial class Player : CharacterBody2D, IGpcToken
             Name = "Test",
             Type = typeof(Idle),
             Layer = LayerMap.Buff,
-            Duration = 10,
+            Duration = 3,
             Period = 1,
-            PeriodFunc = (state =>GD.Print("One Period") )
+            StackMaxCount = 3,
+            StackCurrentCount = 3,
+            PeriodFunc = state =>GD.Print("One Period"),
+            EnterFunc = _=> GD.Print("Enter"),
+            ExitFunc = _=> GD.Print("Exit"),
+            OnStackExpirationFunc = _=> GD.Print("Expirtion")
+            
         };
         
         _scheduler = new ConditionMachine([test]);

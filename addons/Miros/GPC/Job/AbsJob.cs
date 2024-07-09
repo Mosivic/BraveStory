@@ -8,12 +8,12 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _Enter()
     {
-        State.StartFunc?.Invoke(State);
+        State.EnterFunc?.Invoke(State);
     }
 
     protected virtual void _Exit()
     {
-        State.OverFunc?.Invoke(State);
+        State.ExitFunc?.Invoke(State);
     }
     
     protected virtual void _Pause()
@@ -41,12 +41,12 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _OnSucceed()
     {
-        State.SucceedFunc?.Invoke(State);
+        State.OnSucceedFunc?.Invoke(State);
     }
 
     protected virtual void _OnFailed()
     {
-        State.FailedFunc?.Invoke(State);
+        State.OnFailedFunc?.Invoke(State);
     }
 
     
@@ -59,12 +59,12 @@ public abstract class AbsJob(AbsState state)
     
     protected virtual void _OnStackOverflow()
     {
-        State.StackOverflowFunc?.Invoke(State);
+        State.OnStackOverflowFunc?.Invoke(State);
     }
 
     protected virtual void _OnStackExpiration()
     {
-        State.StackExpirationFunc?.Invoke(State);
+        State.OnStackExpirationFunc?.Invoke(State);
     }
     
     
@@ -80,13 +80,14 @@ public abstract class AbsJob(AbsState state)
     protected virtual bool _IsFailed()
     {
         var isFailed = false;
-        if (State.UsePrepareFuncAsRunCondition && State.IsPreparedFunc != null)
-        {
-            isFailed = !State.IsPreparedFunc.Invoke();
-        }
-        else if (State.IsFailedFunc != null)
+        
+        if (State.IsFailedFunc != null)
         {
             isFailed = State.IsFailedFunc.Invoke();
+        }
+        else if (State.UsePrepareFuncAsRunCondition && State.IsPreparedFunc != null)
+        {
+            isFailed = !State.IsPreparedFunc.Invoke();
         }
         
         return isFailed;

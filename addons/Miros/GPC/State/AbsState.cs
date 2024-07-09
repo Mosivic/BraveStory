@@ -29,15 +29,15 @@ public abstract class AbsState
     public Func<bool> IsPreparedFunc { get; init; }
     public Func<bool> IsSucceedFunc { get; init; }
     public Func<bool> IsFailedFunc { get; init; }
-    public Action<AbsState> StartFunc { get; init; }
-    public Action<AbsState> OverFunc { get; init; }
-    public Action<AbsState> SucceedFunc { get; init; }
-    public Action<AbsState> FailedFunc { get; init; }
+    public Action<AbsState> EnterFunc { get; init; }
+    public Action<AbsState> ExitFunc { get; init; }
+    public Action<AbsState> OnSucceedFunc { get; init; }
+    public Action<AbsState> OnFailedFunc { get; init; }
     public Action<AbsState> PauseFunc { get; init; }
     public Action<AbsState> ResumeFunc { get; init; }
     public Action<AbsState,AbsState> StackFunc { get; init; }
-    public Action<AbsState> StackOverflowFunc { get; init; }
-    public Action<AbsState> StackExpirationFunc { get; init; }
+    public Action<AbsState> OnStackOverflowFunc { get; init; }
+    public Action<AbsState> OnStackExpirationFunc { get; init; }
     public Action<AbsState> PeriodFunc { get; init; }
     public Action<AbsState> RunningFunc { get; init; }
     public Action<AbsState> RunningPhysicsFunc { get; init; }

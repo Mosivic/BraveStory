@@ -24,7 +24,10 @@ public class ConditionMachine : AbsScheduler
     {
         var layer = state.Layer;
         if (!LayerStates.ContainsKey(layer))
+        {
             LayerStates.TryAdd(layer, []);
+            RunningLayerStates.TryAdd(layer, []);
+        }
         
         LayerStates[layer].Add(state);
     }
@@ -44,28 +47,28 @@ public class ConditionMachine : AbsScheduler
         }
         
         //State can't stack
+        var index = RunningLayerStates[layer].FindIndex((s => s.Name == state.Name));
         if (!state.IsStack)
         {
-            var insertIndex = RunningLayerStates[layer].FindIndex(s => state.Priority < s.Priority);
-            if (insertIndex == -1)
+            if (index == -1)
                 RunningLayerStates[layer].Add(state);
-            else
-                RunningLayerStates[layer].Insert(insertIndex, state);
             return;
         }
         
         //Find the same state AND Judge to stack
-        var result = RunningLayerStates[layer].FindIndex((s => s.Name == state.Name));
-        if (result == -1)
+        if (index == -1)
+        {
+            RunningLayerStates[layer].Add(state);
+        }
+        else
         {
             var insertIndex = RunningLayerStates[layer].FindIndex(s => state.Priority < s.Priority);
             if (insertIndex == -1)
                 RunningLayerStates[layer].Add(state);
             else
                 RunningLayerStates[layer].Insert(insertIndex, state);
+            _provider.Executor.Stack(RunningLayerStates[layer][index],state);
         }
-        else 
-            _provider.Executor.Stack(RunningLayerStates[layer][result],state);
         
     }
     
@@ -92,7 +95,7 @@ public class ConditionMachine : AbsScheduler
     
     private void UpdateRunningStates()
     {
-        foreach (var layer in RunningLayerStates.Keys)
+        foreach (var layer in LayerStates.Keys)
         {
             RemoveRunOverState(layer);
             
@@ -108,10 +111,9 @@ public class ConditionMachine : AbsScheduler
     private void RemoveRunOverState(Layer layer)
     {
         var layerStates = RunningLayerStates[layer];
-        var layerStateCount = layerStates.Count();
-        if (layerStateCount == 0) return;
+        if (layerStates.Count == 0) return;
         
-        for (var i = 0; i < layerStateCount; i++)
+        for (var i = 0; i < layerStates.Count ; i++)
         {
             var state = layerStates[i];
             if (state.Status is JobRunningStatus.Succeed or JobRunningStatus.Failed)
