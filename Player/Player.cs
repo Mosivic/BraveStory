@@ -3,8 +3,10 @@ using BraveStory.State;
 using Godot;
 using GPC;
 using GPC.Evaluator;
+using GPC.Job;
 using GPC.Job.Executor;
 using GPC.Scheduler;
+using GPC.States.Buff;
 
 namespace BraveStory.Player;
 
@@ -98,6 +100,30 @@ public partial class Player : CharacterBody2D
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
         };
 
+        var addHpBuff = new BuffState()
+        {
+            Name = "AddHp",
+            Layer = LayerMap.Buff,
+            Type = typeof(JobBuff),
+            Modifiers = 
+                [
+                    new Modifier
+                    {
+                        Property = RunSpeed ,
+                        Affect = -10,
+                        Operator = BuffModifierOperator.Add
+                    }
+                ],
+            DurationPolicy = BuffDurationPolicy.Duration,
+            Duration = 10,
+            Period = 2,
+            
+            OnPeriodFunc = state => GD.Print($"One Period RunSpeed:{RunSpeed.Value}"),
+            EnterFunc = _ => GD.Print($"Enter RunSpeed:{RunSpeed.Value}"),
+            ExitFunc = _ => GD.Print("Exit"),
+            OnStackExpirationFunc = _ => GD.Print("Expirtion")
+        };
+        
 
         // var test = new BuffState
         // {
@@ -124,7 +150,7 @@ public partial class Player : CharacterBody2D
         //     IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true),
         //     OnStackExpirationFunc = _ => GD.Print("Expirtion")
         // };
-        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump]);
+        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump,addHpBuff]);
     }
 
     public override void _Process(double delta)

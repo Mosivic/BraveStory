@@ -23,13 +23,7 @@ public abstract class AbsJob(AbsState state)
     {
         state.ResumeFunc?.Invoke(state);
     }
-
-    protected virtual void _Stack(IGpcToken source)
-    {
-        state.StackFunc?.Invoke(state, source);
-    }
-
-
+    
     protected virtual bool _IsPrepared()
     {
         if (state.IsPreparedFunc != null)
@@ -50,10 +44,14 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _OnPeriod()
     {
-        state.PeriodFunc?.Invoke(state);
+        state.OnPeriodFunc?.Invoke(state);
     }
 
-
+    protected virtual void _OnStack()
+    {
+        state.OnStackFunc?.Invoke(state);
+    }
+    
     protected virtual void _OnStackOverflow()
     {
         state.OnStackOverflowFunc?.Invoke(state);
@@ -88,11 +86,11 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _PhysicsUpdate(double delta)
     {
-        state.RunningPhysicsFunc?.Invoke(state);
+        state.PhysicsUpdateFunc?.Invoke(state);
     }
 
     protected virtual void _Update(double delta)
     {
-        state.RunningFunc?.Invoke(state);
+        state.UpdateFunc?.Invoke(state);
     }
 }

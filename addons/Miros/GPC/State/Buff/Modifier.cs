@@ -21,9 +21,9 @@ public struct ModifierMagnitude
 
 public class Modifier
 {
-    public float Recored;
-    public BindableProperty<float> Property { get; set; }
-    public float Affect { get; set; }
-    public BuffModifierOperator Operator { get; set; }
+    public float Record;
+    public required BindableProperty<float> Property { get; set; }
+    public required float Affect { get; set; }
+    public required BuffModifierOperator Operator { get; set; }
     public ModifierMagnitude Magnitude { get; set; }
 }

@@ -103,13 +103,13 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
 
     private void ApplyModifiers()
     {
-        var random = new Random();
-        if (random.NextDouble() > buffState.Chance) return;
-
+        if (buffState.HasChance && (new Random().NextDouble() > buffState.Chance))
+            return;
+        
         for (var i = 0; i < buffState.Modifiers.Count; i++)
         {
             var modifier = buffState.Modifiers[i];
-            modifier.Recored = modifier.Property.Value;
+            modifier.Record = modifier.Property.Value;
             switch (modifier.Operator)
             {
                 case BuffModifierOperator.Add:
@@ -130,6 +130,6 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
 
     private void CancelModifiers()
     {
-        foreach (var modifier in buffState.Modifiers) modifier.Property.Value = modifier.Recored;
+        foreach (var modifier in buffState.Modifiers) modifier.Property.Value = modifier.Record;
     }
 }

@@ -53,7 +53,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
                     state.StackCurrentCount += 1;
                     OnStack();
                 }
-                //Have stackState in Dict AND stackStactCount less than maxCount
+                //Have stackState in Dict AND stackStateCount less than maxCount
                 else if (state.StackSourceCountDict[state.Source] < state.StackMaxCount)
                 {
                     state.StackSourceCountDict.Add(source, 1);
@@ -82,8 +82,6 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
             default:
                 throw new ArgumentOutOfRangeException();
         }
-
-        _Stack(source);
     }
 
     public virtual bool CanEnter()
@@ -91,7 +89,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         return _IsPrepared();
     }
 
-    public bool CanExit()
+    public virtual bool CanExit()
     {
         if (state.Status is JobRunningStatus.Succeed or JobRunningStatus.Failed)
             return true;
@@ -131,6 +129,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     protected virtual void OnStack()
     {
+        _OnStack();
     }
 
     protected virtual void OnStackOverflow()

@@ -43,10 +43,10 @@ public abstract class AbsState
     public Action<AbsState> OnFailedFunc { get; init; }
     public Action<AbsState> PauseFunc { get; init; }
     public Action<AbsState> ResumeFunc { get; init; }
-    public Action<AbsState, IGpcToken> StackFunc { get; init; }
+    public Action<AbsState> OnStackFunc { get; init; }
     public Action<AbsState> OnStackOverflowFunc { get; init; }
     public Action<AbsState> OnStackExpirationFunc { get; init; }
-    public Action<AbsState> PeriodFunc { get; init; }
-    public Action<AbsState> RunningFunc { get; init; }
-    public Action<AbsState> RunningPhysicsFunc { get; init; }
+    public Action<AbsState> OnPeriodFunc { get; init; }
+    public Action<AbsState> UpdateFunc { get; init; }
+    public Action<AbsState> PhysicsUpdateFunc { get; init; }
 }

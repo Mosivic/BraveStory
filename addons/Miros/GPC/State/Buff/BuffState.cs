@@ -37,13 +37,14 @@ public class BuffState : AbsState
     // Core
     public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
     public List<Modifier> Modifiers { get; set; }
-
+    
     // Period 
     public bool IsExecutePeriodicEffectOnStart { get; set; } = true;
     public BuffPeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = BuffPeriodicInhibitionPolicy.Resume;
 
     // Chance
-    public float Chance { get; set; } //0.0 ~ 1.0
+    public bool HasChance { get; init; } = false;
+    public float Chance { get; init; } = 1.0f; //0.0 ~ 1.0
 
     // Stacking
     public bool StackIsRefreshDuration { get; set; } = false;
