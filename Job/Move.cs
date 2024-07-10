@@ -13,7 +13,7 @@ internal class Move(CharacterState state) : JobBase(state)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = state.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * state.RunSpeed.Value, 
+        velocity.X = Mathf.MoveToward(velocity.X, direction * state.RunSpeed.Value,
             state.FloorAcceleration.Value);
         velocity.Y += (float)delta * state.Gravity.Value;
         state.Velocity = velocity;

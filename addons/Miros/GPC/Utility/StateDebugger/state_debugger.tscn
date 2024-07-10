@@ -1,6 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://6jymmwqohfk4"]
-
-[ext_resource type="Script" path="res://addons/Miros/GPC/Utility/StateDebugger/StateDebugger.cs" id="1_s5ltp"]
+[gd_scene format=3 uid="uid://6jymmwqohfk4"]
 
 [node name="StateDebugger" type="MarginContainer"]
 anchors_preset = -1
@@ -9,7 +7,6 @@ anchor_bottom = 1.51389
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.5, 0.5)
-script = ExtResource("1_s5ltp")
 metadata/_edit_use_anchors_ = true
 
 [node name="TabContainer" type="TabContainer" parent="."]

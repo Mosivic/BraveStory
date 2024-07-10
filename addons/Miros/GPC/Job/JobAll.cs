@@ -1,11 +1,10 @@
-﻿using GPC.Job.Executor;
-using GPC.States;
+﻿using GPC.States;
 
 namespace GPC.Job;
 
 internal class JobAll(CompoundState state) : JobBase(state)
 {
-    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
+
 
     public override void Enter()
     {
@@ -14,7 +13,6 @@ internal class JobAll(CompoundState state) : JobBase(state)
         _Enter();
     }
 
-    
 
     public bool IsSucceed()
     {
@@ -26,7 +24,7 @@ internal class JobAll(CompoundState state) : JobBase(state)
 
         return true;
     }
-    
+
     public bool IsFailed()
     {
         foreach (var childCfg in state.SubJobs)
@@ -47,7 +45,4 @@ internal class JobAll(CompoundState state) : JobBase(state)
         foreach (var childCfg in state.SubJobs)
             _provider.Executor.PhysicsUpdate(childCfg, delta);
     }
-
-    
-
 }

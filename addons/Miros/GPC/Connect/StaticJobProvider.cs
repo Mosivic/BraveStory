@@ -6,9 +6,16 @@ namespace GPC.Job.Executor;
 
 public class StaticJobProvider : IJobProvider
 {
-    private static Dictionary<Type, IJob> _jobs  = new();
+    private static readonly Dictionary<Type, IJob> _jobs = new();
     private readonly Dictionary<AbsState, IJob> _statesJob = new();
-    
+
+    public IJob GetJob(AbsState state)
+    {
+        if (_statesJob.TryGetValue(state, out var job))
+            return job;
+        return CreateJob(state);
+    }
+
     private IJob CreateJob(AbsState state)
     {
         var type = state.Type;
@@ -16,12 +23,5 @@ public class StaticJobProvider : IJobProvider
         _jobs[type] = job;
         _statesJob[state] = job;
         return job;
-    }
-    
-    public IJob GetJob(AbsState state)
-    {
-        if (_statesJob.TryGetValue(state, out var job) )
-            return job;
-        return CreateJob(state);
     }
 }

@@ -544,4 +544,5 @@ offset_left = -16.0
 offset_top = 56.0
 offset_right = 284.0
 offset_bottom = 356.0
+Enabled = null
 WatchNode = NodePath("../Player")

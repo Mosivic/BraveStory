@@ -11,19 +11,27 @@ public abstract class AbsState
     public required Type Type { get; init; }
     public int Priority { get; init; }
     public IGpcToken Source { get; init; }
+
     public JobRunningStatus Status { get; set; } = JobRunningStatus.NoRun;
+
     // Duration
     public double Duration { get; init; } = 0;
-    public double DurationElapsed { get; set; } 
+
+    public double DurationElapsed { get; set; }
+
     // Period
     public double Period { get; init; } = 0;
+
     public double PeriodElapsed { get; set; }
+
     // Stack
     public int StackMaxCount { get; init; } = 1;
     public int StackCurrentCount { get; set; } = 1;
-    public Dictionary<IGpcToken,int> StackSourceCountDict { get; set; }
+    public Dictionary<IGpcToken, int> StackSourceCountDict { get; set; }
     public bool IsStack { get; init; } = false;
+
     public StateStackType StackType { get; init; } = StateStackType.Target;
+
     // Function
     public bool UsePrepareFuncAsRunCondition { get; init; } = true;
     public Func<bool> IsPreparedFunc { get; init; }
@@ -35,7 +43,7 @@ public abstract class AbsState
     public Action<AbsState> OnFailedFunc { get; init; }
     public Action<AbsState> PauseFunc { get; init; }
     public Action<AbsState> ResumeFunc { get; init; }
-    public Action<AbsState,AbsState> StackFunc { get; init; }
+    public Action<AbsState, IGpcToken> StackFunc { get; init; }
     public Action<AbsState> OnStackOverflowFunc { get; init; }
     public Action<AbsState> OnStackExpirationFunc { get; init; }
     public Action<AbsState> PeriodFunc { get; init; }

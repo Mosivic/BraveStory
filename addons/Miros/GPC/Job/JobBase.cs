@@ -6,6 +6,12 @@ namespace GPC.Job;
 
 public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
+    public string Name => state.Name;
+    public Layer Layer => state.Layer;
+    public int Priority => state.Priority;
+    public bool IsStack => state.IsStack;
+    public IGpcToken Source => state.Source;
+
     public virtual void Enter()
     {
         state.Status = JobRunningStatus.Running;
@@ -14,11 +20,11 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public void Exit()
     {
-        if (state.Status == JobRunningStatus.Running) 
+        if (state.Status == JobRunningStatus.Running)
             OnFailed();
         _Exit();
     }
-    
+
 
     public virtual void Pause()
     {
@@ -32,31 +38,34 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         _Resume();
     }
 
-    public virtual void Stack(AbsState stackState)
+
+    public virtual void Stack(IGpcToken source)
     {
         switch (state.StackType)
         {
             case StateStackType.Source:
                 state.StackSourceCountDict ??= new Dictionary<IGpcToken, int>
                     { { state.Source, 1 } };
-                
+
                 //Not have stackState in Dict
-                if (!state.StackSourceCountDict.ContainsKey(stackState.Source))
+                if (state.StackSourceCountDict.TryAdd(source, 1))
                 {
-                    state.StackSourceCountDict.Add(stackState.Source,1);
                     state.StackCurrentCount += 1;
                     OnStack();
                 }
                 //Have stackState in Dict AND stackStactCount less than maxCount
-                else if(state.StackSourceCountDict[state.Source] < state.StackMaxCount)
+                else if (state.StackSourceCountDict[state.Source] < state.StackMaxCount)
                 {
-                    state.StackSourceCountDict.Add(stackState.Source,1);
+                    state.StackSourceCountDict.Add(source, 1);
                     state.StackCurrentCount += 1;
                     OnStack();
                 }
                 //Have stackState in Dict AND Overflow
                 else
+                {
                     OnStackOverflow();
+                }
+
                 break;
             case StateStackType.Target:
                 if (state.StackCurrentCount < state.StackMaxCount)
@@ -65,53 +74,18 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
                     OnStack();
                 }
                 else
+                {
                     OnStackOverflow();
+                }
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        _Stack(stackState);
-    }
-    
-    protected virtual void OnSucceed()
-    {
-        state.Status = JobRunningStatus.Succeed;
-        _OnSucceed();
-    }
-    
-    protected virtual void OnFailed()
-    {
-        state.Status = JobRunningStatus.Failed;
-        _OnFailed();
+
+        _Stack(source);
     }
 
-    protected virtual void OnStack()
-    {
-        
-    }
-    
-    protected virtual void OnStackOverflow()
-    {
-        _OnStackOverflow();
-    }
-    
-    protected virtual void OnStackExpiration()
-    {
-        state.StackCurrentCount -= 1;
-        state.DurationElapsed = 0;
-        
-        if (state.StackCurrentCount == 0)
-            state.Status = JobRunningStatus.Succeed;
-           
-        _OnStackExpiration();
-    }
-    
-    protected virtual void OnPeriod()
-    {
-        state.PeriodElapsed = 0;
-        _OnPeriod();
-    }
-    
     public virtual bool CanEnter()
     {
         return _IsPrepared();
@@ -124,16 +98,6 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         return false;
     }
 
-    protected virtual bool IsSucceed()
-    {
-        return _IsSucceed();
-    }
-    
-    protected virtual bool IsFailed()
-    {
-        return _IsFailed();
-    }
-    
     public virtual void Update(double delta)
     {
         if (IsFailed()) OnSucceed();
@@ -141,15 +105,9 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
         state.DurationElapsed += delta;
         state.PeriodElapsed += delta;
-        
-        if (state.Duration > 0 && state.DurationElapsed > state.Duration)
-        {
-            OnStackExpiration();
-        }
-        if (state.Period > 0 && state.PeriodElapsed > state.Period)
-        {
-            OnPeriod();
-        }
+
+        if (state.Duration > 0 && state.DurationElapsed > state.Duration) OnStackExpiration();
+        if (state.Period > 0 && state.PeriodElapsed > state.Period) OnPeriod();
 
         _Update(delta);
     }
@@ -157,5 +115,53 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     public virtual void PhysicsUpdate(double delta)
     {
         _PhysicsUpdate(delta);
+    }
+
+    protected virtual void OnSucceed()
+    {
+        state.Status = JobRunningStatus.Succeed;
+        _OnSucceed();
+    }
+
+    protected virtual void OnFailed()
+    {
+        state.Status = JobRunningStatus.Failed;
+        _OnFailed();
+    }
+
+    protected virtual void OnStack()
+    {
+    }
+
+    protected virtual void OnStackOverflow()
+    {
+        _OnStackOverflow();
+    }
+
+    protected virtual void OnStackExpiration()
+    {
+        state.StackCurrentCount -= 1;
+        state.DurationElapsed = 0;
+
+        if (state.StackCurrentCount == 0)
+            state.Status = JobRunningStatus.Succeed;
+
+        _OnStackExpiration();
+    }
+
+    protected virtual void OnPeriod()
+    {
+        state.PeriodElapsed = 0;
+        _OnPeriod();
+    }
+
+    protected virtual bool IsSucceed()
+    {
+        return _IsSucceed();
+    }
+
+    protected virtual bool IsFailed()
+    {
+        return _IsFailed();
     }
 }

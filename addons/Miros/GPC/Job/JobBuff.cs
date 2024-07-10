@@ -1,78 +1,76 @@
 ﻿using System;
-using System.Collections.Generic;
-using GPC.States;
 using GPC.States.Buff;
 
 namespace GPC.Job;
 
-public class JobBuff(Buff buff) : JobBase(buff)
+public class JobBuff(BuffState buffState) : JobBase(buffState)
 {
     public override void Enter()
     {
-        if (buff.DurationPolicy == BuffDurationPolicy.Instant)
+        if (buffState.DurationPolicy == BuffDurationPolicy.Instant)
         {
             ApplyModifiers();
-            buff.Status = JobRunningStatus.Succeed;
+            buffState.Status = JobRunningStatus.Succeed;
         }
-        else if (buff.DurationPolicy == BuffDurationPolicy.Infinite)
+        else if (buffState.DurationPolicy == BuffDurationPolicy.Infinite)
         {
-            if(buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
+            if (buffState.Period > 0 && buffState.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
-        else if (buff.DurationPolicy == BuffDurationPolicy.Duration)
+        else if (buffState.DurationPolicy == BuffDurationPolicy.Duration)
         {
-            if(buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
+            if (buffState.Period > 0 && buffState.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
-        
+
         base.Enter();
     }
-    
+
     public override void Resume()
     {
-        buff.Status = JobRunningStatus.Running;
-        if (buff.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.Reset)
+        buffState.Status = JobRunningStatus.Running;
+        if (buffState.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.Reset)
         {
-            buff.PeriodElapsed = 0;
+            buffState.PeriodElapsed = 0;
         }
-        else if(buff.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.ExecuteAndReset)
+        else if (buffState.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.ExecuteAndReset)
         {
             ApplyModifiers();
-            buff.PeriodElapsed = 0;
+            buffState.PeriodElapsed = 0;
         }
+
         base.Resume();
     }
-    
-    public override void Stack(AbsState stackState)
-    {
-        if (buff.StackIsRefreshDuration)
-            buff.DurationElapsed = 0;
-        if (buff.StackIsResetPeriod)
-            buff.PeriodElapsed = 0;
 
-        base.Stack(stackState);
+    public override void Stack(IGpcToken source)
+    {
+        if (buffState.StackIsRefreshDuration)
+            buffState.DurationElapsed = 0;
+        if (buffState.StackIsResetPeriod)
+            buffState.PeriodElapsed = 0;
+
+        base.Stack(source);
     }
 
     protected override void OnSucceed()
     {
-        if (buff.DurationPolicy == BuffDurationPolicy.Instant)
+        if (buffState.DurationPolicy == BuffDurationPolicy.Instant)
         {
-
         }
-        else if (buff.DurationPolicy == BuffDurationPolicy.Infinite)
+        else if (buffState.DurationPolicy == BuffDurationPolicy.Infinite)
         {
             CancelModifiers();
         }
-        else if (buff.DurationPolicy == BuffDurationPolicy.Duration)
+        else if (buffState.DurationPolicy == BuffDurationPolicy.Duration)
         {
-
         }
+
         base.OnSucceed();
     }
 
     protected override void OnFailed()
     {
-        switch (buff.DurationPolicy)
+        switch (buffState.DurationPolicy)
         {
             case BuffDurationPolicy.Instant:
                 break;
@@ -91,8 +89,7 @@ public class JobBuff(Buff buff) : JobBase(buff)
         ApplyModifiers();
         base.OnPeriod();
     }
-    
-    
+
 
     protected override void OnStackOverflow()
     {
@@ -107,11 +104,11 @@ public class JobBuff(Buff buff) : JobBase(buff)
     private void ApplyModifiers()
     {
         var random = new Random();
-        if(random.NextDouble() > buff.Chance) return;
-        
-        for (var i = 0; i < buff.Modifiers.Count; i++)
+        if (random.NextDouble() > buffState.Chance) return;
+
+        for (var i = 0; i < buffState.Modifiers.Count; i++)
         {
-            var modifier = buff.Modifiers[i];
+            var modifier = buffState.Modifiers[i];
             modifier.Recored = modifier.Property.Value;
             switch (modifier.Operator)
             {
@@ -133,9 +130,6 @@ public class JobBuff(Buff buff) : JobBase(buff)
 
     private void CancelModifiers()
     {
-        foreach (var modifier in buff.Modifiers)
-        {
-            modifier.Property.Value = modifier.Recored;
-        }
+        foreach (var modifier in buffState.Modifiers) modifier.Property.Value = modifier.Recored;
     }
 }

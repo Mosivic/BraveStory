@@ -1,14 +1,17 @@
-﻿using GPC.States;
-
-namespace GPC.Job;
+﻿namespace GPC.Job;
 
 public interface IJob
 {
+    string Name { get; }
+    Layer Layer { get; }
+    int Priority { get; }
+    bool IsStack { get; }
+    IGpcToken Source { get; }
     void Enter();
     void Exit();
     void Pause();
     void Resume();
-    void Stack(AbsState state);
+    void Stack(IGpcToken source);
     bool CanEnter();
     bool CanExit();
     void Update(double delta);

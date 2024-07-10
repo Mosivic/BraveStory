@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GPC.States.Buff;
 
@@ -23,22 +22,18 @@ public enum BuffPeriodicInhibitionPolicy
     ExecuteAndReset //执行一次后再重置
 }
 
-
 /// <summary>
 ///     当一层buff到期后的处理策略
 /// </summary>
 public enum BuffStackExpirationPolicy
 {
-    ClearAllStack, 
+    ClearAllStack,
     RemoveOneStackAndRefreshDuration,
     RefreshDuration
 }
 
-
-public class Buff : AbsState
+public class BuffState : AbsState
 {
-    public  IGpcToken Source { get; set; }
-    
     // Core
     public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
     public List<Modifier> Modifiers { get; set; }
@@ -49,20 +44,19 @@ public class Buff : AbsState
 
     // Chance
     public float Chance { get; set; } //0.0 ~ 1.0
-    
+
     // Stacking
     public bool StackIsRefreshDuration { get; set; } = false;
     public bool StackIsResetPeriod { get; set; } = false;
     public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }
-   
+
     // Stacking Overflow
     public List<AbsState> OnStackOverflowStates { get; set; }
     public bool IsClearStackOnOverflow { get; set; }
-    
+
     // Expiration
     public List<AbsState> OnSucceedStates { get; set; }
     public List<AbsState> OnFailedStates { get; set; }
-    
-    // Immunity
 
+    // Immunity
 }

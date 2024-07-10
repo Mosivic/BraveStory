@@ -5,33 +5,29 @@ using GPC.States;
 
 namespace GPC.Job.Executor;
 
-public class Connect<TJobProvider, TScheduler> :IConnect<TJobProvider,TScheduler>  
-    where TJobProvider:IJobProvider,new()
-    where TScheduler : IScheduler,new()
+public class Connect<TJobProvider, TScheduler> : IConnect<TJobProvider, TScheduler>
+    where TJobProvider : IJobProvider, new()
+    where TScheduler : IScheduler, new()
 {
-    protected TJobProvider JobProvider { get; set; } 
-    protected TScheduler Scheduler { get; set; }
-    
     public Connect(List<AbsState> states)
     {
         JobProvider = new TJobProvider();
         Scheduler = new TScheduler();
-        
-        foreach (var job in states.Select(state => JobProvider.GetJob(state)))
-        {
-            Scheduler.AddJob(job);
-        }
 
+        foreach (var job in states.Select(state => JobProvider.GetJob(state))) Scheduler.AddJob(job);
     }
-    
-    
+
+    private TJobProvider JobProvider { get; }
+    private TScheduler Scheduler { get; }
+
+
     public void AddState(AbsState state)
     {
         var job = JobProvider.GetJob(state);
         Scheduler.AddJob(job);
     }
 
-    
+
     public void RemoveState(AbsState state)
     {
         var job = JobProvider.GetJob(state);

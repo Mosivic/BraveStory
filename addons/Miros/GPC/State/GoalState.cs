@@ -1,6 +1,6 @@
 ﻿namespace GPC.States;
 
-public class Goal : AbsState, IHubProvider
+public class GoalState : AbsState, IHubProvider
 {
     public IHub Hub => GHub.GetIns();
 }

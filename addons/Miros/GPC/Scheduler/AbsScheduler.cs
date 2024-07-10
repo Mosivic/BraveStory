@@ -7,9 +7,8 @@ namespace GPC.Scheduler;
 
 public abstract class AbsScheduler
 {
+    protected readonly Dictionary<Layer, List<IJob>> RunningJobs = new();
     public Action<AbsState> StateChanged;
     public Action<AbsState> StatePrepared;
-    protected Dictionary<Layer, List<IJob>> Jobs { get; set; } = new();
-    protected readonly Dictionary<Layer, List<IJob>> RunningJobs = new();
-    
+    protected Dictionary<Layer, List<IJob>> WaitingJobs { get; set; } = new();
 }
