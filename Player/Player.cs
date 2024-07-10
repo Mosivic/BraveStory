@@ -114,14 +114,24 @@ public partial class Player : CharacterBody2D, IGpcToken
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true)
         };
 
-        var test = new PlayerState(this, _nodes, _properties)
+        var test = new Buff()
         {
             Name = "Test",
-            Type = typeof(Idle),
+            Type = typeof(JobBuff),
             Layer = LayerMap.Buff,
+            Modifiers =
+            [
+                new Modifier
+                {
+                    Property = _properties.RunSpeed,
+                    Operator = BuffModifierOperator.Add,
+                    Affect = -10
+                }
+            ], 
             Duration = 3,
             Period = 1,
             StackMaxCount = 3,
+            DurationPolicy = BuffDurationPolicy.Duration,
             StackCurrentCount = 3,
             PeriodFunc = state =>GD.Print("One Period"),
             EnterFunc = _=> GD.Print("Enter"),
