@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using GPC.Job;
 using GPC.States;
 
 namespace GPC.Scheduler;
 
-public abstract class AbsScheduler()
+public abstract class AbsScheduler
 {
     public Action<AbsState> StateChanged;
     public Action<AbsState> StatePrepared;
-    public Dictionary<Layer, List<AbsState>> LayerStates { get; set; } = new();
-    protected readonly Dictionary<Layer, List<AbsState>> RunningLayerStates = new();
+    protected Dictionary<Layer, List<IJob>> Jobs { get; set; } = new();
+    protected readonly Dictionary<Layer, List<IJob>> RunningJobs = new();
     
-    public abstract void Update(double delta);
-    public abstract void PhysicsUpdate(double delta);
 }

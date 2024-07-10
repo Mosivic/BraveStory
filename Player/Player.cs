@@ -1,9 +1,12 @@
+using System.Diagnostics;
+using System.Xml.Linq;
 using BraveStory.Scripts;
 using BraveStory.State;
 using Godot;
 using GPC;
 using GPC.Evaluator;
 using GPC.Job;
+using GPC.Job.Executor;
 using GPC.Scheduler;
 using GPC.States.Buff;
 
@@ -25,20 +28,10 @@ internal class PlayerState(Player host) : CharacterState
     }
 }
 
-public partial class Player : CharacterBody2D, IGpcToken
+public partial class Player : CharacterBody2D
 {
-    private ConditionMachine _scheduler;
-
-    public AbsScheduler GetScheduler()
-    {
-        return _scheduler;
-    }
-
-    public Layer GetRootLayer()
-    {
-        return LayerMap.Root;
-    }
-
+    private Connect<StaticJobProvider, ConditionMachine> _connect;
+    
     public override void _Ready()
     {
         Evaluator<bool> isVelocityYPositive = new("isVelocityYPositive", () => Velocity.Y >= 0f);
@@ -114,18 +107,17 @@ public partial class Player : CharacterBody2D, IGpcToken
             OnStackExpirationFunc = _=> GD.Print("Expirtion")
             
         };
-        
-        _scheduler = new ConditionMachine([test]);
-        
+        _connect = new([]);
+
     }
 
     public override void _Process(double delta)
     {
-        _scheduler.Update(delta);
+        _connect.Update(delta);
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        _scheduler.PhysicsUpdate(delta);
+        _connect.PhysicsUpdate(delta);
     }
 }

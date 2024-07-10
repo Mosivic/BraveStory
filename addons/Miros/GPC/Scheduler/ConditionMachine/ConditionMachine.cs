@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using GPC.Job;
 using GPC.Job.Executor;
 using GPC.States;
 
 namespace GPC.Scheduler;
 
-public class ConditionMachine : AbsScheduler
+public class ConditionMachine : AbsScheduler,IScheduler
 {
-    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
     
     public ConditionMachine(List<AbsState> states)
     {
@@ -19,7 +19,8 @@ public class ConditionMachine : AbsScheduler
         }
         
     }
-    
+
+
     public void AddLayerState(AbsState state)
     {
         var layer = state.Layer;
@@ -76,7 +77,17 @@ public class ConditionMachine : AbsScheduler
     {
         
     }
-    
+
+    public void AddJob(IJob job)
+    {
+        
+    }
+
+    public void RemoveJob(IJob job)
+    {
+        throw new NotImplementedException();
+    }
+
     public override void Update(double delta)
     {
         UpdateRunningStates();
