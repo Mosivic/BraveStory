@@ -34,9 +34,14 @@ public class StaticJobExecutor : AbsJobExecutor, IJobExecutor
     }
     
 
-    public bool IsPrepared(AbsState state)
+    public bool CanEnter(AbsState state)
     {
-        return _GetJob(state.Type, state).IsPrepared();
+        return _GetJob(state.Type, state).CanEnter();
+    }
+
+    public bool CanExit(AbsState state)
+    {
+        return _GetJob(state.Type, state).CanExit();
     }
 
     public void Update(AbsState state, double delta)

@@ -9,43 +9,24 @@ using GPC.States.Buff;
 
 namespace BraveStory.Player;
 
-public class PlayerNodes : INodes
+internal class PlayerState(Player host) : CharacterState
 {
-    public ConditionMachine ConditionMachine { get; set; }
-    public AnimationPlayer AnimationPlayer { get; init; }
-    public Sprite2D Sprite { get; init; }
-}
-
-public class PlayerProperties : AbsProperties
-{
-    public BindableProperty<float> Gravity { get; } = new(980f);
-    public BindableProperty<float> RunSpeed { get; } = new(200f);
-    public BindableProperty<float> JumpVelocity { get; } = new(-300f);
-    public BindableProperty<float> FloorAcceleration { get; } = new(200f * 5);
-    public BindableProperty<float> AirAcceleration { get; } = new(200 * 50);
-}
-
-public class BindableProperty<T>(T value)
-{
-    public T Value { get; set; } = value;
-}
-
-class PlayerIdleState : PlayerState
-{
-    public PlayerIdleState(CharacterBody2D host, PlayerNodes node, PlayerProperties properties) : base(host, node, properties)
+    public override AnimationPlayer AnimationPlayer => host.GetNode<AnimationPlayer>("AnimationPlayer");
+    public override Sprite2D Sprite => host.GetNode<Sprite2D>("Sprite");
+    public override Vector2 Velocity
     {
-        Name = "Idle";
-        Layer = LayerMap.Movement;
-        Priority = 5;
-        Type = typeof(Idle);
-        IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false);
+        get => host.Velocity;
+        set => host.Velocity = value;
+    }
+
+    public override void MoveAndSlide()
+    {
+        host.MoveAndSlide();
     }
 }
 
 public partial class Player : CharacterBody2D, IGpcToken
 {
-    private PlayerNodes _nodes;
-    private PlayerProperties _properties;
     private ConditionMachine _scheduler;
 
     public AbsScheduler GetScheduler()
@@ -63,23 +44,17 @@ public partial class Player : CharacterBody2D, IGpcToken
         Evaluator<bool> isVelocityYPositive = new("isVelocityYPositive", () => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new("isOnFloor", IsOnFloor);
 
-        _nodes = new PlayerNodes
-        {
-            ConditionMachine = _scheduler,
-            AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer"),
-            Sprite = GetNode<Sprite2D>("Sprite")
-        };
-        _properties = new PlayerProperties();
 
-        var idle = new PlayerState(this, _nodes, _properties)
+        var idle = new PlayerState(this)
         {
+            
             Name = "Idle",
             Layer = LayerMap.Movement,
             Priority = 5,
             Type = typeof(Idle),
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
         };
-        var jump = new PlayerState(this, _nodes, _properties)
+        var jump = new PlayerState(this)
         {
             Name = "Jump",
             Priority = 10,
@@ -89,7 +64,7 @@ public partial class Player : CharacterBody2D, IGpcToken
                                    isOnFloor.Is(true),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
         };
-        var run = new PlayerState(this, _nodes, _properties)
+        var run = new PlayerState(this)
         {
             Type = typeof(Move),
             Layer = LayerMap.Movement,

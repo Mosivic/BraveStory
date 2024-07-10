@@ -116,12 +116,13 @@ public class ConditionMachine : AbsScheduler
         for (var i = 0; i < layerStates.Count ; i++)
         {
             var state = layerStates[i];
-            if (state.Status is JobRunningStatus.Succeed or JobRunningStatus.Failed)
+            if (_provider.Executor.CanEnter(state))
             {
                 StateChanged.Invoke(state);
                 _provider.Executor.Exit(state);
                 layerStates.RemoveAt(i);
             }
+            
         }
     }
     
@@ -167,7 +168,7 @@ public class ConditionMachine : AbsScheduler
 
         foreach (var state in LayerStates[layer])
         {
-            if (_provider.Executor.IsPrepared(state))
+            if (_provider.Executor.CanEnter(state))
             {
                 StatePrepared.Invoke(state);
                 states.Add(state);

@@ -4,7 +4,7 @@ using GPC.Job;
 
 namespace BraveStory.Job;
 
-internal class Test(PlayerState state) : JobBase(state)
+internal class Test(CharacterState state) : JobBase(state)
 {
     protected override void _Enter()
     {

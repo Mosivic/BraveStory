@@ -8,7 +8,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
     public virtual void Enter()
     {
-        State.Status = JobRunningStatus.Running;
+        state.Status = JobRunningStatus.Running;
         _Enter();
     }
 
@@ -22,13 +22,13 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual void Pause()
     {
-        State.Status = JobRunningStatus.NoRun;
+        state.Status = JobRunningStatus.NoRun;
         _Pause();
     }
 
     public virtual void Resume()
     {
-        State.Status = JobRunningStatus.Running;
+        state.Status = JobRunningStatus.Running;
         _Resume();
     }
 
@@ -75,13 +75,13 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     
     protected virtual void OnSucceed()
     {
-        State.Status = JobRunningStatus.Succeed;
+        state.Status = JobRunningStatus.Succeed;
         _OnSucceed();
     }
     
     protected virtual void OnFailed()
     {
-        State.Status = JobRunningStatus.Failed;
+        state.Status = JobRunningStatus.Failed;
         _OnFailed();
     }
 
@@ -108,15 +108,22 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     
     protected virtual void OnPeriod()
     {
-        State.PeriodElapsed = 0;
+        state.PeriodElapsed = 0;
         _OnPeriod();
     }
     
-    public virtual bool IsPrepared()
+    public virtual bool CanEnter()
     {
         return _IsPrepared();
     }
-    
+
+    public bool CanExit()
+    {
+        if (state.Status is JobRunningStatus.Succeed or JobRunningStatus.Failed)
+            return true;
+        return false;
+    }
+
     protected virtual bool IsSucceed()
     {
         return _IsSucceed();
@@ -132,14 +139,14 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         if (IsFailed()) OnSucceed();
         if (IsSucceed()) OnFailed();
 
-        State.DurationElapsed += delta;
-        State.PeriodElapsed += delta;
+        state.DurationElapsed += delta;
+        state.PeriodElapsed += delta;
         
-        if (State.Duration > 0 && State.DurationElapsed > State.Duration)
+        if (state.Duration > 0 && state.DurationElapsed > state.Duration)
         {
             OnStackExpiration();
         }
-        if (State.Period > 0 && State.PeriodElapsed > State.Period)
+        if (state.Period > 0 && state.PeriodElapsed > state.Period)
         {
             OnPeriod();
         }

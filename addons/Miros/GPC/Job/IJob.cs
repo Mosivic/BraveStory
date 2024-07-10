@@ -9,7 +9,8 @@ public interface IJob
     void Pause();
     void Resume();
     void Stack(AbsState state);
-    bool IsPrepared();
+    bool CanEnter();
+    bool CanExit();
     void Update(double delta);
     void PhysicsUpdate(double delta);
 }

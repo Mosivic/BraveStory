@@ -4,75 +4,73 @@ namespace GPC.Job;
 
 public abstract class AbsJob(AbsState state)
 {
-    protected readonly AbsState State = state;
-
     protected virtual void _Enter()
     {
-        State.EnterFunc?.Invoke(State);
+        state.EnterFunc?.Invoke(state);
     }
 
     protected virtual void _Exit()
     {
-        State.ExitFunc?.Invoke(State);
+        state.ExitFunc?.Invoke(state);
     }
     
     protected virtual void _Pause()
     {
-        State.PauseFunc?.Invoke(State);
+        state.PauseFunc?.Invoke(state);
     }
 
     protected virtual void _Resume()
     {
-        State.ResumeFunc?.Invoke(State);
+        state.ResumeFunc?.Invoke(state);
     }
     
     protected virtual void _Stack(AbsState stackState)
     {
-        State.StackFunc?.Invoke(State,stackState);
+        state.StackFunc?.Invoke(state,stackState);
     }
     
     
     protected virtual bool _IsPrepared()
     {
-        if (State.IsPreparedFunc != null)
-            return State.IsPreparedFunc.Invoke();
+        if (state.IsPreparedFunc != null)
+            return state.IsPreparedFunc.Invoke();
         return true;
     }
 
     protected virtual void _OnSucceed()
     {
-        State.OnSucceedFunc?.Invoke(State);
+        state.OnSucceedFunc?.Invoke(state);
     }
 
     protected virtual void _OnFailed()
     {
-        State.OnFailedFunc?.Invoke(State);
+        state.OnFailedFunc?.Invoke(state);
     }
 
     
     protected virtual void _OnPeriod()
     {
-        State.PeriodFunc?.Invoke(State);
+        state.PeriodFunc?.Invoke(state);
     }
 
 
     
     protected virtual void _OnStackOverflow()
     {
-        State.OnStackOverflowFunc?.Invoke(State);
+        state.OnStackOverflowFunc?.Invoke(state);
     }
 
     protected virtual void _OnStackExpiration()
     {
-        State.OnStackExpirationFunc?.Invoke(State);
+        state.OnStackExpirationFunc?.Invoke(state);
     }
     
     
     protected virtual bool _IsSucceed()
     {
         var isSucceed = false;
-        if (State.IsSucceedFunc != null)
-            isSucceed = State.IsSucceedFunc.Invoke();
+        if (state.IsSucceedFunc != null)
+            isSucceed = state.IsSucceedFunc.Invoke();
         
         return isSucceed;
     }
@@ -81,13 +79,13 @@ public abstract class AbsJob(AbsState state)
     {
         var isFailed = false;
         
-        if (State.IsFailedFunc != null)
+        if (state.IsFailedFunc != null)
         {
-            isFailed = State.IsFailedFunc.Invoke();
+            isFailed = state.IsFailedFunc.Invoke();
         }
-        else if (State.UsePrepareFuncAsRunCondition && State.IsPreparedFunc != null)
+        else if (state.UsePrepareFuncAsRunCondition && state.IsPreparedFunc != null)
         {
-            isFailed = !State.IsPreparedFunc.Invoke();
+            isFailed = !state.IsPreparedFunc.Invoke();
         }
         
         return isFailed;
@@ -95,12 +93,12 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _PhysicsUpdate(double delta)
     {
-        State.RunningPhysicsFunc?.Invoke(State);
+        state.RunningPhysicsFunc?.Invoke(state);
     }
 
     protected virtual void _Update(double delta)
     {
-        State.RunningFunc?.Invoke(State);
+        state.RunningFunc?.Invoke(state);
     }
 
 

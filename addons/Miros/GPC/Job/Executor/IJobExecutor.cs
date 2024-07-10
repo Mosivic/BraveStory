@@ -9,7 +9,8 @@ public interface IJobExecutor
     void Pause(AbsState state);
     void Resume(AbsState state);
     void Stack(AbsState originState,AbsState stackState);
-    bool IsPrepared(AbsState state);
+    bool CanEnter(AbsState state);
+    bool CanExit(AbsState state);
     void Update(AbsState state, double delta);
     void PhysicsUpdate(AbsState state, double delta);
 }

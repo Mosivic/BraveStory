@@ -105,7 +105,7 @@ public partial class StateDebugger : MarginContainer
         var info =
             $"[{Engine.GetProcessFrames().ToString()}] [color=green] {state.Name}[/color]({state.Layer.Name}) : {state.Status}";
         _historyInfo += info + "\n";
-        _historyLabel.SetText(_historyInfo);
+        //_historyLabel.SetText(_historyInfo);
     }
 
     private void OnStateChanged(AbsState state)

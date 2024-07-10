@@ -1,6 +1,4 @@
-﻿using BraveStory.Player;
-
-namespace GPC.States.Buff;
+﻿namespace GPC.States.Buff;
 
 public enum BuffModifierOperator
 {
