@@ -15,6 +15,9 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     public virtual void Enter()
     {
         state.Status = JobRunningStatus.Running;
+        state.StackCurrentCount = state.StackMaxCount;
+        state.PeriodElapsed = 0;
+        state.DurationElapsed = 0;
         _Enter();
     }
 
@@ -98,14 +101,15 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual void Update(double delta)
     {
+        if(state.Status != JobRunningStatus.Running) return;
         if (IsFailed()) OnSucceed();
         if (IsSucceed()) OnFailed();
 
         state.DurationElapsed += delta;
         state.PeriodElapsed += delta;
 
-        if (state.Duration > 0 && state.DurationElapsed > state.Duration) OnStackExpiration();
-        if (state.Period > 0 && state.PeriodElapsed > state.Period) OnPeriod();
+        if (state.Duration > 0 && state.DurationElapsed > state.Duration) OnDurationOver();
+        if (state.Period > 0 && state.PeriodElapsed > state.Period) OnPeriodOver();
 
         _Update(delta);
     }
@@ -137,7 +141,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         _OnStackOverflow();
     }
 
-    protected virtual void OnStackExpiration()
+    protected virtual void OnDurationOver()
     {
         state.StackCurrentCount -= 1;
         state.DurationElapsed = 0;
@@ -145,13 +149,13 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         if (state.StackCurrentCount == 0)
             state.Status = JobRunningStatus.Succeed;
 
-        _OnStackExpiration();
+        _OnDurationOVer();
     }
 
-    protected virtual void OnPeriod()
+    protected virtual void OnPeriodOver()
     {
         state.PeriodElapsed = 0;
-        _OnPeriod();
+        _OnPeriodOver();
     }
 
     protected virtual bool IsSucceed()

@@ -89,10 +89,11 @@ public class ConditionMachine : AbsScheduler, IScheduler
                 return;
             }
         }
-
+        
+        job.Enter();
         var highPriorityJob = RunningJobs[layer].FindIndex(j => j.Priority > job.Priority);
         RunningJobs[layer].Insert(highPriorityJob + 1, job);
-        job.Enter();
+        
     }
 
 

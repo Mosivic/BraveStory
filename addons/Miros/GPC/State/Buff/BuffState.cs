@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GPC.States.Buff;
 
@@ -47,8 +48,8 @@ public class BuffState : AbsState
     public float Chance { get; init; } = 1.0f; //0.0 ~ 1.0
 
     // Stacking
-    public bool StackIsRefreshDuration { get; set; } = false;
-    public bool StackIsResetPeriod { get; set; } = false;
+    public bool StackIsRefreshDuration { get; init; } = false;
+    public bool StackIsResetPeriod { get; init; } = false;
     public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }
 
     // Stacking Overflow
@@ -60,4 +61,8 @@ public class BuffState : AbsState
     public List<AbsState> OnFailedStates { get; set; }
 
     // Immunity
+    
+    //Function
+    public Action<Modifier> OnApplyModifierFunc { get; init; }
+    public Action<Modifier> OnCancelModifierFunc { get; init; }
 }

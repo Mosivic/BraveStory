@@ -115,13 +115,17 @@ public partial class Player : CharacterBody2D
                     }
                 ],
             DurationPolicy = BuffDurationPolicy.Duration,
-            Duration = 10,
-            Period = 2,
-            
-            OnPeriodFunc = state => GD.Print($"One Period RunSpeed:{RunSpeed.Value}"),
-            EnterFunc = _ => GD.Print($"Enter RunSpeed:{RunSpeed.Value}"),
+            Duration = 3,
+            Period = 1,
+            StackMaxCount = 3,
+            UsePrepareFuncAsRunCondition = false,
+            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true),
+            OnPeriodOverFunc = state => GD.Print($"PeriodOver"),
+            EnterFunc = _ => GD.Print($"Enter"),
             ExitFunc = _ => GD.Print("Exit"),
-            OnStackExpirationFunc = _ => GD.Print("Expirtion")
+            OnDurationOverFunc = _ => GD.Print("DurationOver"),
+            OnApplyModifierFunc = _=> GD.Print($"ApplyModifier RunSpeed : {RunSpeed.Value}")
+            
         };
         
 

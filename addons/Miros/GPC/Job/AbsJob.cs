@@ -42,9 +42,9 @@ public abstract class AbsJob(AbsState state)
     }
 
 
-    protected virtual void _OnPeriod()
+    protected virtual void _OnPeriodOver()
     {
-        state.OnPeriodFunc?.Invoke(state);
+        state.OnPeriodOverFunc?.Invoke(state);
     }
 
     protected virtual void _OnStack()
@@ -57,9 +57,9 @@ public abstract class AbsJob(AbsState state)
         state.OnStackOverflowFunc?.Invoke(state);
     }
 
-    protected virtual void _OnStackExpiration()
+    protected virtual void _OnDurationOVer()
     {
-        state.OnStackExpirationFunc?.Invoke(state);
+        state.OnDurationOverFunc?.Invoke(state);
     }
 
 

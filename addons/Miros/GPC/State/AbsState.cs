@@ -45,8 +45,8 @@ public abstract class AbsState
     public Action<AbsState> ResumeFunc { get; init; }
     public Action<AbsState> OnStackFunc { get; init; }
     public Action<AbsState> OnStackOverflowFunc { get; init; }
-    public Action<AbsState> OnStackExpirationFunc { get; init; }
-    public Action<AbsState> OnPeriodFunc { get; init; }
+    public Action<AbsState> OnDurationOverFunc { get; init; }
+    public Action<AbsState> OnPeriodOverFunc { get; init; }
     public Action<AbsState> UpdateFunc { get; init; }
     public Action<AbsState> PhysicsUpdateFunc { get; init; }
 }

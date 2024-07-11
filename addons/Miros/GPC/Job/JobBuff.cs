@@ -54,15 +54,17 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
 
     protected override void OnSucceed()
     {
-        if (buffState.DurationPolicy == BuffDurationPolicy.Instant)
+        switch (buffState.DurationPolicy)
         {
-        }
-        else if (buffState.DurationPolicy == BuffDurationPolicy.Infinite)
-        {
-            CancelModifiers();
-        }
-        else if (buffState.DurationPolicy == BuffDurationPolicy.Duration)
-        {
+            case BuffDurationPolicy.Instant:
+                break;
+            case BuffDurationPolicy.Infinite:
+                CancelModifiers();
+                break;
+            case BuffDurationPolicy.Duration:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
         base.OnSucceed();
@@ -79,26 +81,32 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
                 break;
             case BuffDurationPolicy.Duration:
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
         base.OnFailed();
     }
 
-    protected override void OnPeriod()
+    protected override void OnPeriodOver()
     {
         ApplyModifiers();
-        base.OnPeriod();
+        base.OnPeriodOver();
     }
 
+    protected override void OnStack()
+    {
+        base.OnStack();
+    }
 
     protected override void OnStackOverflow()
     {
         base.OnStackOverflow();
     }
 
-    protected override void OnStackExpiration()
+    protected override void OnDurationOver()
     {
-        base.OnStackExpiration();
+        base.OnDurationOver();
     }
 
     private void ApplyModifiers()
@@ -124,12 +132,22 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
                 case BuffModifierOperator.Override:
                     modifier.Property.Value = modifier.Affect;
                     break;
+                case BuffModifierOperator.Invalid:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+            buffState.OnApplyModifierFunc?.Invoke(modifier);
         }
     }
 
     private void CancelModifiers()
     {
-        foreach (var modifier in buffState.Modifiers) modifier.Property.Value = modifier.Record;
+        foreach (var modifier in buffState.Modifiers)
+        {
+            modifier.Property.Value = modifier.Record;
+            buffState.OnCancelModifierFunc?.Invoke(modifier);
+        }
+            
     }
 }
