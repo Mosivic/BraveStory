@@ -1,6 +1,6 @@
 ﻿using BraveStory.State;
 using Godot;
-using GPC.Job;
+using FSM.Job;
 
 namespace BraveStory.Job;
 

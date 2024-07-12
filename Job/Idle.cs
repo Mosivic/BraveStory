@@ -1,5 +1,5 @@
 using BraveStory.State;
-using GPC.Job;
+using FSM.Job;
 
 internal class Idle(CharacterState state) : JobBase(state)
 {

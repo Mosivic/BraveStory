@@ -11,18 +11,25 @@
         <Compile Remove="addons\Miros\GPC\Scheduler\StateMachine\**"/>
         <Compile Remove="addons\Miros\GPC\Utility\StateDebugger\StateDebugger.cs"/>
         <Compile Remove="addons\Miros\GPC\Job\JobAll.cs"/>
+        <Compile Remove="addons\Miros\FSM\Scheduler\OldGOAP\**" />
+        <Compile Remove="addons\Miros\FSM\Scheduler\StateMachine\**" />
+        <Compile Remove="addons\Miros\FSM\Utility\StateDebugger\**" />
+        <Compile Remove="addons\Miros\FSM\Job\JobAll.cs" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Remove="addons\Miros\GPC\Scheduler\OldGOAP\**"/>
         <EmbeddedResource Remove="addons\Miros\Material\**"/>
         <EmbeddedResource Remove="addons\Miros\GPC\Scheduler\StateMachine\**"/>
+        <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\OldGOAP\**" />
+        <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\StateMachine\**" />
+        <EmbeddedResource Remove="addons\Miros\FSM\Utility\StateDebugger\**" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="addons\Miros\GPC\Filter\"/>
-        <Folder Include="addons\Miros\GPC\Utility\StateDebugger\"/>
+        <Folder Include="addons\Miros\FSM\Filter\" />
+        <Folder Include="addons\Miros\FSM\Utility\" />
     </ItemGroup>
     <ItemGroup>
-        <Content Include="Player\Player.tscn"/>
+        <Content Include="Player\Player.tscn" />
         <Content Include="Scene\Test.tscn"/>
     </ItemGroup>
 </Project>

@@ -1,19 +1,28 @@
 using BraveStory.Scripts;
 using BraveStory.State;
 using Godot;
-using GPC;
-using GPC.Evaluator;
-using GPC.Job;
-using GPC.Job.Executor;
-using GPC.Scheduler;
-using GPC.States.Buff;
+using FSM;
+using FSM.Evaluator;
+using FSM.Job;
+using FSM.Job.Executor;
+using FSM.Scheduler;
+using FSM.States.Buff;
 
 namespace BraveStory.Player;
 
-internal class PlayerState(Player host) : CharacterState
+internal class PlayerState(Player host,PlayerState state)  : CharacterState(state)
 {
-    public override AnimationPlayer AnimationPlayer => host.GetNode<AnimationPlayer>("AnimationPlayer");
-    public override Sprite2D Sprite => host.GetNode<Sprite2D>("Sprite");
+    public override AnimationPlayer AnimationPlayer
+    {
+        get => host.GetNode<AnimationPlayer>("AnimationPlayer");
+        set => throw new System.NotImplementedException();
+    }
+
+    public override Sprite2D Sprite
+    {
+        get => host.GetNode<Sprite2D>("Sprite");
+        set => throw new System.NotImplementedException();
+    }
 
     public override Vector2 Velocity
     {
@@ -47,7 +56,7 @@ internal class PlayerState(Player host) : CharacterState
 
     public override BindableProperty<float> AirAcceleration
     {
-        get => host.AirAcceleration;
+        get => new(200 * 50);
         set => host.AirAcceleration = value;
     }
 
@@ -71,7 +80,6 @@ public partial class Player : CharacterBody2D
     {
         Evaluator<bool> isVelocityYPositive = new("isVelocityYPositive", () => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new("isOnFloor", IsOnFloor);
-
 
         var idle = new PlayerState(this)
         {
