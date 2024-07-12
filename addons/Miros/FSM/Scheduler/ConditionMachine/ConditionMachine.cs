@@ -60,7 +60,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
                 if (!job.CanEnter()) continue;
 
                 var layerRunningJobsCount = RunningJobs[layer].Count;
-                if (layerRunningJobsCount < layer.JobMaxCount)
+                if (layerRunningJobsCount < layer.OnRunningJobMaxCount)
                 {
                     PushRunningJob(layer, job);
                 }
@@ -75,7 +75,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
                 }
             }
     }
-
+    
 
     private void PushRunningJob(Layer layer, IJob job)
     {

@@ -42,7 +42,7 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
         base.Resume();
     }
 
-    public override void Stack(IGpcToken source)
+    public override void Stack(object source)
     {
         if (buffState.StackIsRefreshDuration)
             buffState.DurationElapsed = 0;

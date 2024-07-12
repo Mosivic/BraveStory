@@ -6,12 +6,12 @@ public interface IJob
     Layer Layer { get; }
     int Priority { get; }
     bool IsStack { get; }
-    IGpcToken Source { get; }
+    object Source { get; }
     void Enter();
     void Exit();
     void Pause();
     void Resume();
-    void Stack(IGpcToken source);
+    void Stack(object source);
     bool CanEnter();
     bool CanExit();
     void Update(double delta);

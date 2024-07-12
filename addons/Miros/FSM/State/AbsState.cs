@@ -8,7 +8,7 @@ public abstract class AbsState
     // Core
     public required string Name { get; init; }
     public required Layer Layer { get; init; }
-    public required Type Type { get; init; }
+    public required Type JobType { get; init; }
     public int Priority { get; init; }
     public IGpcToken Source { get; init; }
 
@@ -27,10 +27,13 @@ public abstract class AbsState
     // Stack
     public int StackMaxCount { get; init; } = 1;
     public int StackCurrentCount { get; set; } = 1;
-    public Dictionary<IGpcToken, int> StackSourceCountDict { get; set; }
+    public Dictionary<object, int> StackSourceCountDict { get; set; }
     public bool IsStack { get; init; } = false;
 
     public StateStackType StackType { get; init; } = StateStackType.Target;
+    
+    //Immunity
+    public List<string> EnterTags { get; init; }
 
     // Function
     public bool UsePrepareFuncAsRunCondition { get; init; } = true;
@@ -49,4 +52,5 @@ public abstract class AbsState
     public Action<AbsState> OnPeriodOverFunc { get; init; }
     public Action<AbsState> UpdateFunc { get; init; }
     public Action<AbsState> PhysicsUpdateFunc { get; init; }
+    
 }

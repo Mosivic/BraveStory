@@ -10,7 +10,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
     public Layer Layer => state.Layer;
     public int Priority => state.Priority;
     public bool IsStack => state.IsStack;
-    public IGpcToken Source => state.Source;
+    public object Source => state.Source;
 
     public virtual void Enter()
     {
@@ -40,14 +40,14 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         state.Status = JobRunningStatus.Running;
         _Resume();
     }
+    
 
-
-    public virtual void Stack(IGpcToken source)
+    public virtual void Stack(object source)
     {
         switch (state.StackType)
         {
             case StateStackType.Source:
-                state.StackSourceCountDict ??= new Dictionary<IGpcToken, int>
+                state.StackSourceCountDict ??= new Dictionary<object, int>
                     { { state.Source, 1 } };
 
                 //Not have stackState in Dict

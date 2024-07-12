@@ -6,6 +6,7 @@ using FSM.Evaluator;
 using FSM.Job;
 using FSM.Job.Executor;
 using FSM.Scheduler;
+using FSM.States;
 using FSM.States.Buff;
 using Godot;
 
@@ -24,8 +25,9 @@ public partial class Player : CharacterBody2D
         Sprite = GetNode<Sprite2D>("Sprite");
         
         
-        Evaluator<bool> isVelocityYPositive = new("isVelocityYPositive", () => Velocity.Y >= 0f);
-        Evaluator<bool> isOnFloor = new("isOnFloor", IsOnFloor);
+        Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
+        Evaluator<bool> isOnFloor = new(IsOnFloor);
+        Evaluator<PlayerState, bool> testEVT = new(state => state.Status == JobRunningStatus.Succeed);
 
         var properties = new PlayerProperties();
         
@@ -34,7 +36,7 @@ public partial class Player : CharacterBody2D
             Name = "Idle",
             Layer = LayerMap.Movement,
             Priority = 5,
-            Type = typeof(Idle),
+            JobType = typeof(Idle),
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
         };
         var jump = new PlayerState(this,properties)
@@ -42,25 +44,26 @@ public partial class Player : CharacterBody2D
             Name = "Jump",
             Priority = 10,
             Layer = LayerMap.Movement,
-            Type = typeof(Jump),
+            JobType = typeof(Jump),
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
                                    isOnFloor.Is(true),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
         };
         var run = new PlayerState(this,properties)
         {
-            Type = typeof(Move),
+            JobType = typeof(Move),
             Layer = LayerMap.Movement,
             Name = "Run",
             Priority = 2,
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
+            EnterTags = [],
+            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true) && testEVT.Is(jump,true)
         };
 
         var addHpBuff = new BuffState
         {
             Name = "AddHp",
             Layer = LayerMap.Buff,
-            Type = typeof(JobBuff),
+            JobType = typeof(JobBuff),
             Modifiers =
             [
                 new Modifier
@@ -84,6 +87,8 @@ public partial class Player : CharacterBody2D
         };
 
         _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump]);
+        
+        GD.Print(LayerMap.Movement.ChildrenName);
     }
 
     public override void _Process(double delta)
