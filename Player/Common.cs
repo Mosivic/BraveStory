@@ -1,6 +1,5 @@
-﻿using System;
+﻿using FSM.Evaluator;
 using Godot;
-using FSM.Evaluator;
 
 namespace BraveStory.Player;
 

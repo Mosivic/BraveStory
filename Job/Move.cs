@@ -1,26 +1,27 @@
+using BraveStory.Player;
 using BraveStory.State;
-using Godot;
 using FSM.Job;
+using Godot;
 
-internal class Move(CharacterState state) : JobBase(state)
+internal class Move(PlayerState state) : JobBase(state)
 {
     protected override void _Enter()
     {
-        state.AnimationPlayer.Play("run");
+        state.Host.AnimationPlayer.Play("run");
     }
 
     protected override void _PhysicsUpdate(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
-        var velocity = state.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * state.RunSpeed.Value,
-            state.FloorAcceleration.Value);
-        velocity.Y += (float)delta * state.Gravity.Value;
-        state.Velocity = velocity;
+        var velocity = state.Host.Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, direction * state.Properties.RunSpeed.Value,
+            state.Properties.FloorAcceleration.Value);
+        velocity.Y += (float)delta * state.Properties.Gravity.Value;
+        state.Host.Velocity = velocity;
 
         if (!Mathf.IsZeroApprox(direction))
-            state.Sprite.FlipH = direction < 0;
+            state.Host.Sprite.FlipH = direction < 0;
 
-        state.MoveAndSlide();
+        state.Host.MoveAndSlide();
     }
 }

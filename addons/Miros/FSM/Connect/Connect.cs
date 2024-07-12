@@ -14,7 +14,7 @@ public class Connect<TJobProvider, TScheduler> : IConnect<TJobProvider, TSchedul
         JobProvider = new TJobProvider();
         Scheduler = new TScheduler();
 
-        foreach (var job in states.Select(state => JobProvider.GetJob(state))) 
+        foreach (var job in states.Select(state => JobProvider.GetJob(state)))
             Scheduler.AddJob(job);
     }
 

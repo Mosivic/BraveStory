@@ -101,7 +101,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual void Update(double delta)
     {
-        if(state.Status != JobRunningStatus.Running) return;
+        if (state.Status != JobRunningStatus.Running) return;
         if (IsFailed()) OnSucceed();
         if (IsSucceed()) OnFailed();
 

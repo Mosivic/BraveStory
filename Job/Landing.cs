@@ -1,10 +1,11 @@
-﻿using BraveStory.State;
+﻿using BraveStory.Player;
+using BraveStory.State;
 using FSM.Job;
 
-internal class Landing(CharacterState state) : JobBase(state)
+internal class Landing(PlayerState state) : JobBase(state)
 {
     protected override void _Enter()
     {
-        state.AnimationPlayer.Play("landing");
+        state.Host.AnimationPlayer.Play("landing");
     }
 }

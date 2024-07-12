@@ -111,9 +111,9 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
 
     private void ApplyModifiers()
     {
-        if (buffState.HasChance && (new Random().NextDouble() > buffState.Chance))
+        if (buffState.HasChance && new Random().NextDouble() > buffState.Chance)
             return;
-        
+
         for (var i = 0; i < buffState.Modifiers.Count; i++)
         {
             var modifier = buffState.Modifiers[i];
@@ -137,6 +137,7 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             buffState.OnApplyModifierFunc?.Invoke(modifier);
         }
     }
@@ -148,6 +149,5 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
             modifier.Property.Value = modifier.Record;
             buffState.OnCancelModifierFunc?.Invoke(modifier);
         }
-            
     }
 }

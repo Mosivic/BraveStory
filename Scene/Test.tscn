@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cwh2tu7n4ynt" path="res://Player/Player.tscn" id="2_bd8n3"]
 [ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="4_yrimo"]
 [ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="5_nnajl"]
-[ext_resource type="PackedScene" uid="uid://6jymmwqohfk4" path="res://addons/Miros/GPC/Utility/StateDebugger/state_debugger.tscn" id="6_hh0aq"]
+[ext_resource type="PackedScene" uid="uid://6jymmwqohfk4" path="res://addons/Miros/FSM/Utility/StateDebugger/state_debugger.tscn" id="6_hh0aq"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_22a03"]
 texture = ExtResource("1_wd2bu")
@@ -539,10 +539,8 @@ texture = ExtResource("5_nnajl")
 region_enabled = true
 region_rect = Rect2(112, 0, 96, 256)
 
-[node name="StateDebugger" parent="." node_paths=PackedStringArray("WatchNode") instance=ExtResource("6_hh0aq")]
+[node name="StateDebugger" parent="." instance=ExtResource("6_hh0aq")]
 offset_left = -16.0
 offset_top = 56.0
 offset_right = 284.0
 offset_bottom = 356.0
-Enabled = null
-WatchNode = NodePath("../Player")

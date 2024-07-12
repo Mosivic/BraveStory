@@ -23,7 +23,7 @@ public abstract class AbsJob(AbsState state)
     {
         state.ResumeFunc?.Invoke(state);
     }
-    
+
     protected virtual bool _IsPrepared()
     {
         if (state.IsPreparedFunc != null)
@@ -51,7 +51,7 @@ public abstract class AbsJob(AbsState state)
     {
         state.OnStackFunc?.Invoke(state);
     }
-    
+
     protected virtual void _OnStackOverflow()
     {
         state.OnStackOverflowFunc?.Invoke(state);
