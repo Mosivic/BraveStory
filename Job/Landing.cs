@@ -1,5 +1,4 @@
 ﻿using BraveStory.Player;
-using BraveStory.State;
 using FSM.Job;
 
 internal class Landing(PlayerState state) : JobBase(state)

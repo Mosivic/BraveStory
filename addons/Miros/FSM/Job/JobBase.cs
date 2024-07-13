@@ -40,7 +40,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         state.Status = JobRunningStatus.Running;
         _Resume();
     }
-    
+
 
     public virtual void Stack(object source)
     {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FSM.Job;
 
 namespace FSM;
 
@@ -12,12 +11,12 @@ public class Layer(string name, List<Layer> childrenLayer, int onRunningJobMaxCo
 
     public void RegisterChild(string name)
     {
-        if(ChildrenName.Contains(name)) return;
+        if (ChildrenName.Contains(name)) return;
         ChildrenName.Add(name);
     }
-    public void UnRegisterChild(string name)
+
+    public void UnregisterChild(string name)
     {
         ChildrenName.Remove(name);
     }
-    
 }

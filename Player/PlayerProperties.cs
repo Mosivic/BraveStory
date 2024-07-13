@@ -2,7 +2,7 @@
 
 namespace BraveStory.Player;
 
-public class PlayerProperties:CharacterProperties
+public class PlayerProperties : CharacterProperties
 {
     public override BindableProperty<float> Gravity { get; set; } = new(980f);
     public override BindableProperty<float> RunSpeed { get; set; } = new(200f);

@@ -1,37 +1,33 @@
-using System;
 using BraveStory.Scripts;
-using BraveStory.State;
 using FSM;
 using FSM.Evaluator;
 using FSM.Job;
 using FSM.Job.Executor;
 using FSM.Scheduler;
-using FSM.States;
 using FSM.States.Buff;
 using Godot;
 
 namespace BraveStory.Player;
-
 
 public partial class Player : CharacterBody2D
 {
     private Connect<StaticJobProvider, ConditionMachine> _connect;
     public AnimationPlayer AnimationPlayer;
     public Sprite2D Sprite;
-    
+
     public override void _Ready()
     {
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         Sprite = GetNode<Sprite2D>("Sprite");
-        
-        
+
+
         Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new(IsOnFloor);
-        Evaluator<PlayerState, bool> testEVT = new(state => state.Status == JobRunningStatus.Succeed);
+      
 
         var properties = new PlayerProperties();
-        
-        var idle = new PlayerState(this,properties)
+
+        var idle = new PlayerState(this, properties)
         {
             Name = "Idle",
             Layer = LayerMap.Movement,
@@ -39,7 +35,7 @@ public partial class Player : CharacterBody2D
             JobType = typeof(Idle),
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
         };
-        var jump = new PlayerState(this,properties)
+        var jump = new PlayerState(this, properties)
         {
             Name = "Jump",
             Priority = 10,
@@ -49,15 +45,25 @@ public partial class Player : CharacterBody2D
                                    isOnFloor.Is(true),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
         };
-        var run = new PlayerState(this,properties)
+        var run = new PlayerState(this, properties)
         {
             JobType = typeof(Move),
             Layer = LayerMap.Movement,
             Name = "Run",
             Priority = 2,
-            EnterTags = [],
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true) && testEVT.Is(jump,true)
+            EnterTagRequirements = [new Tag(LayerMap.Movement,"Jump")],
+            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
         };
+
+        var doubleJump = new PlayerState(this, properties)
+        {
+            Name = "DoubleJump",
+            Layer = LayerMap.Movement,
+            JobType = typeof(Jump),
+            EnterTagRequirements = [new(jump)],
+            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
+        };
+        
 
         var addHpBuff = new BuffState
         {
@@ -88,7 +94,6 @@ public partial class Player : CharacterBody2D
 
         _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump]);
         
-        GD.Print(LayerMap.Movement.ChildrenName);
     }
 
     public override void _Process(double delta)

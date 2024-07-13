@@ -11,7 +11,7 @@ public abstract class AbsState
     public required Type JobType { get; init; }
     public int Priority { get; init; }
     public IGpcToken Source { get; init; }
-
+    
     public JobRunningStatus Status { get; set; } = JobRunningStatus.NoRun;
 
     // Duration
@@ -31,10 +31,11 @@ public abstract class AbsState
     public bool IsStack { get; init; } = false;
 
     public StateStackType StackType { get; init; } = StateStackType.Target;
-    
-    //Immunity
-    public List<string> EnterTags { get; init; }
 
+    //Immunity
+    public List<Tag> EnterTagRequirements { get; init; }
+    public List<Tag> ExitTagRequirements { get; set; }
+ 
     // Function
     public bool UsePrepareFuncAsRunCondition { get; init; } = true;
     public Func<bool> IsPreparedFunc { get; init; }
@@ -52,5 +53,4 @@ public abstract class AbsState
     public Action<AbsState> OnPeriodOverFunc { get; init; }
     public Action<AbsState> UpdateFunc { get; init; }
     public Action<AbsState> PhysicsUpdateFunc { get; init; }
-    
 }

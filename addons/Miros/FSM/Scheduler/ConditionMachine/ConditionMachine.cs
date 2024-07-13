@@ -75,7 +75,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
                 }
             }
     }
-    
+
 
     private void PushRunningJob(Layer layer, IJob job)
     {
