@@ -14,15 +14,16 @@ public partial class Player : CharacterBody2D
 {
     private Connect<StaticJobProvider, ConditionMachine> _connect;
     private AnimationPlayer _animationPlayer;
-    private Sprite2D _sprite;
+    private Node2D _graphic;
     private RayCast2D _handChecker;
     private RayCast2D _footChecker;
     private PlayerProperties _properties;
 
+    
     public override void _Ready()
     {
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        _sprite = GetNode<Sprite2D>("Graphic/Sprite");
+        _graphic = GetNode<Node2D>("Graphic");
         _handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
         _footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
         _properties = new PlayerProperties();
@@ -76,7 +77,7 @@ public partial class Player : CharacterBody2D
             Name = "Fall",
             Layer = LayerMap.Movement,
             JobType = typeof(PlayerJob),
-            Priority = 12,
+            Priority = 18,
             IsPreparedFunc = () => isOnFloor.Is(false) && Velocity.Y>0,
             EnterFunc = (s)=> PlayAnimation("jump"),
             PhysicsUpdateFunc = ((state, d) => Move(d))
@@ -120,8 +121,11 @@ public partial class Player : CharacterBody2D
             Name = "WallSliding",
             Layer = LayerMap.Movement,
             JobType = typeof(PlayerJob),
-            Priority = 15,
+            Priority = 16,
             EnterFunc = (s)=> PlayAnimation("wall_sliding"),
+            IsPreparedFunc = (() => isOnFloor.Is(false) && 
+                                    _handChecker.IsColliding() && _footChecker.IsColliding()),
+            PhysicsUpdateFunc = ((state, d) => Move(d))
             
         };
         
@@ -155,7 +159,7 @@ public partial class Player : CharacterBody2D
         };
 
         _connect = new Connect<StaticJobProvider, ConditionMachine>([
-            idle, run, jump,doubleJump,fall,landing]);
+            idle, run, jump,doubleJump,fall,wallSliding]);
         
     }
 
@@ -183,8 +187,8 @@ public partial class Player : CharacterBody2D
         velocity.Y += (float)delta * _properties.Gravity.Value;
         Velocity = velocity;
 
-        if (!Mathf.IsZeroApprox(direction))
-            _sprite.FlipH = direction < 0;
+        if (!Mathf.IsZeroApprox(direction)) 
+            _graphic.Scale = new Vector2(direction >= 0 ? -1 : 1, 1);
 
         MoveAndSlide();
     }
