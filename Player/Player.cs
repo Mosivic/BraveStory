@@ -51,16 +51,27 @@ public partial class Player : CharacterBody2D
             Layer = LayerMap.Movement,
             Name = "Run",
             Priority = 2,
-            EnterTagRequirements = [new Tag(LayerMap.Movement,"Jump")],
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
         };
+        
+        var fall = new PlayerState(this, properties)
+        {
+            Name = "Fall",
+            Layer = LayerMap.Movement,
+            JobType = typeof(Fall),
+            Priority = 12,
+            IsPreparedFunc = () => isOnFloor.Is(false) && Velocity.Y>0,
+        };
+        
 
         var doubleJump = new PlayerState(this, properties)
         {
             Name = "DoubleJump",
             Layer = LayerMap.Movement,
             JobType = typeof(Jump),
-            EnterTagRequirements = [new(jump)],
+            Priority = 13,
+            IsPreparedFunc = ()=>Evaluators.IsJumpKeyDown.Is(true) &&
+                                 isOnFloor.Is(false) && _connect.HasAnyStateRunning([jump,fall]),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
         };
         
@@ -92,7 +103,7 @@ public partial class Player : CharacterBody2D
             OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {properties.RunSpeed.Value}")
         };
 
-        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump]);
+        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump,doubleJump,fall]);
         
     }
 

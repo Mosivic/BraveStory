@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scene/Test.cs" id="1_pntpl"]
 [ext_resource type="Texture2D" uid="uid://boub6swj2g75j" path="res://Art/Legacy-Fantasy - High Forest 2.3/Assets/Tree-Assets.png" id="1_wd2bu"]
-[ext_resource type="PackedScene" uid="uid://cwh2tu7n4ynt" path="res://Player/Player.tscn" id="2_bd8n3"]
+[ext_resource type="PackedScene" path="res://Player/Player.tscn" id="2_bd8n3"]
 [ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="4_yrimo"]
 [ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="5_nnajl"]
 [ext_resource type="PackedScene" uid="uid://6jymmwqohfk4" path="res://addons/Miros/FSM/Utility/StateDebugger/state_debugger.tscn" id="6_hh0aq"]

@@ -35,6 +35,23 @@ public class Connect<TJobProvider, TScheduler> : IConnect<TJobProvider, TSchedul
         Scheduler.RemoveJob(job);
     }
 
+    public bool HasStateRunning(AbsState state)
+    {
+        var job = JobProvider.GetJob(state);
+        return Scheduler.HasJobRunning(job);
+    }
+    
+    public bool HasAnyStateRunning(List<AbsState> states)
+    {
+        return states.Select(state => JobProvider.GetJob(state)).Any(job => Scheduler.HasJobRunning(job));
+    }
+    
+    
+    public bool HasAllStateRunning(List<AbsState> states)
+    {
+        return states.Select(state => JobProvider.GetJob(state)).All(job => Scheduler.HasJobRunning(job));
+    }
+    
     public void Update(double delta)
     {
         Scheduler.Update(delta);

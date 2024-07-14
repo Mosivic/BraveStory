@@ -26,7 +26,7 @@ public readonly struct Tag
         return obj is Tag other && Equals(other);
     }
 
-    public bool Equals(Tag other)
+    private bool Equals(Tag other)
     {
         return Equals(Layer, other.Layer) && Name == other.Name;
     }

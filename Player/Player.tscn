@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cwh2tu7n4ynt"]
+[gd_scene load_steps=11 format=3 uid="uid://domj7ott646q7"]
 
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://cmk51oivoq0j6" path="res://Art/generic_char_v0.2/png/red/char_red_1.png" id="2_vcyf2"]
@@ -170,6 +170,7 @@ tracks/2/keys = {
 [sub_resource type="Animation" id="Animation_pi230"]
 resource_name = "landing"
 length = 0.25
+loop_mode = 1
 step = 0.01
 tracks/0/type = "value"
 tracks/0/imported = false

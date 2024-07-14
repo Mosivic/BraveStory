@@ -31,11 +31,7 @@ public abstract class AbsState
     public bool IsStack { get; init; } = false;
 
     public StateStackType StackType { get; init; } = StateStackType.Target;
-
-    //Immunity
-    public List<Tag> EnterTagRequirements { get; init; }
-    public List<Tag> ExitTagRequirements { get; set; }
- 
+    
     // Function
     public bool UsePrepareFuncAsRunCondition { get; init; } = true;
     public Func<bool> IsPreparedFunc { get; init; }

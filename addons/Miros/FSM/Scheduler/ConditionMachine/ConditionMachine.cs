@@ -26,6 +26,11 @@ public class ConditionMachine : AbsScheduler, IScheduler
             WaitingJobs[layer].Remove(job);
     }
 
+    public bool HasJobRunning(IJob job)
+    {
+        return RunningJobs[job.Layer].Contains(job);
+    }
+
 
     public void Update(double delta)
     {
