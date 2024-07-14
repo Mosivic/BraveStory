@@ -9,8 +9,8 @@ public abstract class AbsState
     public required string Name { get; init; }
     public required Layer Layer { get; init; }
     public required Type JobType { get; init; }
-    public int Priority { get; init; }
-    public IGpcToken Source { get; init; }
+    public required int Priority { get; init; }
+    public object Source { get; init; }
     
     public JobRunningStatus Status { get; set; } = JobRunningStatus.NoRun;
 

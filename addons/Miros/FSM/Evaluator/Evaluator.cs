@@ -10,10 +10,10 @@ public interface IEvaluator
 public class Evaluator<T>(Func<T> func) : IEvaluator
     where T : IComparable
 {
-    private bool Result { get; set; }
     private ulong Checksum { get; set; }
     private Func<T> Func { get; } = func;
     private T Value { get; set; }
+    private T LastValue { get; set; }
 
     public string GetFuncValueString()
     {
@@ -24,22 +24,30 @@ public class Evaluator<T>(Func<T> func) : IEvaluator
 
     public bool Is(T expectValue, CompareType type = CompareType.Equals)
     {
+        return Compare(Value, expectValue, type);
+    }
+
+
+    public bool LastIs(T expectValue, CompareType type = CompareType.Equals)
+    {
+        return Compare(LastValue, expectValue, type);
+    }
+
+    private bool Compare(T value,T expectValue, CompareType type = CompareType.Equals)
+    {
         CalcFuncValue();
 
         switch (type)
         {
             case CompareType.Equals:
-                Result = Value.Equals(expectValue);
-                break;
+                return value.Equals(expectValue);
             case CompareType.Greater:
-                Result = Value.CompareTo(expectValue) > 0;
-                break;
+                return value.CompareTo(expectValue) > 0;
             case CompareType.Less:
-                Result = Value.CompareTo(expectValue) < 0;
-                break;
+                return value.CompareTo(expectValue) < 0;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
-
-        return Result;
     }
 
     private void CalcFuncValue()
@@ -48,6 +56,7 @@ public class Evaluator<T>(Func<T> func) : IEvaluator
         if (Checksum.Equals(frames))
             return;
 
+        LastValue = Value;
         Value = Func.Invoke();
         Checksum = frames;
     }

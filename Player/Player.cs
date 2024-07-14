@@ -62,7 +62,20 @@ public partial class Player : CharacterBody2D
             Priority = 12,
             IsPreparedFunc = () => isOnFloor.Is(false) && Velocity.Y>0,
         };
+
+        var landing = new PlayerState(this, properties)
+        {
+            Name = "Last",
+            Layer = LayerMap.Movement,
+            JobType = typeof(Landing),
+            IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
+            Duration = 0.15,
+            IsFailedFunc = ()=>false,
+            UpdateFunc = (state => GD.Print("Landing!")),
+            Priority = 15,
+        };
         
+
 
         var doubleJump = new PlayerState(this, properties)
         {
@@ -100,10 +113,11 @@ public partial class Player : CharacterBody2D
             EnterFunc = _ => GD.Print("Enter"),
             ExitFunc = _ => GD.Print("Exit"),
             OnDurationOverFunc = _ => GD.Print("DurationOver"),
-            OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {properties.RunSpeed.Value}")
+            OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {properties.RunSpeed.Value}"),
+            Priority = 0
         };
 
-        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump,doubleJump,fall]);
+        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump,doubleJump,fall,landing]);
         
     }
 
