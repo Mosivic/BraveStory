@@ -8,7 +8,6 @@
     <ItemGroup>
         <Compile Remove="addons\Miros\Material\**"/>
         <Compile Remove="addons\Miros\FSM\Scheduler\OldGOAP\**"/>
-        <Compile Remove="addons\Miros\FSM\Job\JobAll.cs"/>
         <Compile Remove="addons\Miros\FSM\Scheduler\StateMachine\**"/>
     </ItemGroup>
     <ItemGroup>
