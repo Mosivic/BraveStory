@@ -7,7 +7,7 @@ public enum CompareType
     Less
 }
 
-public enum JobRunningStatus
+public enum RunningStatus
 {
     NoRun,
     Running,

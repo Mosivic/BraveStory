@@ -7,28 +7,28 @@ public class ConditionMachine : AbsScheduler, IScheduler
 {
     public void AddJob(IJob job)
     {
-        var layer = job.Layer;
+        var layer = job.State.Layer;
         if (!WaitingJobs.ContainsKey(layer))
         {
             WaitingJobs[layer] = [];
             RunningJobs[layer] = [];
         }
 
-        var index = WaitingJobs[layer].FindIndex(j => job.Priority > j.Priority);
+        var index = WaitingJobs[layer].FindIndex(j => job.State.Priority > j.State.Priority);
         WaitingJobs[layer].Insert(index + 1, job);
     }
 
 
     public void RemoveJob(IJob job)
     {
-        var layer = job.Layer;
+        var layer = job.State.Layer;
         if (WaitingJobs.ContainsKey(layer) && WaitingJobs[layer].Contains(job))
             WaitingJobs[layer].Remove(job);
     }
 
     public bool HasJobRunning(IJob job)
     {
-        return RunningJobs[job.Layer].Contains(job);
+        return RunningJobs[job.State.Layer].Contains(job);
     }
 
 
@@ -62,14 +62,21 @@ public class ConditionMachine : AbsScheduler, IScheduler
             for (var i = WaitingJobs[layer].Count - 1; i >= 0; i--)
             {
                 var job = WaitingJobs[layer][i];
-                if (!job.CanEnter()) continue;
+                
+                if(job.State.FromState.Count!=0 &&
+                   !RunningJobs[layer].Exists((j =>job.State.FromState.Contains(j.State))))
+                    continue;
+                
+                if (!job.CanEnter()) 
+                    continue;
+                
 
                 var layerRunningJobsCount = RunningJobs[layer].Count;
                 if (layerRunningJobsCount < layer.OnRunningJobMaxCount)
                 {
                     PushRunningJob(layer, job);
                 }
-                else if (job.Priority > RunningJobs[layer].Last().Priority)
+                else if (job.State.Priority > RunningJobs[layer].Last().State.Priority)
                 {
                     PopRunningJob(layer, RunningJobs[layer].Last());
                     PushRunningJob(layer, job);
@@ -85,19 +92,19 @@ public class ConditionMachine : AbsScheduler, IScheduler
     private void PushRunningJob(Layer layer, IJob job)
     {
         WaitingJobs[layer].Remove(job);
-        if (job.IsStack)
+        if (job.State.IsStack)
         {
-            var index = RunningJobs[layer].FindIndex(j => j.Name == job.Name);
+            var index = RunningJobs[layer].FindIndex(j => j.State.Name == job.State.Name);
             if (index != -1)
             {
-                RunningJobs[layer][index].Stack(job.Source);
+                RunningJobs[layer][index].Stack(job.State.Source);
                 return;
             }
         }
 
         job.Enter();
 
-        var highPriorityJob = RunningJobs[layer].FindIndex(j => j.Priority > job.Priority);
+        var highPriorityJob = RunningJobs[layer].FindIndex(j => j.State.Priority > job.State.Priority);
         RunningJobs[layer].Insert(highPriorityJob + 1, job);
     }
 
@@ -105,7 +112,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
     private void PopRunningJob(Layer layer, IJob job)
     {
         RunningJobs[layer].Remove(job);
-        var index = WaitingJobs[layer].FindIndex(j => job.Priority > j.Priority);
+        var index = WaitingJobs[layer].FindIndex(j => job.State.Priority > j.State.Priority);
         WaitingJobs[layer].Insert(index + 1, job);
 
         job.Exit();

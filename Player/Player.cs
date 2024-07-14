@@ -88,7 +88,7 @@ public partial class Player : CharacterBody2D, IDebugNode
             Name = "Fall",
             Layer = LayerMap.Movement,
             JobType = typeof(PlayerJob),
-            Priority = 9,
+            Priority = 14,
             IsPreparedFunc = () => isOnFloor.Is(false),
             EnterFunc = s => PlayAnimation("jump"),
             PhysicsUpdateFunc = (state, d) => Move(d)
@@ -116,7 +116,7 @@ public partial class Player : CharacterBody2D, IDebugNode
             JobType = typeof(PlayerJob),
             Priority = 15,
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
-                                   isOnFloor.Is(false) && _connect.HasAnyStateRunning([jump, fall]),
+                                   isOnFloor.Is(false),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true),
             EnterFunc = s =>
             {
@@ -172,7 +172,11 @@ public partial class Player : CharacterBody2D, IDebugNode
             OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {_properties.RunSpeed.Value}"),
             Priority = 0
         };
-
+        
+        
+        doubleJump.From(jump);
+        doubleJump.From(fall);
+        
         _connect = new Connect<StaticJobProvider, ConditionMachine>([
             idle, run, jump, doubleJump, fall, wallSliding
         ]);

@@ -45,30 +45,11 @@ public class Connect<TJobProvider, TScheduler> : IConnect
         Scheduler.PhysicsUpdate(delta);
     }
 
-    public bool HasStateRunning(AbsState state)
-    {
-        var job = JobProvider.GetJob(state);
-        return HasJobRunning(job);
-    }
-
-    public bool HasAnyStateRunning(AbsState[] states)
-    {
-        return states.Select(state => JobProvider.GetJob(state)).Any(job => Scheduler.HasJobRunning(job));
-    }
-
-
-    public bool HasAllStateRunning(AbsState[] states)
-    {
-        return states.Select(state => JobProvider.GetJob(state)).All(job => Scheduler.HasJobRunning(job));
-    }
 
     public IJob[] GetAllJobs()
     {
         return JobProvider.GetAllJobs();
     }
 
-    public bool HasJobRunning(IJob job)
-    {
-        return Scheduler.HasJobRunning(job);
-    }
+ 
 }

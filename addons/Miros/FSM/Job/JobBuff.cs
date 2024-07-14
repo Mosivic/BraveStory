@@ -10,7 +10,7 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
         if (buffState.DurationPolicy == BuffDurationPolicy.Instant)
         {
             ApplyModifiers();
-            buffState.Status = JobRunningStatus.Succeed;
+            buffState.Status = RunningStatus.Succeed;
         }
         else if (buffState.DurationPolicy == BuffDurationPolicy.Infinite)
         {
@@ -28,7 +28,7 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
 
     public override void Resume()
     {
-        buffState.Status = JobRunningStatus.Running;
+        buffState.Status = RunningStatus.Running;
         if (buffState.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.Reset)
         {
             buffState.PeriodElapsed = 0;

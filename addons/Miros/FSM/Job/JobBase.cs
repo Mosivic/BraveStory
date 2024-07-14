@@ -6,16 +6,11 @@ namespace FSM.Job;
 
 public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
-    public string Name => state.Name;
-    public Layer Layer => state.Layer;
-    public int Priority => state.Priority;
-    public JobRunningStatus Status => state.Status;
-    public bool IsStack => state.IsStack;
-    public object Source => state.Source;
+    public AbsState State => state;
 
     public virtual void Enter()
     {
-        state.Status = JobRunningStatus.Running;
+        state.Status = RunningStatus.Running;
         state.StackCurrentCount = state.StackMaxCount;
         state.PeriodElapsed = 0;
         state.DurationElapsed = 0;
@@ -24,7 +19,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public void Exit()
     {
-        if (state.Status == JobRunningStatus.Running)
+        if (state.Status == RunningStatus.Running)
             OnFailed();
         _Exit();
     }
@@ -32,13 +27,13 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual void Pause()
     {
-        state.Status = JobRunningStatus.NoRun;
+        state.Status = RunningStatus.NoRun;
         _Pause();
     }
 
     public virtual void Resume()
     {
-        state.Status = JobRunningStatus.Running;
+        state.Status = RunningStatus.Running;
         _Resume();
     }
 
@@ -95,14 +90,14 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual bool CanExit()
     {
-        if (state.Status is JobRunningStatus.Succeed or JobRunningStatus.Failed)
+        if (state.Status is RunningStatus.Succeed or RunningStatus.Failed)
             return true;
         return false;
     }
 
     public virtual void Update(double delta)
     {
-        if (state.Status != JobRunningStatus.Running) return;
+        if (state.Status != RunningStatus.Running) return;
         if (IsFailed()) OnSucceed();
         if (IsSucceed()) OnFailed();
 
@@ -122,13 +117,13 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     protected virtual void OnSucceed()
     {
-        state.Status = JobRunningStatus.Succeed;
+        state.Status = RunningStatus.Succeed;
         _OnSucceed();
     }
 
     protected virtual void OnFailed()
     {
-        state.Status = JobRunningStatus.Failed;
+        state.Status = RunningStatus.Failed;
         _OnFailed();
     }
 
@@ -148,7 +143,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         state.DurationElapsed = 0;
 
         if (state.StackCurrentCount == 0)
-            state.Status = JobRunningStatus.Succeed;
+            state.Status = RunningStatus.Succeed;
 
         _OnDurationOVer();
     }

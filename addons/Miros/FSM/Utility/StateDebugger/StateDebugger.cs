@@ -63,13 +63,12 @@ public partial class StateDebugger : MarginContainer
         _jobs = _connect.GetAllJobs();
         foreach (var job in _jobs)
         {
-            GD.Print(job.Name);
-            var layer = job.Layer;
+            var layer = job.State.Layer;
             var treeItem = _layerTreeItemDict[layer];
             var layerTreeItem = _stateTree.CreateItem(treeItem);
             _jobTreeItemDict[job] = layerTreeItem;
 
-            layerTreeItem.SetText(0, job.Name);
+            layerTreeItem.SetText(0, job.State.Name);
             layerTreeItem.SetIcon(1, _redPointTexture);
         }
     }
@@ -99,7 +98,7 @@ public partial class StateDebugger : MarginContainer
         foreach (var job in _jobs)
         {
             var treeItem = _jobTreeItemDict[job];
-            if (job.Status == JobRunningStatus.Running)
+            if (job.State.Status == RunningStatus.Running)
                 treeItem.SetIcon(1, _greenPointTexture);
             else
                 treeItem.SetIcon(1, _redPointTexture);
@@ -109,7 +108,7 @@ public partial class StateDebugger : MarginContainer
     private void UpdateStateDisplay(IJob job)
     {
         var treeItem = _jobTreeItemDict[job];
-        if (job.Status == JobRunningStatus.Running)
+        if (job.State.Status == RunningStatus.Running)
             treeItem.SetIcon(1, _greenPointTexture);
         else
             treeItem.SetIcon(1, _redPointTexture);
@@ -132,7 +131,7 @@ public partial class StateDebugger : MarginContainer
     private void OnStatePrepared(IJob state)
     {
         var treeItem = _jobTreeItemDict[state];
-        if (state.Status == JobRunningStatus.NoRun)
+        if (state.State.Status == RunningStatus.NoRun)
             treeItem.SetIcon(1, _orangePointTexture);
     }
 }
