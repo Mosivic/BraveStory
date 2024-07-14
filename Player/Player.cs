@@ -1,3 +1,4 @@
+using BraveStory.Job;
 using BraveStory.Scripts;
 using FSM;
 using FSM.Evaluator;
@@ -12,80 +13,116 @@ namespace BraveStory.Player;
 public partial class Player : CharacterBody2D
 {
     private Connect<StaticJobProvider, ConditionMachine> _connect;
-    public AnimationPlayer AnimationPlayer;
-    public Sprite2D Sprite;
+    private AnimationPlayer _animationPlayer;
+    private Sprite2D _sprite;
+    private RayCast2D _handChecker;
+    private RayCast2D _footChecker;
+    private PlayerProperties _properties;
 
     public override void _Ready()
     {
-        AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        Sprite = GetNode<Sprite2D>("Sprite");
-
-
+        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        _sprite = GetNode<Sprite2D>("Graphic/Sprite");
+        _handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
+        _footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
+        _properties = new PlayerProperties();
+        
         Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new(IsOnFloor);
       
-
-        var properties = new PlayerProperties();
-
-        var idle = new PlayerState(this, properties)
+        // Idle  
+        var idle = new PlayerState(this, _properties)
         {
             Name = "Idle",
             Layer = LayerMap.Movement,
             Priority = 5,
-            JobType = typeof(Idle),
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false)
+            JobType = typeof(PlayerJob),
+            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false),
+            EnterFunc = (s)=> PlayAnimation("idle"),
         };
-        var jump = new PlayerState(this, properties)
+        // Jump
+        var jump = new PlayerState(this, _properties)
         {
             Name = "Jump",
             Priority = 10,
             Layer = LayerMap.Movement,
-            JobType = typeof(Jump),
+            JobType = typeof(PlayerJob),
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
                                    isOnFloor.Is(true),
-            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
+            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true),
+            EnterFunc = (s) =>
+            {
+                PlayAnimation("jump");
+                Velocity = new Vector2(Velocity.X, _properties.JumpVelocity.Value);
+            },
+            PhysicsUpdateFunc = ((state, d) => Move(d))
         };
-        var run = new PlayerState(this, properties)
+        
+        // Run
+        var run = new PlayerState(this, _properties)
         {
-            JobType = typeof(Move),
+            JobType = typeof(PlayerJob),
             Layer = LayerMap.Movement,
             Name = "Run",
             Priority = 2,
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true)
+            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true),
+            EnterFunc = (s)=> PlayAnimation("run"),
+            PhysicsUpdateFunc = ((state, d) => Move(d))
         };
         
-        var fall = new PlayerState(this, properties)
+        // Fall
+        var fall = new PlayerState(this, _properties)
         {
             Name = "Fall",
             Layer = LayerMap.Movement,
-            JobType = typeof(Fall),
+            JobType = typeof(PlayerJob),
             Priority = 12,
             IsPreparedFunc = () => isOnFloor.Is(false) && Velocity.Y>0,
+            EnterFunc = (s)=> PlayAnimation("jump"),
+            PhysicsUpdateFunc = ((state, d) => Move(d))
         };
 
-        var landing = new PlayerState(this, properties)
+        // Landing
+        var landing = new PlayerState(this, _properties)
         {
             Name = "Last",
             Layer = LayerMap.Movement,
-            JobType = typeof(Landing),
+            JobType = typeof(PlayerJob),
             IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
-            Duration = 0.15,
+            Duration = 0.25,
             IsFailedFunc = ()=>false,
-            UpdateFunc = (state => GD.Print("Landing!")),
             Priority = 15,
+            EnterFunc = (s)=> PlayAnimation("landing"),
         };
         
 
-
-        var doubleJump = new PlayerState(this, properties)
+        // Double Jump
+        var doubleJump = new PlayerState(this, _properties)
         {
             Name = "DoubleJump",
             Layer = LayerMap.Movement,
-            JobType = typeof(Jump),
+            JobType = typeof(PlayerJob),
             Priority = 13,
             IsPreparedFunc = ()=>Evaluators.IsJumpKeyDown.Is(true) &&
                                  isOnFloor.Is(false) && _connect.HasAnyStateRunning([jump,fall]),
-            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true)
+            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true),
+            EnterFunc = (s) =>
+            {
+                PlayAnimation("jump");
+                Velocity = new Vector2(Velocity.X, _properties.JumpVelocity.Value);
+            },
+            PhysicsUpdateFunc = ((state, d) => Move(d))
+        };
+        
+        // Wall Sliding
+        var wallSliding = new PlayerState(this, _properties)
+        {
+            Name = "WallSliding",
+            Layer = LayerMap.Movement,
+            JobType = typeof(PlayerJob),
+            Priority = 15,
+            EnterFunc = (s)=> PlayAnimation("wall_sliding"),
+            
         };
         
 
@@ -98,7 +135,7 @@ public partial class Player : CharacterBody2D
             [
                 new Modifier
                 {
-                    Property = properties.RunSpeed,
+                    Property = _properties.RunSpeed,
                     Affect = -10,
                     Operator = BuffModifierOperator.Add
                 }
@@ -113,11 +150,12 @@ public partial class Player : CharacterBody2D
             EnterFunc = _ => GD.Print("Enter"),
             ExitFunc = _ => GD.Print("Exit"),
             OnDurationOverFunc = _ => GD.Print("DurationOver"),
-            OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {properties.RunSpeed.Value}"),
+            OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {_properties.RunSpeed.Value}"),
             Priority = 0
         };
 
-        _connect = new Connect<StaticJobProvider, ConditionMachine>([idle, run, jump,doubleJump,fall,landing]);
+        _connect = new Connect<StaticJobProvider, ConditionMachine>([
+            idle, run, jump,doubleJump,fall,landing]);
         
     }
 
@@ -130,4 +168,25 @@ public partial class Player : CharacterBody2D
     {
         _connect.PhysicsUpdate(delta);
     }
+    
+    public void PlayAnimation(string animationName)
+    {
+        _animationPlayer.Play(animationName);
+    }
+
+    public void Move(double delta)
+    {
+        var direction = Input.GetAxis("move_left", "move_right");
+        var velocity = Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, direction * _properties.RunSpeed.Value,
+            _properties.FloorAcceleration.Value);
+        velocity.Y += (float)delta * _properties.Gravity.Value;
+        Velocity = velocity;
+
+        if (!Mathf.IsZeroApprox(direction))
+            _sprite.FlipH = direction < 0;
+
+        MoveAndSlide();
+    }
+
 }

@@ -47,6 +47,6 @@ public abstract class AbsState
     public Action<AbsState> OnStackOverflowFunc { get; init; }
     public Action<AbsState> OnDurationOverFunc { get; init; }
     public Action<AbsState> OnPeriodOverFunc { get; init; }
-    public Action<AbsState> UpdateFunc { get; init; }
-    public Action<AbsState> PhysicsUpdateFunc { get; init; }
+    public Action<AbsState,double> UpdateFunc { get; init; }
+    public Action<AbsState,double> PhysicsUpdateFunc { get; init; }
 }

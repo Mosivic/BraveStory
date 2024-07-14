@@ -4,6 +4,7 @@ using FSM.States;
 
 namespace FSM.Job;
 
+
 public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
     public string Name => state.Name;
