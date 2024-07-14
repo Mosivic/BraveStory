@@ -5,7 +5,7 @@ using FSM.States;
 
 namespace FSM.Job.Executor;
 
-public class Connect<TJobProvider, TScheduler> : IConnect<TJobProvider, TScheduler>
+public class Connect<TJobProvider, TScheduler> : IConnect
     where TJobProvider : IJobProvider, new()
     where TScheduler : IScheduler, new()
 {
@@ -35,23 +35,6 @@ public class Connect<TJobProvider, TScheduler> : IConnect<TJobProvider, TSchedul
         Scheduler.RemoveJob(job);
     }
 
-    public bool HasStateRunning(AbsState state)
-    {
-        var job = JobProvider.GetJob(state);
-        return Scheduler.HasJobRunning(job);
-    }
-    
-    public bool HasAnyStateRunning(List<AbsState> states)
-    {
-        return states.Select(state => JobProvider.GetJob(state)).Any(job => Scheduler.HasJobRunning(job));
-    }
-    
-    
-    public bool HasAllStateRunning(List<AbsState> states)
-    {
-        return states.Select(state => JobProvider.GetJob(state)).All(job => Scheduler.HasJobRunning(job));
-    }
-    
     public void Update(double delta)
     {
         Scheduler.Update(delta);
@@ -60,5 +43,32 @@ public class Connect<TJobProvider, TScheduler> : IConnect<TJobProvider, TSchedul
     public void PhysicsUpdate(double delta)
     {
         Scheduler.PhysicsUpdate(delta);
+    }
+
+    public bool HasStateRunning(AbsState state)
+    {
+        var job = JobProvider.GetJob(state);
+        return HasJobRunning(job);
+    }
+
+    public bool HasAnyStateRunning(AbsState[] states)
+    {
+        return states.Select(state => JobProvider.GetJob(state)).Any(job => Scheduler.HasJobRunning(job));
+    }
+
+
+    public bool HasAllStateRunning(AbsState[] states)
+    {
+        return states.Select(state => JobProvider.GetJob(state)).All(job => Scheduler.HasJobRunning(job));
+    }
+
+    public IJob[] GetAllJobs()
+    {
+        return JobProvider.GetAllJobs();
+    }
+
+    public bool HasJobRunning(IJob job)
+    {
+        return Scheduler.HasJobRunning(job);
     }
 }

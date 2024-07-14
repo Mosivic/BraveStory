@@ -11,7 +11,7 @@ public abstract class AbsState
     public required Type JobType { get; init; }
     public required int Priority { get; init; }
     public object Source { get; init; }
-    
+
     public JobRunningStatus Status { get; set; } = JobRunningStatus.NoRun;
 
     // Duration
@@ -31,7 +31,7 @@ public abstract class AbsState
     public bool IsStack { get; init; } = false;
 
     public StateStackType StackType { get; init; } = StateStackType.Target;
-    
+
     // Function
     public bool UsePrepareFuncAsRunCondition { get; init; } = true;
     public Func<bool> IsPreparedFunc { get; init; }
@@ -47,6 +47,6 @@ public abstract class AbsState
     public Action<AbsState> OnStackOverflowFunc { get; init; }
     public Action<AbsState> OnDurationOverFunc { get; init; }
     public Action<AbsState> OnPeriodOverFunc { get; init; }
-    public Action<AbsState,double> UpdateFunc { get; init; }
-    public Action<AbsState,double> PhysicsUpdateFunc { get; init; }
+    public Action<AbsState, double> UpdateFunc { get; init; }
+    public Action<AbsState, double> PhysicsUpdateFunc { get; init; }
 }

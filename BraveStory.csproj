@@ -6,30 +6,22 @@
         <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="addons\Miros\GPC\Scheduler\OldGOAP\**"/>
         <Compile Remove="addons\Miros\Material\**"/>
-        <Compile Remove="addons\Miros\GPC\Scheduler\StateMachine\**"/>
-        <Compile Remove="addons\Miros\GPC\Utility\StateDebugger\StateDebugger.cs"/>
-        <Compile Remove="addons\Miros\GPC\Job\JobAll.cs"/>
         <Compile Remove="addons\Miros\FSM\Scheduler\OldGOAP\**"/>
-        <Compile Remove="addons\Miros\FSM\Scheduler\StateMachine\**"/>
-        <Compile Remove="addons\Miros\FSM\Utility\StateDebugger\**"/>
         <Compile Remove="addons\Miros\FSM\Job\JobAll.cs"/>
+        <Compile Remove="addons\Miros\FSM\Scheduler\StateMachine\**"/>
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Remove="addons\Miros\GPC\Scheduler\OldGOAP\**"/>
         <EmbeddedResource Remove="addons\Miros\Material\**"/>
-        <EmbeddedResource Remove="addons\Miros\GPC\Scheduler\StateMachine\**"/>
         <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\OldGOAP\**"/>
         <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\StateMachine\**"/>
-        <EmbeddedResource Remove="addons\Miros\FSM\Utility\StateDebugger\**"/>
     </ItemGroup>
     <ItemGroup>
         <Folder Include="addons\Miros\FSM\Filter\"/>
-        <Folder Include="addons\Miros\FSM\Utility\"/>
     </ItemGroup>
     <ItemGroup>
-        <Content Include="Player\Player.tscn" />
+        <Content Include="addons\Miros\FSM\Utility\StateDebugger\state_debugger.tscn" />
+        <Content Include="Player\Player.tscn"/>
         <Content Include="Scene\Test.tscn"/>
     </ItemGroup>
 </Project>

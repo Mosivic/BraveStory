@@ -1055,8 +1055,24 @@ texture = ExtResource("5_nnajl")
 region_enabled = true
 region_rect = Rect2(112, 0, 96, 256)
 
-[node name="StateDebugger" parent="." instance=ExtResource("6_hh0aq")]
-offset_left = -16.0
-offset_top = 56.0
-offset_right = 284.0
-offset_bottom = 356.0
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StateDebugger" parent="UI" node_paths=PackedStringArray("WatchNode") instance=ExtResource("6_hh0aq")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 181.0
+offset_top = 85.0
+offset_right = 481.0
+offset_bottom = 385.0
+grow_horizontal = 0
+grow_vertical = 1
+WatchNode = NodePath("../../Player")

@@ -5,6 +5,7 @@ public interface IJob
     string Name { get; }
     Layer Layer { get; }
     int Priority { get; }
+    JobRunningStatus Status { get; }
     bool IsStack { get; }
     object Source { get; }
     void Enter();

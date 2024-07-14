@@ -5,8 +5,8 @@ namespace FSM;
 
 public readonly struct Tag
 {
-    private Layer Layer { get;}
-    private string Name { get;}
+    private Layer Layer { get; }
+    private string Name { get; }
 
 
     public Tag(Layer layer, string name)
@@ -20,7 +20,7 @@ public readonly struct Tag
         Layer = state.Layer;
         Name = state.Name;
     }
-    
+
     public override bool Equals(object obj)
     {
         return obj is Tag other && Equals(other);
@@ -50,5 +50,4 @@ public readonly struct Tag
     {
         return $"{Layer.Name}.{Name}";
     }
-    
 }

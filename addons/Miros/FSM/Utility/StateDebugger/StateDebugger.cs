@@ -1,24 +1,30 @@
 using System.Collections.Generic;
-using Godot;
 using FSM;
-using FSM.Scheduler;
+using FSM.Job;
+using FSM.Job.Executor;
 using FSM.States;
+using FSM.Utility.StateDebugger;
+using Godot;
 
 [Icon("res://addons/Miros/Material/Icon/state_debugger.svg")]
 public partial class StateDebugger : MarginContainer
 {
-    private double _elapsedTime;
+    private readonly Dictionary<IJob, TreeItem> _jobTreeItemDict = new();
+    private readonly Dictionary<Layer, TreeItem> _layerTreeItemDict = new();
+    private IConnect _connect;
 
+    private double _elapsedTime;
     private ItemList _evaluatorStatus;
 
     private Texture2D _greenPointTexture =
         GD.Load<Texture2D>("addons/Miros/Material/Icon/green_point.svg");
 
     private string _historyInfo;
+
+
     private RichTextLabel _historyLabel;
     private int _historyMaxCountLimit = 300;
-
-    private readonly Dictionary<Layer, TreeItem> _layerTreeItemDict = new();
+    private IJob[] _jobs;
 
     private Texture2D _orangePointTexture =
         GD.Load<Texture2D>("addons/Miros/Material/Icon/orange_point.svg");
@@ -28,9 +34,8 @@ public partial class StateDebugger : MarginContainer
 
     private Layer _rootLayer;
 
-    private AbsScheduler _scheduler;
     private Tree _stateTree;
-    private readonly Dictionary<AbsState, TreeItem> _stateTreeItemDict = new();
+
     [Export] public bool Enabled = true;
     [Export] public Node WatchNode;
 
@@ -42,34 +47,30 @@ public partial class StateDebugger : MarginContainer
 
         if (WatchNode != null)
         {
-            _scheduler = (WatchNode as IGpcToken).GetScheduler();
-            _rootLayer = (WatchNode as IGpcToken).GetRootLayer();
+            _rootLayer = (WatchNode as IDebugNode).GetRootLayer();
+            _connect = (WatchNode as IDebugNode).GetConnect();
         }
+        
+        if (_connect == null) return;
+        
+        var root = _stateTree.CreateItem();
+        root.SetText(0, _rootLayer.Name);
+        _layerTreeItemDict[_rootLayer] = root;
 
+        foreach (var childLayer in _rootLayer.ChildrenLayer)
+            CreateTreeChild(root, childLayer);
 
-        if (_scheduler != null)
+        _jobs = _connect.GetAllJobs();
+        foreach (var job in _jobs)
         {
-            _scheduler.StatePrepared += OnStatePrepared;
-            _scheduler.StateChanged += OnStateChanged;
-            
-            var root = _stateTree.CreateItem();
-            root.SetText(1, _rootLayer.Name);
-            _layerTreeItemDict[_rootLayer] = root;
+            GD.Print(job.Name);
+            var layer = job.Layer;
+            var treeItem = _layerTreeItemDict[layer];
+            var layerTreeItem = _stateTree.CreateItem(treeItem);
+            _jobTreeItemDict[job] = layerTreeItem;
 
-            foreach (var childLayer in _rootLayer.ChildrenLayer) CreateTreeChild(root, childLayer);
-
-            foreach (var layer in _scheduler.LayerStates.Keys)
-            {
-                foreach (var state in _scheduler.LayerStates[layer])
-                {
-                    var treeItem = _layerTreeItemDict[layer];
-                    var layerTreeItem = _stateTree.CreateItem(treeItem);
-                    _stateTreeItemDict[state] = layerTreeItem;
-
-                    layerTreeItem.SetText(0, state.Name);
-                    layerTreeItem.SetIcon(1, _redPointTexture);
-                }
-            }
+            layerTreeItem.SetText(0, job.Name);
+            layerTreeItem.SetIcon(1, _redPointTexture);
         }
     }
 
@@ -88,13 +89,27 @@ public partial class StateDebugger : MarginContainer
         _layerTreeItemDict[layer] = layerTreeItem;
 
         if (layer.ChildrenLayer == null) return;
-        foreach (var childLayer in layer.ChildrenLayer) CreateTreeChild(layerTreeItem, childLayer);
+        foreach (var childLayer in layer.ChildrenLayer)
+            CreateTreeChild(layerTreeItem, childLayer);
     }
 
-    private void UpdateStateDisplay(AbsState state)
+
+    public override void _Process(double delta)
     {
-        var treeItem = _stateTreeItemDict[state];
-        if (state.Status == JobRunningStatus.Running)
+        foreach (var job in _jobs)
+        {
+            var treeItem = _jobTreeItemDict[job];
+            if (job.Status == JobRunningStatus.Running)
+                treeItem.SetIcon(1, _greenPointTexture);
+            else
+                treeItem.SetIcon(1, _redPointTexture);
+        }
+    }
+
+    private void UpdateStateDisplay(IJob job)
+    {
+        var treeItem = _jobTreeItemDict[job];
+        if (job.Status == JobRunningStatus.Running)
             treeItem.SetIcon(1, _greenPointTexture);
         else
             treeItem.SetIcon(1, _redPointTexture);
@@ -108,15 +123,15 @@ public partial class StateDebugger : MarginContainer
         //_historyLabel.SetText(_historyInfo);
     }
 
-    private void OnStateChanged(AbsState state)
+    private void OnStateChanged(IJob state)
     {
         UpdateStateDisplay(state);
         //UpdateHistoryDisplay(state, status);
     }
 
-    private void OnStatePrepared(AbsState state)
+    private void OnStatePrepared(IJob state)
     {
-        var treeItem = _stateTreeItemDict[state];
+        var treeItem = _jobTreeItemDict[state];
         if (state.Status == JobRunningStatus.NoRun)
             treeItem.SetIcon(1, _orangePointTexture);
     }

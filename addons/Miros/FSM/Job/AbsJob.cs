@@ -86,11 +86,11 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual void _PhysicsUpdate(double delta)
     {
-        state.PhysicsUpdateFunc?.Invoke(state,delta);
+        state.PhysicsUpdateFunc?.Invoke(state, delta);
     }
 
     protected virtual void _Update(double delta)
     {
-        state.UpdateFunc?.Invoke(state,delta);
+        state.UpdateFunc?.Invoke(state, delta);
     }
 }

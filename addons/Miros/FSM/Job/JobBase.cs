@@ -4,12 +4,12 @@ using FSM.States;
 
 namespace FSM.Job;
 
-
 public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 {
     public string Name => state.Name;
     public Layer Layer => state.Layer;
     public int Priority => state.Priority;
+    public JobRunningStatus Status => state.Status;
     public bool IsStack => state.IsStack;
     public object Source => state.Source;
 

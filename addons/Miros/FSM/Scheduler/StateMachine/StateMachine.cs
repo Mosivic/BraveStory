@@ -1,18 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using FSM.Job;
 using FSM.States;
-using FSM.Job.Executor;
 
-namespace FSM.Scheduler;
 
-public class StateMachine(StateSet stateSet) : AbsScheduler()
+
+public class StateMachine : AbsScheduler
 {
     private readonly HashSet<ITransition> _anyTransitions = new();
     private readonly Dictionary<string, StateNode> _nodes = new();
-    private readonly JobExecutorProvider<StaticJobExecutor> _provider = new();
+
     private StateNode _current;
 
-    public override void Update(double delta)
+    public void AddJob(IJob job)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RemoveJob(IJob job)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasJobRunning(IJob job)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Update(double delta)
     {
         var transition = GetTransition();
         if (transition != null)
@@ -21,7 +36,7 @@ public class StateMachine(StateSet stateSet) : AbsScheduler()
         _provider.Executor.Update(_current.State, delta);
     }
 
-    public override void PhysicsUpdate(double delta)
+    public  void PhysicsUpdate(double delta)
     {
         _provider.Executor.PhysicsUpdate(_current.State, delta);
     }

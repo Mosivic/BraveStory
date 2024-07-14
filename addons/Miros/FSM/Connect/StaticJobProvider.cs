@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FSM.States;
+using Godot;
 
 namespace FSM.Job.Executor;
 
 public class StaticJobProvider : IJobProvider
 {
-    private static readonly Dictionary<Type, IJob> _jobs = new();
     private readonly Dictionary<AbsState, IJob> _statesJob = new();
 
     public IJob GetJob(AbsState state)
@@ -16,11 +17,15 @@ public class StaticJobProvider : IJobProvider
         return CreateJob(state);
     }
 
+    public IJob[] GetAllJobs()
+    {
+        return _statesJob.Values.ToArray();
+    }
+
     private IJob CreateJob(AbsState state)
     {
         var type = state.JobType;
         var job = (IJob)Activator.CreateInstance(type, [state]);
-        _jobs[type] = job;
         _statesJob[state] = job;
         return job;
     }

@@ -33,7 +33,7 @@ public class Evaluator<T>(Func<T> func) : IEvaluator
         return Compare(LastValue, expectValue, type);
     }
 
-    private bool Compare(T value,T expectValue, CompareType type = CompareType.Equals)
+    private bool Compare(T value, T expectValue, CompareType type = CompareType.Equals)
     {
         CalcFuncValue();
 
