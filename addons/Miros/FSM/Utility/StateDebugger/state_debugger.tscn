@@ -14,6 +14,7 @@ metadata/_edit_use_anchors_ = true
 
 [node name="TabContainer" type="TabContainer" parent="."]
 layout_mode = 2
+current_tab = 0
 
 [node name="States" type="MarginContainer" parent="TabContainer"]
 layout_mode = 2
