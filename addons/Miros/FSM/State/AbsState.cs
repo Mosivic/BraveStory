@@ -61,5 +61,4 @@ public abstract class AbsState
         if(!FromState.Contains(other))
             FromState.Add(other);
     }
-    
 }

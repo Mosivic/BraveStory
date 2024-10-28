@@ -149,7 +149,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         {
             Name = "AddHp",
             Layer = LayerMap.Buff,
-            JobType = typeof(Buff),
+            JobType = typeof(JobBuff),
             Modifiers =
             [
                 new Modifier
@@ -177,7 +177,6 @@ public partial class Player : CharacterBody2D, IDebugNode
         doubleJump.From(jump);
         doubleJump.From(fall);
         
-
         _connect = new Connect<StaticJobProvider, ConditionMachine>([
             idle, run, jump, doubleJump, fall, wallSliding
         ]);

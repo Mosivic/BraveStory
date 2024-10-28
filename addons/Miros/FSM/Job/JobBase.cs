@@ -17,7 +17,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
         _Enter();
     }
 
-    public virtual void Exit()
+    public void Exit()
     {
         if (state.Status == RunningStatus.Running)
             OnFailed();
