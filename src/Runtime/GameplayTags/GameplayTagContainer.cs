@@ -1,8 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 public class GameplayTagContainer
 {
+
+    // 定义事件
+    public event EventHandler<GameplayTagEventArgs> TagAdded;
+    public event EventHandler<GameplayTagEventArgs> TagRemoved;
+    public event EventHandler<GameplayTagContainerEventArgs> TagsChanged;
+    
+
     private readonly HashSet<GameplayTag> _tags = new();
     
     public bool HasTag(GameplayTag tag)
@@ -22,20 +30,47 @@ public class GameplayTagContainer
     
     public void AddTag(GameplayTag tag)
     {
-        if (tag.IsValid)
+        if (tag.IsValid && _tags.Add(tag))
         {
-            _tags.Add(tag);
+            OnTagAdded(tag);
+            OnTagsChanged(new[] { tag });
         }
     }
     
     public void RemoveTag(GameplayTag tag)
     {
-        _tags.Remove(tag);
+        if(_tags.Remove(tag)){
+            OnTagRemoved(tag);
+            OnTagsChanged(new[] { tag });
+        }
     }
     
     public void AppendTags(GameplayTagContainer other)
     {
-        _tags.UnionWith(other._tags);
+        var addedTags = other._tags.Except(_tags).ToList();
+        if (addedTags.Any())
+        {
+            _tags.UnionWith(addedTags);
+            foreach (var tag in addedTags)
+            {
+                OnTagAdded(tag);
+            }
+            OnTagsChanged(addedTags);
+        }
+    }
+
+    public void RemoveTags(GameplayTagContainer other)
+    {
+        var removedTags = _tags.Intersect(other._tags).ToList();
+        if (removedTags.Any())
+        {
+            _tags.ExceptWith(removedTags);
+            foreach (var tag in removedTags)
+            {
+                OnTagRemoved(tag);
+            }
+            OnTagsChanged(removedTags);
+        }
     }
 
     public bool HasTagExact(GameplayTag tag)
@@ -79,5 +114,20 @@ public class GameplayTagContainer
     public int GetTagCount()
     {
         return _tags.Count;
+    }
+
+    protected virtual void OnTagAdded(GameplayTag tag)
+    {
+        TagAdded?.Invoke(this, new GameplayTagEventArgs(tag, this));
+    }
+    
+    protected virtual void OnTagRemoved(GameplayTag tag)
+    {
+        TagRemoved?.Invoke(this, new GameplayTagEventArgs(tag, this));
+    }
+    
+    protected virtual void OnTagsChanged(IEnumerable<GameplayTag> tags)
+    {
+        TagsChanged?.Invoke(this, new GameplayTagContainerEventArgs(this, tags));
     }
 } 
