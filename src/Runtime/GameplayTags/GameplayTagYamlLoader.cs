@@ -1,7 +1,7 @@
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
-using System.IO;
 using System.Linq;
+using Godot;
 
 public class GameplayTagYamlLoader
 {
@@ -15,17 +15,19 @@ public class GameplayTagYamlLoader
     }
     
     public void LoadFromFile(string filePath)
-    {
-        if (!File.Exists(filePath))
+    {   
+        using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
+        if (file == null)
         {
-            throw new FileNotFoundException($"Tag config file not found: {filePath}");
+            GD.PrintErr($"Tag config file not found: {filePath}");
+            return;
         }
         
         var deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .Build();
             
-        var yaml = File.ReadAllText(filePath);
+        var yaml = file.GetAsText();
         var config = deserializer.Deserialize<GameplayTagsConfig>(yaml);
         
         foreach (var tagData in config.Tags)
@@ -50,7 +52,14 @@ public class GameplayTagYamlLoader
             .Build();
             
         var yaml = serializer.Serialize(config);
-        File.WriteAllText(filePath, yaml);
+        
+        using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Write);
+        if (file == null)
+        {
+            GD.PrintErr($"Cannot create or open file for writing: {filePath}");
+            return;
+        }
+        file.StoreString(yaml);
     }
     
     private void ProcessTagData(GameplayTagData tagData, string parentPath)
