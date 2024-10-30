@@ -8,7 +8,6 @@ public class TagInheritanceExample
     public void Initialize()
     {
         _tagManager = GameplayTagManager.Instance;
-        _inheritance = new GameplayTagInheritance();
         
         // 创建一些标签
         var weaponTag = _tagManager.RequestGameplayTag("Item.Weapon");

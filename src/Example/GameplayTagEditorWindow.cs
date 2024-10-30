@@ -43,10 +43,9 @@ public partial class GameplayTagEditorWindow : Window
 
 
 	private void Test(){
-		var tagManager = GameplayTagManager.Instance;
-		var tagInheritanc = new GameplayTagInheritance();
-
-		var tagYamlLoader = new GameplayTagYamlLoader(tagManager,tagInheritanc);
+		var tagYamlLoader = new GameplayTagYamlLoader();
 		tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
+		tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
+		
 	}
 } 

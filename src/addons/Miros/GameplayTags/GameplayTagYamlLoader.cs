@@ -6,12 +6,10 @@ using Godot;
 public class GameplayTagYamlLoader
 {
     private readonly GameplayTagManager _tagManager;
-    private readonly GameplayTagInheritance _inheritance;
     
-    public GameplayTagYamlLoader(GameplayTagManager tagManager, GameplayTagInheritance inheritance)
+    public GameplayTagYamlLoader()
     {
-        _tagManager = tagManager;
-        _inheritance = inheritance;
+        _tagManager = GameplayTagManager.Instance;
     }
     
     public void LoadFromFile(string filePath)
@@ -30,9 +28,12 @@ public class GameplayTagYamlLoader
         var yaml = file.GetAsText();
         var config = deserializer.Deserialize<GameplayTagsConfig>(yaml);
         
+        // 处理基础路径
+        string basePath = config.BasePath ?? "";
+        
         foreach (var tagData in config.Tags)
         {
-            ProcessTagData(tagData, "");
+            ProcessTagData(tagData, basePath);
         }
     }
     
@@ -69,10 +70,21 @@ public class GameplayTagYamlLoader
             
         var tag = _tagManager.RequestGameplayTag(fullPath);
         
+        // 处理多继承关系，支持完整路径
+        foreach (var inheritTag in tagData.Inherits)
+        {
+            // 如果继承标签包含点号，则视��完整路径
+            var parentTagPath = inheritTag.Contains('.') ? 
+                inheritTag : $"{parentPath}.{inheritTag}";
+                
+            var parentTag = _tagManager.RequestGameplayTag(parentTagPath);
+            GameplayTagInheritance.Instance.AddInheritance(tag, parentTag);
+        }
+        
         // 设置属性
         foreach (var prop in tagData.Properties)
         {
-            _inheritance.SetProperty(tag, prop.Key, prop.Value);
+            GameplayTagInheritance.Instance.SetProperty(tag, prop.Key, prop.Value);
         }
         
         // 处理子标签
@@ -87,7 +99,7 @@ public class GameplayTagYamlLoader
         var tagData = new GameplayTagData
         {
             Name = tag.ToString().Split('.').Last(),
-            Properties = _inheritance.GetAllProperties(tag)
+            Properties = GameplayTagInheritance.Instance.GetAllProperties(tag)
         };
         
         // 添加子标签

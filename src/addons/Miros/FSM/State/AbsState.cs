@@ -7,7 +7,7 @@ public abstract class AbsState
 {
     // Core
     public required string Name { get; init; }
-    public required Layer Layer { get; init; }
+    public required GameplayTag Layer {get;init;}
     public required Type JobType { get; init; }
     public required int Priority { get; init; }
     public object Source { get; init; }
@@ -27,8 +27,8 @@ public abstract class AbsState
     public List<AbsState> FromState { get; } = [];
     
     // Immunity
-    public Tag[] TagsInclusion { get; init; }
-    public Tag[] TagsExclusion { get; init; }
+    public GameplayTagContainer TagsInclusion { get; init; }
+    public GameplayTagContainer TagsExclusion { get; init; }
 
     // Stack
     public int StackMaxCount { get; init; } = 1;

@@ -5,10 +5,19 @@ using System.Linq;
 public class GameplayTagManager
 {
     private static GameplayTagManager _instance;
-    public static GameplayTagManager Instance => _instance ??= new GameplayTagManager();
+    public static GameplayTagManager Instance
+    {
+        get
+        {
+            _instance ??= new GameplayTagManager();
+            return _instance;
+        }
+    }
     
     private readonly Dictionary<string, GameplayTag> _registeredTags = new();
     private readonly Dictionary<GameplayTag, HashSet<GameplayTag>> _tagHierarchy = new();
+    
+    private GameplayTagManager() { }
     
     public GameplayTag RequestGameplayTag(string tagName)
     {

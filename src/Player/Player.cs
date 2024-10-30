@@ -1,17 +1,15 @@
 using BraveStory.Job;
-using BraveStory.Scripts;
 using FSM;
 using FSM.Evaluator;
 using FSM.Job;
 using FSM.Job.Executor;
 using FSM.Scheduler;
 using FSM.States.Buff;
-using FSM.Utility.StateDebugger;
 using Godot;
 
 namespace BraveStory.Player;
 
-public partial class Player : CharacterBody2D, IDebugNode
+public partial class Player : CharacterBody2D
 {
     private AnimationPlayer _animationPlayer;
     private Connect<StaticJobProvider, ConditionMachine> _connect;
@@ -20,10 +18,6 @@ public partial class Player : CharacterBody2D, IDebugNode
     private RayCast2D _handChecker;
     private PlayerProperties _properties;
 
-    public Layer GetRootLayer()
-    {
-        return LayerMap.Root;
-    }
 
     public IConnect GetConnect()
     {
@@ -37,16 +31,22 @@ public partial class Player : CharacterBody2D, IDebugNode
         _graphic = GetNode<Node2D>("Graphic");
         _handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
         _footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
-        _properties = new PlayerProperties();
+        
 
         Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new(IsOnFloor);
+        
+        var _tagManager = GameplayTagManager.Instance;
+        var movementTag = _tagManager.RequestGameplayTag("Movement");
+        var buffTag = _tagManager.RequestGameplayTag("Buff");
+        
+        _properties = new PlayerProperties();
 
         // Idle  
         var idle = new PlayerState(this, _properties)
         {
             Name = "Idle",
-            Layer = LayerMap.Movement,
+            Layer = movementTag,
             Priority = 5,
             JobType = typeof(PlayerJob),
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false),
@@ -56,8 +56,8 @@ public partial class Player : CharacterBody2D, IDebugNode
         var jump = new PlayerState(this, _properties)
         {
             Name = "Jump",
+            Layer = movementTag,
             Priority = 10,
-            Layer = LayerMap.Movement,
             JobType = typeof(PlayerJob),
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
                                 isOnFloor.Is(true),
@@ -74,7 +74,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         var run = new PlayerState(this, _properties)
         {
             JobType = typeof(PlayerJob),
-            Layer = LayerMap.Movement,
+            Layer = movementTag,
             Name = "Run",
             Priority = 2,
             IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true),
@@ -86,7 +86,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         var fall = new PlayerState(this, _properties)
         {
             Name = "Fall",
-            Layer = LayerMap.Movement,
+            Layer = movementTag,
             JobType = typeof(PlayerJob),
             Priority = 14,
             IsPreparedFunc = () => isOnFloor.Is(false),
@@ -98,7 +98,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         var landing = new PlayerState(this, _properties)
         {
             Name = "Last",
-            Layer = LayerMap.Movement,
+            Layer = movementTag,
             JobType = typeof(PlayerJob),
             IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
             Duration = 0.25,
@@ -112,7 +112,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         var doubleJump = new PlayerState(this, _properties)
         {
             Name = "DoubleJump",
-            Layer = LayerMap.Movement,
+            Layer = movementTag,
             JobType = typeof(PlayerJob),
             Priority = 15,
             IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
@@ -130,7 +130,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         var wallSliding = new PlayerState(this, _properties)
         {
             Name = "WallSliding",
-            Layer = LayerMap.Movement,
+            Layer = movementTag,
             JobType = typeof(PlayerJob),
             Priority = 16,
             EnterFunc = s =>
@@ -148,7 +148,7 @@ public partial class Player : CharacterBody2D, IDebugNode
         var addHpBuff = new BuffState
         {
             Name = "AddHp",
-            Layer = LayerMap.Buff,
+            Layer = buffTag,
             JobType = typeof(JobBuff),
             Modifiers =
             [

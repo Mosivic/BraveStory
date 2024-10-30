@@ -1,11 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://cxklyc3a0qesu"]
+[gd_scene load_steps=8 format=3 uid="uid://cxklyc3a0qesu"]
 
 [ext_resource type="Script" path="res://Scene/Test.cs" id="1_pntpl"]
 [ext_resource type="Texture2D" uid="uid://boub6swj2g75j" path="res://Art/Legacy-Fantasy - High Forest 2.3/Assets/Tree-Assets.png" id="1_wd2bu"]
 [ext_resource type="PackedScene" uid="uid://domj7ott646q7" path="res://Player/Player.tscn" id="2_bd8n3"]
 [ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="4_yrimo"]
 [ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="5_nnajl"]
-[ext_resource type="PackedScene" uid="uid://6jymmwqohfk4" path="res://addons/Miros/FSM/Utility/StateDebugger/state_debugger.tscn" id="6_hh0aq"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_22a03"]
 texture = ExtResource("1_wd2bu")
@@ -1054,25 +1053,3 @@ position = Vector2(336, 144)
 texture = ExtResource("5_nnajl")
 region_enabled = true
 region_rect = Rect2(112, 0, 96, 256)
-
-[node name="UI" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="StateDebugger" parent="UI" node_paths=PackedStringArray("WatchNode") instance=ExtResource("6_hh0aq")]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = 181.0
-offset_top = 85.0
-offset_right = 481.0
-offset_bottom = 385.0
-grow_horizontal = 0
-grow_vertical = 1
-WatchNode = NodePath("../../Player")

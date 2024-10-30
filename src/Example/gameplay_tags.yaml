@@ -1,3 +1,4 @@
+basePath: ""
 tags:
   - name: Item
     description: Base tag for all items
@@ -30,3 +31,4 @@ tags:
       - name: Debuff
         properties:
           duration: 5 
+  - name: Character

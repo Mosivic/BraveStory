@@ -72,7 +72,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
                 
 
                 var layerRunningJobsCount = RunningJobs[layer].Count;
-                if (layerRunningJobsCount < layer.OnRunningJobMaxCount)
+                if (layerRunningJobsCount < 3) //限定最大并行数
                 {
                     PushRunningJob(layer, job);
                 }
@@ -89,7 +89,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
     }
 
 
-    private void PushRunningJob(Layer layer, IJob job)
+    private void PushRunningJob(GameplayTag layer, IJob job)
     {
         WaitingJobs[layer].Remove(job);
         if (job.State.IsStack)
@@ -109,7 +109,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
     }
 
 
-    private void PopRunningJob(Layer layer, IJob job)
+    private void PopRunningJob(GameplayTag layer, IJob job)
     {
         RunningJobs[layer].Remove(job);
         var index = WaitingJobs[layer].FindIndex(j => job.State.Priority > j.State.Priority);

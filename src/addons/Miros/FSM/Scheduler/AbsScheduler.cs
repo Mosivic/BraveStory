@@ -5,6 +5,6 @@ namespace FSM.Scheduler;
 
 public abstract class AbsScheduler
 {
-    protected readonly Dictionary<Layer, List<IJob>> RunningJobs = new();
-    protected Dictionary<Layer, List<IJob>> WaitingJobs { get; set; } = new();
+    protected readonly Dictionary<GameplayTag, List<IJob>> RunningJobs = new();
+    protected Dictionary<GameplayTag, List<IJob>> WaitingJobs { get; set; } = new();
 }
