@@ -1,0 +1,32 @@
+tags:
+  - name: Item
+    description: Base tag for all items
+    properties:
+      weight: 1.0
+      stackable: false
+    children:
+      - name: Weapon
+        description: All weapon items
+        properties:
+          baseDamage: 10
+          durabilityMax: 100
+        children:
+          - name: Sword
+            properties:
+              attackSpeed: 1.2
+              weaponType: melee
+            children:
+              - name: Magic
+                properties:
+                  magicDamage: 5
+                  elementType: fire
+                  
+  - name: Status
+    description: Character status effects
+    children:
+      - name: Buff
+        properties:
+          duration: 10
+      - name: Debuff
+        properties:
+          duration: 5 
