@@ -3,34 +3,48 @@ using Godot;
 
 namespace FSM.Evaluator;
 
-public interface IEvaluator
-{
-}
 
 public class Evaluator<T>(Func<T> func) : IEvaluator
     where T : IComparable
 {
-    private ulong Checksum { get; set; }
-    private Func<T> Func { get; } = func;
-    private T Value { get; set; }
-    private T LastValue { get; set; }
+    private readonly Func<T> _func = func;
+    private ulong _checksum;
+    private T _value;
+    private T _lastValue;
+    private bool? _lastCompareResult;
+    private T _lastCompareValue;
+    private CompareType _lastCompareType;
 
     public string GetFuncValueString()
     {
         CalcFuncValue();
-        return Value.ToString();
+        return _value?.ToString() ?? "null";
     }
-
 
     public bool Is(T expectValue, CompareType type = CompareType.Equals)
     {
-        return Compare(Value, expectValue, type);
-    }
+        CalcFuncValue();
+        
+        if (_lastCompareValue != null && 
+            _lastCompareValue.Equals(expectValue) && 
+            _lastCompareType == type && 
+            _lastCompareResult.HasValue)
+        {
+            return _lastCompareResult.Value;
+        }
 
+        var result = Compare(_value, expectValue, type);
+        
+        _lastCompareValue = expectValue;
+        _lastCompareType = type;
+        _lastCompareResult = result;
+        
+        return result;
+    }
 
     public bool LastIs(T expectValue, CompareType type = CompareType.Equals)
     {
-        return Compare(LastValue, expectValue, type);
+        return Compare(_lastValue, expectValue, type);
     }
 
     private bool Compare(T value, T expectValue, CompareType type = CompareType.Equals)
@@ -53,11 +67,20 @@ public class Evaluator<T>(Func<T> func) : IEvaluator
     private void CalcFuncValue()
     {
         var frames = Engine.GetProcessFrames();
-        if (Checksum.Equals(frames))
+        if (_checksum == frames)
             return;
 
-        LastValue = Value;
-        Value = Func.Invoke();
-        Checksum = frames;
+        _lastValue = _value;
+        _value = _func();
+        _checksum = frames;
+        
+        _lastCompareResult = null;
     }
+
+    public string GetLastValueString()
+    {
+        CalcFuncValue();
+        return _lastValue?.ToString() ?? "null";
+    }
+
 }

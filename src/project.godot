@@ -15,6 +15,10 @@ run/main_scene="res://Scene/Test.tscn"
 config/features=PackedStringArray("4.2", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameInitializer="*res://addons/Miros/Core/GameInitializer.cs"
+
 [display]
 
 window/size/viewport_width=384

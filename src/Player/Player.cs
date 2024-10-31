@@ -25,16 +25,20 @@ public partial class Player : CharacterBody2D
     }
     
     public override void _Ready()
-    {
+    {   
+        // Compoents
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         _graphic = GetNode<Node2D>("Graphic");
         _handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
         _footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
         
-
+        // Evaluators
         Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new(IsOnFloor);
+        var isJumpKeyDown = EvaluatorManager.Instance.GetEvaluator<bool>(EvaluatorKeys.KEYDOWN_JUMP);
+        var isMoveKeyDown = EvaluatorManager.Instance.GetEvaluator<bool>(EvaluatorKeys.KEYDOWN_MOVE);
         
+
         var tagYamlLoader = new GameplayTagYamlLoader();
         tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
         tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
@@ -52,7 +56,7 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             Priority = 5,
             JobType = typeof(PlayerJob),
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(false),
+            IsPreparedFunc = () => isJumpKeyDown.Is(false),
             EnterFunc = s => PlayAnimation("idle")
         };
         // Jump
@@ -62,7 +66,7 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             Priority = 10,
             JobType = typeof(PlayerJob),
-            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
+            IsPreparedFunc = () => isJumpKeyDown.Is(true) &&
                                 isOnFloor.Is(true),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true),
             EnterFunc = s =>
@@ -80,7 +84,7 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             Name = "Run",
             Priority = 2,
-            IsPreparedFunc = () => Evaluators.IsMoveKeyDown.Is(true),
+            IsPreparedFunc = () => isMoveKeyDown.Is(true),
             EnterFunc = s => PlayAnimation("run"),
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
@@ -118,7 +122,7 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             JobType = typeof(PlayerJob),
             Priority = 15,
-            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true) &&
+            IsPreparedFunc = () => isJumpKeyDown.Is(true) &&
                                     isOnFloor.Is(false),
             IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true),
             EnterFunc = s =>
@@ -167,7 +171,7 @@ public partial class Player : CharacterBody2D
             Period = 1,
             StackMaxCount = 3,
             UsePrepareFuncAsRunCondition = false,
-            IsPreparedFunc = () => Evaluators.IsJumpKeyDown.Is(true),
+            IsPreparedFunc = () => isJumpKeyDown.Is(true),
             OnPeriodOverFunc = state => GD.Print("PeriodOver"),
             EnterFunc = _ => GD.Print("Enter"),
             ExitFunc = _ => GD.Print("Exit"),
