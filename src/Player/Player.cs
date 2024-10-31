@@ -23,8 +23,7 @@ public partial class Player : CharacterBody2D
     {
         return _connect;
     }
-
-
+    
     public override void _Ready()
     {
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -35,6 +34,10 @@ public partial class Player : CharacterBody2D
 
         Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
         Evaluator<bool> isOnFloor = new(IsOnFloor);
+        
+        var tagYamlLoader = new GameplayTagYamlLoader();
+        tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
+        tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
         
         var _tagManager = GameplayTagManager.Instance;
         var movementTag = _tagManager.RequestGameplayTag("Movement");

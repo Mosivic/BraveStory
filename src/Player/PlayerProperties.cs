@@ -20,9 +20,9 @@ public class PlayerProperties : CharacterProperties
         AirAcceleration.Value = GameplayTagInheritance.Instance.GetPropertyValue<float>(playerTag, "airAcceleration", 1000f);
     }
 
-    public override BindableProperty<float> Gravity { get; set; }
-    public override BindableProperty<float> RunSpeed { get; set; }
-    public override BindableProperty<float> JumpVelocity { get; set; }
-    public override BindableProperty<float> FloorAcceleration { get; set; }
-    public override BindableProperty<float> AirAcceleration { get; set; }
+    public override BindableProperty<float> Gravity { get; set; } = new();
+    public override BindableProperty<float> RunSpeed { get; set; } = new();
+    public override BindableProperty<float> JumpVelocity { get; set; } = new();
+    public override BindableProperty<float> FloorAcceleration { get; set; } = new();
+    public override BindableProperty<float> AirAcceleration { get; set; } = new();
 }

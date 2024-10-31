@@ -1,6 +1,6 @@
 ﻿namespace FSM;
 
-public class BindableProperty<T>(T value)
+public class BindableProperty<T>()
 {
-    public T Value { get; set; } = value;
+    public T Value { get; set; }
 }
