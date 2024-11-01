@@ -19,10 +19,6 @@ public partial class Player : CharacterBody2D
     private PlayerProperties _properties;
 
 
-    public IConnect GetConnect()
-    {
-        return _connect;
-    }
     
     public override void _Ready()
     {   
@@ -32,20 +28,34 @@ public partial class Player : CharacterBody2D
         _handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
         _footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
         
-        // Evaluators
-        Evaluator<bool> isVelocityYPositive = new(() => Velocity.Y >= 0f);
-        Evaluator<bool> isOnFloor = new(IsOnFloor);
-        var isJumpKeyDown = EvaluatorManager.Instance.GetEvaluator<bool>(EvaluatorKeys.KEYDOWN_JUMP);
-        var isMoveKeyDown = EvaluatorManager.Instance.GetEvaluator<bool>(EvaluatorKeys.KEYDOWN_MOVE);
-        
+        var tagManager = GameplayTagManager.Instance;
+        var evaluatorManager = EvaluatorManager.Instance;
 
-        var tagYamlLoader = new GameplayTagYamlLoader();
-        tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
-        tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
-        
-        var _tagManager = GameplayTagManager.Instance;
-        var movementTag = _tagManager.RequestGameplayTag("Movement");
-        var buffTag = _tagManager.RequestGameplayTag("Buff");
+        var entityTags = new GameplayTagContainer();
+
+        // 创建要应用的标签
+        var tagKeydownJump = tagManager.RequestGameplayTag("Condition.KeyDownJump");
+        var tagKeydownMove = tagManager.RequestGameplayTag("Condition.KeyDownMove");
+        var tagOnFloor = tagManager.RequestGameplayTag("Condition.OnFloor");
+        var tagVelocityYPositive = tagManager.RequestGameplayTag("Condition.VelocityYPositive");
+
+        // Evaluators
+        var isKeyDownJump = evaluatorManager.CreateTaggedEvaluator(
+            "is_keydown_jump",() => Input.IsActionJustPressed("jump"),entityTags,tagKeydownJump
+        );
+        var isKeyDownMove = evaluatorManager.CreateTaggedEvaluator(
+            "is_keydown_move",() => Input.IsActionJustPressed("jump"),entityTags,tagKeydownJump
+        );
+        var isOnFloor = evaluatorManager.CreateTaggedEvaluator(
+            "is_on_floor",IsOnFloor,entityTags,tagOnFloor
+        );
+        var isVelocityYPositive = evaluatorManager.CreateTaggedEvaluator(
+            "is_velocity_y_positive",() => Velocity.Y >= 0f,entityTags,tagVelocityYPositive
+        );
+
+
+        var movementTag = tagManager.RequestGameplayTag("Movement");
+        var buffTag = tagManager.RequestGameplayTag("Buff");
         
         _properties = new PlayerProperties();
 
@@ -56,7 +66,6 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             Priority = 5,
             JobType = typeof(PlayerJob),
-            IsPreparedFunc = () => isJumpKeyDown.Is(false),
             EnterFunc = s => PlayAnimation("idle")
         };
         // Jump
@@ -66,9 +75,7 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             Priority = 10,
             JobType = typeof(PlayerJob),
-            IsPreparedFunc = () => isJumpKeyDown.Is(true) &&
-                                isOnFloor.Is(true),
-            IsFailedFunc = () => Velocity.Y == 0 && isOnFloor.Is(true),
+            ConditionTags = [tagKeydownJump,tagOnFloor],
             EnterFunc = s =>
             {
                 PlayAnimation("jump");
@@ -84,35 +91,35 @@ public partial class Player : CharacterBody2D
             Layer = movementTag,
             Name = "Run",
             Priority = 2,
-            IsPreparedFunc = () => isMoveKeyDown.Is(true),
+            ConditionTags =[tagKeydownMove],
             EnterFunc = s => PlayAnimation("run"),
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
 
-        // Fall
-        var fall = new PlayerState(this, _properties)
-        {
-            Name = "Fall",
-            Layer = movementTag,
-            JobType = typeof(PlayerJob),
-            Priority = 14,
-            IsPreparedFunc = () => isOnFloor.Is(false),
-            EnterFunc = s => PlayAnimation("jump"),
-            PhysicsUpdateFunc = (state, d) => Move(d)
-        };
+        // // Fall
+        // var fall = new PlayerState(this, _properties)
+        // {
+        //     Name = "Fall",
+        //     Layer = movementTag,
+        //     JobType = typeof(PlayerJob),
+        //     Priority = 14,
+        //     IsPreparedFunc = () => isOnFloor.Is(false),
+        //     EnterFunc = s => PlayAnimation("jump"),
+        //     PhysicsUpdateFunc = (state, d) => Move(d)
+        // };
 
-        // Landing
-        var landing = new PlayerState(this, _properties)
-        {
-            Name = "Last",
-            Layer = movementTag,
-            JobType = typeof(PlayerJob),
-            IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
-            Duration = 0.25,
-            IsFailedFunc = () => false,
-            Priority = 15,
-            EnterFunc = s => PlayAnimation("landing")
-        };
+        // // Landing
+        // var landing = new PlayerState(this, _properties)
+        // {
+        //     Name = "Last",
+        //     Layer = movementTag,
+        //     JobType = typeof(PlayerJob),
+        //     IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
+        //     Duration = 0.25,
+        //     IsFailedFunc = () => false,
+        //     Priority = 15,
+        //     EnterFunc = s => PlayAnimation("landing")
+        // };
 
 
         // Double Jump
@@ -180,9 +187,6 @@ public partial class Player : CharacterBody2D
             Priority = 0
         };
 
-
-        doubleJump.From(jump);
-        doubleJump.From(fall);
 
         _connect = new Connect<StaticJobProvider, ConditionMachine>([
             idle, run, jump, doubleJump, fall, wallSliding

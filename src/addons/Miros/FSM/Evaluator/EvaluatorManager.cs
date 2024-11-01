@@ -86,4 +86,41 @@ public class EvaluatorManager
     {
         return new Dictionary<string, IEvaluator>(_evaluators);
     }
+
+    // 创建带标签的评估器
+    public TaggedEvaluator<T> CreateTaggedEvaluator<T>(
+        string key, 
+        Func<T> func,
+        GameplayTagContainer targetTags,
+        GameplayTag tagToApply) where T : IComparable
+    {
+        if (_evaluators.ContainsKey(key))
+        {
+            GD.PrintErr($"Evaluator with key {key} already exists!");
+            return GetTaggedEvaluator<T>(key);
+        }
+
+        var evaluator = new TaggedEvaluator<T>(func, targetTags, tagToApply);
+        _evaluators[key] = evaluator;
+        _evaluatorTypes[key] = typeof(T);
+        return evaluator;
+    }
+
+    // 获取带标签的评估器
+    public TaggedEvaluator<T> GetTaggedEvaluator<T>(string key) where T : IComparable
+    {
+        if (!_evaluators.ContainsKey(key))
+        {
+            GD.PrintErr($"Evaluator with key {key} not found!");
+            return null;
+        }
+
+        if (_evaluatorTypes[key] != typeof(T))
+        {
+            GD.PrintErr($"Type mismatch for evaluator {key}. Expected {_evaluatorTypes[key]}, got {typeof(T)}");
+            return null;
+        }
+
+        return (TaggedEvaluator<T>)_evaluators[key];
+    }
 } 

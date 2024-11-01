@@ -31,6 +31,7 @@ public partial class GameInitializer : Node
         base._Ready();
         if (_isInitialized) return;
         
+        InitializeGameplayTagSystem();
         InitializeEvaluators();
         InitializeManagers();
         InitializeServices();
@@ -75,9 +76,9 @@ public partial class GameInitializer : Node
         {
             // 这里初始化其他管理器
             // 例如：音频管理器、资源管理器、UI管理器等
-            InitializeAudioManager();
-            InitializeResourceManager();
-            InitializeUIManager();
+            // InitializeAudioManager();
+            // InitializeResourceManager();
+            // InitializeUIManager();
             
             GD.Print("Managers initialized!");
         }
@@ -94,9 +95,9 @@ public partial class GameInitializer : Node
         {
             // 这里初始化各种服务
             // 例如：存档服务、网络服务、成就系统等
-            InitializeSaveSystem();
-            InitializeNetworkService();
-            InitializeAchievementSystem();
+            // InitializeSaveSystem();
+            // InitializeNetworkService();
+            // InitializeAchievementSystem();
             
             // 在开发模式下初始化调试管理器
             #if DEBUG
@@ -146,6 +147,13 @@ public partial class GameInitializer : Node
     private void InitializeAchievementSystem()
     {
         // 实现成就系统初始化逻辑
+    }
+
+    private void InitializeGameplayTagSystem()
+    {
+        var tagYamlLoader = new GameplayTagYamlLoader();
+        tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
+        tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
     }
 
     // 游戏退出时的清理工作

@@ -22,13 +22,14 @@ public abstract class AbsState
     // Period
     public double Period { get; init; } = 0;
     public double PeriodElapsed { get; set; }
-    
-    // Transition
-    public List<AbsState> FromState { get; } = [];
+
     
     // Immunity
     public GameplayTagContainer TagsInclusion { get; init; }
     public GameplayTagContainer TagsExclusion { get; init; }
+
+    public HashSet<GameplayTag> ConditionTags { get; init; }
+    public HashSet<GameplayTag> BlockingTags { get; init; }
 
     // Stack
     public int StackMaxCount { get; init; } = 1;
@@ -38,10 +39,7 @@ public abstract class AbsState
     public StateStackType StackType { get; init; } = StateStackType.Target;
 
     // Function
-    public bool UsePrepareFuncAsRunCondition { get; init; } = true;
-    public Func<bool> IsPreparedFunc { get; init; }
-    public Func<bool> IsSucceedFunc { get; init; }
-    public Func<bool> IsFailedFunc { get; init; }
+
     public Action<AbsState> EnterFunc { get; init; }
     public Action<AbsState> ExitFunc { get; init; }
     public Action<AbsState> OnSucceedFunc { get; init; }
@@ -54,11 +52,7 @@ public abstract class AbsState
     public Action<AbsState> OnPeriodOverFunc { get; init; }
     public Action<AbsState, double> UpdateFunc { get; init; }
     public Action<AbsState, double> PhysicsUpdateFunc { get; init; }
-    
-    
-    public void From(AbsState other)
-    {
-        if(!FromState.Contains(other))
-            FromState.Add(other);
-    }
+
+
+
 }
