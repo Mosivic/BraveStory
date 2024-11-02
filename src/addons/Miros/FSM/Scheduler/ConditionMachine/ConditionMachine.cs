@@ -1,13 +1,20 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using FSM.Job;
+using FSM.States;
 
 namespace FSM.Scheduler;
 
 public class ConditionMachine : AbsScheduler, IScheduler
 {
+    protected readonly Dictionary<GameplayTag, List<IJob>> RunningJobs = new();
+    protected Dictionary<GameplayTag, List<IJob>> WaitingJobs { get; set; } = new();
+
     public void AddJob(IJob job)
     {
         var layer = job.State.Layer;
+
         if (!WaitingJobs.ContainsKey(layer))
         {
             WaitingJobs[layer] = [];

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 using FSM.Scheduler;
 using FSM.States;
 
@@ -14,8 +15,10 @@ public class Connect<TJobProvider, TScheduler> : IConnect
         JobProvider = new TJobProvider();
         Scheduler = new TScheduler();
 
-        foreach (var job in states.Select(state => JobProvider.GetJob(state)))
+        foreach(var state in states){
+            var job = JobProvider.GetJob(state);
             Scheduler.AddJob(job);
+        }
     }
 
     private TJobProvider JobProvider { get; }
@@ -51,5 +54,9 @@ public class Connect<TJobProvider, TScheduler> : IConnect
         return JobProvider.GetAllJobs();
     }
 
- 
+
+    public TScheduler GetScheduler(){
+        return Scheduler;
+    }
+
 }

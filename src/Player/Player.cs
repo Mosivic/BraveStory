@@ -1,3 +1,4 @@
+using System.Data.Common;
 using FSM.Job;
 using FSM.Job.Executor;
 using FSM.Scheduler;
@@ -11,7 +12,7 @@ namespace BraveStory.Player;
 public partial class Player : CharacterBody2D
 {
     private AnimationPlayer _animationPlayer;
-    private Connect<StaticJobProvider, ConditionMachine> _connect;
+    private Connect<StaticJobProvider, MultiLayerStateMachine> _connect;
     private RayCast2D _footChecker;
     private Node2D _graphic;
     private RayCast2D _handChecker;
@@ -186,9 +187,22 @@ public partial class Player : CharacterBody2D
         };
 
 
-        _connect = new Connect<StaticJobProvider, ConditionMachine>([
+        _connect = new Connect<StaticJobProvider, MultiLayerStateMachine>([
             idle, run, jump, doubleJump,fall, wallSliding
         ]);
+
+        var transitions = new StateTransitionContainer();
+
+        // 添加转换规则
+        // Idle -> Run/Jump/Fall
+        transitions.AddTransitions(idle, [run,jump,fall]);
+        
+        // Run -> Idle/Jump
+        transitions.AddTransitions(run, [idle,jump]);
+
+        transitions.AddTransitions(fall,[idle,run]);
+
+        _connect.GetScheduler().AddLayer(Tags.LayerMovement,idle,transitions);
 
         var debugWindow = new TagDebugWindow(ownedTags.GetTags());
         AddChild(debugWindow);
