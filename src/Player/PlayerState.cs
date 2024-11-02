@@ -2,8 +2,8 @@
 
 namespace BraveStory.Player;
 
-public class PlayerState(Player host, PlayerProperties properties) : CharacterState<Player, PlayerProperties>
+public class PlayerState(Player host, PlayerData properties) : CharacterState<Player, PlayerData>
 {
     public override Player Host { get; set; } = host;
-    public override PlayerProperties Properties { get; set; } = properties;
+    public override PlayerData Properties { get; set; } = properties;
 }

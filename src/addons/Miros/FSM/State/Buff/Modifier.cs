@@ -22,7 +22,7 @@ public struct ModifierMagnitude
 public class Modifier
 {
     public float Record;
-    public required BindableProperty<float> Property { get; set; }
+    public required float Property { get; set; }
     public required float Affect { get; set; }
     public required BuffModifierOperator Operator { get; set; }
     public ModifierMagnitude Magnitude { get; set; }

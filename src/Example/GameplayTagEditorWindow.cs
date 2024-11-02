@@ -43,9 +43,6 @@ public partial class GameplayTagEditorWindow : Window
 
 
 	private void Test(){
-		var tagYamlLoader = new GameplayTagYamlLoader();
-		tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
-		tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
 		
 	}
 } 

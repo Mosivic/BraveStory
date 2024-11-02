@@ -1,0 +1,9 @@
+basePath: "Condition"
+tags:
+  - name: KeyDownJump
+  - name: KeyDownMove
+  - name: OnFloor
+  - name: OnAir
+  - name: VelocityYPositive
+  - name: HandColliding
+  - name: FootColliding

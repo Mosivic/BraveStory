@@ -20,7 +20,7 @@ tags:
               - name: Magic
                 properties:
                   magicDamage: 5
-                  elementType: fire
+                  elementType: true
                   
   - name: Status
     description: Character status effects
