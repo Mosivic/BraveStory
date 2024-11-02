@@ -7,7 +7,7 @@ public class AbilityTagExample
     public void Initialize()
     {
         _tagManager = GameplayTagManager.Instance;
-        _abilityTags = new GameplayTagContainer();
+        _abilityTags = new GameplayTagContainer([]);
         
         // 注册技能相关的标签
         var abilityTag = _tagManager.RequestGameplayTag("Ability");

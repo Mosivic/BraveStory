@@ -117,20 +117,20 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
         for (var i = 0; i < buffState.Modifiers.Count; i++)
         {
             var modifier = buffState.Modifiers[i];
-            modifier.Record = modifier.Property.Value;
+            modifier.Record = modifier.Property;
             switch (modifier.Operator)
             {
                 case BuffModifierOperator.Add:
-                    modifier.Property.Value += modifier.Affect;
+                    modifier.Property += modifier.Affect;
                     break;
                 case BuffModifierOperator.Multiply:
-                    modifier.Property.Value *= modifier.Affect;
+                    modifier.Property *= modifier.Affect;
                     break;
                 case BuffModifierOperator.Divide:
-                    modifier.Property.Value /= modifier.Affect;
+                    modifier.Property /= modifier.Affect;
                     break;
                 case BuffModifierOperator.Override:
-                    modifier.Property.Value = modifier.Affect;
+                    modifier.Property = modifier.Affect;
                     break;
                 case BuffModifierOperator.Invalid:
                     break;
@@ -146,7 +146,7 @@ public class JobBuff(BuffState buffState) : JobBase(buffState)
     {
         foreach (var modifier in buffState.Modifiers)
         {
-            modifier.Property.Value = modifier.Record;
+            modifier.Property = modifier.Record;
             buffState.OnCancelModifierFunc?.Invoke(modifier);
         }
     }

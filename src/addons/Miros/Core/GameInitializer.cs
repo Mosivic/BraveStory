@@ -31,7 +31,6 @@ public partial class GameInitializer : Node
         base._Ready();
         if (_isInitialized) return;
         
-        InitializeGameplayTagSystem();
         InitializeEvaluators();
         InitializeManagers();
         InitializeServices();
@@ -44,27 +43,6 @@ public partial class GameInitializer : Node
     private void InitializeEvaluators()
     {
         var evaluatorManager = EvaluatorManager.Instance;
-
-        // 游戏状态评估器
-        // evaluatorManager.CreateEvaluator(
-        //     EvaluatorKeys.GAME_SCORE, 
-        //     () => _gameScore
-        // );
-        
-        // evaluatorManager.CreateEvaluator(
-        //     EvaluatorKeys.GAME_TIME, 
-        //     () => _gameTime
-        // );
-
-        evaluatorManager.CreateEvaluator(
-            EvaluatorKeys.KEYDOWN_JUMP,
-            () => Input.IsActionJustPressed("jump")
-        );
-
-        evaluatorManager.CreateEvaluator(
-            EvaluatorKeys.KEYDOWN_MOVE,
-            () => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"))
-        );
 
         GD.Print("Evaluators initialized!");
     }
@@ -147,13 +125,6 @@ public partial class GameInitializer : Node
     private void InitializeAchievementSystem()
     {
         // 实现成就系统初始化逻辑
-    }
-
-    private void InitializeGameplayTagSystem()
-    {
-        var tagYamlLoader = new GameplayTagYamlLoader();
-        tagYamlLoader.LoadFromFile("res://Example/gameplay_tags.yaml");
-        tagYamlLoader.LoadFromFile("res://Example/character_tags.yaml");
     }
 
     // 游戏退出时的清理工作

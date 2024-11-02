@@ -11,7 +11,7 @@ public class GameplayTagQueryExample
         var stunTag = tagManager.RequestGameplayTag("Status.Stun");
         
         // 创建一个标签容器
-        var container = new GameplayTagContainer();
+        var container = new GameplayTagContainer([]);
         container.AddTag(swordTag);
         
         // 基础查询

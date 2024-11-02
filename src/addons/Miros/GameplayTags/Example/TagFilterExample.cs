@@ -12,7 +12,7 @@ public class GameplayTagFilterExample
         var rareTag = tagManager.RequestGameplayTag("Quality.Rare");
         
         // 创建一个测试物品
-        var itemTags = new GameplayTagContainer();
+        var itemTags = new GameplayTagContainer([]);
         itemTags.AddTag(swordTag);
         itemTags.AddTag(rareTag);
         

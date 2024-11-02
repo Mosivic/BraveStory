@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BraveStory;
 
 public class GameplayTagContainer(HashSet<GameplayTag> tags)
 {
@@ -12,7 +13,8 @@ public class GameplayTagContainer(HashSet<GameplayTag> tags)
     
 
     private readonly HashSet<GameplayTag> _tags = tags;
-    
+
+
     public bool HasTag(GameplayTag tag)
     {
         return _tags.Contains(tag);
@@ -20,14 +22,28 @@ public class GameplayTagContainer(HashSet<GameplayTag> tags)
     
     public bool HasAny(GameplayTagContainer other)
     {
+        if (other==null) return false;
         return _tags.Overlaps(other._tags);
+    }
+    public bool HasAny(HashSet<GameplayTag> other)
+    {
+        if (other==null) return false;
+        return _tags.Overlaps(other);
     }
     
     public bool HasAll(GameplayTagContainer other)
     {
+        if (other==null) return false;
         return _tags.IsSupersetOf(other._tags);
     }
     
+    public bool HasAll(HashSet<GameplayTag> other)
+    {
+        if (other==null) return false;
+        return _tags.IsSupersetOf(other);
+    }
+
+
     public void AddTag(GameplayTag tag)
     {
         if (tag.IsValid && _tags.Add(tag))

@@ -4,6 +4,6 @@ using FSM.States;
 
 namespace BraveStory.Player;
 
-internal class PlayerJob(HostState<Player,PlayerData> state) : JobBase(state)
+internal class PlayerJob(HostState<Player> state) : JobBase(state)
 {
 }

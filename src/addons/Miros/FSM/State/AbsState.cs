@@ -25,6 +25,8 @@ public abstract class AbsState
     public required GameplayTagContainer OwnedTags {get;init;}
     public HashSet<GameplayTag> RequiredTags { get; init; }
     public HashSet<GameplayTag> BlockedTags { get; init; }
+    public HashSet<GameplayTag> SucceedTags { get; init; }
+    public HashSet<GameplayTag> FailedTags { get; init; }
 
     // Stack
     public int StackMaxCount { get; init; } = 1;
@@ -34,7 +36,6 @@ public abstract class AbsState
     public StateStackType StackType { get; init; } = StateStackType.Target;
 
     // Function
-
     public Action<AbsState> EnterFunc { get; init; }
     public Action<AbsState> ExitFunc { get; init; }
     public Action<AbsState> OnSucceedFunc { get; init; }

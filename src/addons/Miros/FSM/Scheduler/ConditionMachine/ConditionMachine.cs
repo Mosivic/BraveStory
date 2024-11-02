@@ -63,10 +63,6 @@ public class ConditionMachine : AbsScheduler, IScheduler
             {
                 var job = WaitingJobs[layer][i];
                 
-                if(job.State.FromState.Count!=0 &&
-                    !RunningJobs[layer].Exists((j =>job.State.FromState.Contains(j.State))))
-                    continue;
-                
                 if (!job.CanEnter()) 
                     continue;
                 

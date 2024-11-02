@@ -6,7 +6,7 @@ public partial class TagEventExample : Node
     
     public override void _Ready()
     {
-        _tags = new GameplayTagContainer();
+        _tags = new GameplayTagContainer([]);
         
         // 注册事件处理器
         var eventManager = GameplayTagEventManager.Instance;

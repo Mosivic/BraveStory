@@ -3,7 +3,7 @@ using Godot;
 
 public partial class GameplayEffectComponent : Node
 {
-    private GameplayTagContainer _ownerTags = new();
+    private GameplayTagContainer _ownerTags = new([]);
     private Dictionary<GameplayEffect, double> _activeEffects = new();
     
     public override void _Ready()

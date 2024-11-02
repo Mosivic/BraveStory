@@ -1,6 +1,7 @@
 ﻿using FSM.States;
 
 namespace FSM.Job;
+// 对自定义回调函数的处理
 
 public abstract class AbsJob(AbsState state)
 {
@@ -22,13 +23,6 @@ public abstract class AbsJob(AbsState state)
     protected virtual void _Resume()
     {
         state.ResumeFunc?.Invoke(state);
-    }
-
-    protected virtual bool _IsPrepared()
-    {
-        if (state.IsPreparedFunc != null)
-            return state.IsPreparedFunc.Invoke();
-        return true;
     }
 
     protected virtual void _OnSucceed()
@@ -65,23 +59,12 @@ public abstract class AbsJob(AbsState state)
 
     protected virtual bool _IsSucceed()
     {
-        var isSucceed = false;
-        if (state.IsSucceedFunc != null)
-            isSucceed = state.IsSucceedFunc.Invoke();
-
-        return isSucceed;
+        return false;
     }
 
     protected virtual bool _IsFailed()
     {
-        var isFailed = false;
-
-        if (state.IsFailedFunc != null)
-            isFailed = state.IsFailedFunc.Invoke();
-        else if (state.UsePrepareFuncAsRunCondition && state.IsPreparedFunc != null)
-            isFailed = !state.IsPreparedFunc.Invoke();
-
-        return isFailed;
+        return false;
     }
 
     protected virtual void _PhysicsUpdate(double delta)

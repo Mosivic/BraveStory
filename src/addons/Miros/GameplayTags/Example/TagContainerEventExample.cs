@@ -9,7 +9,7 @@ public class TagEventContainerExample
     public void Initialize()
     {
         _tagManager = GameplayTagManager.Instance;
-        _tags = new GameplayTagContainer();
+        _tags = new GameplayTagContainer([]);
         
         // 订阅事件
         _tags.TagAdded += OnTagAdded;

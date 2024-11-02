@@ -4,8 +4,15 @@ using FSM.States;
 
 namespace FSM.Job;
 
-public abstract class JobBase(AbsState state) : AbsJob(state), IJob
+public abstract class JobBase : AbsJob, IJob
 {
+    private protected readonly AbsState state;
+
+    protected JobBase(AbsState state) : base(state)
+    {
+        this.state = state;
+    }
+
     public AbsState State => state;
 
     public virtual void Enter()
@@ -85,7 +92,7 @@ public abstract class JobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual bool CanEnter()
     {
-        return _IsPrepared();
+        return state.OwnedTags.HasAll(state.RequiredTags) && !state.OwnedTags.HasAny(state.BlockedTags);
     }
 
     public virtual bool CanExit()
