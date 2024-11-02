@@ -4,6 +4,7 @@ using FSM.Scheduler;
 using FSM.States;
 using FSM.States.Buff;
 using Godot;
+using YamlDotNet.Core.Tokens;
 
 namespace BraveStory.Player;
 
@@ -29,22 +30,25 @@ public partial class Player : CharacterBody2D
         var ownedTags = new GameplayTagContainer([Tags.Player]);
 
         // Evaluators
-        var isKeyDownJump = evaluatorManager.CreateTaggedEvaluator(
+        var isKeyDownJump = evaluatorManager.CreateEvaluator(
             "is_keydown_jump",() => Input.IsActionJustPressed("jump"),ownedTags,Tags.KeyDownJump
         );
-        var isKeyDownMove = evaluatorManager.CreateTaggedEvaluator(
-            "is_keydown_move",() => Input.IsActionJustPressed("jump"),ownedTags,Tags.KeyDownMove
+        var isKeyDownMove = evaluatorManager.CreateEvaluator(
+            "is_keydown_move",() => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")),ownedTags,Tags.KeyDownMove
         );
-        var isOnFloor = evaluatorManager.CreateTaggedEvaluator(
+        var isOnFloor = evaluatorManager.CreateEvaluator(
             "is_on_floor",IsOnFloor,ownedTags,Tags.OnFloor
         );
-        var isVelocityYPositive = evaluatorManager.CreateTaggedEvaluator(
-            "is_velocity_y_positive",() => Velocity.Y >= 0f,ownedTags,Tags.VelocityYPositive
+        var isOnAir = evaluatorManager.CreateEvaluator(
+            "is_on_air",()=>!IsOnFloor(),ownedTags,Tags.OnAir
         );
-        var isFootColliding = evaluatorManager.CreateTaggedEvaluator(
+        var isVelocityYPositive = evaluatorManager.CreateEvaluator(
+            "is_velocity_y_positive",() => Velocity.Y > 0f,ownedTags,Tags.VelocityYPositive
+        );
+        var isFootColliding = evaluatorManager.CreateEvaluator(
             "is_foot_colliding",() => _footChecker.IsColliding(),ownedTags,Tags.FootColliding
         );
-        var isHandColliding = evaluatorManager.CreateTaggedEvaluator(
+        var isHandColliding = evaluatorManager.CreateEvaluator(
             "is_hand_colliding",() => _handChecker.IsColliding(),ownedTags,Tags.HandColliding
         );
         
@@ -89,17 +93,18 @@ public partial class Player : CharacterBody2D
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
 
-        // // Fall
-        // var fall = new PlayerState(this, _data)
-        // {
-        //     Name = "Fall",
-        //     Layer = movementTag,
-        //     JobType = typeof(PlayerJob),
-        //     Priority = 14,
-        //     IsPreparedFunc = () => isOnFloor.Is(false),
-        //     EnterFunc = s => PlayAnimation("jump"),
-        //     PhysicsUpdateFunc = (state, d) => Move(d)
-        // };
+        // Fall
+        var fall = new HostState<Player>(this)
+        {
+            Name = "Fall",
+            Layer = Tags.LayerMovement,
+            OwnedTags =ownedTags,
+            JobType = typeof(PlayerJob),
+            Priority = 14,
+            RequiredTags = [Tags.OnAir],
+            EnterFunc = s => PlayAnimation("jump"),
+            PhysicsUpdateFunc = (state, d) => Move(d)
+        };
 
         // // Landing
         // var landing = new PlayerState(this, _data)
@@ -182,13 +187,18 @@ public partial class Player : CharacterBody2D
 
 
         _connect = new Connect<StaticJobProvider, ConditionMachine>([
-            idle, run, jump, doubleJump, wallSliding
+            idle, run, jump, doubleJump,fall, wallSliding
         ]);
+
+        var debugWindow = new TagDebugWindow(ownedTags.GetTags());
+        AddChild(debugWindow);
+
     }
 
     public override void _Process(double delta)
     {
         _connect.Update(delta);
+        EvaluatorManager.Instance.ProcessEvaluators();
     }
 
     public override void _PhysicsProcess(double delta)

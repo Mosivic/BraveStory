@@ -30,7 +30,7 @@ class TagProperty:
         if isinstance(self.default_value, str):
             return f'"{self.default_value}"'
         if isinstance(self.default_value, bool):
-            return str(self.default_value).lower()
+            return str(self.default_value)
         if self.type_name == "float":  # 为float类型添加F后缀
             return f"{self.default_value}f"
         return str(self.default_value)

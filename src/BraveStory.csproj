@@ -17,9 +17,6 @@
     <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\StateMachine\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="addons\Miros\FSM\Filter\" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="addons\Miros\FSM\Utility\StateDebugger\state_debugger.tscn" />
     <Content Include="Player\Player.tscn" />
     <Content Include="Scene\Test.tscn" />

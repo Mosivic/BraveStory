@@ -1,4 +1,5 @@
 ﻿using FSM.States;
+using Godot;
 
 namespace FSM.Job;
 // 对自定义回调函数的处理
@@ -7,11 +8,13 @@ public abstract class AbsJob(AbsState state)
 {
     protected virtual void _Enter()
     {
+        GD.Print($"[Job] Enter {state.Name}.");
         state.EnterFunc?.Invoke(state);
     }
 
     protected virtual void _Exit()
     {
+        GD.Print($"[Job] Exit {state.Name}.");
         state.ExitFunc?.Invoke(state);
     }
 

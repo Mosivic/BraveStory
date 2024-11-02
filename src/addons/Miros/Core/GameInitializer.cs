@@ -77,12 +77,6 @@ public partial class GameInitializer : Node
             // InitializeNetworkService();
             // InitializeAchievementSystem();
             
-            // 在开发模式下初始化调试管理器
-            #if DEBUG
-            AddChild(DebugManager.Instance);
-            GD.Print("Debug manager initialized!");
-            #endif
-            
             GD.Print("Services initialized!");
         }
         catch (Exception e)

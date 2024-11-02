@@ -33,13 +33,13 @@ public class GameplayTagContainer(HashSet<GameplayTag> tags)
     
     public bool HasAll(GameplayTagContainer other)
     {
-        if (other==null) return false;
+        if (other==null) return true;
         return _tags.IsSupersetOf(other._tags);
     }
     
     public bool HasAll(HashSet<GameplayTag> other)
     {
-        if (other==null) return false;
+        if (other==null) return true;
         return _tags.IsSupersetOf(other);
     }
 
@@ -127,6 +127,10 @@ public class GameplayTagContainer(HashSet<GameplayTag> tags)
         return _tags.ToList();
     }
     
+    public HashSet<GameplayTag> GetTags(){
+        return _tags;
+    }
+
     public int GetTagCount()
     {
         return _tags.Count;

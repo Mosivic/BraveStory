@@ -23,7 +23,6 @@ public class GameplayTagManager
     {
         if (string.IsNullOrEmpty(tagName)) return default;
         
-        tagName = tagName.ToLower();
         if (_registeredTags.TryGetValue(tagName, out var existingTag))
         {
             return existingTag;
@@ -145,7 +144,7 @@ public class GameplayTagManager
     // 检查标签名是否已注册
     public bool IsTagNameRegistered(string tagName)
     {
-        return _registeredTags.ContainsKey(tagName?.ToLower() ?? string.Empty);
+        return _registeredTags.ContainsKey(tagName ?? string.Empty);
     }
     
     // 清除所有注册的标签（谨慎使用）
@@ -161,17 +160,17 @@ public class GameplayTagManager
         if (string.IsNullOrEmpty(oldPath) || string.IsNullOrEmpty(newPath)) return false;
         
         // 检查新路径是否已存在
-        if (_registeredTags.ContainsKey(newPath.ToLower())) return false;
+        if (_registeredTags.ContainsKey(newPath)) return false;
         
         // 获取旧标签
-        if (!_registeredTags.TryGetValue(oldPath.ToLower(), out var oldTag)) return false;
+        if (!_registeredTags.TryGetValue(oldPath, out var oldTag)) return false;
         
         // 创建新标签
         var newTag = new GameplayTag(newPath);
         
         // 更新注册表
-        _registeredTags.Remove(oldPath.ToLower());
-        _registeredTags[newPath.ToLower()] = newTag;
+        _registeredTags.Remove(oldPath);
+        _registeredTags[newPath] = newTag;
         
         // 更新层级关系
         if (_tagHierarchy.TryGetValue(oldTag, out var children))

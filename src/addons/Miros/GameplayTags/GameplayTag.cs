@@ -8,7 +8,7 @@ public readonly struct GameplayTag : IEquatable<GameplayTag>
     
     public GameplayTag(string tagName)
     {
-        _tagName = tagName?.ToLower() ?? string.Empty;
+        _tagName = tagName;
     }
     
     public bool Equals(GameplayTag other)
