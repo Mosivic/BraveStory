@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class GameplayTagContainer
+public class GameplayTagContainer(HashSet<GameplayTag> tags)
 {
 
     // 定义事件
@@ -11,7 +11,7 @@ public class GameplayTagContainer
     public event EventHandler<GameplayTagContainerEventArgs> TagsChanged;
     
 
-    private readonly HashSet<GameplayTag> _tags = new();
+    private readonly HashSet<GameplayTag> _tags = tags;
     
     public bool HasTag(GameplayTag tag)
     {

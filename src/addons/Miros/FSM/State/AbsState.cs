@@ -16,20 +16,15 @@ public abstract class AbsState
 
     // Duration
     public double Duration { get; init; } = 0;
-
     public double DurationElapsed { get; set; }
-
     // Period
     public double Period { get; init; } = 0;
     public double PeriodElapsed { get; set; }
 
-    
-    // Immunity
-    public GameplayTagContainer TagsInclusion { get; init; }
-    public GameplayTagContainer TagsExclusion { get; init; }
-
-    public HashSet<GameplayTag> ConditionTags { get; init; }
-    public HashSet<GameplayTag> BlockingTags { get; init; }
+    // Tags
+    public required GameplayTagContainer OwnedTags {get;init;}
+    public HashSet<GameplayTag> RequiredTags { get; init; }
+    public HashSet<GameplayTag> BlockedTags { get; init; }
 
     // Stack
     public int StackMaxCount { get; init; } = 1;

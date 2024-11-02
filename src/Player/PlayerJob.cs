@@ -1,8 +1,9 @@
-﻿using BraveStory.Player;
+﻿
 using FSM.Job;
+using FSM.States;
 
-namespace BraveStory.Job;
+namespace BraveStory.Player;
 
-internal class PlayerJob(PlayerState state) : JobBase(state)
+internal class PlayerJob(HostState<Player,PlayerData> state) : JobBase(state)
 {
 }
