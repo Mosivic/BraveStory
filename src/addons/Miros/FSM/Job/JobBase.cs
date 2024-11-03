@@ -92,7 +92,8 @@ public abstract class JobBase : AbsJob, IJob
 
     public virtual bool CanEnter()
     {
-        return state.OwnedTags.HasAll(state.RequiredTags) && !state.OwnedTags.HasAny(state.BlockedTags);
+        return false;
+        // return state.OwnedTags.HasAll(state.RequiredTags) && !state.OwnedTags.HasAny(state.BlockedTags);
     }
 
     public virtual bool CanExit()

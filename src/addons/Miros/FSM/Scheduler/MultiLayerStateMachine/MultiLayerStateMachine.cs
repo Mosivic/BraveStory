@@ -10,10 +10,16 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
 {
     private readonly Dictionary<GameplayTag, StateLayer> _layers = new();
     private Dictionary<AbsState, IJob> _jobs = new();
+    private GameplayTagContainer _ownedTags;
     
+    
+    public void SetOwnedTags(GameplayTagContainer ownedTags){
+        _ownedTags = ownedTags;
+    }
+
     
     public void AddLayer(GameplayTag layer,AbsState defaultState,StateTransitionContainer transitionContainer){
-        _layers[layer] = new StateLayer(layer,defaultState,transitionContainer,_jobs);
+        _layers[layer] = new StateLayer(layer,defaultState,transitionContainer,_jobs,_ownedTags);
     }
 
     public void AddJob(IJob job)

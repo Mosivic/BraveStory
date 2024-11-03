@@ -15,6 +15,7 @@ public partial class Player : CharacterBody2D
     private MultiLayerStateMachineConnect _connect;
     private RayCast2D _footChecker;
     private Node2D _graphic;
+    private Sprite2D _sprite;
     private RayCast2D _handChecker;
     public PlayerData Data {get;set;} = new PlayerData();
 
@@ -24,6 +25,7 @@ public partial class Player : CharacterBody2D
         // Compoents
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         _graphic = GetNode<Node2D>("Graphic");
+        _sprite = _graphic.GetNode<Sprite2D>("Sprite");
         _handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
         _footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
         
@@ -59,11 +61,8 @@ public partial class Player : CharacterBody2D
         {
             Name = "Idle",
             Tag = Tags.Idle,
-            OwnedTags =ownedTags,
             Priority = 5,
             JobType = typeof(PlayerJob),
-            RequiredTags = [Tags.OnFloor],
-            BlockedTags = [Tags.KeyDownMove],
             EnterFunc = s => PlayAnimation("idle")
         };
         // Jump
@@ -71,10 +70,8 @@ public partial class Player : CharacterBody2D
         {
             Name = "Jump",
             Tag = Tags.Jump,
-            OwnedTags =ownedTags,
             Priority = 10,
             JobType = typeof(PlayerJob),
-            RequiredTags = [Tags.KeyDownJump,Tags.OnFloor],
             EnterFunc = s =>
             {
                 PlayAnimation("jump");
@@ -88,10 +85,8 @@ public partial class Player : CharacterBody2D
         {
             JobType = typeof(PlayerJob),
             Tag = Tags.Run,
-            OwnedTags =ownedTags,
             Name = "Run",
             Priority = 2,
-            RequiredTags =[Tags.KeyDownMove],
             EnterFunc = s => PlayAnimation("run"),
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
@@ -101,10 +96,8 @@ public partial class Player : CharacterBody2D
         {
             Name = "Fall",
             Tag = Tags.Fall,
-            OwnedTags =ownedTags,
             JobType = typeof(PlayerJob),
             Priority = 14,
-            RequiredTags = [Tags.OnAir],
             EnterFunc = s => PlayAnimation("jump"),
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
@@ -129,9 +122,7 @@ public partial class Player : CharacterBody2D
             Name = "DoubleJump",
             Tag = Tags.DoubleJump,
             JobType = typeof(PlayerJob),
-            OwnedTags =ownedTags,
             Priority = 15,
-            RequiredTags = [Tags.KeyDownJump,Tags.OnAir],
             EnterFunc = s =>
             {
                 PlayAnimation("jump");
@@ -146,7 +137,6 @@ public partial class Player : CharacterBody2D
             Name = "WallSliding",
             Tag = Tags.WallSlide,
             JobType = typeof(PlayerJob),
-            OwnedTags =ownedTags,
             Priority = 16,
             EnterFunc = s =>
             {
@@ -154,8 +144,6 @@ public partial class Player : CharacterBody2D
                 Data.Gravity /= 3;
             },
             ExitFunc = s => Data.Gravity *= 3,
-            RequiredTags = [Tags.FootColliding,Tags.HandColliding],
-            BlockedTags = [Tags.OnFloor],
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
 
@@ -165,7 +153,6 @@ public partial class Player : CharacterBody2D
             Name = "AddHp",
             Tag = Tags.LayerBuff,
             JobType = typeof(JobBuff),
-            OwnedTags =ownedTags,
             Modifiers =
             [
                 new Modifier
@@ -179,7 +166,6 @@ public partial class Player : CharacterBody2D
             Duration = 3,
             Period = 1,
             StackMaxCount = 3,
-            RequiredTags = [Tags.KeyDownJump],
             OnPeriodOverFunc = state => GD.Print("PeriodOver"),
             EnterFunc = _ => GD.Print("Enter"),
             ExitFunc = _ => GD.Print("Exit"),
@@ -190,22 +176,22 @@ public partial class Player : CharacterBody2D
 
         // 转换规则
         var transitions = new StateTransitionContainer();
-        // Idle -> Run/Jump/Fall
-        transitions.AddTransitions(idle, [run,jump,fall]);
-        // Run -> Idle/Jump
-        transitions.AddTransitions(run, [idle,jump]);
-        // Fall -> Idle
-        transitions.AddTransitions(fall,[idle,doubleJump]);
-        // Jump -> Fall
-        transitions.AddTransitions(jump,[fall]);
-        // DoubleJump -> Fall
-        transitions.AddTransition(doubleJump,fall);
-
-
+        // Idle
+        transitions.AddTransition(new(idle,run,new([Tags.KeyDownMove])));
+        transitions.AddTransition(new(idle,fall,new([Tags.OnAir])));
+        transitions.AddTransition(new(idle,jump,new([Tags.KeyDownJump])));
+        // Run
+        transitions.AddTransition(new(run,idle,new(noneRequirements:[Tags.KeyDownMove])));
+        transitions.AddTransition(new(run,jump,new([Tags.KeyDownJump])));
+        // Jump
+        transitions.AddTransition(new(jump,fall,new()));
+        // Fall
+        transitions.AddTransition(new(fall,idle,new([Tags.OnFloor])));
+        
+        
         // 注册状态和转换
-        _connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump,fall, wallSlide]);
+        _connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump,fall, wallSlide],ownedTags);
         _connect.AddLayer(Tags.LayerMovement,idle,transitions);
-
 
         // Debug Window
         var canvasLayer = new CanvasLayer();

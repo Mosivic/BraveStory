@@ -13,15 +13,21 @@ public class StateLayer
     private AbsState _currentState;
     private AbsState _lastState;
     private readonly StateTransitionContainer _transitionContainer;
-    private readonly Dictionary<AbsState, IJob> _jobs = new();
+
+    private readonly Dictionary<AbsState, IJob> _jobs;
+    private GameplayTagContainer _ownedTags;
     
-    public StateLayer(GameplayTag layerTag,AbsState defaultState,StateTransitionContainer transitionRuleContainer,Dictionary<AbsState, IJob> jobs)
+    public StateLayer(GameplayTag layerTag,AbsState defaultState,
+        StateTransitionContainer transitionRuleContainer,
+        Dictionary<AbsState, IJob> jobs,
+        GameplayTagContainer ownedTags)
     {
         Layer = layerTag;
         _defaultState = defaultState;
         _currentState = defaultState;
         _transitionContainer = transitionRuleContainer;
         _jobs = jobs;
+        _ownedTags = ownedTags;
     }
 
     public void Update(double delta)
@@ -40,12 +46,11 @@ public class StateLayer
 
     private void ProcessNextState()
     {
-        var toStates = _transitionContainer.GetToStates(_currentState);
+        var toStates = _transitionContainer.GetPossibleState(_ownedTags,_currentState);
 
         // 使用LINQ获取优先级最高且可进入的状态
         var nextState = toStates
         .OrderByDescending(s => s.Priority)
-        .Where(s => _jobs[s].CanEnter())
         .FirstOrDefault();
         
         if (nextState == null) return;
@@ -63,6 +68,8 @@ public class StateLayer
         currentJob.Exit();
         nextJob.Enter();
         
+        _ownedTags.RemoveTag(_currentState.Tag);
+        _ownedTags.AddTag(nextState.Tag);
         
         _lastState = _currentState;
         _currentState = nextState;

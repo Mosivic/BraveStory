@@ -21,13 +21,6 @@ public abstract class AbsState
     public double Period { get; init; } = 0;
     public double PeriodElapsed { get; set; }
 
-    // Tags
-    public required GameplayTagContainer OwnedTags {get;init;}
-    public HashSet<GameplayTag> RequiredTags { get; init; }
-    public HashSet<GameplayTag> BlockedTags { get; init; }
-    public HashSet<GameplayTag> SucceedTags { get; init; }
-    public HashSet<GameplayTag> FailedTags { get; init; }
-
     // Stack
     public int StackMaxCount { get; init; } = 1;
     public int StackCurrentCount { get; set; } = 1;

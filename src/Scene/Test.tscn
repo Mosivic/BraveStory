@@ -1017,7 +1017,6 @@ layer_0/tile_data = PackedInt32Array(655360, 524288, 0, 655361, 196608, 3, 65536
 position = Vector2(137, 87)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
-visible = false
 
 [node name="Sky" type="ParallaxLayer" parent="ParallaxBackground"]
 motion_scale = Vector2(0.3, 0.3)
