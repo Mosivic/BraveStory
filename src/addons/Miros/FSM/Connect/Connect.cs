@@ -10,53 +10,46 @@ public class Connect<TJobProvider, TScheduler> : IConnect
     where TJobProvider : IJobProvider, new()
     where TScheduler : IScheduler, new()
 {
-    public Connect(List<AbsState> states)
-    {
-        JobProvider = new TJobProvider();
-        Scheduler = new TScheduler();
+    protected TJobProvider _jobProvider = new();
+    protected TScheduler _scheduler = new();
 
+    public Connect(HashSet<AbsState> states)
+    {
         foreach(var state in states){
-            var job = JobProvider.GetJob(state);
-            Scheduler.AddJob(job);
+            var job = _jobProvider.GetJob(state);
+            _scheduler.AddJob(job);
         }
     }
-
-    private TJobProvider JobProvider { get; }
-    private TScheduler Scheduler { get; }
 
 
     public void AddState(AbsState state)
     {
-        var job = JobProvider.GetJob(state);
-        Scheduler.AddJob(job);
+        var job = _jobProvider.GetJob(state);
+        _scheduler.AddJob(job);
     }
 
 
     public void RemoveState(AbsState state)
     {
-        var job = JobProvider.GetJob(state);
-        Scheduler.RemoveJob(job);
+        var job = _jobProvider.GetJob(state);
+        _scheduler.RemoveJob(job);
     }
 
     public void Update(double delta)
     {
-        Scheduler.Update(delta);
+        _scheduler.Update(delta);
     }
 
     public void PhysicsUpdate(double delta)
     {
-        Scheduler.PhysicsUpdate(delta);
+        _scheduler.PhysicsUpdate(delta);
     }
 
 
     public IJob[] GetAllJobs()
     {
-        return JobProvider.GetAllJobs();
+        return _jobProvider.GetAllJobs();
     }
 
-
-    public TScheduler GetScheduler(){
-        return Scheduler;
-    }
 
 }

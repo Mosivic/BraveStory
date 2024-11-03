@@ -12,7 +12,7 @@ namespace BraveStory.Player;
 public partial class Player : CharacterBody2D
 {
     private AnimationPlayer _animationPlayer;
-    private Connect<StaticJobProvider, MultiLayerStateMachine> _connect;
+    private MultiLayerStateMachineConnect _connect;
     private RayCast2D _footChecker;
     private Node2D _graphic;
     private RayCast2D _handChecker;
@@ -131,7 +131,7 @@ public partial class Player : CharacterBody2D
             JobType = typeof(PlayerJob),
             OwnedTags =ownedTags,
             Priority = 15,
-            RequiredTags = [Tags.KeyDownJump,Tags.OnFloor],
+            RequiredTags = [Tags.KeyDownJump,Tags.OnAir],
             EnterFunc = s =>
             {
                 PlayAnimation("jump");
@@ -188,26 +188,26 @@ public partial class Player : CharacterBody2D
             Priority = 0
         };
 
-
-        _connect = new Connect<StaticJobProvider, MultiLayerStateMachine>([
-            idle, run, jump, doubleJump,fall, wallSlide
-        ]);
-
+        // 转换规则
         var transitions = new StateTransitionContainer();
-
-        // 添加转换规则
         // Idle -> Run/Jump/Fall
         transitions.AddTransitions(idle, [run,jump,fall]);
-        
         // Run -> Idle/Jump
         transitions.AddTransitions(run, [idle,jump]);
         // Fall -> Idle
-        transitions.AddTransitions(fall,[idle]);
+        transitions.AddTransitions(fall,[idle,doubleJump]);
         // Jump -> Fall
-        transitions.AddTransition(jump,fall);
+        transitions.AddTransitions(jump,[fall]);
+        // DoubleJump -> Fall
+        transitions.AddTransition(doubleJump,fall);
 
-        _connect.GetScheduler().AddLayer(Tags.LayerMovement,idle,transitions);
 
+        // 注册状态和转换
+        _connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump,fall, wallSlide]);
+        _connect.AddLayer(Tags.LayerMovement,idle,transitions);
+
+
+        // Debug Window
         var canvasLayer = new CanvasLayer();
         AddChild(canvasLayer);
         
