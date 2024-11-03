@@ -5,7 +5,7 @@ using System.Linq;
 
 public partial class TagDebugWindow : Control
 {
-    private Label _tagLabel;
+    private Tree _tagTree;
     private HashSet<GameplayTag> _tags;
     
     private const float UPDATE_INTERVAL = 0.1f; // 更新间隔（秒）
@@ -19,7 +19,7 @@ public partial class TagDebugWindow : Control
     public override void _Ready()
     {
         // 设置窗口属性
-        CustomMinimumSize = new Vector2(200, 100);
+        CustomMinimumSize = new Vector2(300, 600);
         Position = new Vector2(10, 10);
         
         // 创建半透明背景
@@ -27,14 +27,14 @@ public partial class TagDebugWindow : Control
         panel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(panel);
         
-        // 创建标签显示
-        _tagLabel = new Label
+        // 创建树形控件
+        _tagTree = new Tree
         {
             Position = new Vector2(10, 10),
+            Size = new Vector2(280, 580),
             Theme = new Theme(),
-            Modulate = Colors.White
         };
-        AddChild(_tagLabel);
+        AddChild(_tagTree);
         
         // 设置透明度
         Modulate = new Color(1, 1, 1, 0.8f);
@@ -55,11 +55,34 @@ public partial class TagDebugWindow : Control
     
     private void UpdateTagDisplay()
     {
-        string tagText = "Tags:\n";
-        foreach (var tag in _tags)
+        _tagTree.Clear();
+        var root = _tagTree.CreateItem();
+        root.SetText(0, "Tags");
+        
+        // 创建标签路径字典
+        var tagPaths = new Dictionary<string, TreeItem>();
+        tagPaths[""] = root;
+
+        foreach (var tag in _tags.OrderBy(t => t.ToString()))
         {
-            tagText += $"• {tag}\n";
+            var segments = tag.ToString().Split('.');
+            var currentPath = "";
+            
+            for (int i = 0; i < segments.Length; i++)
+            {
+                var segment = segments[i];
+                var newPath = currentPath == "" ? segment : $"{currentPath}.{segment}";
+                
+                if (!tagPaths.ContainsKey(newPath))
+                {
+                    var parent = tagPaths[currentPath];
+                    var item = _tagTree.CreateItem(parent);
+                    item.SetText(0, segment);
+                    tagPaths[newPath] = item;
+                }
+                
+                currentPath = newPath;
+            }
         }
-        _tagLabel.Text = tagText;
     }
 }

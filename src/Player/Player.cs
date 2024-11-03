@@ -201,8 +201,8 @@ public partial class Player : CharacterBody2D
         
         // Run -> Idle/Jump
         transitions.AddTransitions(run, [idle,jump]);
-        // Fall -> Idle/Run
-        transitions.AddTransitions(fall,[idle,run]);
+        // Fall -> Idle
+        transitions.AddTransitions(fall,[idle]);
         // Jump -> Fall
         transitions.AddTransition(jump,fall);
 
