@@ -131,4 +131,8 @@ public class ConditionMachine : AbsScheduler, IScheduler
         throw new NotImplementedException();
     }
 
+    public double GetCurrentStateTime(GameplayTag layer)
+    {
+        throw new NotImplementedException();
+    }
 }

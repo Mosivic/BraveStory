@@ -68,4 +68,12 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
         }
         return null;
     }
+
+    public double GetCurrentStateTime(GameplayTag layer)
+    {
+        if(_layers.ContainsKey(layer)){
+            return _layers[layer].GetCurrentStateTime();
+        }
+        return 0;
+    }
 }

@@ -17,6 +17,8 @@ public class StateLayer
     private readonly Dictionary<AbsState, IJob> _jobs;
     private GameplayTagContainer _ownedTags;
     
+    private double _currentStateTime;
+    
     public StateLayer(GameplayTag layerTag,AbsState defaultState,
         StateTransitionContainer transitionRuleContainer,
         Dictionary<AbsState, IJob> jobs,
@@ -35,7 +37,7 @@ public class StateLayer
         ProcessNextState();
         
         _jobs[_currentState].Update(delta);
-        
+        _currentStateTime += delta;
     }
     
     public void PhysicsUpdate(double delta)
@@ -73,6 +75,8 @@ public class StateLayer
         
         _lastState = _currentState;
         _currentState = nextState;
+        _currentStateTime = 0.0;
+        
 #if DEBUG && true
         GD.Print($"[{Engine.GetProcessFrames()}] {_lastState.Name} -> {_currentState.Name}.");
 #endif
@@ -87,5 +91,10 @@ public class StateLayer
     public AbsState GetLastState()
     {
         return _lastState;
+    }
+
+    public double GetCurrentStateTime()
+    {
+        return _currentStateTime;
     }
 }

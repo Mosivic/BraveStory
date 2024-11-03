@@ -51,12 +51,16 @@ public class Connect<TJobProvider, TScheduler> : IConnect
         return _jobProvider.GetAllJobs();
     }
 
-    public virtual AbsState GetNowState(GameplayTag layer){
+    public AbsState GetNowState(GameplayTag layer){
         return _scheduler.GetLastState(layer);
     }
 
-    public virtual AbsState GetLastState(GameplayTag layer){
+    public AbsState GetLastState(GameplayTag layer){
         return _scheduler.GetLastState(layer);
+    }
+
+    public double GetCurrentStateTime(GameplayTag layer){
+        return _scheduler.GetCurrentStateTime(layer);
     }
 
 }
