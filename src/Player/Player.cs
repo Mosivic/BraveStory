@@ -20,6 +20,9 @@ public partial class Player : CharacterBody2D
     public PlayerData Data {get;set;} = new PlayerData();
 
 
+    private int _jumpCount = 0;
+    private int _maxJumpCount = 2;
+
     public override void _Ready()
     {   
         // Compoents
@@ -54,6 +57,9 @@ public partial class Player : CharacterBody2D
         evaluatorManager.CreateEvaluator(
             "is_hand_colliding",() => _handChecker.IsColliding(),ownedTags,Tags.HandColliding
         );
+        evaluatorManager.CreateEvaluator(
+            "over_max_jump_count",() => _jumpCount>=_maxJumpCount,ownedTags,Tags.OverMaxJumpCount
+        );
         
         
         // Idle  
@@ -63,7 +69,7 @@ public partial class Player : CharacterBody2D
             Tag = Tags.Idle,
             Priority = 5,
             JobType = typeof(PlayerJob),
-            EnterFunc = s => PlayAnimation("idle")
+            EnterFunc = s => { PlayAnimation("idle"); _jumpCount=0;}
         };
         // Jump
         var jump = new HostState<Player>(this)
@@ -76,6 +82,7 @@ public partial class Player : CharacterBody2D
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+                _jumpCount+=1;
             },
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
@@ -127,6 +134,7 @@ public partial class Player : CharacterBody2D
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+                _jumpCount+=1;
             },
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
@@ -187,6 +195,10 @@ public partial class Player : CharacterBody2D
         transitions.AddTransition(new(jump,fall,new()));
         // Fall
         transitions.AddTransition(new(fall,idle,new([Tags.OnFloor])));
+        transitions.AddTransition(new(fall,doubleJump,new([Tags.KeyDownJump],[],[Tags.OverMaxJumpCount])));
+        // DoubleJump
+        transitions.AddTransition(new(doubleJump,fall,new()));
+        
         
         
         // 注册状态和转换

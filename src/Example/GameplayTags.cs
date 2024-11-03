@@ -82,6 +82,8 @@ namespace BraveStory
 
         public static GameplayTag FootColliding { get; } = TagManager.RequestGameplayTag("Condition.FootColliding");
 
+        public static GameplayTag OverMaxJumpCount { get; } = TagManager.RequestGameplayTag("Condition.OverMaxJumpCount");
+
         public static GameplayTag Magic { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword.Magic");
 
         public static GameplayTag Sword { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword");
