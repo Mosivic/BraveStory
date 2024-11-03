@@ -52,4 +52,20 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
             _layers[key].PhysicsUpdate(delta);
         }
     }
+
+    public AbsState GetNowState(GameplayTag layer)
+    {
+        if(_layers.ContainsKey(layer)){
+            return _layers[layer].GetNowState();
+        }
+        return null;
+    }
+
+    public AbsState GetLastState(GameplayTag layer)
+    {
+        if(_layers.ContainsKey(layer)){
+            return _layers[layer].GetLastState();
+        }
+        return null;
+    }
 }

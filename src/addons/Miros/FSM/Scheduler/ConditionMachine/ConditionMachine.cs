@@ -120,4 +120,15 @@ public class ConditionMachine : AbsScheduler, IScheduler
 
         job.Exit();
     }
+
+    public AbsState GetNowState(GameplayTag Layer)
+    {
+        throw new NotImplementedException();
+    }
+
+    public AbsState GetLastState(GameplayTag Layer)
+    {
+        throw new NotImplementedException();
+    }
+
 }

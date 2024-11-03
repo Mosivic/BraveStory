@@ -23,6 +23,7 @@ public partial class Player : CharacterBody2D
     private int _jumpCount = 0;
     private int _maxJumpCount = 2;
 
+
     public override void _Ready()
     {   
         // Compoents
@@ -82,7 +83,8 @@ public partial class Player : CharacterBody2D
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
-                _jumpCount+=1;
+                _jumpCount++;
+                
             },
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
@@ -132,6 +134,7 @@ public partial class Player : CharacterBody2D
             Priority = 15,
             EnterFunc = s =>
             {
+                
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
                 _jumpCount+=1;
@@ -149,10 +152,8 @@ public partial class Player : CharacterBody2D
             EnterFunc = s =>
             {
                 PlayAnimation("wall_sliding");
-                Data.Gravity /= 3;
             },
-            ExitFunc = s => Data.Gravity *= 3,
-            PhysicsUpdateFunc = (state, d) => Move(d)
+            PhysicsUpdateFunc = (state, d) => WallSlide(d)
         };
 
 
@@ -195,10 +196,14 @@ public partial class Player : CharacterBody2D
         transitions.AddTransition(new(jump,fall,new()));
         // Fall
         transitions.AddTransition(new(fall,idle,new([Tags.OnFloor])));
+        transitions.AddTransition(new(fall,wallSlide,new([Tags.FootColliding,Tags.HandColliding])));
         transitions.AddTransition(new(fall,doubleJump,new([Tags.KeyDownJump],[],[Tags.OverMaxJumpCount])));
         // DoubleJump
         transitions.AddTransition(new(doubleJump,fall,new()));
-        
+        // WallSlide
+        transitions.AddTransition(new(wallSlide,idle,new([Tags.OnFloor])));
+        transitions.AddTransition(new(wallSlide,fall,new(noneRequirements:[Tags.FootColliding])));
+        transitions.AddTransition(new(wallSlide,jump,new([Tags.KeyDownJump])));
         
         
         // 注册状态和转换
@@ -237,6 +242,20 @@ public partial class Player : CharacterBody2D
         velocity.X = Mathf.MoveToward(velocity.X, direction * Data.RunSpeed,
             Data.FloorAcceleration);
         velocity.Y += (float)delta * Data.Gravity;
+        Velocity = velocity;
+
+        if (!Mathf.IsZeroApprox(direction))
+            _graphic.Scale = new Vector2(direction >= 0 ? -1 : 1, 1);
+
+        MoveAndSlide();
+    }
+
+    public void WallSlide(double delta)
+    {
+        var direction = Input.GetAxis("move_left", "move_right");
+        var velocity = Velocity;
+        velocity.X = 0.0f;
+        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Data.Gravity, 600);
         Velocity = velocity;
 
         if (!Mathf.IsZeroApprox(direction))

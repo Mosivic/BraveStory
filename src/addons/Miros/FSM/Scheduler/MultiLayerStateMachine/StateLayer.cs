@@ -77,8 +77,14 @@ public class StateLayer
         GD.Print($"[StateLayer] Change state to {_currentState.Name}.");
     }
 
-    public AbsState GetCurrentState()
+
+    public AbsState GetNowState()
     {
         return _currentState;
+    }
+
+    public AbsState GetLastState()
+    {
+        return _lastState;
     }
 }
