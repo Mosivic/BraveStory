@@ -73,8 +73,9 @@ public class StateLayer
         
         _lastState = _currentState;
         _currentState = nextState;
-
-        GD.Print($"[StateLayer] Change state to {_currentState.Name}.");
+#if DEBUG && true
+        GD.Print($"[{Engine.GetProcessFrames()}] {_lastState.Name} -> {_currentState.Name}.");
+#endif
     }
 
 

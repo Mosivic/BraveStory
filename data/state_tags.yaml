@@ -8,5 +8,6 @@ tags:
       - name: Fall
       - name: Attack
       - name: DoubleJump
+      - name: WallJump
       - name: Landing
       - name: WallSlide

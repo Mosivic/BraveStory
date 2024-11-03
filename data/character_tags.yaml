@@ -7,7 +7,8 @@ tags:
       RunSpeed: 200.0
       JumpVelocity: -300.0
       FloorAcceleration: 1000.0
-      AirAcceleration: true
+      AirAcceleration: 800.0
+      WallJumpVelocity: [1000,-320]
   - name: Warrior
     properties:
       Strength: 10

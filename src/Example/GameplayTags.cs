@@ -10,7 +10,8 @@ namespace BraveStory
         public float RunSpeed { get; set;} = 200.0f;
         public float JumpVelocity { get; set;} = -300.0f;
         public float FloorAcceleration { get; set;} = 1000.0f;
-        public bool AirAcceleration { get; set;} = true;
+        public float AirAcceleration { get; set;} = 800.0f;
+        public Vector2 WallJumpVelocity { get; set;} = new Vector2(1000f, -320f);
     }
 
     public class WarriorData
@@ -115,6 +116,8 @@ namespace BraveStory
         public static GameplayTag Attack { get; } = TagManager.RequestGameplayTag("State.Action.Attack");
 
         public static GameplayTag DoubleJump { get; } = TagManager.RequestGameplayTag("State.Action.DoubleJump");
+
+        public static GameplayTag WallJump { get; } = TagManager.RequestGameplayTag("State.Action.WallJump");
 
         public static GameplayTag Landing { get; } = TagManager.RequestGameplayTag("State.Action.Landing");
 

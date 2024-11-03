@@ -86,7 +86,21 @@ public partial class Player : CharacterBody2D
                 _jumpCount++;
                 
             },
-            PhysicsUpdateFunc = (state, d) => Move(d)
+        };
+
+        // Wall Jump
+        var wall_jump = new HostState<Player>(this){
+            Name = "WallJump",
+            Tag = Tags.WallJump,
+            JobType = typeof(PlayerJob),
+            Priority = 15,
+            EnterFunc = s =>
+            {
+                PlayAnimation("jump");
+                float wallJumpDirectionX = _graphic.Scale.X;
+                Velocity = new Vector2(wallJumpDirectionX* 400,-320);
+                _jumpCount = 0;
+            },
         };
 
         // Run
@@ -108,7 +122,7 @@ public partial class Player : CharacterBody2D
             JobType = typeof(PlayerJob),
             Priority = 14,
             EnterFunc = s => PlayAnimation("jump"),
-            PhysicsUpdateFunc = (state, d) => Move(d)
+            PhysicsUpdateFunc = (state, d) => Fall(d)
         };
 
         // // Landing
@@ -196,18 +210,20 @@ public partial class Player : CharacterBody2D
         transitions.AddTransition(new(jump,fall,new()));
         // Fall
         transitions.AddTransition(new(fall,idle,new([Tags.OnFloor])));
-        transitions.AddTransition(new(fall,wallSlide,new([Tags.FootColliding,Tags.HandColliding])));
+        transitions.AddTransition(new(fall,wallSlide,new([Tags.FootColliding,Tags.HandColliding],noneRequirements:[Tags.KeyDownMove])));
         transitions.AddTransition(new(fall,doubleJump,new([Tags.KeyDownJump],[],[Tags.OverMaxJumpCount])));
         // DoubleJump
         transitions.AddTransition(new(doubleJump,fall,new()));
         // WallSlide
         transitions.AddTransition(new(wallSlide,idle,new([Tags.OnFloor])));
         transitions.AddTransition(new(wallSlide,fall,new(noneRequirements:[Tags.FootColliding])));
-        transitions.AddTransition(new(wallSlide,jump,new([Tags.KeyDownJump])));
+        transitions.AddTransition(new(wallSlide,wall_jump,new([Tags.KeyDownJump])));
+        // WallJump
+        transitions.AddTransition(new(wall_jump,fall,new()));
         
         
         // 注册状态和转换
-        _connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump,fall, wallSlide],ownedTags);
+        _connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump,fall, wallSlide, wall_jump],ownedTags);
         _connect.AddLayer(Tags.LayerMovement,idle,transitions);
 
         // Debug Window
@@ -235,18 +251,49 @@ public partial class Player : CharacterBody2D
         _animationPlayer.Play(animationName);
     }
 
+    // 添加一个统一处理朝向的方法
+    private void UpdateFacing(float direction)
+    {
+        // 如果有输入，根据输入方向转向
+        if (!Mathf.IsZeroApprox(direction))
+        {
+            _graphic.Scale = new Vector2(direction < 0 ? 1 : -1, 1);
+        }
+        // 如果没有输入，根据速度方向转向
+        else if (!Mathf.IsZeroApprox(Velocity.X))
+        {
+            _graphic.Scale = new Vector2(Velocity.X < 0 ? 1 : -1, 1);
+        }
+    }
+
     public void Move(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * Data.RunSpeed,
-            Data.FloorAcceleration);
+        velocity.X = Mathf.MoveToward(velocity.X, direction * Data.RunSpeed, Data.FloorAcceleration);
         velocity.Y += (float)delta * Data.Gravity;
         Velocity = velocity;
 
-        if (!Mathf.IsZeroApprox(direction))
-            _graphic.Scale = new Vector2(direction >= 0 ? -1 : 1, 1);
+        UpdateFacing(direction);  // 使用新方法处理朝向
+        MoveAndSlide();
+    }
 
+    public void Fall(double delta)
+    {
+        var direction = Input.GetAxis("move_left", "move_right");
+        var velocity = Velocity;
+        
+        // 添加空中移动控制
+        velocity.X = Mathf.MoveToward(
+            velocity.X, 
+            direction * Data.RunSpeed, 
+            Data.AirAcceleration * (float)delta
+        );
+        
+        velocity.Y += (float)delta * Data.Gravity;
+        Velocity = velocity;
+
+        UpdateFacing(direction);
         MoveAndSlide();
     }
 
@@ -254,13 +301,20 @@ public partial class Player : CharacterBody2D
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
-        velocity.X = 0.0f;
         velocity.Y = Mathf.Min(velocity.Y + (float)delta * Data.Gravity, 600);
         Velocity = velocity;
 
-        if (!Mathf.IsZeroApprox(direction))
-            _graphic.Scale = new Vector2(direction >= 0 ? -1 : 1, 1);
+        UpdateFacing(direction);  // 使用新方法处理朝向
+        MoveAndSlide();
+    }
 
+    public void WallJumpMove(double delta)
+    {
+        var velocity = Velocity;
+        velocity.Y += (float)delta * Data.Gravity;
+        Velocity = velocity;
+
+        UpdateFacing(0);  // 在空中时只根据速度方向转向
         MoveAndSlide();
     }
 }

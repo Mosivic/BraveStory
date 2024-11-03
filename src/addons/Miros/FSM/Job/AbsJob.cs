@@ -8,13 +8,11 @@ public abstract class AbsJob(AbsState state)
 {
     protected virtual void _Enter()
     {
-        GD.Print($"[Job] Enter {state.Name}.");
         state.EnterFunc?.Invoke(state);
     }
 
     protected virtual void _Exit()
     {
-        GD.Print($"[Job] Exit {state.Name}.");
         state.ExitFunc?.Invoke(state);
     }
 

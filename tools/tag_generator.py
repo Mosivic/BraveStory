@@ -16,7 +16,9 @@ class TagProperty:
             'float': 'float',
             'bool': 'bool',
             'string': 'string',
-            'double': 'double'
+            'double': 'double',
+            'vector2': 'Vector2',
+            'vector3': 'Vector3'
         }
         return type_map.get(type_name.lower(), type_name)
     
@@ -33,6 +35,10 @@ class TagProperty:
             return str(self.default_value).lower()
         if self.type_name == "float":  # 为float类型添加F后缀
             return f"{self.default_value}f"
+        if self.type_name == "Vector2" and isinstance(self.default_value, list) and len(self.default_value) == 2:
+            return f"new Vector2({self.default_value[0]}f, {self.default_value[1]}f)"
+        if self.type_name == "Vector3" and isinstance(self.default_value, list) and len(self.default_value) == 3:
+            return f"new Vector3({self.default_value[0]}f, {self.default_value[1]}f, {self.default_value[2]}f)"
         return str(self.default_value)
 
 class TagDefinition:
@@ -128,6 +134,11 @@ class TagTreeLoader:
             return 'float'
         if isinstance(value, str):
             return 'string'
+        if isinstance(value, list):
+            if len(value) == 2 and all(isinstance(x, (int, float)) for x in value):
+                return 'Vector2'
+            if len(value) == 3 and all(isinstance(x, (int, float)) for x in value):
+                return 'Vector3'
         return 'string'  # 默认为string类型
     
     def resolve_inheritance(self):
@@ -178,11 +189,11 @@ class TagCodeGenerator:
         
         # 先生成所有基类
         base_classes = {tag.name: tag for tag in self.tag_loader.tag_trees.values() 
-                       if tag.properties and not tag.inherits}
+                        if tag.properties and not tag.inherits}
         
         # 然后生成继承类
         derived_classes = {tag.name: tag for tag in self.tag_loader.tag_trees.values() 
-                          if tag.properties and tag.inherits}
+                            if tag.properties and tag.inherits}
         
         # 生成基类
         for tag in base_classes.values():
