@@ -20,3 +20,8 @@ tags:
       - Item.Weapon.Sword      # 可以继承任意标签树的属性
     properties:
       JumpVelocity: -300.0  
+  - name: Enemy
+    inherits: 
+      - Base
+    properties:
+      WalkSpeed: 80.0  

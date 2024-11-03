@@ -8,3 +8,7 @@ tags:
   - name: HandColliding
   - name: FootColliding
   - name: OverMaxJumpCount
+  - name: PlayerDetected
+  - name: Hit
+  - name: WallDetected
+  - name: FloorDetected

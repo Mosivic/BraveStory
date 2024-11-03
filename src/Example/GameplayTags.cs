@@ -6,57 +6,77 @@ namespace BraveStory
 {
     public class BaseData
     {
-        public float Gravity { get; set;} = 980.0f;
-        public float RunSpeed { get; set;} = 200.0f;
-        public float JumpVelocity { get; set;} = -300.0f;
-        public float FloorAcceleration { get; set;} = 1000.0f;
-        public float AirAcceleration { get; set;} = 800.0f;
-        public Vector2 WallJumpVelocity { get; set;} = new Vector2(1000f, -320f);
+        public float Gravity = 980.0f;
+        public float RunSpeed = 200.0f;
+        public float JumpVelocity = -300.0f;
+        public float FloorAcceleration = 1000.0f;
+        public float AirAcceleration = 800.0f;
+        public Vector2 WallJumpVelocity = new Vector2(1000f, -320f);
     }
 
     public class WarriorData
     {
-        public int Strength { get; set;} = 10;
-        public int Defense { get; set;} = 8;
+        public int Strength = 10;
+        public int Defense = 8;
+    }
+
+    public class PlayerData
+    {
+        public float Gravity = 980.0f;
+        public float RunSpeed = 200.0f;
+        public float JumpVelocity = -300.0f;
+        public float FloorAcceleration = 1000.0f;
+        public float AirAcceleration = 800.0f;
+        public Vector2 WallJumpVelocity = new Vector2(1000f, -320f);
+        public int Strength = 10;
+        public int Defense = 8;
+        public float attackSpeed = 1.2f;
+        public string weaponType = "melee";
+    }
+
+    public class EnemyData
+    {
+        public float Gravity = 980.0f;
+        public float RunSpeed = 200.0f;
+        public float JumpVelocity = -300.0f;
+        public float FloorAcceleration = 1000.0f;
+        public float AirAcceleration = 800.0f;
+        public Vector2 WallJumpVelocity = new Vector2(1000f, -320f);
+        public float WalkSpeed = 80.0f;
     }
 
     public class MagicData
     {
-        public int magicDamage { get; set;} = 5;
-        public bool elementType { get; set;} = true;
+        public int magicDamage = 5;
+        public bool elementType = true;
     }
 
     public class SwordData
     {
-        public float attackSpeed { get; set;} = 1.2f;
-        public string weaponType { get; set;} = "melee";
+        public float attackSpeed = 1.2f;
+        public string weaponType = "melee";
     }
 
     public class WeaponData
     {
-        public int baseDamage { get; set;} = 10;
-        public int durabilityMax { get; set;} = 100;
+        public int baseDamage = 10;
+        public int durabilityMax = 100;
     }
 
     public class ItemData
     {
-        public float weight { get; set;} = 1.0f;
-        public bool stackable { get; set;} = false;
+        public float weight = 1.0f;
+        public bool stackable = false;
     }
 
     public class BuffData
     {
-        public int duration { get; set;} = 10;
+        public int duration = 10;
     }
 
     public class DebuffData
     {
-        public int duration { get; set;} = 5;
-    }
-
-    public class PlayerData : BaseData
-    {
-        public new float JumpVelocity { get; } = -300.0f;
+        public int duration = 5;
     }
 
     public static class Tags
@@ -68,6 +88,8 @@ namespace BraveStory
         public static GameplayTag Warrior { get; } = TagManager.RequestGameplayTag("Character.Warrior");
 
         public static GameplayTag Player { get; } = TagManager.RequestGameplayTag("Character.Player");
+
+        public static GameplayTag Enemy { get; } = TagManager.RequestGameplayTag("Character.Enemy");
 
         public static GameplayTag KeyDownJump { get; } = TagManager.RequestGameplayTag("Condition.KeyDownJump");
 
@@ -84,6 +106,14 @@ namespace BraveStory
         public static GameplayTag FootColliding { get; } = TagManager.RequestGameplayTag("Condition.FootColliding");
 
         public static GameplayTag OverMaxJumpCount { get; } = TagManager.RequestGameplayTag("Condition.OverMaxJumpCount");
+
+        public static GameplayTag PlayerDetected { get; } = TagManager.RequestGameplayTag("Condition.PlayerDetected");
+
+        public static GameplayTag Hit { get; } = TagManager.RequestGameplayTag("Condition.Hit");
+
+        public static GameplayTag WallDetected { get; } = TagManager.RequestGameplayTag("Condition.WallDetected");
+
+        public static GameplayTag FloorDetected { get; } = TagManager.RequestGameplayTag("Condition.FloorDetected");
 
         public static GameplayTag Magic { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword.Magic");
 
@@ -108,6 +138,8 @@ namespace BraveStory
         public static GameplayTag Idle { get; } = TagManager.RequestGameplayTag("State.Action.Idle");
 
         public static GameplayTag Run { get; } = TagManager.RequestGameplayTag("State.Action.Run");
+
+        public static GameplayTag Walk { get; } = TagManager.RequestGameplayTag("State.Action.Walk");
 
         public static GameplayTag Jump { get; } = TagManager.RequestGameplayTag("State.Action.Jump");
 

@@ -184,56 +184,47 @@ class TagCodeGenerator:
         ])
     
     def _generate_tag_data_classes(self) -> str:
-        """生成标签数据类"""
-        classes = []
+        """生成标签数据结构体"""
+        definitions = []
         
-        # 先生成所有基类
-        base_classes = {tag.name: tag for tag in self.tag_loader.tag_trees.values() 
-                        if tag.properties and not tag.inherits}
-        
-        # 然后生成继承类
-        derived_classes = {tag.name: tag for tag in self.tag_loader.tag_trees.values() 
-                            if tag.properties and tag.inherits}
-        
-        # 生成基类
-        for tag in base_classes.values():
+        # 处理所有包含属性的标签
+        for tag in self.tag_loader.tag_trees.values():
+            if not tag.properties:
+                continue
+                
             class_name = self._get_data_struct_name(tag)
-            props = []
-            for prop in tag.properties.values():
-                type_name = prop.type_name
-                props.append(
-                    f"{self.indent}{self.indent}public {type_name} {prop.name} {{ get; set;}} = {prop.get_default_value_string()};"
+            props = {}  # 使用字典来存储属性，确保不重复
+            
+            # 如果有继承，先添加所有继承的属性
+            if tag.inherits:
+                for inherit_path in tag.inherits:
+                    parent_tag = self.tag_loader.tag_trees[inherit_path]
+                    for prop_name, prop in parent_tag.properties.items():
+                        if prop_name not in props:  # 只有在属性不存在时才添加
+                            props[prop_name] = (
+                                f"{self.indent}{self.indent}public {prop.type_name} "
+                                f"{prop.name} = {prop.get_default_value_string()};"
+                            )
+            
+            # 添加自己的属性（如果与继承的属性重复，会覆盖）
+            for prop_name, prop in tag.properties.items():
+                props[prop_name] = (
+                    f"{self.indent}{self.indent}public {prop.type_name} "
+                    f"{prop.name} = {prop.get_default_value_string()};"
                 )
             
-            classes.extend([
+            # 将属性列表转换为有序的行
+            prop_lines = list(props.values())
+            
+            definitions.extend([
                 f"{self.indent}public class {class_name}",
                 f"{self.indent}{{",
-                *props,
+                *prop_lines,
                 f"{self.indent}}}",
                 ""
             ])
         
-        # 生成派生类
-        for tag in derived_classes.values():
-            class_name = self._get_data_struct_name(tag)
-            parent_name = self._get_data_struct_name(self.tag_loader.tag_trees[tag.inherits[0]])
-            
-            props = []
-            for prop in tag.properties.values():
-                type_name = prop.type_name
-                props.append(
-                    f"{self.indent}{self.indent}public new {type_name} {prop.name} {{ get; }} = {prop.get_default_value_string()};"
-                )
-            
-            classes.extend([
-                f"{self.indent}public class {class_name} : {parent_name}",
-                f"{self.indent}{{",
-                *props,
-                f"{self.indent}}}",
-                ""
-            ])
-        
-        return "\n".join(classes)
+        return "\n".join(definitions)
     
     def _generate_tags_class(self) -> str:
         """生成标签类"""
@@ -274,6 +265,9 @@ def main():
     # 加载所有标签文件
     loader = TagTreeLoader()
     loader.load_tag_files(src_dir)
+    
+    # 解析继承关系
+    loader.resolve_inheritance()
     
     # 生成代码
     generator = TagCodeGenerator(loader)

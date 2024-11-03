@@ -4,6 +4,7 @@ tags:
     children:
       - name: Idle
       - name: Run
+      - name: Walk
       - name: Jump
       - name: Fall
       - name: Attack
