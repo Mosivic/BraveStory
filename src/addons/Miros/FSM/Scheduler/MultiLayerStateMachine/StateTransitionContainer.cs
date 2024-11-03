@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Transactions;
@@ -7,8 +8,9 @@ public class StateTransitionContainer
 {
     private readonly Dictionary<AbsState, HashSet<StateTransition>> _transitions = new();
     
-    public void AddTransition(StateTransition transition)
+    public void AddTransition(AbsState fromState,AbsState toState,Func<bool> condition = null)
     {
+        var transition = new StateTransition(fromState,toState,condition);
         if(!_transitions.ContainsKey(transition.FromState))
         {
             _transitions[transition.FromState] = new();
@@ -17,7 +19,7 @@ public class StateTransitionContainer
     }
 
     
-    public bool CanTransitionTo(GameplayTagContainer ownedTags,AbsState fromState, AbsState toState)
+    public bool CanTransitionTo(AbsState fromState, AbsState toState)
     {
         if (!_transitions.TryGetValue(fromState, out var rules))
         {
@@ -25,17 +27,17 @@ public class StateTransitionContainer
         }
         
         var rule = rules.FirstOrDefault(r => r.ToState == toState);
-        return rule != null && rule.CanTransition(ownedTags);
+        return rule != null && rule.CanTransition();
     }
     
-    public IEnumerable<AbsState> GetPossibleState(GameplayTagContainer ownedTags,AbsState fromState)
+    public IEnumerable<AbsState> GetPossibleState(AbsState fromState)
     {
         if (!_transitions.TryGetValue(fromState, out var rules))
         {
             return Enumerable.Empty<AbsState>();
         }
         
-        return rules.Where(r => r.CanTransition(ownedTags))
+        return rules.Where(r => r.CanTransition())
                     .Select(r => r.ToState);
     }
 }

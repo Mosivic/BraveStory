@@ -48,7 +48,7 @@ public class StateLayer
 
     private void ProcessNextState()
     {
-        var toStates = _transitionContainer.GetPossibleState(_ownedTags,_currentState);
+        var toStates = _transitionContainer.GetPossibleState(_currentState);
 
         // 使用LINQ获取优先级最高且可进入的状态
         var nextState = toStates

@@ -3,6 +3,7 @@ using BraveStory.Player;
 using FSM.States;
 using Godot;
 using System;
+using YamlDotNet.Core.Tokens;
 
 public partial class Boar : Enemy
 {
@@ -23,23 +24,9 @@ public partial class Boar : Enemy
 
 		// 设置初始朝向为左边
 		_graphic.Scale = new Vector2(-1, 1);
-
-		var evaluatorManager = EvaluatorManager.Instance;
+		
 		var ownedTags = new GameplayTagContainer([Tags.Enemy]);
 
-		// Evaluators
-		evaluatorManager.CreateEvaluator(
-			"is_player_detected", () => _playerChecker.IsColliding(), ownedTags, Tags.PlayerDetected
-		);
-		evaluatorManager.CreateEvaluator(
-			"is_wall_detected", () => _wallChecker.IsColliding(), ownedTags, Tags.WallDetected
-		);
-		evaluatorManager.CreateEvaluator(
-			"is_floor_detected", () => _floorChecker.IsColliding(), ownedTags, Tags.FloorDetected
-		);
-		evaluatorManager.CreateEvaluator(
-			"is_hit", () => false, ownedTags, Tags.Hit  // You'll need to implement hit detection
-		);
 
 		// States
 		var idle = new HostState<Boar>(this)
@@ -84,21 +71,21 @@ public partial class Boar : Enemy
 		var transitions = new StateTransitionContainer();
 		
 		// Idle transitions
-		transitions.AddTransition(new(idle, walk, new([], [], [Tags.PlayerDetected])));
-		transitions.AddTransition(new(idle, run, new([Tags.PlayerDetected])));
-		transitions.AddTransition(new(idle, hit, new([Tags.Hit])));
+		transitions.AddTransition(idle, walk,()=>!_playerChecker.IsColliding()&& WaitOverTime(Tags.LayerMovement,2));
+		transitions.AddTransition(idle, run,()=>_playerChecker.IsColliding());
+		// transitions.AddTransition(idle, hit);
 
 		// Walk transitions
-		transitions.AddTransition(new(walk, idle, new(noneRequirements:[Tags.FloorDetected])));
-		transitions.AddTransition(new(walk, run, new([Tags.PlayerDetected])));
-		transitions.AddTransition(new(walk, hit, new([Tags.Hit])));
+		transitions.AddTransition(walk, idle, ()=>!_floorChecker.IsColliding());
+		transitions.AddTransition(walk, run, ()=>_playerChecker.IsColliding());
+		// transitions.AddTransition(walk, hit);
 
 		// Run transitions
-		transitions.AddTransition(new(run, idle, new(noneRequirements: [Tags.PlayerDetected])));
-		transitions.AddTransition(new(run, hit, new([Tags.Hit])));
+		transitions.AddTransition(run, idle, ()=>!_playerChecker.IsColliding());
+		// transitions.AddTransition(run, hit);
 
 		// Hit transitions
-		transitions.AddTransition(new(hit, idle, new()));
+		// transitions.AddTransition(hit, idle);
 
 		// Register states and transitions
 		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit], ownedTags);
@@ -159,11 +146,15 @@ public partial class Boar : Enemy
 	public override void _Process(double delta)
 	{
 		_connect.Update(delta);
-		EvaluatorManager.Instance.ProcessEvaluators();
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		_connect.PhysicsUpdate(delta);
 	}
+
+	public bool WaitOverTime(GameplayTag layer,double time)
+    {
+        return _connect.GetCurrentStateTime(layer) > time;
+    }
 }
