@@ -39,13 +39,19 @@ public class Evaluator
         // 根据条件添加或移除标签
         if (_result && !_isTagApplied)
         {
+            
+#if DEBUG && false
             GD.Print($"[Evaluator] Add Tag: {_tagToApply}");
+#endif
             _targetTags.AddTag(_tagToApply);
             _isTagApplied = true;
+
         }
         else if (!_result && _isTagApplied)
         {
+#if DEBUG && false
             GD.Print($"[Evaluator] Remove Tag: {_tagToApply}");
+#endif
             _targetTags.RemoveTag(_tagToApply);
             _isTagApplied = false;
         }

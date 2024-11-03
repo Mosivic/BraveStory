@@ -7,7 +7,7 @@ public abstract class AbsState
 {
     // Core
     public required string Name { get; init; }
-    public required GameplayTag Layer {get;init;}
+    public required GameplayTag Tag {get;init;}
     public required Type JobType { get; init; }
     public required int Priority { get; init; }
     public object Source { get; init; }

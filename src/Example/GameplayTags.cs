@@ -102,5 +102,23 @@ namespace BraveStory
 
         public static GameplayTag LayerBuff { get; } = TagManager.RequestGameplayTag("StateLayer.LayerBuff");
 
+        public static GameplayTag Idle { get; } = TagManager.RequestGameplayTag("State.Action.Idle");
+
+        public static GameplayTag Run { get; } = TagManager.RequestGameplayTag("State.Action.Run");
+
+        public static GameplayTag Jump { get; } = TagManager.RequestGameplayTag("State.Action.Jump");
+
+        public static GameplayTag Fall { get; } = TagManager.RequestGameplayTag("State.Action.Fall");
+
+        public static GameplayTag Attack { get; } = TagManager.RequestGameplayTag("State.Action.Attack");
+
+        public static GameplayTag DoubleJump { get; } = TagManager.RequestGameplayTag("State.Action.DoubleJump");
+
+        public static GameplayTag Landing { get; } = TagManager.RequestGameplayTag("State.Action.Landing");
+
+        public static GameplayTag WallSlide { get; } = TagManager.RequestGameplayTag("State.Action.WallSlide");
+
+        public static GameplayTag Action { get; } = TagManager.RequestGameplayTag("State.Action");
+
     }
 }

@@ -9,12 +9,14 @@ public abstract class AbsJob(AbsState state)
     protected virtual void _Enter()
     {
         GD.Print($"[Job] Enter {state.Name}.");
+        state.OwnedTags.AddTag(state.Tag);
         state.EnterFunc?.Invoke(state);
     }
 
     protected virtual void _Exit()
     {
         GD.Print($"[Job] Exit {state.Name}.");
+        state.OwnedTags.RemoveTag(state.Tag);
         state.ExitFunc?.Invoke(state);
     }
 

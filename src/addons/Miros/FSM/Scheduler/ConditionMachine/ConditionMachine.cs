@@ -13,7 +13,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
 
     public void AddJob(IJob job)
     {
-        var layer = job.State.Layer;
+        var layer = job.State.Tag;
 
         if (!WaitingJobs.ContainsKey(layer))
         {
@@ -28,14 +28,14 @@ public class ConditionMachine : AbsScheduler, IScheduler
 
     public void RemoveJob(IJob job)
     {
-        var layer = job.State.Layer;
+        var layer = job.State.Tag;
         if (WaitingJobs.ContainsKey(layer) && WaitingJobs[layer].Contains(job))
             WaitingJobs[layer].Remove(job);
     }
 
     public bool HasJobRunning(IJob job)
     {
-        return RunningJobs[job.State.Layer].Contains(job);
+        return RunningJobs[job.State.Tag].Contains(job);
     }
 
 

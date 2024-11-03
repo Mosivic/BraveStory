@@ -31,25 +31,25 @@ public partial class Player : CharacterBody2D
         var ownedTags = new GameplayTagContainer([Tags.Player]);
 
         // Evaluators
-        var isKeyDownJump = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_keydown_jump",() => Input.IsActionJustPressed("jump"),ownedTags,Tags.KeyDownJump
         );
-        var isKeyDownMove = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_keydown_move",() => !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right")),ownedTags,Tags.KeyDownMove
         );
-        var isOnFloor = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_on_floor",IsOnFloor,ownedTags,Tags.OnFloor
         );
-        var isOnAir = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_on_air",()=>!IsOnFloor(),ownedTags,Tags.OnAir
         );
-        var isVelocityYPositive = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_velocity_y_positive",() => Velocity.Y > 0f,ownedTags,Tags.VelocityYPositive
         );
-        var isFootColliding = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_foot_colliding",() => _footChecker.IsColliding(),ownedTags,Tags.FootColliding
         );
-        var isHandColliding = evaluatorManager.CreateEvaluator(
+        evaluatorManager.CreateEvaluator(
             "is_hand_colliding",() => _handChecker.IsColliding(),ownedTags,Tags.HandColliding
         );
         
@@ -58,17 +58,19 @@ public partial class Player : CharacterBody2D
         var idle = new HostState<Player>(this)
         {
             Name = "Idle",
-            Layer = Tags.LayerMovement,
+            Tag = Tags.Idle,
             OwnedTags =ownedTags,
             Priority = 5,
             JobType = typeof(PlayerJob),
+            RequiredTags = [Tags.OnFloor],
+            BlockedTags = [Tags.KeyDownMove],
             EnterFunc = s => PlayAnimation("idle")
         };
         // Jump
         var jump = new HostState<Player>(this)
         {
             Name = "Jump",
-            Layer = Tags.LayerMovement,
+            Tag = Tags.Jump,
             OwnedTags =ownedTags,
             Priority = 10,
             JobType = typeof(PlayerJob),
@@ -85,7 +87,7 @@ public partial class Player : CharacterBody2D
         var run = new HostState<Player>(this)
         {
             JobType = typeof(PlayerJob),
-            Layer = Tags.LayerMovement,
+            Tag = Tags.Run,
             OwnedTags =ownedTags,
             Name = "Run",
             Priority = 2,
@@ -98,7 +100,7 @@ public partial class Player : CharacterBody2D
         var fall = new HostState<Player>(this)
         {
             Name = "Fall",
-            Layer = Tags.LayerMovement,
+            Tag = Tags.Fall,
             OwnedTags =ownedTags,
             JobType = typeof(PlayerJob),
             Priority = 14,
@@ -125,7 +127,7 @@ public partial class Player : CharacterBody2D
         var doubleJump = new HostState<Player>(this)
         {
             Name = "DoubleJump",
-            Layer = Tags.LayerMovement,
+            Tag = Tags.DoubleJump,
             JobType = typeof(PlayerJob),
             OwnedTags =ownedTags,
             Priority = 15,
@@ -138,11 +140,11 @@ public partial class Player : CharacterBody2D
             PhysicsUpdateFunc = (state, d) => Move(d)
         };
 
-        // Wall Sliding
-        var wallSliding = new HostState<Player>(this)
+        // Wall Slide
+        var wallSlide = new HostState<Player>(this)
         {
             Name = "WallSliding",
-            Layer = Tags.LayerMovement,
+            Tag = Tags.WallSlide,
             JobType = typeof(PlayerJob),
             OwnedTags =ownedTags,
             Priority = 16,
@@ -161,7 +163,7 @@ public partial class Player : CharacterBody2D
         var addHpBuff = new BuffState
         {
             Name = "AddHp",
-            Layer = Tags.LayerBuff,
+            Tag = Tags.LayerBuff,
             JobType = typeof(JobBuff),
             OwnedTags =ownedTags,
             Modifiers =
@@ -188,7 +190,7 @@ public partial class Player : CharacterBody2D
 
 
         _connect = new Connect<StaticJobProvider, MultiLayerStateMachine>([
-            idle, run, jump, doubleJump,fall, wallSliding
+            idle, run, jump, doubleJump,fall, wallSlide
         ]);
 
         var transitions = new StateTransitionContainer();
@@ -199,13 +201,18 @@ public partial class Player : CharacterBody2D
         
         // Run -> Idle/Jump
         transitions.AddTransitions(run, [idle,jump]);
-
+        // Fall -> Idle/Run
         transitions.AddTransitions(fall,[idle,run]);
+        // Jump -> Fall
+        transitions.AddTransition(jump,fall);
 
         _connect.GetScheduler().AddLayer(Tags.LayerMovement,idle,transitions);
 
+        var canvasLayer = new CanvasLayer();
+        AddChild(canvasLayer);
+        
         var debugWindow = new TagDebugWindow(ownedTags.GetTags());
-        AddChild(debugWindow);
+        canvasLayer.AddChild(debugWindow);  
 
     }
 

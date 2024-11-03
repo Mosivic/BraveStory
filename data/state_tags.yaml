@@ -1,0 +1,12 @@
+basePath: "State"
+tags:
+  - name: Action
+    children:
+      - name: Idle
+      - name: Run
+      - name: Jump
+      - name: Fall
+      - name: Attack
+      - name: DoubleJump
+      - name: Landing
+      - name: WallSlide

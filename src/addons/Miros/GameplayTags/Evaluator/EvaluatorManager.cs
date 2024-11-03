@@ -1,4 +1,3 @@
-
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -67,7 +66,9 @@ public class EvaluatorManager
     {
         if (_evaluators.ContainsKey(key))
         {
+#if DEBUG && true
             GD.PrintErr($"Evaluator with key {key} already exists!");
+#endif
             return GetEvaluator(key);
         }
 

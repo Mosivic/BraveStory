@@ -30,7 +30,7 @@ class TagProperty:
         if isinstance(self.default_value, str):
             return f'"{self.default_value}"'
         if isinstance(self.default_value, bool):
-            return str(self.default_value)
+            return str(self.default_value).lower()
         if self.type_name == "float":  # 为float类型添加F后缀
             return f"{self.default_value}f"
         return str(self.default_value)
@@ -57,8 +57,9 @@ class TagTreeLoader:
     
     def load_tag_files(self, root_dir: str):
         """加载所有标签文件"""
-        for file_path in Path(root_dir).rglob("*.yaml"):
-            if file_path.name.endswith("_tags.yaml"):
+        # 命名规则为：“*_tags.yaml", "*_tags.yml"
+        for file_path in Path(root_dir).rglob("*.[yY][aA][mM][lL]"):
+            if file_path.name.endswith(("_tags.yaml", "_tags.yml")):
                 self.load_tag_file(str(file_path))
     
     def load_tag_file(self, file_path: str):
