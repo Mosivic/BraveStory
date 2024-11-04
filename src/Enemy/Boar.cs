@@ -78,32 +78,37 @@ public partial class Boar : Enemy
 			Priority = 20,
 			JobType = typeof(EnemyJob),
 			EnterFunc = s => PlayAnimation("die"),
+			PhysicsUpdateFunc = (s,d) => {
+				if(IsAnimationFinished()) QueueFree();
+			}
 		};
 
 		// Transitions
 		var transitions = new StateTransitionContainer();
 		
-		// Idle -> Walk/Run
+		// Idle
 		transitions.AddTransition(idle, walk,()=>!_playerChecker.IsColliding());
 		transitions.AddTransition(idle, run,()=>_playerChecker.IsColliding());
 		
 
-		// Walk transitions
+		// Walk 
 		transitions.AddTransition(walk, idle, () => 
 			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && WaitOverTime(Tags.LayerMovement, 2)) || 
 			(!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
 		transitions.AddTransition(walk, run, ()=>_playerChecker.IsColliding());
 
-		// Run transitions
+		// Run 
 		transitions.AddTransition(run, idle, ()=>!_playerChecker.IsColliding());
 
-		// Hit transitions
+		// Hit 
 		transitions.AddAnyTransition(hit, ()=>_hasHit);
 		transitions.AddTransition(hit,idle,()=>WaitOverTime(Tags.LayerMovement, 0.4));
 		
+		// Die
+		transitions.AddAnyTransition(die,()=> _hp <= 0);
 
 		// Register states and transitions
-		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit], ownedTags);
+		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit,die], ownedTags);
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
 
 		// State Info Display
@@ -127,7 +132,7 @@ public partial class Boar : Enemy
 	private void Patrol(double delta)
 	{
 		// 检查是否碰到墙壁
-		if (_wallChecker.IsColliding() || !_floorChecker.IsColliding())
+		if (_wallChecker.IsColliding())
 		{
 			// 转向：将 X 缩放在 1 和 -1 之间切换
 			_graphic.Scale = new Vector2(_graphic.Scale.X * -1, 1);
@@ -175,6 +180,12 @@ public partial class Boar : Enemy
     {
         return _connect.GetCurrentStateTime(layer) > time;
     }
+
+	public bool IsAnimationFinished()
+	{
+    return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+	}
+
 
 	public void _on_hurt_box_hurt(Area2D hitbox){
 		_hp -= 1;

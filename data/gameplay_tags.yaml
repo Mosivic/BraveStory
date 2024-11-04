@@ -22,7 +22,7 @@ tags:
                   magicDamage: 5
                   elementType: true
                   
-  - name: Status
+  - name: Effect
     description: Character status effects
     children:
       - name: Buff

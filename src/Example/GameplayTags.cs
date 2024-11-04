@@ -91,30 +91,6 @@ namespace BraveStory
 
         public static GameplayTag Enemy { get; } = TagManager.RequestGameplayTag("Character.Enemy");
 
-        public static GameplayTag KeyDownJump { get; } = TagManager.RequestGameplayTag("Condition.KeyDownJump");
-
-        public static GameplayTag KeyDownMove { get; } = TagManager.RequestGameplayTag("Condition.KeyDownMove");
-
-        public static GameplayTag OnFloor { get; } = TagManager.RequestGameplayTag("Condition.OnFloor");
-
-        public static GameplayTag OnAir { get; } = TagManager.RequestGameplayTag("Condition.OnAir");
-
-        public static GameplayTag VelocityYPositive { get; } = TagManager.RequestGameplayTag("Condition.VelocityYPositive");
-
-        public static GameplayTag HandColliding { get; } = TagManager.RequestGameplayTag("Condition.HandColliding");
-
-        public static GameplayTag FootColliding { get; } = TagManager.RequestGameplayTag("Condition.FootColliding");
-
-        public static GameplayTag OverMaxJumpCount { get; } = TagManager.RequestGameplayTag("Condition.OverMaxJumpCount");
-
-        public static GameplayTag PlayerDetected { get; } = TagManager.RequestGameplayTag("Condition.PlayerDetected");
-
-        public static GameplayTag Hit { get; } = TagManager.RequestGameplayTag("Condition.Hit");
-
-        public static GameplayTag WallDetected { get; } = TagManager.RequestGameplayTag("Condition.WallDetected");
-
-        public static GameplayTag FloorDetected { get; } = TagManager.RequestGameplayTag("Condition.FloorDetected");
-
         public static GameplayTag Magic { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword.Magic");
 
         public static GameplayTag Sword { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword");
@@ -123,11 +99,11 @@ namespace BraveStory
 
         public static GameplayTag Item { get; } = TagManager.RequestGameplayTag("Item");
 
-        public static GameplayTag Buff { get; } = TagManager.RequestGameplayTag("Status.Buff");
+        public static GameplayTag Buff { get; } = TagManager.RequestGameplayTag("Effect.Buff");
 
-        public static GameplayTag Debuff { get; } = TagManager.RequestGameplayTag("Status.Debuff");
+        public static GameplayTag Debuff { get; } = TagManager.RequestGameplayTag("Effect.Debuff");
 
-        public static GameplayTag Status { get; } = TagManager.RequestGameplayTag("Status");
+        public static GameplayTag Effect { get; } = TagManager.RequestGameplayTag("Effect");
 
         public static GameplayTag Character { get; } = TagManager.RequestGameplayTag("Character");
 
@@ -155,7 +131,13 @@ namespace BraveStory
 
         public static GameplayTag WallSlide { get; } = TagManager.RequestGameplayTag("State.Action.WallSlide");
 
+        public static GameplayTag Hit { get; } = TagManager.RequestGameplayTag("State.Action.Hit");
+
         public static GameplayTag Action { get; } = TagManager.RequestGameplayTag("State.Action");
+
+        public static GameplayTag Die { get; } = TagManager.RequestGameplayTag("State.Status.Die");
+
+        public static GameplayTag Status { get; } = TagManager.RequestGameplayTag("State.Status");
 
     }
 }
