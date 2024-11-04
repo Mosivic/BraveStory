@@ -162,4 +162,8 @@ public partial class Boar : Enemy
     {
         return _connect.GetCurrentStateTime(layer) > time;
     }
+
+	public void _on_hurt_box_hurt(Area2D hitbox){
+		GD.Print("SSSSSSSSSSSSSSSSSSSS");
+	}
 }
