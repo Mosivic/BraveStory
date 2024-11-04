@@ -29,6 +29,8 @@ public abstract class AbsState
     public StateStackType StackType { get; init; } = StateStackType.Target;
 
     // Function
+    public Func<AbsState, bool> EnterCondition { get; init; }
+    public Func<AbsState, bool> ExitCondition { get; init; }
     public Action<AbsState> EnterFunc { get; init; }
     public Action<AbsState> ExitFunc { get; init; }
     public Action<AbsState> OnSucceedFunc { get; init; }

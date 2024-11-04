@@ -8,9 +8,9 @@ public class StateTransitionContainer
 {
     private readonly Dictionary<AbsState, HashSet<StateTransition>> _transitions = new();
     
-    public void AddTransition(AbsState fromState,AbsState toState,Func<bool> condition = null)
+    public void AddTransition(AbsState fromState,AbsState toState,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
-        var transition = new StateTransition(fromState,toState,condition);
+        var transition = new StateTransition(fromState,toState,condition,mode);
         if(!_transitions.ContainsKey(transition.FromState))
         {
             _transitions[transition.FromState] = new();
@@ -30,14 +30,15 @@ public class StateTransitionContainer
         return rule != null && rule.CanTransition();
     }
     
-    public IEnumerable<AbsState> GetPossibleState(AbsState fromState)
+    // 返回满足转换条件的所有状态
+    public IEnumerable<StateTransition> GetPossibleTransition(AbsState fromState)
     {
         if (!_transitions.TryGetValue(fromState, out var rules))
         {
-            return Enumerable.Empty<AbsState>();
+            return Enumerable.Empty<StateTransition>();
         }
-        
+
         return rules.Where(r => r.CanTransition())
-                    .Select(r => r.ToState);
+                    .Select(r => r);
     }
 }

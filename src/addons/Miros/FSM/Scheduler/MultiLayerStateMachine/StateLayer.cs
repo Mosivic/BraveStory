@@ -48,15 +48,19 @@ public class StateLayer
 
     private void ProcessNextState()
     {
-        var toStates = _transitionContainer.GetPossibleState(_currentState);
+        var transitions = _transitionContainer.GetPossibleTransition(_currentState);
 
         // 使用LINQ获取优先级最高且可进入的状态
-        var nextState = toStates
-        .OrderByDescending(s => s.Priority)
-        .FirstOrDefault();
+        var nextTransition = transitions
+            .OrderByDescending(t => t.ToState.Priority)
+            .Where(t => t.Mode == StateTransitionMode.Normal
+                ? (t.CanTransition() && _jobs[t.FromState].CanExit() && _jobs[t.ToState].CanEnter())
+                : (t.CanTransition() && _jobs[t.ToState].CanEnter()))
+            .FirstOrDefault();
         
-        if (nextState == null) return;
+        if (nextTransition == null) return;
         
+        var nextState = nextTransition.ToState;
         var nextJob = _jobs[nextState];
         var currentJob = _jobs[_currentState];
         
