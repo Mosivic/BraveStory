@@ -13,6 +13,9 @@ public partial class Boar : Enemy
 	private MultiLayerStateMachineConnect _connect;
 	private EnemyData _data = new EnemyData();
 
+	private int _hp = 5;
+	private bool _hasHit = false;
+
 	public override void _Ready()
 	{
 		// Components
@@ -64,7 +67,17 @@ public partial class Boar : Enemy
 			Tag = Tags.Hit,
 			Priority = 20,
 			JobType = typeof(EnemyJob),
-			EnterFunc = s => PlayAnimation("hit")
+			EnterFunc = s => PlayAnimation("hit"),
+			ExitFunc = s => _hasHit = false
+		};
+
+		var die = new HostState<Boar>(this)
+		{
+			Name = "Die",
+			Tag = Tags.Hit,
+			Priority = 20,
+			JobType = typeof(EnemyJob),
+			EnterFunc = s => PlayAnimation("die"),
 		};
 
 		// Transitions
@@ -73,21 +86,21 @@ public partial class Boar : Enemy
 		// Idle -> Walk/Run
 		transitions.AddTransition(idle, walk,()=>!_playerChecker.IsColliding());
 		transitions.AddTransition(idle, run,()=>_playerChecker.IsColliding());
-		// transitions.AddTransition(idle, hit);
+		
 
 		// Walk transitions
 		transitions.AddTransition(walk, idle, () => 
 			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && WaitOverTime(Tags.LayerMovement, 2)) || 
 			(!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
 		transitions.AddTransition(walk, run, ()=>_playerChecker.IsColliding());
-		// transitions.AddTransition(walk, hit);
 
 		// Run transitions
 		transitions.AddTransition(run, idle, ()=>!_playerChecker.IsColliding());
-		// transitions.AddTransition(run, hit);
 
 		// Hit transitions
-		// transitions.AddTransition(hit, idle);
+		transitions.AddAnyTransition(hit, ()=>_hasHit);
+		transitions.AddTransition(hit,idle,()=>WaitOverTime(Tags.LayerMovement, 0.4));
+		
 
 		// Register states and transitions
 		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit], ownedTags);
@@ -164,6 +177,7 @@ public partial class Boar : Enemy
     }
 
 	public void _on_hurt_box_hurt(Area2D hitbox){
-		GD.Print("SSSSSSSSSSSSSSSSSSSS");
+		_hp -= 1;
+		_hasHit = true;
 	}
 }

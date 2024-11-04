@@ -745,10 +745,10 @@ tracks/4/path = NodePath("Graphic/HitBox/CollisionShape2D3:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [false, true]
+"values": [true, false, true]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3xvkg"]
@@ -831,13 +831,11 @@ collision_mask = 16
 script = ExtResource("5_41uyc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Graphic/HitBox"]
-visible = false
 position = Vector2(12, -20)
 shape = SubResource("RectangleShape2D_8logo")
 disabled = true
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Graphic/HitBox"]
-visible = false
 position = Vector2(4, -15.5)
 shape = SubResource("RectangleShape2D_41nr6")
 disabled = true

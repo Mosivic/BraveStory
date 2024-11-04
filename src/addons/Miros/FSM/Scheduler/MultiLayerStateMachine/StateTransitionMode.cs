@@ -2,7 +2,8 @@
 
 public enum StateTransitionMode
 {
-    None,
-    Normal,
-    Force,
+    None, // 无
+    Normal, // 正常,当退出条件、转换条件、进入条件都满足时 -> 转换状态
+    Force, // 强制，当转换条件、进入条件满足时 -> 转换状态
+    Delay, // 延迟，当转换条件、进入条件满足后等待退出条件满足时 -> 转换条件
 }

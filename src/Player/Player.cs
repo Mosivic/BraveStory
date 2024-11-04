@@ -152,6 +152,7 @@ public partial class Player : CharacterBody2D
 			{
 				PlayAnimation("attack1");
 			},
+			ExitCondition = s=> IsAnimationFinished()
 		};
 		
 		var attack11 = new HostState<Player>(this)
@@ -164,6 +165,7 @@ public partial class Player : CharacterBody2D
 			{
 				PlayAnimation("attack11");
 			},
+			ExitCondition = s=> IsAnimationFinished()
 		};
 
 		var attack111 = new HostState<Player>(this)
@@ -176,6 +178,7 @@ public partial class Player : CharacterBody2D
 			{
 				PlayAnimation("attack111");
 			},
+			ExitCondition = s=> IsAnimationFinished()
 		};
 
 
@@ -214,15 +217,15 @@ public partial class Player : CharacterBody2D
 		transitions.AddTransition(idle, attack1, KeyDownAttack);
 
 		// Attack1
-		transitions.AddTransition(attack1,idle,()=>WaitOverTime(Tags.LayerMovement,0.4f));
-		transitions.AddTransition(attack1,attack11,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack());
+		transitions.AddTransition(attack1,idle);
+		transitions.AddTransition(attack1,attack11,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack(),StateTransitionMode.Delay);
 
 		// Attack11
-		transitions.AddTransition(attack11,idle,()=>WaitOverTime(Tags.LayerMovement,0.4f));
-		transitions.AddTransition(attack11,attack111,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack());
+		transitions.AddTransition(attack11,idle);
+		transitions.AddTransition(attack11,attack111,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack(),StateTransitionMode.Delay);
 
 		// Attack111
-		transitions.AddTransition(attack111,idle,()=>WaitOverTime(Tags.LayerMovement,0.8f));
+		transitions.AddTransition(attack111,idle);
 
 		// Run
 		transitions.AddTransition(run, idle, () => !KeyDownMove());
@@ -279,6 +282,11 @@ public partial class Player : CharacterBody2D
 	public void PlayAnimation(string animationName)
 	{
 		_animationPlayer.Play(animationName);
+	}
+
+	public bool IsAnimationFinished()
+	{
+    return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
 	}
 
 	// 添加一个统一处理朝向的方法
