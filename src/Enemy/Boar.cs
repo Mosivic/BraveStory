@@ -92,6 +92,9 @@ public partial class Boar : Enemy
 		// Register states and transitions
 		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit], ownedTags);
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
+
+		// State Info Display
+		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
 	}
 
 	private void PlayAnimation(string animationName)

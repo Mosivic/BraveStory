@@ -70,7 +70,7 @@ public partial class Player : CharacterBody2D
 			{
 				PlayAnimation("jump");
 				float wallJumpDirectionX = _graphic.Scale.X;
-				Velocity = new Vector2(wallJumpDirectionX * 400, -320);
+				Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
 				_jumpCount = 0;
 			},
 		};
@@ -93,7 +93,7 @@ public partial class Player : CharacterBody2D
 			Tag = Tags.Fall,
 			JobType = typeof(PlayerJob),
 			Priority = 14,
-			EnterFunc = s => PlayAnimation("jump"),
+			EnterFunc = s => PlayAnimation("fall"),
 			PhysicsUpdateFunc = (state, d) => Fall(d)
 		};
 
@@ -109,9 +109,6 @@ public partial class Player : CharacterBody2D
 		//     Priority = 15,
 		//     EnterFunc = s => PlayAnimation("landing")
 		// };
-
-    [Export]
-    public bool CanCombo { get; set; } = false;
 
 
 		// Double Jump
@@ -143,6 +140,42 @@ public partial class Player : CharacterBody2D
 				PlayAnimation("wall_sliding");
 			},
 			PhysicsUpdateFunc = (state, d) => WallSlide(d)
+		};
+
+		var attack1 = new HostState<Player>(this)
+		{
+			Name = "Attack1",
+			Tag = Tags.Attack,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("attack1");
+			},
+		};
+		
+		var attack11 = new HostState<Player>(this)
+		{
+			Name = "Attack11",
+			Tag = Tags.Attack,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("attack11");
+			},
+		};
+
+		var attack111 = new HostState<Player>(this)
+		{
+			Name = "Attack111",
+			Tag = Tags.Attack,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("attack111");
+			},
 		};
 
 
@@ -178,27 +211,45 @@ public partial class Player : CharacterBody2D
 		transitions.AddTransition(idle, run, KeyDownMove);
 		transitions.AddTransition(idle, fall, () => !IsOnFloor());
 		transitions.AddTransition(idle, jump, KeyDownJump);
+		transitions.AddTransition(idle, attack1, KeyDownAttack);
+
+		// Attack1
+		transitions.AddTransition(attack1,idle,()=>WaitOverTime(Tags.LayerMovement,0.4f));
+		transitions.AddTransition(attack1,attack11,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack());
+
+		// Attack11
+		transitions.AddTransition(attack11,idle,()=>WaitOverTime(Tags.LayerMovement,0.4f));
+		transitions.AddTransition(attack11,attack111,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack());
+
+		// Attack111
+		transitions.AddTransition(attack111,idle,()=>WaitOverTime(Tags.LayerMovement,0.8f));
+
 		// Run
 		transitions.AddTransition(run, idle, () => !KeyDownMove());
 		transitions.AddTransition(run, jump, KeyDownJump);
+		transitions.AddTransition(run, attack1, KeyDownAttack);
+
 		// Jump
 		transitions.AddTransition(jump, fall);
+
 		// Fall
 		transitions.AddTransition(fall, idle, IsOnFloor);
 		transitions.AddTransition(fall, wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove());
 		transitions.AddTransition(fall, doubleJump, () => KeyDownJump() && (_jumpCount < _maxJumpCount));
+
 		// DoubleJump
 		transitions.AddTransition(doubleJump, fall);
+
 		// WallSlide
 		transitions.AddTransition(wallSlide, idle, IsOnFloor);
 		transitions.AddTransition(wallSlide, fall, () => !_footChecker.IsColliding());
 		transitions.AddTransition(wallSlide, wall_jump, KeyDownJump);
+
 		// WallJump
 		transitions.AddTransition(wall_jump, fall);
 
-
 		// 注册状态和转换
-		_connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump, fall, wallSlide, wall_jump], ownedTags);
+		_connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump, fall, wallSlide, wall_jump,attack1,attack11,attack111], ownedTags);
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
 
 		// Canvas Layer
@@ -236,12 +287,12 @@ public partial class Player : CharacterBody2D
 		// 如果有输入，根据输入方向转向
 		if (!Mathf.IsZeroApprox(direction))
 		{
-			_graphic.Scale = new Vector2(direction < 0 ? 1 : -1, 1);
+			_graphic.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
 		}
 		// 如果没有输入，根据速度方向转向
 		else if (!Mathf.IsZeroApprox(Velocity.X))
 		{
-			_graphic.Scale = new Vector2(Velocity.X < 0 ? 1 : -1, 1);
+			_graphic.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 		}
 	}
 
@@ -305,6 +356,11 @@ public partial class Player : CharacterBody2D
 	public bool KeyDownJump()
 	{
 		return Input.IsActionJustPressed("jump");
+	}
+
+	public bool KeyDownAttack()
+	{
+		return Input.IsActionJustPressed("attack");
 	}
 
 	public bool WaitOverTime(GameplayTag layer,double time)
