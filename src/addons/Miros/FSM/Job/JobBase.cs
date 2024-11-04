@@ -26,8 +26,11 @@ public abstract class JobBase : AbsJob, IJob
 
     public void Exit()
     {
-        if (state.Status == RunningStatus.Running)
+        if(CanExit())
+            OnSucceed();
+        else
             OnFailed();
+
         _Exit();
     }
 
@@ -92,22 +95,21 @@ public abstract class JobBase : AbsJob, IJob
 
     public virtual bool CanEnter()
     {
-        return false;
-        // return state.OwnedTags.HasAll(state.RequiredTags) && !state.OwnedTags.HasAny(state.BlockedTags);
+        return state.EnterCondition?.Invoke(state) ?? true;
     }
+
+
 
     public virtual bool CanExit()
     {
-        if (state.Status is RunningStatus.Succeed or RunningStatus.Failed)
-            return true;
-        return false;
+        return state.ExitCondition?.Invoke(state) ?? true;
     }
+    
+
 
     public virtual void Update(double delta)
     {
         if (state.Status != RunningStatus.Running) return;
-        if (IsFailed()) OnSucceed();
-        if (IsSucceed()) OnFailed();
 
         state.DurationElapsed += delta;
         state.PeriodElapsed += delta;
@@ -131,7 +133,7 @@ public abstract class JobBase : AbsJob, IJob
 
     protected virtual void OnFailed()
     {
-        state.Status = RunningStatus.Failed;
+         state.Status = RunningStatus.Failed;
         _OnFailed();
     }
 
@@ -162,13 +164,4 @@ public abstract class JobBase : AbsJob, IJob
         _OnPeriodOver();
     }
 
-    protected virtual bool IsSucceed()
-    {
-        return _IsSucceed();
-    }
-
-    protected virtual bool IsFailed()
-    {
-        return _IsFailed();
-    }
 }

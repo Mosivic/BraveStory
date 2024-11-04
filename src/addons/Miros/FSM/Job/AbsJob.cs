@@ -57,17 +57,6 @@ public abstract class AbsJob(AbsState state)
         state.OnDurationOverFunc?.Invoke(state);
     }
 
-
-    protected virtual bool _IsSucceed()
-    {
-        return false;
-    }
-
-    protected virtual bool _IsFailed()
-    {
-        return false;
-    }
-
     protected virtual void _PhysicsUpdate(double delta)
     {
         state.PhysicsUpdateFunc?.Invoke(state, delta);

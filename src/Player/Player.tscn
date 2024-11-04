@@ -1,8 +1,9 @@
-[gd_scene load_steps=13 format=3 uid="uid://domj7ott646q7"]
+[gd_scene load_steps=14 format=3 uid="uid://domj7ott646q7"]
 
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://csyrvg2w36bm3" path="res://Art/generic_char_v0.2/png/red/char_red_2.png" id="2_735ug"]
 [ext_resource type="Texture2D" uid="uid://cmk51oivoq0j6" path="res://Art/generic_char_v0.2/png/red/char_red_1.png" id="2_vcyf2"]
+[ext_resource type="Script" path="res://Player/StateInfoDisplay.cs" id="4_6uk3r"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
 size = Vector2(18, 32)
@@ -533,3 +534,7 @@ target_position = Vector2(0, 12)
 position = Vector2(0, -5)
 rotation = 1.5708
 target_position = Vector2(0, 12)
+
+[node name="StateInfoDisplay" type="Node2D" parent="."]
+position = Vector2(0, -40)
+script = ExtResource("4_6uk3r")
