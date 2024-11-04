@@ -74,7 +74,7 @@ public partial class Boar : Enemy
 		var die = new HostState<Boar>(this)
 		{
 			Name = "Die",
-			Tag = Tags.Hit,
+			Tag = Tags.Die,
 			Priority = 20,
 			JobType = typeof(EnemyJob),
 			EnterFunc = s => PlayAnimation("die"),
@@ -102,7 +102,7 @@ public partial class Boar : Enemy
 
 		// Hit 
 		transitions.AddAnyTransition(hit, ()=>_hasHit);
-		transitions.AddTransition(hit,idle,()=>WaitOverTime(Tags.LayerMovement, 0.4));
+		transitions.AddTransition(hit,idle,IsAnimationFinished);
 		
 		// Die
 		transitions.AddAnyTransition(die,()=> _hp <= 0);

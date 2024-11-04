@@ -1,11 +1,7 @@
-using System.Data.Common;
 using FSM.Job;
-using FSM.Job.Executor;
-using FSM.Scheduler;
 using FSM.States;
 using FSM.States.Buff;
 using Godot;
-using YamlDotNet.Core.Tokens;
 
 namespace BraveStory.Player;
 
@@ -21,9 +17,11 @@ public partial class Player : CharacterBody2D
 
 	private int _jumpCount = 0;
 	private int _maxJumpCount = 2;
+    private bool _hasHit = false;
+    private int _hp = 10;
 
 
-	public override void _Ready()
+    public override void _Ready()
 	{
 		// Compoents
 		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -181,6 +179,27 @@ public partial class Player : CharacterBody2D
 			ExitCondition = s=> IsAnimationFinished()
 		};
 
+		var hit = new HostState<Player>(this)
+		{
+			Name = "Hit",
+			Tag = Tags.Hit,
+			Priority = 20,
+			JobType = typeof(PlayerJob),
+			EnterFunc = s => PlayAnimation("hit"),
+			ExitFunc = s => _hasHit = false
+		};
+
+		var die = new HostState<Player>(this)
+		{
+			Name = "Die",
+			Tag = Tags.Die,
+			Priority = 20,
+			JobType = typeof(PlayerJob),
+			EnterFunc = s => PlayAnimation("die"),
+			PhysicsUpdateFunc = (s,d) => {
+				if(IsAnimationFinished()) QueueFree();
+			}
+		};
 
 		var addHpBuff = new BuffState
 		{
@@ -251,8 +270,18 @@ public partial class Player : CharacterBody2D
 		// WallJump
 		transitions.AddTransition(wall_jump, fall);
 
+		// Hit 
+		transitions.AddAnyTransition(hit, ()=>_hasHit);
+		transitions.AddTransition(hit,idle,IsAnimationFinished);
+		
+		// Die
+		transitions.AddAnyTransition(die,()=> _hp <= 0);
+
 		// 注册状态和转换
-		_connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump, fall, wallSlide, wall_jump,attack1,attack11,attack111], ownedTags);
+		_connect = new MultiLayerStateMachineConnect([
+			idle, run, jump, doubleJump, fall, wallSlide,
+			wall_jump,attack1,attack11,attack111,hit,die], ownedTags);
+
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
 
 		// Canvas Layer
@@ -374,5 +403,10 @@ public partial class Player : CharacterBody2D
 	public bool WaitOverTime(GameplayTag layer,double time)
 	{
 		return _connect.GetCurrentStateTime(layer) > time;
+	}
+
+	public void _on_hurt_box_hurt(Area2D hitbox){
+		_hp -= 1;
+		_hasHit = true;
 	}
 }

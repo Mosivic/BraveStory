@@ -46,4 +46,14 @@ public class StateTransitionContainer
         
         return rules.Union(_anyTransitions).Where(r => r.CanTransition());
     }
+
+    public IEnumerable<AbsState> GetAllStates()
+    {
+        var fromTransitions = _transitions.Values
+            .SelectMany(transitions => transitions.Select(t => t.ToState));
+        
+        var anyTransitions = _anyTransitions.Select(t => t.ToState);
+        
+        return fromTransitions.Union(anyTransitions);
+    }
 }

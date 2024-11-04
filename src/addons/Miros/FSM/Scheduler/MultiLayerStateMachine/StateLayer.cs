@@ -13,12 +13,13 @@ public class StateLayer
     private AbsState _currentState;
     private AbsState _lastState;
     private AbsState _delayState = null;
+
     private readonly StateTransitionContainer _transitionContainer;
 
-
     private readonly Dictionary<AbsState, IJob> _jobs;
+
     private GameplayTagContainer _ownedTags;
-    
+
     private double _currentStateTime;
     
     public StateLayer(GameplayTag layerTag,AbsState defaultState,
@@ -134,4 +135,5 @@ public class StateLayer
     {
         return _currentStateTime;
     }
+
 }
