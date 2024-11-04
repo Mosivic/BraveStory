@@ -23,6 +23,9 @@ public partial class Player : CharacterBody2D
     private int _jumpCount = 0;
     private int _maxJumpCount = 2;
 
+    [Export]
+    public bool CanCombo { get; set; } = false;
+
 
     public override void _Ready()
     {

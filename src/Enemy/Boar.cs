@@ -70,13 +70,15 @@ public partial class Boar : Enemy
 		// Transitions
 		var transitions = new StateTransitionContainer();
 		
-		// Idle transitions
-		transitions.AddTransition(idle, walk,()=>!_playerChecker.IsColliding()&& WaitOverTime(Tags.LayerMovement,2));
+		// Idle -> Walk/Run
+		transitions.AddTransition(idle, walk,()=>!_playerChecker.IsColliding());
 		transitions.AddTransition(idle, run,()=>_playerChecker.IsColliding());
 		// transitions.AddTransition(idle, hit);
 
 		// Walk transitions
-		transitions.AddTransition(walk, idle, ()=>!_floorChecker.IsColliding());
+		transitions.AddTransition(walk, idle, () => 
+			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && WaitOverTime(Tags.LayerMovement, 2)) || 
+			(!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
 		transitions.AddTransition(walk, run, ()=>_playerChecker.IsColliding());
 		// transitions.AddTransition(walk, hit);
 
