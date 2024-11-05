@@ -23,7 +23,7 @@ public partial class Player : CharacterBody2D
 
 	private float _slidingSpeed = 0f;
 	private const float INITIAL_SLIDING_SPEED = 400f;
-	private const float SLIDING_DECELERATION = 700f;
+	private const float SLIDING_DECELERATION = 600f;
 	private const float MIN_SLIDING_SPEED = 20f;
 
 	public override void _Ready()
@@ -232,7 +232,7 @@ public partial class Player : CharacterBody2D
 				}
 				Slide(d);
 			},
-			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED || IsAnimationFinished()
+			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED 
 		};
 
 		var addHpBuff = new BuffState
