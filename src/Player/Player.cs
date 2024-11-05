@@ -13,6 +13,7 @@ public partial class Player : CharacterBody2D
 	private Node2D _graphic;
 	private Sprite2D _sprite;
 	private RayCast2D _handChecker;
+	private Area2D _hurtBox;
 	private PlayerData Data { get; set; } = new PlayerData();
 
 	private int _jumpCount = 0;
@@ -20,6 +21,10 @@ public partial class Player : CharacterBody2D
 	private bool _hasHit = false;
 	private int _hp = 10;
 
+	private float _slidingSpeed = 0f;
+	private const float INITIAL_SLIDING_SPEED = 400f;
+	private const float SLIDING_DECELERATION = 700f;
+	private const float MIN_SLIDING_SPEED = 20f;
 
 	public override void _Ready()
 	{
@@ -29,6 +34,7 @@ public partial class Player : CharacterBody2D
 		_sprite = _graphic.GetNode<Sprite2D>("Sprite");
 		_handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
 		_footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
+		_hurtBox = GetNode<Area2D>("Graphic/HurtBox");
 
 		var ownedTags = new GameplayTagContainer([Tags.Player]);
 
@@ -201,6 +207,34 @@ public partial class Player : CharacterBody2D
 			}
 		};
 
+		// Sliding
+		var sliding = new HostState<Player>(this)
+		{
+			Name = "Sliding",
+			Tag = Tags.LayerMovement,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("sliding_start");
+				_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphic.Scale.X);
+				_hurtBox.SetDeferred("monitorable",false);
+			},
+			ExitFunc = s => _hurtBox.SetDeferred("monitorable",true),
+			PhysicsUpdateFunc = (state, d) =>{
+				if(_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
+				{
+					PlayAnimation("sliding_loop");
+				}
+				else if(_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
+				{
+					PlayAnimation("sliding_end");
+				}
+				Slide(d);
+			},
+			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED || IsAnimationFinished()
+		};
+
 		var addHpBuff = new BuffState
 		{
 			Name = "AddHp",
@@ -271,16 +305,22 @@ public partial class Player : CharacterBody2D
 		transitions.AddTransition(wall_jump, fall);
 
 		// Hit 
-		transitions.AddAnyTransition(hit, ()=>_hasHit);
+		transitions.AddAnyTransition(hit, ()=>_hasHit,StateTransitionMode.Force);
 		transitions.AddTransition(hit,idle,IsAnimationFinished);
 		
 		// Die
 		transitions.AddAnyTransition(die,()=> _hp <= 0);
 
+		// 转换规则
+		transitions.AddTransition(idle, sliding, KeyDownSliding);
+		transitions.AddTransition(run, sliding, KeyDownSliding);
+		transitions.AddTransition(sliding, idle);
+
 		// 注册状态和转换
 		_connect = new MultiLayerStateMachineConnect([
 			idle, run, jump, doubleJump, fall, wallSlide,
-			wall_jump,attack1,attack11,attack111,hit,die], ownedTags);
+			wall_jump,attack1,attack11,attack111,hit,die,
+			sliding], ownedTags);
 
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
 
@@ -294,8 +334,6 @@ public partial class Player : CharacterBody2D
 
 		// State Info Display
 		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
-
-
 	}
 
 	public override void _Process(double delta)
@@ -315,7 +353,7 @@ public partial class Player : CharacterBody2D
 
 	public bool IsAnimationFinished()
 	{
-	return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+		return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
 	}
 
 	// 添加一个统一处理朝向的方法
@@ -400,6 +438,11 @@ public partial class Player : CharacterBody2D
 		return Input.IsActionJustPressed("attack");
 	}
 
+	public bool KeyDownSliding()
+	{
+		return Input.IsActionJustPressed("sliding");
+	}
+
 	public bool WaitOverTime(GameplayTag layer,double time)
 	{
 		return _connect.GetCurrentStateTime(layer) > time;
@@ -408,5 +451,15 @@ public partial class Player : CharacterBody2D
 	public void _on_hurt_box_hurt(Area2D hitbox){
 		_hp -= 1;
 		_hasHit = true;
+	}
+
+	public void Slide(double delta)
+	{
+		var velocity = Velocity;
+		_slidingSpeed = Mathf.MoveToward(_slidingSpeed, 0, SLIDING_DECELERATION * (float)delta);
+		velocity.X = _slidingSpeed;
+		velocity.Y += (float)delta * Data.Gravity;
+		Velocity = velocity;
+		MoveAndSlide();
 	}
 }
