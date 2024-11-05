@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using FSM.Job;
 using FSM.States;
@@ -10,23 +11,29 @@ namespace BraveStory.Player;
 public partial class Player : CharacterBody2D
 {
 	private AnimationPlayer _animationPlayer;
-	private MultiLayerStateMachineConnect _connect;
+	
 	private RayCast2D _footChecker;
 	private Node2D _graphic;
 	private Sprite2D _sprite;
 	private RayCast2D _handChecker;
 	private Area2D _hurtBox;
+	private AnimatedSprite2D _animatedSprite;
+
+
+	private MultiLayerStateMachineConnect _connect;
 	private PlayerData Data { get; set; } = new PlayerData();
+	public HashSet<Interactable> Interactions { get; set; } = new();
+
 
 	private int _jumpCount = 0;
 	private int _maxJumpCount = 2;
 	private bool _hasHit = false;
 	private int _hp = 10;
-
 	private float _slidingSpeed = 0f;
 	private const float INITIAL_SLIDING_SPEED = 400f;
 	private const float SLIDING_DECELERATION = 600f;
 	private const float MIN_SLIDING_SPEED = 20f;
+
 
 	public override void _Ready()
 	{
@@ -37,6 +44,7 @@ public partial class Player : CharacterBody2D
 		_handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
 		_footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
 		_hurtBox = GetNode<Area2D>("Graphic/HurtBox");
+		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
 		var ownedTags = new GameplayTagContainer([Tags.Player]);
 
@@ -45,8 +53,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Idle",
 			Tag = Tags.Idle,
-			Priority = 5,
-
 			EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
 		};
 		// Jump
@@ -54,8 +60,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Jump",
 			Tag = Tags.Jump,
-			Priority = 10,
-
 			EnterFunc = s =>
 			{
 				PlayAnimation("jump");
@@ -70,8 +74,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "WallJump",
 			Tag = Tags.WallJump,
-
-			Priority = 15,
 			EnterFunc = s =>
 			{
 				PlayAnimation("jump");
@@ -84,10 +86,8 @@ public partial class Player : CharacterBody2D
 		// Run
 		var run = new HostState<Player>(this)
 		{
-
 			Tag = Tags.Run,
 			Name = "Run",
-			Priority = 2,
 			EnterFunc = s => PlayAnimation("run"),
 			PhysicsUpdateFunc = (state, d) => Move(d)
 		};
@@ -97,8 +97,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Fall",
 			Tag = Tags.Fall,
-
-			Priority = 14,
 			EnterFunc = s => PlayAnimation("fall"),
 			PhysicsUpdateFunc = (state, d) => Fall(d)
 		};
@@ -122,7 +120,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "DoubleJump",
 			Tag = Tags.DoubleJump,
-			Priority = 15,
 			EnterFunc = s =>
 			{
 				PlayAnimation("jump");
@@ -137,7 +134,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "WallSliding",
 			Tag = Tags.WallSlide,
-			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("wall_sliding");
@@ -149,7 +145,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Attack1",
 			Tag = Tags.Attack,
-			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("attack1");
@@ -161,7 +156,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Attack11",
 			Tag = Tags.Attack,
-			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("attack11");
@@ -173,7 +167,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Attack111",
 			Tag = Tags.Attack,
-			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("attack111");
@@ -185,7 +178,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Hit",
 			Tag = Tags.Hit,
-			Priority = 20,
 			EnterFunc = s => PlayAnimation("hit"),
 			ExitFunc = s => _hasHit = false
 		};
@@ -194,20 +186,23 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Die",
 			Tag = Tags.Die,
-			Priority = 20,
-			EnterFunc = s => PlayAnimation("die"),
+			EnterFunc = s => {
+				PlayAnimation("die");
+				Interactions.Clear();
+			},
 			PhysicsUpdateFunc = (s, d) =>
 			{
 				if (IsAnimationFinished()) QueueFree();
 			}
+			
 		};
+
 
 		// Sliding
 		var sliding = new HostState<Player>(this)
 		{
 			Name = "Sliding",
 			Tag = Tags.LayerMovement,
-			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("sliding_start");
@@ -227,7 +222,7 @@ public partial class Player : CharacterBody2D
 				}
 				Slide(d);
 			},
-			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED 
+			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED
 		};
 
 		var addHpBuff = new BuffState
@@ -337,6 +332,15 @@ public partial class Player : CharacterBody2D
 	public override void _Process(double delta)
 	{
 		_connect.Update(delta);
+
+		if(Interactions.Count!=0){
+			_animatedSprite.Visible = true;
+			if(Input.IsActionJustPressed("interact")){
+				Interactions.Last().Interact();
+			}
+		}else{
+			_animatedSprite.Visible =false;
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
