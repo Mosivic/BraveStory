@@ -3,7 +3,7 @@ using FSM.States.Buff;
 
 namespace FSM.Job;
 
-public class JobBuff(BuffState buffState) : JobBase(buffState)
+public class JobBuff(BuffState buffState) : AbsJobBase(buffState)
 {
     public override void Enter()
     {

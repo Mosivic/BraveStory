@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using FSM.Job;
 using FSM.States;
 using FSM.States.Buff;
@@ -44,7 +46,7 @@ public partial class Player : CharacterBody2D
 			Name = "Idle",
 			Tag = Tags.Idle,
 			Priority = 5,
-			JobType = typeof(PlayerJob),
+
 			EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
 		};
 		// Jump
@@ -53,7 +55,7 @@ public partial class Player : CharacterBody2D
 			Name = "Jump",
 			Tag = Tags.Jump,
 			Priority = 10,
-			JobType = typeof(PlayerJob),
+
 			EnterFunc = s =>
 			{
 				PlayAnimation("jump");
@@ -68,7 +70,7 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "WallJump",
 			Tag = Tags.WallJump,
-			JobType = typeof(PlayerJob),
+
 			Priority = 15,
 			EnterFunc = s =>
 			{
@@ -82,7 +84,7 @@ public partial class Player : CharacterBody2D
 		// Run
 		var run = new HostState<Player>(this)
 		{
-			JobType = typeof(PlayerJob),
+
 			Tag = Tags.Run,
 			Name = "Run",
 			Priority = 2,
@@ -95,7 +97,7 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Fall",
 			Tag = Tags.Fall,
-			JobType = typeof(PlayerJob),
+
 			Priority = 14,
 			EnterFunc = s => PlayAnimation("fall"),
 			PhysicsUpdateFunc = (state, d) => Fall(d)
@@ -106,7 +108,7 @@ public partial class Player : CharacterBody2D
 		// {
 		//     Name = "Last",
 		//     Layer = movementTag,
-		//     JobType = typeof(PlayerJob),
+		//     JobType = typeof(JobSimple),
 		//     IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
 		//     Duration = 0.25,
 		//     IsFailedFunc = () => false,
@@ -120,11 +122,9 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "DoubleJump",
 			Tag = Tags.DoubleJump,
-			JobType = typeof(PlayerJob),
 			Priority = 15,
 			EnterFunc = s =>
 			{
-
 				PlayAnimation("jump");
 				Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
 				_jumpCount += 1;
@@ -137,7 +137,6 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "WallSliding",
 			Tag = Tags.WallSlide,
-			JobType = typeof(PlayerJob),
 			Priority = 16,
 			EnterFunc = s =>
 			{
@@ -150,39 +149,36 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Attack1",
 			Tag = Tags.Attack,
-			JobType = typeof(PlayerJob),
 			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("attack1");
 			},
-			ExitCondition = s=> IsAnimationFinished()
+			ExitCondition = s => IsAnimationFinished()
 		};
-		
+
 		var attack11 = new HostState<Player>(this)
 		{
 			Name = "Attack11",
 			Tag = Tags.Attack,
-			JobType = typeof(PlayerJob),
 			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("attack11");
 			},
-			ExitCondition = s=> IsAnimationFinished()
+			ExitCondition = s => IsAnimationFinished()
 		};
 
 		var attack111 = new HostState<Player>(this)
 		{
 			Name = "Attack111",
 			Tag = Tags.Attack,
-			JobType = typeof(PlayerJob),
 			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("attack111");
 			},
-			ExitCondition = s=> IsAnimationFinished()
+			ExitCondition = s => IsAnimationFinished()
 		};
 
 		var hit = new HostState<Player>(this)
@@ -190,7 +186,6 @@ public partial class Player : CharacterBody2D
 			Name = "Hit",
 			Tag = Tags.Hit,
 			Priority = 20,
-			JobType = typeof(PlayerJob),
 			EnterFunc = s => PlayAnimation("hit"),
 			ExitFunc = s => _hasHit = false
 		};
@@ -200,10 +195,10 @@ public partial class Player : CharacterBody2D
 			Name = "Die",
 			Tag = Tags.Die,
 			Priority = 20,
-			JobType = typeof(PlayerJob),
 			EnterFunc = s => PlayAnimation("die"),
-			PhysicsUpdateFunc = (s,d) => {
-				if(IsAnimationFinished()) QueueFree();
+			PhysicsUpdateFunc = (s, d) =>
+			{
+				if (IsAnimationFinished()) QueueFree();
 			}
 		};
 
@@ -212,21 +207,21 @@ public partial class Player : CharacterBody2D
 		{
 			Name = "Sliding",
 			Tag = Tags.LayerMovement,
-			JobType = typeof(PlayerJob),
 			Priority = 16,
 			EnterFunc = s =>
 			{
 				PlayAnimation("sliding_start");
 				_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphic.Scale.X);
-				_hurtBox.SetDeferred("monitorable",false);
+				_hurtBox.SetDeferred("monitorable", false);
 			},
-			ExitFunc = s => _hurtBox.SetDeferred("monitorable",true),
-			PhysicsUpdateFunc = (state, d) =>{
-				if(_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
+			ExitFunc = s => _hurtBox.SetDeferred("monitorable", true),
+			PhysicsUpdateFunc = (state, d) =>
+			{
+				if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
 				{
 					PlayAnimation("sliding_loop");
 				}
-				else if(_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
+				else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
 				{
 					PlayAnimation("sliding_end");
 				}
@@ -263,58 +258,61 @@ public partial class Player : CharacterBody2D
 
 		// 转换规则
 		var transitions = new StateTransitionContainer();
-		// Idle
-		transitions.AddTransition(idle, run, KeyDownMove);
-		transitions.AddTransition(idle, fall, () => !IsOnFloor());
-		transitions.AddTransition(idle, jump, KeyDownJump);
-		transitions.AddTransition(idle, attack1, KeyDownAttack);
 
-		// Attack1
-		transitions.AddTransition(attack1,idle);
-		transitions.AddTransition(attack1,attack11,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack(),StateTransitionMode.Delay);
+		transitions
+			.AddTransitionGroup(idle, [
+				new(run, KeyDownMove),
+				new(fall, () => !IsOnFloor()),
+				new(jump, KeyDownJump),
+				new(attack1, KeyDownAttack),
+				new(sliding, KeyDownSliding)
+			])
+			.AddTransitionGroup(attack1, [
+				new(idle),
+				new(attack11, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.Delay)
+			])
+			.AddTransitionGroup(attack11, [
+				new(idle),
+				new(attack111, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.Delay)
+			])
+			.AddTransitionGroup(attack111, [
+				new(idle)
+			])
+			.AddTransitionGroup(run, [
+				new(idle, () => !KeyDownMove()),
+				new(jump, KeyDownJump),
+				new(attack1, KeyDownAttack),
+				new(sliding, KeyDownSliding)
+			])
+			.AddTransitionGroup(jump, [
+				new(fall)
+			])
+			.AddTransitionGroup(fall, [
+				new(idle, IsOnFloor),
+				new(wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove()),
+				new(doubleJump, () => KeyDownJump() && (_jumpCount < _maxJumpCount))
+			])
+			.AddTransitionGroup(doubleJump, [
+				new(fall)
+			])
+			.AddTransitionGroup(wallSlide, [
+				new(idle, IsOnFloor),
+				new(fall, () => !_footChecker.IsColliding()),
+				new(wall_jump, KeyDownJump)
+			])
+			.AddTransitionGroup(wall_jump, [
+				new(fall)
+			])
+			.AddTransitionGroup(hit, [
+				new(idle, IsAnimationFinished)
+			])
+			.AddTransitionGroup(sliding, [
+				new(idle)
+			]);
 
-		// Attack11
-		transitions.AddTransition(attack11,idle);
-		transitions.AddTransition(attack11,attack111,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack(),StateTransitionMode.Delay);
-
-		// Attack111
-		transitions.AddTransition(attack111,idle);
-
-		// Run
-		transitions.AddTransition(run, idle, () => !KeyDownMove());
-		transitions.AddTransition(run, jump, KeyDownJump);
-		transitions.AddTransition(run, attack1, KeyDownAttack);
-
-		// Jump
-		transitions.AddTransition(jump, fall);
-
-		// Fall
-		transitions.AddTransition(fall, idle, IsOnFloor);
-		transitions.AddTransition(fall, wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove());
-		transitions.AddTransition(fall, doubleJump, () => KeyDownJump() && (_jumpCount < _maxJumpCount));
-
-		// DoubleJump
-		transitions.AddTransition(doubleJump, fall);
-
-		// WallSlide
-		transitions.AddTransition(wallSlide, idle, IsOnFloor);
-		transitions.AddTransition(wallSlide, fall, () => !_footChecker.IsColliding());
-		transitions.AddTransition(wallSlide, wall_jump, KeyDownJump);
-
-		// WallJump
-		transitions.AddTransition(wall_jump, fall);
-
-		// Hit 
-		transitions.AddAnyTransition(hit, ()=>_hasHit,StateTransitionMode.Force);
-		transitions.AddTransition(hit,idle,IsAnimationFinished);
-		
-		// Die
-		transitions.AddAnyTransition(die,()=> _hp <= 0);
-
-		// 转换规则
-		transitions.AddTransition(idle, sliding, KeyDownSliding);
-		transitions.AddTransition(run, sliding, KeyDownSliding);
-		transitions.AddTransition(sliding, idle);
+		// Special transitions that don't fit the group pattern
+		transitions.AddAnyTransition(hit, () => _hasHit, StateTransitionMode.Force);
+		transitions.AddAnyTransition(die, () => _hp <= 0);
 
 		// 注册状态和转换
 		_connect = new MultiLayerStateMachineConnect([
@@ -371,35 +369,33 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
+	private void UpdateMovement(double delta, float direction, bool isAirborne = false)
+	{
+		var velocity = Velocity;
+		float acceleration = isAirborne ? Data.AirAcceleration : Data.FloorAcceleration;
+
+		velocity.X = Mathf.MoveToward(
+			velocity.X,
+			direction * Data.RunSpeed,
+			acceleration * (float)delta
+		);
+		velocity.Y += (float)delta * Data.Gravity;
+
+		Velocity = velocity;
+		UpdateFacing(direction);
+		MoveAndSlide();
+	}
+
 	public void Move(double delta)
 	{
 		var direction = Input.GetAxis("move_left", "move_right");
-		var velocity = Velocity;
-		velocity.X = Mathf.MoveToward(velocity.X, direction * Data.RunSpeed, Data.FloorAcceleration);
-		velocity.Y += (float)delta * Data.Gravity;
-		Velocity = velocity;
-
-		UpdateFacing(direction);  // 使用新方法处理朝向
-		MoveAndSlide();
+		UpdateMovement(delta, direction);
 	}
 
 	public void Fall(double delta)
 	{
 		var direction = Input.GetAxis("move_left", "move_right");
-		var velocity = Velocity;
-
-		// 添加空中移动控制
-		velocity.X = Mathf.MoveToward(
-			velocity.X,
-			direction * Data.RunSpeed,
-			Data.AirAcceleration * (float)delta
-		);
-
-		velocity.Y += (float)delta * Data.Gravity;
-		Velocity = velocity;
-
-		UpdateFacing(direction);
-		MoveAndSlide();
+		UpdateMovement(delta, direction, true);
 	}
 
 	public void WallSlide(double delta)
@@ -443,12 +439,13 @@ public partial class Player : CharacterBody2D
 		return Input.IsActionJustPressed("sliding");
 	}
 
-	public bool WaitOverTime(GameplayTag layer,double time)
+	public bool WaitOverTime(GameplayTag layer, double time)
 	{
 		return _connect.GetCurrentStateTime(layer) > time;
 	}
 
-	public void _on_hurt_box_hurt(Area2D hitbox){
+	public void _on_hurt_box_hurt(Area2D hitbox)
+	{
 		_hp -= 1;
 		_hasHit = true;
 	}

@@ -4,11 +4,11 @@ using FSM.States;
 
 namespace FSM.Job;
 
-public abstract class JobBase : AbsJob, IJob
+public abstract class AbsJobBase : AbsJob, IJob
 {
     private protected readonly AbsState state;
 
-    protected JobBase(AbsState state) : base(state)
+    protected AbsJobBase(AbsState state) : base(state)
     {
         this.state = state;
     }

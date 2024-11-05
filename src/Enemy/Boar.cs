@@ -38,7 +38,6 @@ public partial class Boar : Enemy
 			Name = "Idle",
 			Tag = Tags.Idle,
 			Priority = 5,
-			JobType = typeof(EnemyJob),
 			EnterFunc = s => PlayAnimation("idle")
 		};
 
@@ -47,7 +46,6 @@ public partial class Boar : Enemy
 			Name = "Walk",
 			Tag = Tags.Walk,
 			Priority = 10,
-			JobType = typeof(EnemyJob),
 			EnterFunc = s => PlayAnimation("walk"),
 			PhysicsUpdateFunc = (state, d) => Patrol(d)
 		};
@@ -57,7 +55,6 @@ public partial class Boar : Enemy
 			Name = "Run",
 			Tag = Tags.Run,
 			Priority = 15,
-			JobType = typeof(EnemyJob),
 			EnterFunc = s => PlayAnimation("run"),
 			PhysicsUpdateFunc = (state, d) => Chase(d)
 		};
@@ -67,7 +64,6 @@ public partial class Boar : Enemy
 			Name = "Hit",
 			Tag = Tags.Hit,
 			Priority = 20,
-			JobType = typeof(EnemyJob),
 			EnterFunc = s =>
 			{
 				PlayAnimation("hit");
@@ -102,7 +98,6 @@ public partial class Boar : Enemy
 			Name = "Die",
 			Tag = Tags.Die,
 			Priority = 20,
-			JobType = typeof(EnemyJob),
 			EnterFunc = s => PlayAnimation("die"),
 			PhysicsUpdateFunc = (s, d) =>
 			{

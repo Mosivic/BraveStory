@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FSM.Job;
 
 namespace FSM.States;
 
@@ -8,7 +9,7 @@ public abstract class AbsState
     // Core
     public required string Name { get; init; }
     public required GameplayTag Tag {get;init;}
-    public required Type JobType { get; init; }
+    public Type JobType { get; init; } = typeof(JobSimple);
     public required int Priority { get; init; }
     public object Source { get; init; }
 

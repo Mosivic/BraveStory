@@ -8,6 +8,7 @@ public class StateTransitionContainer
     private readonly Dictionary<AbsState, HashSet<StateTransition>> _transitions = new();
     private readonly HashSet<StateTransition> _anyTransitions = new();
     
+
     public void AddTransition(AbsState fromState,AbsState toState,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
         var transition = new StateTransition(toState,condition,mode);
@@ -56,4 +57,16 @@ public class StateTransitionContainer
         
         return fromTransitions.Union(anyTransitions);
     }
+
+
+    // 添加链式调用方法
+    public StateTransitionContainer AddTransitionGroup(AbsState fromState, IEnumerable<StateTransition> transitions)
+    {
+        foreach (var transition in transitions)
+        {
+            AddTransition(fromState, transition.ToState, transition.Condition, transition.Mode);
+        }
+        return this;
+    }
+
 }
