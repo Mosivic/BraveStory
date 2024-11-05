@@ -12,3 +12,8 @@ tags:
       - name: WallJump
       - name: Landing
       - name: WallSlide
+      - name: Hit
+  - name: Status
+    children:
+      - name: Die
+  

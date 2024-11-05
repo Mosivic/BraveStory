@@ -13,6 +13,10 @@ public partial class Boar : Enemy
 	private MultiLayerStateMachineConnect _connect;
 	private EnemyData _data = new EnemyData();
 
+	private int _hp = 5;
+	private bool _hasHit = false;
+	private Vector2 _knockbackVelocity = Vector2.Zero;
+	
 	public override void _Ready()
 	{
 		// Components
@@ -24,7 +28,7 @@ public partial class Boar : Enemy
 
 		// 设置初始朝向为左边
 		_graphic.Scale = new Vector2(-1, 1);
-		
+
 		var ownedTags = new GameplayTagContainer([Tags.Enemy]);
 
 
@@ -64,32 +68,78 @@ public partial class Boar : Enemy
 			Tag = Tags.Hit,
 			Priority = 20,
 			JobType = typeof(EnemyJob),
-			EnterFunc = s => PlayAnimation("hit")
+			EnterFunc = s =>
+			{
+				PlayAnimation("hit");
+				// 方式1：根据玩家位置计算击退方向
+				var playerPos = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
+				if (playerPos.HasValue)
+				{
+					var direction = (GlobalPosition - playerPos.Value).Normalized();
+					_knockbackVelocity = direction * 300f; // 击退力度
+				}
+			},
+			PhysicsUpdateFunc = (s, d) =>
+			{
+				// 应用击退力
+				var velocity = Velocity;
+				velocity += _knockbackVelocity;
+				velocity.Y += (float)d * _data.Gravity;
+				// 逐渐减弱击退效果
+				_knockbackVelocity *= 0.8f;
+				Velocity = velocity;
+				MoveAndSlide();
+			},
+			ExitFunc = s =>
+			{
+				_hasHit = false;
+				_knockbackVelocity = Vector2.Zero;
+			}
+		};
+
+		var die = new HostState<Boar>(this)
+		{
+			Name = "Die",
+			Tag = Tags.Die,
+			Priority = 20,
+			JobType = typeof(EnemyJob),
+			EnterFunc = s => PlayAnimation("die"),
+			PhysicsUpdateFunc = (s, d) =>
+			{
+				if (IsAnimationFinished()) QueueFree();
+			}
 		};
 
 		// Transitions
 		var transitions = new StateTransitionContainer();
-		
-		// Idle transitions
-		transitions.AddTransition(idle, walk,()=>!_playerChecker.IsColliding()&& WaitOverTime(Tags.LayerMovement,2));
-		transitions.AddTransition(idle, run,()=>_playerChecker.IsColliding());
-		// transitions.AddTransition(idle, hit);
 
-		// Walk transitions
-		transitions.AddTransition(walk, idle, ()=>!_floorChecker.IsColliding());
-		transitions.AddTransition(walk, run, ()=>_playerChecker.IsColliding());
-		// transitions.AddTransition(walk, hit);
+		// Idle
+		transitions.AddTransition(idle, walk, () => !_playerChecker.IsColliding());
+		transitions.AddTransition(idle, run, () => _playerChecker.IsColliding());
 
-		// Run transitions
-		transitions.AddTransition(run, idle, ()=>!_playerChecker.IsColliding());
-		// transitions.AddTransition(run, hit);
 
-		// Hit transitions
-		// transitions.AddTransition(hit, idle);
+		// Walk 
+		transitions.AddTransition(walk, idle, () =>
+			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && WaitOverTime(Tags.LayerMovement, 2)) ||
+			(!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
+		transitions.AddTransition(walk, run, () => _playerChecker.IsColliding());
+
+		// Run 
+		transitions.AddTransition(run, idle, () => !_playerChecker.IsColliding());
+
+		// Hit 
+		transitions.AddAnyTransition(hit, () => _hasHit);
+		transitions.AddTransition(hit, idle, IsAnimationFinished);
+
+		// Die
+		transitions.AddAnyTransition(die, () => _hp <= 0);
 
 		// Register states and transitions
-		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit], ownedTags);
+		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit, die], ownedTags);
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
+
+		// State Info Display
+		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
 	}
 
 	private void PlayAnimation(string animationName)
@@ -109,7 +159,7 @@ public partial class Boar : Enemy
 	private void Patrol(double delta)
 	{
 		// 检查是否碰到墙壁
-		if (_wallChecker.IsColliding() || !_floorChecker.IsColliding())
+		if (_wallChecker.IsColliding())
 		{
 			// 转向：将 X 缩放在 1 和 -1 之间切换
 			_graphic.Scale = new Vector2(_graphic.Scale.X * -1, 1);
@@ -153,8 +203,20 @@ public partial class Boar : Enemy
 		_connect.PhysicsUpdate(delta);
 	}
 
-	public bool WaitOverTime(GameplayTag layer,double time)
-    {
-        return _connect.GetCurrentStateTime(layer) > time;
-    }
+	public bool WaitOverTime(GameplayTag layer, double time)
+	{
+		return _connect.GetCurrentStateTime(layer) > time;
+	}
+
+	public bool IsAnimationFinished()
+	{
+		return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+	}
+
+
+	public void _on_hurt_box_hurt(Area2D hitbox)
+	{
+		_hp -= 1;
+		_hasHit = true;
+	}
 }

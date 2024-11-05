@@ -1,21 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Transactions;
 using FSM.States;
 
 public class StateTransitionContainer
 {
     private readonly Dictionary<AbsState, HashSet<StateTransition>> _transitions = new();
+    private readonly HashSet<StateTransition> _anyTransitions = new();
     
     public void AddTransition(AbsState fromState,AbsState toState,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
-        var transition = new StateTransition(fromState,toState,condition,mode);
-        if(!_transitions.ContainsKey(transition.FromState))
+        var transition = new StateTransition(toState,condition,mode);
+        if(!_transitions.ContainsKey(fromState))
         {
-            _transitions[transition.FromState] = new();
+            _transitions[fromState] = new();
         }
-        _transitions[transition.FromState].Add(transition);
+        _transitions[fromState].Add(transition);
+    }
+
+    public void AddAnyTransition(AbsState toState,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
+    {
+        var transition = new StateTransition(toState,condition,mode);
+        _anyTransitions.Add(transition);
     }
 
     
@@ -37,8 +43,17 @@ public class StateTransitionContainer
         {
             return Enumerable.Empty<StateTransition>();
         }
+        
+        return rules.Union(_anyTransitions).Where(r => r.CanTransition());
+    }
 
-        return rules.Where(r => r.CanTransition())
-                    .Select(r => r);
+    public IEnumerable<AbsState> GetAllStates()
+    {
+        var fromTransitions = _transitions.Values
+            .SelectMany(transitions => transitions.Select(t => t.ToState));
+        
+        var anyTransitions = _anyTransitions.Select(t => t.ToState);
+        
+        return fromTransitions.Union(anyTransitions);
     }
 }

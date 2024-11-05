@@ -1,11 +1,7 @@
-using System.Data.Common;
 using FSM.Job;
-using FSM.Job.Executor;
-using FSM.Scheduler;
 using FSM.States;
 using FSM.States.Buff;
 using Godot;
-using YamlDotNet.Core.Tokens;
 
 namespace BraveStory.Player;
 
@@ -21,9 +17,11 @@ public partial class Player : CharacterBody2D
 
 	private int _jumpCount = 0;
 	private int _maxJumpCount = 2;
+    private bool _hasHit = false;
+    private int _hp = 10;
 
 
-	public override void _Ready()
+    public override void _Ready()
 	{
 		// Compoents
 		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -70,7 +68,7 @@ public partial class Player : CharacterBody2D
 			{
 				PlayAnimation("jump");
 				float wallJumpDirectionX = _graphic.Scale.X;
-				Velocity = new Vector2(wallJumpDirectionX * 400, -320);
+				Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
 				_jumpCount = 0;
 			},
 		};
@@ -93,7 +91,7 @@ public partial class Player : CharacterBody2D
 			Tag = Tags.Fall,
 			JobType = typeof(PlayerJob),
 			Priority = 14,
-			EnterFunc = s => PlayAnimation("jump"),
+			EnterFunc = s => PlayAnimation("fall"),
 			PhysicsUpdateFunc = (state, d) => Fall(d)
 		};
 
@@ -142,6 +140,66 @@ public partial class Player : CharacterBody2D
 			PhysicsUpdateFunc = (state, d) => WallSlide(d)
 		};
 
+		var attack1 = new HostState<Player>(this)
+		{
+			Name = "Attack1",
+			Tag = Tags.Attack,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("attack1");
+			},
+			ExitCondition = s=> IsAnimationFinished()
+		};
+		
+		var attack11 = new HostState<Player>(this)
+		{
+			Name = "Attack11",
+			Tag = Tags.Attack,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("attack11");
+			},
+			ExitCondition = s=> IsAnimationFinished()
+		};
+
+		var attack111 = new HostState<Player>(this)
+		{
+			Name = "Attack111",
+			Tag = Tags.Attack,
+			JobType = typeof(PlayerJob),
+			Priority = 16,
+			EnterFunc = s =>
+			{
+				PlayAnimation("attack111");
+			},
+			ExitCondition = s=> IsAnimationFinished()
+		};
+
+		var hit = new HostState<Player>(this)
+		{
+			Name = "Hit",
+			Tag = Tags.Hit,
+			Priority = 20,
+			JobType = typeof(PlayerJob),
+			EnterFunc = s => PlayAnimation("hit"),
+			ExitFunc = s => _hasHit = false
+		};
+
+		var die = new HostState<Player>(this)
+		{
+			Name = "Die",
+			Tag = Tags.Die,
+			Priority = 20,
+			JobType = typeof(PlayerJob),
+			EnterFunc = s => PlayAnimation("die"),
+			PhysicsUpdateFunc = (s,d) => {
+				if(IsAnimationFinished()) QueueFree();
+			}
+		};
 
 		var addHpBuff = new BuffState
 		{
@@ -175,27 +233,55 @@ public partial class Player : CharacterBody2D
 		transitions.AddTransition(idle, run, KeyDownMove);
 		transitions.AddTransition(idle, fall, () => !IsOnFloor());
 		transitions.AddTransition(idle, jump, KeyDownJump);
+		transitions.AddTransition(idle, attack1, KeyDownAttack);
+
+		// Attack1
+		transitions.AddTransition(attack1,idle);
+		transitions.AddTransition(attack1,attack11,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack(),StateTransitionMode.Delay);
+
+		// Attack11
+		transitions.AddTransition(attack11,idle);
+		transitions.AddTransition(attack11,attack111,()=>WaitOverTime(Tags.LayerMovement,0.2f)&&KeyDownAttack(),StateTransitionMode.Delay);
+
+		// Attack111
+		transitions.AddTransition(attack111,idle);
+
 		// Run
 		transitions.AddTransition(run, idle, () => !KeyDownMove());
 		transitions.AddTransition(run, jump, KeyDownJump);
+		transitions.AddTransition(run, attack1, KeyDownAttack);
+
 		// Jump
 		transitions.AddTransition(jump, fall);
+
 		// Fall
 		transitions.AddTransition(fall, idle, IsOnFloor);
 		transitions.AddTransition(fall, wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove());
 		transitions.AddTransition(fall, doubleJump, () => KeyDownJump() && (_jumpCount < _maxJumpCount));
+
 		// DoubleJump
 		transitions.AddTransition(doubleJump, fall);
+
 		// WallSlide
 		transitions.AddTransition(wallSlide, idle, IsOnFloor);
 		transitions.AddTransition(wallSlide, fall, () => !_footChecker.IsColliding());
 		transitions.AddTransition(wallSlide, wall_jump, KeyDownJump);
+
 		// WallJump
 		transitions.AddTransition(wall_jump, fall);
 
+		// Hit 
+		transitions.AddAnyTransition(hit, ()=>_hasHit);
+		transitions.AddTransition(hit,idle,IsAnimationFinished);
+		
+		// Die
+		transitions.AddAnyTransition(die,()=> _hp <= 0);
 
 		// 注册状态和转换
-		_connect = new MultiLayerStateMachineConnect([idle, run, jump, doubleJump, fall, wallSlide, wall_jump], ownedTags);
+		_connect = new MultiLayerStateMachineConnect([
+			idle, run, jump, doubleJump, fall, wallSlide,
+			wall_jump,attack1,attack11,attack111,hit,die], ownedTags);
+
 		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
 
 		// Canvas Layer
@@ -227,18 +313,23 @@ public partial class Player : CharacterBody2D
 		_animationPlayer.Play(animationName);
 	}
 
+	public bool IsAnimationFinished()
+	{
+    return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+	}
+
 	// 添加一个统一处理朝向的方法
 	private void UpdateFacing(float direction)
 	{
 		// 如果有输入，根据输入方向转向
 		if (!Mathf.IsZeroApprox(direction))
 		{
-			_graphic.Scale = new Vector2(direction < 0 ? 1 : -1, 1);
+			_graphic.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
 		}
 		// 如果没有输入，根据速度方向转向
 		else if (!Mathf.IsZeroApprox(Velocity.X))
 		{
-			_graphic.Scale = new Vector2(Velocity.X < 0 ? 1 : -1, 1);
+			_graphic.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 		}
 	}
 
@@ -304,8 +395,18 @@ public partial class Player : CharacterBody2D
 		return Input.IsActionJustPressed("jump");
 	}
 
+	public bool KeyDownAttack()
+	{
+		return Input.IsActionJustPressed("attack");
+	}
+
 	public bool WaitOverTime(GameplayTag layer,double time)
 	{
 		return _connect.GetCurrentStateTime(layer) > time;
+	}
+
+	public void _on_hurt_box_hurt(Area2D hitbox){
+		_hp -= 1;
+		_hasHit = true;
 	}
 }

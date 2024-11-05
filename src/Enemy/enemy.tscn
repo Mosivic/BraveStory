@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://5f6ngwh4b25f"]
+[gd_scene load_steps=3 format=3 uid="uid://5f6ngwh4b25f"]
 
 [ext_resource type="Script" path="res://Enemy/Enemy.cs" id="1_pwhk1"]
+[ext_resource type="Script" path="res://Player/StateInfoDisplay.cs" id="2_pyc0l"]
 
 [node name="Enemy" type="CharacterBody2D"]
 collision_layer = 4
@@ -14,3 +15,6 @@ script = ExtResource("1_pwhk1")
 position = Vector2(-3, 0)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="StateInfoDisplay" type="Node2D" parent="."]
+script = ExtResource("2_pyc0l")

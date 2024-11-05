@@ -1,14 +1,22 @@
-[gd_scene load_steps=14 format=3 uid="uid://b60glotno805d"]
+[gd_scene load_steps=19 format=3 uid="uid://b60glotno805d"]
 
 [ext_resource type="PackedScene" uid="uid://5f6ngwh4b25f" path="res://Enemy/enemy.tscn" id="1_w3tnv"]
 [ext_resource type="Texture2D" uid="uid://diasn0p580ws0" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Idle/Idle-Sheet.png" id="2_e4ssd"]
 [ext_resource type="Script" path="res://Enemy/Boar.cs" id="2_gphwb"]
 [ext_resource type="Texture2D" uid="uid://cehsld3emvxjh" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Walk/Walk-Base-Sheet.png" id="2_ii47p"]
 [ext_resource type="Texture2D" uid="uid://bkmqhykoigyuy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Run/Run-Sheet.png" id="2_l8evk"]
+[ext_resource type="Script" path="res://HitBox.gd" id="4_da4tt"]
 [ext_resource type="Texture2D" uid="uid://ddtr8ovkgqhwy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_i5lod"]
+[ext_resource type="Script" path="res://HurtBox.gd" id="5_sqhmi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q70f8"]
+size = Vector2(37, 7)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ik7lp"]
+radius = 14.3178
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lk46v"]
-radius = 14.0
+radius = 18.0
 
 [sub_resource type="Animation" id="Animation_bjpte"]
 length = 0.001
@@ -47,6 +55,18 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [ExtResource("2_ii47p")]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Graphics/Sprite2D:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_5ywbd"]
@@ -212,9 +232,86 @@ tracks/2/keys = {
 "values": [0, 1, 2, 3, 4, 5]
 }
 
+[sub_resource type="Animation" id="Animation_ypk7j"]
+resource_name = "die"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("5_i5lod")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Graphics/Sprite2D:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [4]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Graphics/Sprite2D:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Graphics/Sprite2D:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Graphics/HurtBox:monitorable")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Graphics/HitBox:monitoring")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_2r4i3"]
 _data = {
 "RESET": SubResource("Animation_bjpte"),
+"die": SubResource("Animation_ypk7j"),
 "hit": SubResource("Animation_5ywbd"),
 "idle": SubResource("Animation_0xhkb"),
 "run": SubResource("Animation_pv1ms"),
@@ -244,11 +341,31 @@ target_position = Vector2(-3.62396e-05, 16)
 position = Vector2(-18, -1)
 target_position = Vector2(0, 9)
 
+[node name="HitBox" type="Area2D" parent="Graphics" index="4"]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("4_da4tt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/HitBox" index="0"]
+position = Vector2(0.5, -10.5)
+shape = SubResource("RectangleShape2D_q70f8")
+
+[node name="HurtBox" type="Area2D" parent="Graphics" index="5"]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("5_sqhmi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/HurtBox" index="0"]
+position = Vector2(0, -13)
+shape = SubResource("CircleShape2D_ik7lp")
+
 [node name="CollisionShape2D" parent="." index="1"]
-position = Vector2(0, -14)
+position = Vector2(0, -13)
 shape = SubResource("CircleShape2D_lk46v")
 
 [node name="AnimationPlayer" parent="." index="2"]
 libraries = {
 "": SubResource("AnimationLibrary_2r4i3")
 }
+
+[connection signal="hurt" from="Graphics/HurtBox" to="." method="_on_hurt_box_hurt"]
