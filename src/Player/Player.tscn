@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://domj7ott646q7"]
+[gd_scene load_steps=34 format=3 uid="uid://domj7ott646q7"]
 
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://csyrvg2w36bm3" path="res://Art/generic_char_v0.2/png/red/char_red_2.png" id="2_735ug"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://Player/StateInfoDisplay.cs" id="4_6uk3r"]
 [ext_resource type="Script" path="res://HurtBox.gd" id="4_ijs23"]
 [ext_resource type="Script" path="res://HitBox.gd" id="5_41uyc"]
+[ext_resource type="Texture2D" uid="uid://b4baa7e42g6ko" path="res://Art/gamepad-ui/gdb-keyboard-2.png" id="7_l7dr7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
 size = Vector2(18, 32)
@@ -1093,6 +1094,42 @@ size = Vector2(32, 13)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6k7cx"]
 size = Vector2(20, 31)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_8oyvh"]
+atlas = ExtResource("7_l7dr7")
+region = Rect2(96, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gqfnm"]
+atlas = ExtResource("7_l7dr7")
+region = Rect2(96, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ku6mj"]
+atlas = ExtResource("7_l7dr7")
+region = Rect2(96, 272, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xmdfm"]
+atlas = ExtResource("7_l7dr7")
+region = Rect2(96, 384, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gb8ve"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8oyvh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gqfnm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ku6mj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xmdfm")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]
+
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
 script = ExtResource("1_d4cnt")
@@ -1161,5 +1198,10 @@ disabled = true
 [node name="StateInfoDisplay" type="Node2D" parent="."]
 position = Vector2(0, -40)
 script = ExtResource("4_6uk3r")
+
+[node name="InteractionIcon" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -43)
+sprite_frames = SubResource("SpriteFrames_gb8ve")
+frame_progress = 0.0572009
 
 [connection signal="hurt" from="Graphic/HurtBox" to="." method="_on_hurt_box_hurt"]
