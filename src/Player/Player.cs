@@ -373,33 +373,35 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	private void UpdateMovement(double delta, float direction, bool isAirborne = false)
-	{
-		var velocity = Velocity;
-		float acceleration = isAirborne ? Data.AirAcceleration : Data.FloorAcceleration;
-
-		velocity.X = Mathf.MoveToward(
-			velocity.X,
-			direction * Data.RunSpeed,
-			acceleration * (float)delta
-		);
-		velocity.Y += (float)delta * Data.Gravity;
-
-		Velocity = velocity;
-		UpdateFacing(direction);
-		MoveAndSlide();
-	}
-
 	public void Move(double delta)
 	{
 		var direction = Input.GetAxis("move_left", "move_right");
-		UpdateMovement(delta, direction);
+		var velocity = Velocity;
+		velocity.X = Mathf.MoveToward(velocity.X, direction * Data.RunSpeed, Data.FloorAcceleration);
+		velocity.Y += (float)delta * Data.Gravity;
+		Velocity = velocity;
+
+		UpdateFacing(direction);  // 使用新方法处理朝向
+		MoveAndSlide();
 	}
 
 	public void Fall(double delta)
 	{
 		var direction = Input.GetAxis("move_left", "move_right");
-		UpdateMovement(delta, direction, true);
+		var velocity = Velocity;
+
+		// 添加空中移动控制
+		velocity.X = Mathf.MoveToward(
+			velocity.X,
+			direction * Data.RunSpeed,
+			Data.AirAcceleration * (float)delta
+		);
+
+		velocity.Y += (float)delta * Data.Gravity;
+		Velocity = velocity;
+
+		UpdateFacing(direction);
+		MoveAndSlide();
 	}
 
 	public void WallSlide(double delta)
