@@ -1,6 +1,7 @@
 using BraveStory.Player;
 using Godot;
 using System;
+using System.Threading.Tasks;
 
 public partial class Interactable : Area2D
 {
@@ -17,9 +18,10 @@ public partial class Interactable : Area2D
         BodyExited += OnBodyExited;
     }
 
-    public virtual void Interact(){
-        GD.Print($"[Interact] {Name}");
-        EmitSignal(SignalName.Interacted);
+    public virtual async Task Interact()
+    {
+        // 基类的异步实现
+        await Task.CompletedTask;
     }
 
     private void OnBodyEntered(Node2D body)
