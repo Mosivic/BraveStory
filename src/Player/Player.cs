@@ -17,11 +17,11 @@ public partial class Player : CharacterBody2D
 
 	private int _jumpCount = 0;
 	private int _maxJumpCount = 2;
-    private bool _hasHit = false;
-    private int _hp = 10;
+	private bool _hasHit = false;
+	private int _hp = 10;
 
 
-    public override void _Ready()
+	public override void _Ready()
 	{
 		// Compoents
 		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -315,7 +315,7 @@ public partial class Player : CharacterBody2D
 
 	public bool IsAnimationFinished()
 	{
-    return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+	return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
 	}
 
 	// 添加一个统一处理朝向的方法
