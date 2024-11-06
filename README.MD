@@ -6,4 +6,41 @@
 
 Godot Edition：v4.3-stable_mono_win64
 
->  不能使用 v4.3 及以上版本进行开发，因为当前场景仍然使用 Tilemap 与 ParallaxLayer ，两者在 v4.3 中已经被新节点所取代了，所以更新到 v4.3 以上版本存在显示上的 BUG . 
+# Miros Plugin 
+## 核心概念
+### GameplayTag 标签
+### State 状态
+#### Type
+##### Host
+##### Goal
+##### Compound
+##### Buff
+### Job 任务
+#### Type 
+##### Simple
+##### Buff
+##### All
+##### Select
+### Scheduler 调度器 
+#### MultiLayerStateMachine 多层状态机器
+#### ConditionStateMachine 条件状态机
+#### GoalOrientedStatePlanner 目标导向状态规划器
+### Connect 连接
+
+## 工具
+### GameInitializer 初始器
+### SceneManager 场景管理
+### SaveManager 存档管理
+### SoundManager （TODO）
+### EffectManager (TODO)
+
+## 特效
+### Shader
+#### SceneTransition 场景切换特效
+
+## Debug 调试
+
+## Interact 交互
+####  HitBox & HurtBox
+####  Interactable 
+

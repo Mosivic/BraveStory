@@ -72,14 +72,14 @@ public class StateLayer
             {
                 StateTransitionMode.Normal => t.CanTransition() && _jobs[_currentState].CanExit() && _jobs[t.ToState].CanEnter(),
                 StateTransitionMode.Force => t.CanTransition() && _jobs[t.ToState].CanEnter(),
-                StateTransitionMode.Delay => t.CanTransition() && _jobs[t.ToState].CanEnter(),
+                StateTransitionMode.DelayFront => t.CanTransition() && _jobs[t.ToState].CanEnter(),
                 _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
             })
             .FirstOrDefault();
         
         if (nextTransition == null) return;
         
-        if(nextTransition.Mode == StateTransitionMode.Delay)
+        if(nextTransition.Mode == StateTransitionMode.DelayFront)
         {
             _delayState = nextTransition.ToState;
 

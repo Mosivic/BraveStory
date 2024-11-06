@@ -264,11 +264,11 @@ public partial class Player : CharacterBody2D
 			])
 			.AddTransitionGroup(attack1, [
 				new(idle),
-				new(attack11, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.Delay)
+				new(attack11, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.DelayFront)
 			])
 			.AddTransitionGroup(attack11, [
 				new(idle),
-				new(attack111, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.Delay)
+				new(attack111, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.DelayFront)
 			])
 			.AddTransitionGroup(attack111, [
 				new(idle)
