@@ -104,7 +104,17 @@ public partial class GameInitializer : Node
     // 示例：存档系统初始化
     private void InitializeSaveSystem()
     {
-        // 实现存档系统初始化逻辑
+        try
+        {
+            // 创建SaveManager实例
+            var saveManager = new SaveManager();
+            AddChild(saveManager);
+            GD.Print("Save system initialized!");
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"Failed to initialize save system: {e.Message}");
+        }
     }
 
     // 示例：网络服务初始化
@@ -124,9 +134,6 @@ public partial class GameInitializer : Node
     {
         if (!_isInitialized) return;
 
-        // 清理所有评估器
-        EvaluatorManager.Instance.ClearEvaluators();
-
         // 清理其他资源
         CleanupManagers();
         CleanupServices();
@@ -144,4 +151,6 @@ public partial class GameInitializer : Node
     {
         // 实现服务清理逻辑
     }
+
+
 } 
