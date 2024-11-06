@@ -53,7 +53,7 @@ public partial class SceneManager : Node
         // 加载过渡动画场景
         try
         {
-            var transitionScene = GD.Load<PackedScene>("res://addons/Miros/Core/SceneTransitionStyle/RainTransition.tscn");
+            var transitionScene = GD.Load<PackedScene>("res://addons/Miros/Core/SceneTransitionStyle/FadeTransition.tscn");
             if (transitionScene != null)
             {
                 _transitionNode = transitionScene.Instantiate();

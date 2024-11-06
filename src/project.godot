@@ -20,12 +20,14 @@ config/icon="res://icon.svg"
 GameInitializer="*res://addons/Miros/Core/GameInitializer.cs"
 SceneManager="*res://addons/Miros/Core/SceneManager.cs"
 SaveManager="*res://addons/Miros/Core/SaveManager.cs"
+Vignette="res://vignette.tscn"
 
 [display]
 
 window/size/window_width_override=1152
 window/size/window_height_override=648
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [dotnet]
 

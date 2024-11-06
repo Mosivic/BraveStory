@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=4 uid="uid://cknpusok1jb1v"]
 
-[ext_resource type="Script" path="res://Scene/world.cs" id="1_m2g80"]
+[ext_resource type="Script" path="res://Scene/World.cs" id="1_m2g80"]
 [ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="1_nsodj"]
 [ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="2_t0hkr"]
 [ext_resource type="TileSet" uid="uid://fvo26q11dfj4" path="res://Asset/tiles.tres" id="2_uyf8m"]

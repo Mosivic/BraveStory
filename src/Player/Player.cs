@@ -329,14 +329,14 @@ public partial class Player : CharacterBody2D
 		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
 	}
 
-	public override async void _Process(double delta)
+	public override void _Process(double delta)
 	{
 		_connect.Update(delta);
 
 		if(Interactions.Count!=0){
 			_animatedSprite.Visible = true;
 			if(Input.IsActionJustPressed("interact")){
-				await Interactions.Last().Interact();
+				Interactions.Last().Interact();
 			}
 		}else{
 			_animatedSprite.Visible =false;

@@ -1,6 +1,6 @@
-[gd_scene load_steps=12 format=4 uid="uid://cxklyc3a0qesu"]
+[gd_scene load_steps=13 format=4 uid="uid://cxklyc3a0qesu"]
 
-[ext_resource type="Script" path="res://Scene/world.cs" id="1_c6n6q"]
+[ext_resource type="Script" path="res://Scene/World.cs" id="1_c6n6q"]
 [ext_resource type="Texture2D" uid="uid://boub6swj2g75j" path="res://Art/Legacy-Fantasy - High Forest 2.3/Assets/Tree-Assets.png" id="2_jsf3d"]
 [ext_resource type="PackedScene" uid="uid://djtsla3eopxai" path="res://Object/mine_gate.tscn" id="3_0jw26"]
 [ext_resource type="Script" path="res://Interactable.cs" id="4_560ve"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="6_updyp"]
 [ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="7_wnsr4"]
 [ext_resource type="PackedScene" uid="uid://b60glotno805d" path="res://Enemy/boar.tscn" id="8_pkutf"]
+[ext_resource type="PackedScene" uid="uid://bmtx6e5xi32o2" path="res://save_stone.tscn" id="9_b055e"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_22a03"]
 texture = ExtResource("2_jsf3d")
@@ -519,8 +520,8 @@ script = ExtResource("4_560ve")
 position = Vector2(0, -5.5)
 shape = SubResource("RectangleShape2D_sxquk")
 
-[node name="Player" parent="." instance=ExtResource("5_k7g31")]
-position = Vector2(137, 87)
+[node name="SaveStone" parent="TileMapLayers" instance=ExtResource("9_b055e")]
+position = Vector2(-117, -115)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
@@ -561,3 +562,6 @@ region_rect = Rect2(112, 0, 96, 256)
 
 [node name="Boar" parent="." instance=ExtResource("8_pkutf")]
 position = Vector2(436, 66)
+
+[node name="Player" parent="." instance=ExtResource("5_k7g31")]
+position = Vector2(137, 87)

@@ -18,10 +18,9 @@ public partial class Interactable : Area2D
         BodyExited += OnBodyExited;
     }
 
-    public virtual async Task Interact()
+    public virtual void Interact()
     {
-        // 基类的异步实现
-        await Task.CompletedTask;
+        GD.Print($"[Interact] {Name} is interacted.");
     }
 
     private void OnBodyEntered(Node2D body)

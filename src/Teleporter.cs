@@ -8,8 +8,10 @@ public partial class Teleporter : Interactable
     [Export] public Node2D Player {get;set;}
 
 
-    public override async Task Interact()
+    public override void Interact()
     {
+        base.Interact();
+
         if (string.IsNullOrEmpty(Path))
         {
             GD.PrintErr("Scene path is not set!");
@@ -23,7 +25,7 @@ public partial class Teleporter : Interactable
             return;
         }
 
-        await SceneManager.Instance?.ChangeScene(Path, Player, EntryPoint);
+        SceneManager.Instance?.ChangeScene(Path, Player, EntryPoint);
     }
 }
 

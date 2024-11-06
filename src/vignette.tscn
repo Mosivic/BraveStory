@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cosic0lgd6as7"]
+
+[ext_resource type="Shader" path="res://Shaders/vignette.gdshader" id="1_4al4x"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_twp8o"]
+shader = ExtResource("1_4al4x")
+shader_parameter/radius = 1.0
+shader_parameter/softness = 0.572
+shader_parameter/vignette_color = Color(0.00820202, 0.00820202, 0.00820202, 1)
+
+[node name="Vignette" type="CanvasLayer"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_twp8o")
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2

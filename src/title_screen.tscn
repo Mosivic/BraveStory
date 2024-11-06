@@ -1,0 +1,268 @@
+[gd_scene load_steps=24 format=4 uid="uid://ci2kl0inxu1ju"]
+
+[ext_resource type="Texture2D" uid="uid://cdmn5y8u7uwdf" path="res://Art/Legacy-Fantasy - High Forest 2.3/HUD/Base-01.png" id="1_fgjim"]
+[ext_resource type="FontFile" uid="uid://cs3rytrtn7vnb" path="res://Asset/fonts/SmileySans-Oblique.otf" id="1_hvl7a"]
+[ext_resource type="PackedScene" uid="uid://djtsla3eopxai" path="res://Object/mine_gate.tscn" id="3_ucefj"]
+[ext_resource type="TileSet" uid="uid://fvo26q11dfj4" path="res://Asset/tiles.tres" id="4_da1fy"]
+[ext_resource type="Texture2D" uid="uid://cmk51oivoq0j6" path="res://Art/generic_char_v0.2/png/red/char_red_1.png" id="5_7iffo"]
+[ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="6_d88ly"]
+[ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="7_xj4gv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8tkel"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_t5exk"]
+texture = ExtResource("1_fgjim")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+region_rect = Rect2(94, 14, 20, 20)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vw26t"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6sfuu"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.6, 0.6, 0.6, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lrvsy"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="Theme" id="Theme_6fsi6"]
+default_font = ExtResource("1_hvl7a")
+Button/colors/font_outline_color = Color(0.103744, 0.103744, 0.103744, 0.756863)
+Button/constants/outline_size = 20
+Button/font_sizes/font_size = 60
+Button/styles/disabled = SubResource("StyleBoxEmpty_8tkel")
+Button/styles/focus = SubResource("StyleBoxTexture_t5exk")
+Button/styles/hover = SubResource("StyleBoxEmpty_vw26t")
+Button/styles/normal = SubResource("StyleBoxFlat_6sfuu")
+Button/styles/pressed = SubResource("StyleBoxFlat_lrvsy")
+Label/colors/font_color = Color(1, 0.615686, 0.0156863, 1)
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0)
+Label/constants/outline_size = 25
+Label/constants/shadow_outline_size = 30
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fyhk0"]
+atlas = ExtResource("5_7iffo")
+region = Rect2(0, 0, 56, 56)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxudk"]
+atlas = ExtResource("5_7iffo")
+region = Rect2(56, 0, 56, 56)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ftsl"]
+atlas = ExtResource("5_7iffo")
+region = Rect2(112, 0, 56, 56)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lmxaj"]
+atlas = ExtResource("5_7iffo")
+region = Rect2(168, 0, 56, 56)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dxt0i"]
+atlas = ExtResource("5_7iffo")
+region = Rect2(224, 0, 56, 56)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5ba5y"]
+atlas = ExtResource("5_7iffo")
+region = Rect2(280, 0, 56, 56)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_o3olt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fyhk0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yxudk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ftsl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lmxaj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dxt0i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5ba5y")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="Animation" id="Animation_5ra7m"]
+resource_name = "show"
+length = 0.35
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("V:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.333333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-319, 284), Vector2(40, 284)]
+}
+
+[sub_resource type="Animation" id="Animation_vtt0y"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("V:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(40, 284)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ktc0s"]
+_data = {
+"RESET": SubResource("Animation_vtt0y"),
+"show": SubResource("Animation_5ra7m")
+}
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_6fsi6")
+
+[node name="Scene" type="Node2D" parent="."]
+position = Vector2(-2287, -1109)
+scale = Vector2(3, 3)
+
+[node name="MineGate" parent="Scene" instance=ExtResource("3_ucefj")]
+position = Vector2(1079, 494)
+
+[node name="Brush" type="TileMapLayer" parent="Scene"]
+tile_map_data = PackedByteArray("AAA0AB0AAQANAAAAAAA3ABwAAQANAAYAAAA2ABcAAQALAAQAAAA4ABoAAQAKAAgAAAA4ABkAAQAMAAQAAAA4ABgAAQALAAQAAAA4ABcAAQAJAAUAAAA3ABoAAQAKAAgAAAA3ABkAAQAMAAQAAAA3ABgAAQAMAAQAAAA3ABcAAQALAAUAAAA2ABoAAQAJAAQAAAA2ABkAAQALAAQAAAA2ABgAAQAMAAUAAAA1ABoAAQAKAAQAAAA1ABkAAQAMAAUAAAA1ABgAAQAKAAUAAAA1ABcAAQAJAAcAAAA0ABoAAQAKAAgAAAA0ABkAAQAMAAQAAAA0ABgAAQAKAAUAAAA0ABcAAQALAAQAAAAzABoAAQAKAAgAAAAzABkAAQALAAUAAAAzABgAAQAJAAUAAAAzABcAAQALAAUAAAAyABoAAQAKAAgAAAAyABkAAQALAAQAAAAyABgAAQAKAAUAAAAyABcAAQAJAAUAAAAxABoAAQAKAAgAAAAxABkAAQAMAAQAAAAxABgAAQAJAAUAAAAxABcAAQAJAAQAAAAwABoAAQAKAAgAAAAwABkAAQAKAAUAAAAwABgAAQAJAAcAAAAwABcAAQAJAAcAAABHABoAAQAKAAcAAABHABkAAQAJAAUAAABHABgAAQALAAcAAABHABcAAQALAAcAAABGABoAAQALAAUAAABGABkAAQAMAAQAAABGABgAAQAKAAcAAABGABcAAQAKAAcAAABFABoAAQAKAAQAAABFABkAAQAKAAcAAABFABgAAQAMAAUAAABFABcAAQALAAUAAABEABoAAQAKAAgAAABEABkAAQAMAAQAAABEABgAAQALAAQAAABEABcAAQALAAUAAABDABoAAQAKAAgAAABDABkAAQAKAAcAAABDABgAAQAMAAUAAABDABcAAQALAAQAAABCABoAAQAJAAgAAABCABkAAQAJAAcAAABCABgAAQAKAAQAAABCABcAAQAMAAQAAABHAB4AAQAKAAgAAABHAB0AAQAMAAUAAABHABwAAQAKAAcAAABHABsAAQAMAAUAAABGAB4AAQAKAAgAAABGAB0AAQALAAUAAABGABwAAQALAAQAAABGABsAAQAMAAUAAABFAB4AAQAJAAgAAABFAB0AAQAJAAcAAABFABwAAQAJAAcAAABFABsAAQAJAAcAAAAvABkAAQAJAAYAAAAvABoAAQAJAAgAAAA1ABsAAQAJAAgAAAA2ABsAAQALAAgAAAA5ABkAAQALAAUAAAA5ABoAAQAKAAQAAAA6ABoAAQAKAAcAAAA5ABgAAQAJAAUAAAA6ABkAAQALAAcAAAA7ABoAAQALAAYAAAA6ABsAAQAKAAgAAAA7ABsAAQALAAgAAAA5ABsAAQAJAAgAAAA5ABcAAQALAAYAAAA6ABgAAQALAAYAAAA/ABcAAQAJAAgAAABAABcAAQAKAAgAAABBABcAAQAKAAQAAABBABgAAQAJAAgAAAA+ACMAAQANAAAAAAA=")
+tile_set = ExtResource("4_da1fy")
+
+[node name="Env" type="TileMapLayer" parent="Scene"]
+position = Vector2(1, 0)
+tile_map_data = PackedByteArray("AAAAACgAAQAAAAQAAABHACUAAQAFAAEAAABHACQAAQAEAAMAAABHACMAAQAEAAIAAABHACIAAQAEAAIAAABHACEAAQAFAAEAAABHACAAAQAEAAMAAABHAB8AAQAEAAMAAABHAB4AAQAEAAMAAABHAB0AAQAEAAIAAABHABwAAQAEAAMAAABHABsAAQAEAAIAAABHABoAAQAEAAMAAABHABkAAQAEAAIAAABHABgAAQAFAAEAAABHABcAAQAEAAIAAABGACUAAQABAAMAAABGACQAAQABAAIAAABGACMAAQABAAIAAABGACIAAQAHAAIAAABGACEAAQAAAAIAAABGACAAAQAAAAIAAABGAB8AAQAAAAMAAABGAB4AAQAAAAMAAABGAB0AAQAAAAIAAABGABwAAQAAAAIAAABGABsAAQAAAAMAAABGABoAAQAAAAMAAABGABkAAQAAAAIAAABGABgAAQAAAAMAAABGABcAAQAIAAAAAABFACUAAQABAAIAAABEACUAAQADAAIAAABDACUAAQADAAMAAABCACUAAQADAAMAAABBACUAAQABAAMAAABAACUAAQADAAMAAAA/ACUAAQADAAIAAAA+ACUAAQADAAIAAAA9ACUAAQABAAMAAAA8ACUAAQACAAIAAAA7ACUAAQABAAMAAAA6ACUAAQADAAMAAAA5ACUAAQACAAIAAAA4ACUAAQACAAIAAAA3ACUAAQAHAAIAAAA2ACUAAQABAAAAAAA1ACUAAQAGAAEAAAA0ACUAAQACAAAAAAAzACUAAQABAAAAAAAyACUAAQACAAAAAAAxACUAAQACAAAAAAAwACUAAQABAAAAAAAzAB8AAQAEAAQAAAAzAB4AAQAKAAEAAAAzAB0AAQAFAAAAAAAzABwAAQADAAIAAAAyAB8AAQAGAAAAAAAyAB4AAQADAAIAAAAyAB0AAQABAAIAAAAyABwAAQADAAMAAAAxAB8AAQAGAAAAAAAxAB4AAQABAAIAAAAxAB0AAQABAAIAAAAxABwAAQACAAMAAAAwAB8AAQAGAAAAAAAwAB4AAQACAAIAAAAwAB0AAQABAAMAAAAwABwAAQADAAIAAAA7ABwAAQAGAAAAAAA7ABsAAQACAAMAAAA7ABoAAQABAAMAAAA7ABkAAQAFAAIAAAA7ABgAAQAEAAAAAAA6ABwAAQAGAAAAAAA6ABsAAQABAAIAAAA6ABoAAQABAAIAAAA6ABkAAQADAAMAAAA6ABgAAQAGAAEAAAA5ABwAAQAGAAAAAAA5ABsAAQADAAMAAAA5ABoAAQACAAIAAAA5ABkAAQACAAIAAAA5ABgAAQACAAAAAAA4ABwAAQAGAAAAAAA4ABsAAQACAAIAAAA4ABoAAQACAAIAAAA4ABkAAQACAAMAAAA4ABgAAQAGAAEAAAA3ABwAAQAGAAAAAAA3ABsAAQADAAMAAAA3ABoAAQABAAMAAAA3ABkAAQABAAMAAAA3ABgAAQAGAAEAAAA2ABwAAQAGAAAAAAA2ABsAAQACAAMAAAA2ABoAAQACAAIAAAA2ABkAAQABAAIAAAA2ABgAAQABAAAAAAA1ABwAAQAGAAAAAAA1ABsAAQABAAIAAAA1ABoAAQADAAIAAAA1ABkAAQADAAMAAAA1ABgAAQAGAAEAAAA0ABwAAQAFAAAAAAA0ABsAAQACAAIAAAA0ABoAAQADAAIAAAA0ABkAAQADAAMAAAA0ABgAAQAGAAEAAAAzABsAAQADAAIAAAAzABoAAQADAAMAAAAzABkAAQABAAMAAAAzABgAAQABAAAAAAAyABsAAQACAAMAAAAyABoAAQACAAMAAAAyABkAAQADAAMAAAAyABgAAQACAAAAAAAxABsAAQABAAIAAAAxABoAAQABAAIAAAAxABkAAQADAAMAAAAxABgAAQABAAAAAAAwABsAAQABAAMAAAAwABoAAQADAAIAAAAwABkAAQADAAMAAAAwABgAAQABAAAAAAA0AB0AAQAEAAQAAAA8ABoAAQAFAAIAAAA8ABsAAQACAAIAAAA9ABsAAQAFAAIAAAA8ABkAAQAEAAAAAAA9ABoAAQAEAAAAAAA/ABwAAQAEAAQAAAA/ABsAAQAEAAAAAAA+ABwAAQAGAAAAAAA+ABsAAQADAAAAAAA9ABwAAQAGAAAAAAA8ABwAAQAGAAAAAABFACQAAQADAAIAAABFACMAAQACAAIAAABFACIAAQAGAAEAAABEACQAAQACAAIAAABEACMAAQABAAMAAABEACIAAQACAAAAAABDACQAAQACAAIAAABDACMAAQADAAIAAABDACIAAQADAAAAAABCACQAAQADAAMAAABCACMAAQACAAMAAABCACIAAQAGAAEAAABBACQAAQACAAMAAABBACMAAQACAAMAAABBACIAAQADAAAAAABAACQAAQABAAMAAABAACMAAQACAAMAAABAACIAAQACAAAAAAA/ACQAAQABAAMAAAA/ACMAAQACAAIAAAA/ACIAAQACAAAAAAA+ACQAAQABAAMAAAA+ACMAAQABAAMAAAA+ACIAAQADAAAAAAA9ACQAAQACAAMAAAA9ACMAAQACAAMAAAA9ACIAAQAGAAEAAAA8ACQAAQAHAAIAAAA8ACMAAQAAAAMAAAA8ACIAAQAAAAAAAAA6ACQAAQADAAAAAAA7ACQAAQADAAAAAAA5ACQAAQABAAAAAAA4ACQAAQAGAAEAAAA3ACQAAQAAAAAAAAAyACQAAQAIAAMAAAAvABgAAQAAAAAAAAAvABkAAQAHAAIAAAAvABoAAQACAAMAAAAvABsAAQABAAMAAAAvABwAAQABAAIAAAAvAB0AAQACAAIAAAAvAB4AAQADAAMAAAAvAB8AAQAGAAAAAAAvACUAAQAGAAEAAAA=")
+tile_set = ExtResource("4_da1fy")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Scene"]
+position = Vector2(1026, 513.5)
+scale = Vector2(-1, 1)
+sprite_frames = SubResource("SpriteFrames_o3olt")
+autoplay = "default"
+frame_progress = 0.039165
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Scene"]
+
+[node name="Sky" type="ParallaxLayer" parent="Scene/ParallaxBackground"]
+motion_scale = Vector2(0.3, 0.3)
+motion_mirroring = Vector2(480, 0)
+metadata/_edit_lock_ = true
+
+[node name="Background" type="Sprite2D" parent="Scene/ParallaxBackground/Sky"]
+scale = Vector2(2, 2)
+texture = ExtResource("6_d88ly")
+centered = false
+
+[node name="Hills" type="ParallaxLayer" parent="Scene/ParallaxBackground"]
+scale = Vector2(2.5, 2.5)
+motion_mirroring = Vector2(384, 0)
+metadata/_edit_lock_ = true
+
+[node name="Background" type="Sprite2D" parent="Scene/ParallaxBackground/Hills"]
+position = Vector2(48, 256.4)
+texture = ExtResource("7_xj4gv")
+region_enabled = true
+region_rect = Rect2(112, 0, 96, 256)
+
+[node name="Background2" type="Sprite2D" parent="Scene/ParallaxBackground/Hills"]
+position = Vector2(144, 256.4)
+texture = ExtResource("7_xj4gv")
+region_enabled = true
+region_rect = Rect2(112, 0, 96, 256)
+
+[node name="Background3" type="Sprite2D" parent="Scene/ParallaxBackground/Hills"]
+position = Vector2(240, 256.4)
+texture = ExtResource("7_xj4gv")
+region_enabled = true
+region_rect = Rect2(112, 0, 96, 256)
+
+[node name="Background4" type="Sprite2D" parent="Scene/ParallaxBackground/Hills"]
+position = Vector2(336, 256.4)
+texture = ExtResource("7_xj4gv")
+region_enabled = true
+region_rect = Rect2(112, 0, 96, 256)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 83.0
+offset_bottom = 147.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("1_hvl7a")
+theme_override_font_sizes/font_size = 96
+text = "勇者传说"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="V" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = -40.0
+offset_right = 240.0
+offset_bottom = 211.0
+grow_vertical = 2
+
+[node name="NewGame" type="Button" parent="V"]
+layout_mode = 2
+text = "新的故事"
+
+[node name="LoadGame" type="Button" parent="V"]
+layout_mode = 2
+text = "旧的回忆"
+
+[node name="ExitGame" type="Button" parent="V"]
+layout_mode = 2
+text = "离开游戏"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ktc0s")
+}
+autoplay = "show"
