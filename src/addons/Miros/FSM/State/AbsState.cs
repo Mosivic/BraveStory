@@ -10,9 +10,9 @@ public abstract class AbsState
     public required string Name { get; init; }
     public required GameplayTag Tag {get;init;}
     public Type JobType { get; init; } = typeof(JobSimple);
-    public required int Priority { get; init; }
+    public int Priority { get; init; } = 0;
     public object Source { get; init; }
-
+    
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
 
     // Duration

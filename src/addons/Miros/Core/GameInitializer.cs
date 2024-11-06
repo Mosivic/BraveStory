@@ -42,8 +42,6 @@ public partial class GameInitializer : Node
     // 初始化所有评估器
     private void InitializeEvaluators()
     {
-        var evaluatorManager = EvaluatorManager.Instance;
-
         GD.Print("Evaluators initialized!");
     }
 
