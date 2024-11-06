@@ -1,24 +1,25 @@
 using BraveStory;
 using BraveStory.Player;
 using FSM.States;
+using FSM.States.Buff;
 using Godot;
 using System;
 using YamlDotNet.Core.Tokens;
 
-public partial class Boar : Enemy
+public partial class Boar : Character
 {
 	private RayCast2D _wallChecker;
 	private RayCast2D _floorChecker;
 	private RayCast2D _playerChecker;
-	private MultiLayerStateMachineConnect _connect;
-	private EnemyData _data = new EnemyData();
 
+	private EnemyData _data = new EnemyData();
 	private int _hp = 5;
-	private bool _hasHit = false;
+
 	private Vector2 _knockbackVelocity = Vector2.Zero;
-	
+
 	public override void _Ready()
 	{
+		base._Ready();
 		// Components
 		_wallChecker = GetNode<RayCast2D>("Graphics/WallChecker");
 		_floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
@@ -28,6 +29,7 @@ public partial class Boar : Enemy
 
 		// 设置初始朝向为左边
 		_graphic.Scale = new Vector2(-1, 1);
+
 
 		var ownedTags = new GameplayTagContainer([Tags.Enemy]);
 
@@ -137,10 +139,7 @@ public partial class Boar : Enemy
 		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
 	}
 
-	private void PlayAnimation(string animationName)
-	{
-		_animationPlayer.Play(animationName);
-	}
+
 
 	private void UpdateFacing(float direction)
 	{
@@ -186,32 +185,5 @@ public partial class Boar : Enemy
 				MoveAndSlide();
 			}
 		}
-	}
-
-	public override void _Process(double delta)
-	{
-		_connect.Update(delta);
-	}
-
-	public override void _PhysicsProcess(double delta)
-	{
-		_connect.PhysicsUpdate(delta);
-	}
-
-	public bool WaitOverTime(GameplayTag layer, double time)
-	{
-		return _connect.GetCurrentStateTime(layer) > time;
-	}
-
-	public bool IsAnimationFinished()
-	{
-		return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
-	}
-
-
-	public void _on_hurt_box_hurt(Area2D hitbox)
-	{
-		_hp -= 1;
-		_hasHit = true;
 	}
 }

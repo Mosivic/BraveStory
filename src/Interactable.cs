@@ -21,6 +21,7 @@ public partial class Interactable : Area2D
     public virtual void Interact()
     {
         GD.Print($"[Interact] {Name} is interacted.");
+        EmitSignal(SignalName.Interacted);
     }
 
     private void OnBodyEntered(Node2D body)

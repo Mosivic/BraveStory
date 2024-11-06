@@ -1,0 +1,84 @@
+using Godot;
+using System;
+using BraveStory;
+using FSM.Job.Executor;
+using FSM.Scheduler;
+
+public partial class Character : CharacterBody2D
+{
+    protected AnimationPlayer _animationPlayer;
+    protected Node2D _graphic;
+    protected Sprite2D _sprite;
+    protected HitBox _hitBox;
+    protected HurtBox _hurtBox;
+    protected bool _hasHit = false;
+
+	protected MultiLayerStateMachineConnect _connect;
+
+
+    public override void _Ready()
+    {
+        base._Ready();
+
+        // 处理击中事件 
+		_hitBox = GetNode<HitBox>("HitBox");
+		_hitBox.OnHit += HandleHit;
+
+		// 处理受伤事件
+		_hurtBox = GetNode<HurtBox>("HurtBox");
+		_hurtBox.OnHurt += HandleHurt;
+
+    }
+
+
+    public override void _Process(double delta)
+	{
+		_connect.Update(delta);
+	}
+
+
+	public override void _PhysicsProcess(double delta)
+	{
+		_connect.PhysicsUpdate(delta);
+	}
+
+
+	protected bool WaitOverTime(GameplayTag layer, double time)
+	{
+		return _connect.GetCurrentStateTime(layer) > time;
+	}
+
+
+    protected bool IsAnimationFinished()
+	{
+		return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+	}
+
+    protected void PlayAnimation(string animationName)
+	{
+		_animationPlayer.Play(animationName);
+	}
+
+    private void HandleHurt(object sender, HurtEventArgs e)
+    {
+        _hasHit = true;
+    }
+
+
+    private void HandleHit(object sender, HitEventArgs e)
+    {
+
+    }
+
+
+    public override void _ExitTree()
+    {
+
+        if (_hitBox != null)
+            _hitBox.OnHit -= HandleHit;
+        if (_hurtBox != null)
+            _hurtBox.OnHurt -= HandleHurt;
+        base._ExitTree();
+    }
+}
+

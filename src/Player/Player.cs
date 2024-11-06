@@ -8,26 +8,18 @@ using Godot;
 
 namespace BraveStory.Player;
 
-public partial class Player : CharacterBody2D
+public partial class Player : Character
 {
-	private AnimationPlayer _animationPlayer;
-	
 	private RayCast2D _footChecker;
-	private Node2D _graphic;
-	private Sprite2D _sprite;
 	private RayCast2D _handChecker;
-	private Area2D _hurtBox;
 	private AnimatedSprite2D _animatedSprite;
 
-
-	private MultiLayerStateMachineConnect _connect;
 	private PlayerData Data { get; set; } = new PlayerData();
 	public HashSet<Interactable> Interactions { get; set; } = new();
 
 
 	private int _jumpCount = 0;
 	private int _maxJumpCount = 2;
-	private bool _hasHit = false;
 	private int _hp = 10;
 	private float _slidingSpeed = 0f;
 	private const float INITIAL_SLIDING_SPEED = 400f;
@@ -43,7 +35,6 @@ public partial class Player : CharacterBody2D
 		_sprite = _graphic.GetNode<Sprite2D>("Sprite");
 		_handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
 		_footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
-		_hurtBox = GetNode<Area2D>("Graphic/HurtBox");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
 		var ownedTags = new GameplayTagContainer([Tags.Player]);
@@ -331,7 +322,7 @@ public partial class Player : CharacterBody2D
 
 	public override void _Process(double delta)
 	{
-		_connect.Update(delta);
+		base._Process(delta);
 
 		if(Interactions.Count!=0){
 			_animatedSprite.Visible = true;
@@ -343,20 +334,8 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	public override void _PhysicsProcess(double delta)
-	{
-		_connect.PhysicsUpdate(delta);
-	}
 
-	public void PlayAnimation(string animationName)
-	{
-		_animationPlayer.Play(animationName);
-	}
 
-	public bool IsAnimationFinished()
-	{
-		return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
-	}
 
 	// 添加一个统一处理朝向的方法
 	private void UpdateFacing(float direction)
@@ -445,10 +424,6 @@ public partial class Player : CharacterBody2D
 		return Input.IsActionJustPressed("sliding");
 	}
 
-	public bool WaitOverTime(GameplayTag layer, double time)
-	{
-		return _connect.GetCurrentStateTime(layer) > time;
-	}
 
 	public void _on_hurt_box_hurt(Area2D hitbox)
 	{

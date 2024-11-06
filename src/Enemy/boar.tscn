@@ -5,9 +5,9 @@
 [ext_resource type="Script" path="res://Enemy/Boar.cs" id="2_gphwb"]
 [ext_resource type="Texture2D" uid="uid://cehsld3emvxjh" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Walk/Walk-Base-Sheet.png" id="2_ii47p"]
 [ext_resource type="Texture2D" uid="uid://bkmqhykoigyuy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Run/Run-Sheet.png" id="2_l8evk"]
-[ext_resource type="Script" path="res://HitBox.gd" id="4_da4tt"]
+[ext_resource type="Script" path="res://HitBox.cs" id="4_aqrj4"]
+[ext_resource type="Script" path="res://HurtBox.cs" id="5_bss0n"]
 [ext_resource type="Texture2D" uid="uid://ddtr8ovkgqhwy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_i5lod"]
-[ext_resource type="Script" path="res://HurtBox.gd" id="5_sqhmi"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q70f8"]
 size = Vector2(37, 7)
@@ -344,7 +344,7 @@ target_position = Vector2(0, 9)
 [node name="HitBox" type="Area2D" parent="Graphics" index="4"]
 collision_layer = 0
 collision_mask = 8
-script = ExtResource("4_da4tt")
+script = ExtResource("4_aqrj4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/HitBox" index="0"]
 position = Vector2(0.5, -10.5)
@@ -353,7 +353,7 @@ shape = SubResource("RectangleShape2D_q70f8")
 [node name="HurtBox" type="Area2D" parent="Graphics" index="5"]
 collision_layer = 16
 collision_mask = 0
-script = ExtResource("5_sqhmi")
+script = ExtResource("5_bss0n")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/HurtBox" index="0"]
 position = Vector2(0, -13)
@@ -367,5 +367,3 @@ shape = SubResource("CircleShape2D_lk46v")
 libraries = {
 "": SubResource("AnimationLibrary_2r4i3")
 }
-
-[connection signal="hurt" from="Graphics/HurtBox" to="." method="_on_hurt_box_hurt"]
