@@ -1,7 +1,6 @@
 using BraveStory;
-using BraveStory.Player;
-using FSM.States;
 using Godot;
+using Miros.Core;
 
 public partial class Boar : Character
 {

@@ -1,6 +1,6 @@
-using FSM.States.Buff;
 using Godot;
 using System;
+using Miros.Core;
 
 public class HitEventArgs : EventArgs
 {

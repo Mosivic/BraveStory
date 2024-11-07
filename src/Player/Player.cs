@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using FSM.Job;
-using FSM.States;
-using FSM.States.Buff;
+using BraveStory;
+using Miros.Core;
 using Godot;
 
-namespace BraveStory.Player;
+
 
 public partial class Player : Character
 {
@@ -225,7 +223,7 @@ public partial class Player : Character
 				{
 					Property = Data.RunSpeed,
 					Affect = -10,
-					Operator = BuffModifierOperator.Add
+					Operator = ModifierOperation.Add
 				}
 			],
 			DurationPolicy = BuffDurationPolicy.Duration,

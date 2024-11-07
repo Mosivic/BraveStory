@@ -1,4 +1,7 @@
 using Godot;
+using Miros.Core;
+
+namespace BraveStory;
 
 public partial class Character : CharacterBody2D
 {

@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not modify.
 using Godot;
-using System.Runtime.CompilerServices;
+using Miros.Core;
 
 namespace BraveStory
 {

@@ -1,8 +1,7 @@
 using Godot;
-using FSM.States;
-using FSM.Job.Executor;
+using Miros.Core;
 
-namespace BraveStory.Player;
+namespace BraveStory;
 
 public partial class StateInfoDisplay : Node2D
 {

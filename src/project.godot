@@ -20,7 +20,8 @@ config/icon="res://icon.svg"
 GameInitializer="*res://addons/Miros/Core/GameInitializer.cs"
 SceneManager="*res://addons/Miros/Core/SceneManager.cs"
 SaveManager="*res://addons/Miros/Core/SaveManager.cs"
-Vignette="res://vignette.tscn"
+SunLight="res://sun_light.tscn"
+Crt="res://crt.tscn"
 
 [display]
 
