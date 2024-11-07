@@ -29,12 +29,10 @@ public partial class Player : Character
 
 	public override void _Ready()
 	{
+		base._Ready();
 		// Compoents
-		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		_graphic = GetNode<Node2D>("Graphic");
-		_sprite = _graphic.GetNode<Sprite2D>("Sprite");
-		_handChecker = GetNode<RayCast2D>("Graphic/HandChecker");
-		_footChecker = GetNode<RayCast2D>("Graphic/FootChecker");
+		_handChecker = GetNode<RayCast2D>("Graphics/HandChecker");
+		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
 		var ownedTags = new GameplayTagContainer([Tags.Player]);
@@ -68,7 +66,7 @@ public partial class Player : Character
 			EnterFunc = s =>
 			{
 				PlayAnimation("jump");
-				float wallJumpDirectionX = _graphic.Scale.X;
+				float wallJumpDirectionX = _graphics.Scale.X;
 				Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
 				_jumpCount = 0;
 			},
@@ -197,7 +195,7 @@ public partial class Player : Character
 			EnterFunc = s =>
 			{
 				PlayAnimation("sliding_start");
-				_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphic.Scale.X);
+				_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
 				_hurtBox.SetDeferred("monitorable", false);
 			},
 			ExitFunc = s => _hurtBox.SetDeferred("monitorable", true),
@@ -343,12 +341,12 @@ public partial class Player : Character
 		// 如果有输入，根据输入方向转向
 		if (!Mathf.IsZeroApprox(direction))
 		{
-			_graphic.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
+			_graphics.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
 		}
 		// 如果没有输入，根据速度方向转向
 		else if (!Mathf.IsZeroApprox(Velocity.X))
 		{
-			_graphic.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
+			_graphics.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 		}
 	}
 
@@ -425,12 +423,6 @@ public partial class Player : Character
 	}
 
 
-	public void _on_hurt_box_hurt(Area2D hitbox)
-	{
-		_hp -= 1;
-		_hasHit = true;
-	}
-
 	public void Slide(double delta)
 	{
 		var velocity = Velocity;
@@ -439,5 +431,16 @@ public partial class Player : Character
 		velocity.Y += (float)delta * Data.Gravity;
 		Velocity = velocity;
 		MoveAndSlide();
+	}
+
+
+	protected override void HandleHit(object sender, HitEventArgs e)
+	{
+		_hitBox.SetBuffState(new BuffState
+		{
+			Name = "TestBuff",
+			Tag = Tags.LayerBuff,
+			JobType = typeof(JobBuff),
+		});
 	}
 }

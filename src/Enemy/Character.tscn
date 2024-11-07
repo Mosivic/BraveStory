@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://5f6ngwh4b25f"]
+
+[ext_resource type="Script" path="res://Enemy/Character.cs" id="1_atnfq"]
+[ext_resource type="Script" path="res://Player/StateInfoDisplay.cs" id="2_eql2w"]
+[ext_resource type="Script" path="res://HitBox.cs" id="2_wqhsd"]
+[ext_resource type="Script" path="res://HurtBox.cs" id="3_ttc38"]
+
+[node name="Character" type="CharacterBody2D"]
+collision_layer = 4
+script = ExtResource("1_atnfq")
+
+[node name="Graphics" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+
+[node name="HitBox" type="Area2D" parent="Graphics"]
+script = ExtResource("2_wqhsd")
+
+[node name="HurtBox" type="Area2D" parent="Graphics"]
+script = ExtResource("3_ttc38")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-3, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="StateInfoDisplay" type="Node2D" parent="."]
+script = ExtResource("2_eql2w")

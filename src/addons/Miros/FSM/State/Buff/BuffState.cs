@@ -37,7 +37,7 @@ public class BuffState : AbsState
 {
     // Core
     public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
-    public List<Modifier> Modifiers { get; set; }
+    public HashSet<Modifier> Modifiers { get; set; } = new();
 
     // Period 
     public bool IsExecutePeriodicEffectOnStart { get; set; } = true;

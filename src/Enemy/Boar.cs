@@ -1,10 +1,7 @@
 using BraveStory;
 using BraveStory.Player;
 using FSM.States;
-using FSM.States.Buff;
 using Godot;
-using System;
-using YamlDotNet.Core.Tokens;
 
 public partial class Boar : Character
 {
@@ -24,15 +21,11 @@ public partial class Boar : Character
 		_wallChecker = GetNode<RayCast2D>("Graphics/WallChecker");
 		_floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
 		_playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
-		_animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-		_graphic = GetNode<Node2D>("Graphics");
 
 		// 设置初始朝向为左边
-		_graphic.Scale = new Vector2(-1, 1);
-
+		_graphics.Scale = new Vector2(-1, 1);
 
 		var ownedTags = new GameplayTagContainer([Tags.Enemy]);
-
 
 		// States
 		var idle = new HostState<Boar>(this)
@@ -146,7 +139,7 @@ public partial class Boar : Character
 		if (!Mathf.IsZeroApprox(direction))
 		{
 			// 修改朝向逻辑：direction < 0 时朝左（-1），direction > 0 时朝右（1）
-			_graphic.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
+			_graphics.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
 		}
 	}
 
@@ -156,12 +149,12 @@ public partial class Boar : Character
 		if (_wallChecker.IsColliding())
 		{
 			// 转向：将 X 缩放在 1 和 -1 之间切换
-			_graphic.Scale = new Vector2(_graphic.Scale.X * -1, 1);
+			_graphics.Scale = new Vector2(_graphics.Scale.X * -1, 1);
 		}
 
 		// 移动逻辑
 		var velocity = Velocity;
-		velocity.X = _data.WalkSpeed * -_graphic.Scale.X;  // 注意这里加了负号
+		velocity.X = _data.WalkSpeed * -_graphics.Scale.X;  // 注意这里加了负号
 		velocity.Y += (float)delta * _data.Gravity;
 		Velocity = velocity;
 		MoveAndSlide();
@@ -181,7 +174,7 @@ public partial class Boar : Character
 				velocity.Y += (float)delta * _data.Gravity;
 				Velocity = velocity;
 				// 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
-				_graphic.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
+				_graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
 				MoveAndSlide();
 			}
 		}

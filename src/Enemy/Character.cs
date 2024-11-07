@@ -1,13 +1,9 @@
 using Godot;
-using System;
-using BraveStory;
-using FSM.Job.Executor;
-using FSM.Scheduler;
 
 public partial class Character : CharacterBody2D
 {
     protected AnimationPlayer _animationPlayer;
-    protected Node2D _graphic;
+    protected Node2D _graphics;
     protected Sprite2D _sprite;
     protected HitBox _hitBox;
     protected HurtBox _hurtBox;
@@ -18,14 +14,16 @@ public partial class Character : CharacterBody2D
 
     public override void _Ready()
     {
-        base._Ready();
-
+        _graphics = GetNode<Node2D>("Graphics");
+        _sprite = _graphics.GetNode<Sprite2D>("Sprite2D");
+        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+    
         // 处理击中事件 
-		_hitBox = GetNode<HitBox>("HitBox");
+		_hitBox = _graphics.GetNode<HitBox>("HitBox");
 		_hitBox.OnHit += HandleHit;
 
 		// 处理受伤事件
-		_hurtBox = GetNode<HurtBox>("HurtBox");
+		_hurtBox = _graphics.GetNode<HurtBox>("HurtBox");
 		_hurtBox.OnHurt += HandleHurt;
 
     }
@@ -59,13 +57,14 @@ public partial class Character : CharacterBody2D
 		_animationPlayer.Play(animationName);
 	}
 
-    private void HandleHurt(object sender, HurtEventArgs e)
+    protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        _hasHit = true;
+		GD.Print($"[Hurt]{Name} Received buff :{e.Buff.Name}");
+		_hasHit = true;
     }
 
 
-    private void HandleHit(object sender, HitEventArgs e)
+    protected virtual void HandleHit(object sender, HitEventArgs e)
     {
 
     }
