@@ -6,17 +6,17 @@ public class JobBuff(BuffState buffState) : AbsJobBase(buffState)
 {
     public override void Enter()
     {
-        if (buffState.DurationPolicy == BuffDurationPolicy.Instant)
+        if (buffState.DurationPolicy == DurationPolicy.Instant)
         {
             ApplyModifiers();
             buffState.Status = RunningStatus.Succeed;
         }
-        else if (buffState.DurationPolicy == BuffDurationPolicy.Infinite)
+        else if (buffState.DurationPolicy == DurationPolicy.Infinite)
         {
             if (buffState.Period > 0 && buffState.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
-        else if (buffState.DurationPolicy == BuffDurationPolicy.Duration)
+        else if (buffState.DurationPolicy == DurationPolicy.Duration)
         {
             if (buffState.Period > 0 && buffState.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
@@ -28,11 +28,11 @@ public class JobBuff(BuffState buffState) : AbsJobBase(buffState)
     public override void Resume()
     {
         buffState.Status = RunningStatus.Running;
-        if (buffState.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.Reset)
+        if (buffState.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.Reset)
         {
             buffState.PeriodElapsed = 0;
         }
-        else if (buffState.PeriodicInhibitionPolicy == BuffPeriodicInhibitionPolicy.ExecuteAndReset)
+        else if (buffState.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.ExecuteAndReset)
         {
             ApplyModifiers();
             buffState.PeriodElapsed = 0;
@@ -55,12 +55,12 @@ public class JobBuff(BuffState buffState) : AbsJobBase(buffState)
     {
         switch (buffState.DurationPolicy)
         {
-            case BuffDurationPolicy.Instant:
+            case DurationPolicy.Instant:
                 break;
-            case BuffDurationPolicy.Infinite:
+            case DurationPolicy.Infinite:
                 CancelModifiers();
                 break;
-            case BuffDurationPolicy.Duration:
+            case DurationPolicy.Duration:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -73,12 +73,12 @@ public class JobBuff(BuffState buffState) : AbsJobBase(buffState)
     {
         switch (buffState.DurationPolicy)
         {
-            case BuffDurationPolicy.Instant:
+            case DurationPolicy.Instant:
                 break;
-            case BuffDurationPolicy.Infinite:
+            case DurationPolicy.Infinite:
                 CancelModifiers();
                 break;
-            case BuffDurationPolicy.Duration:
+            case DurationPolicy.Duration:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

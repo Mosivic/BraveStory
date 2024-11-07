@@ -219,14 +219,14 @@ public partial class Player : Character
 			JobType = typeof(JobBuff),
 			Modifiers =
 			[
-				new Modifier
-				{
-					Property = Data.RunSpeed,
-					Affect = -10,
-					Operator = ModifierOperation.Add
-				}
+				// new Modifier
+				// {
+				// 	Property = Data.RunSpeed,
+				// 	Affect = -10,
+				// 	Operator = ModifierOperation.Add
+				// }
 			],
-			DurationPolicy = BuffDurationPolicy.Duration,
+			DurationPolicy = DurationPolicy.Duration,
 			Duration = 3,
 			Period = 1,
 			StackMaxCount = 3,
