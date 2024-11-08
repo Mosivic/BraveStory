@@ -134,21 +134,3 @@ public enum SupportedOperation
     Override = 1 << 3,
     All = Add | Multiply | Divide | Override
 }
-
-public enum CalculateMode
-{
-    /// <summary>
-    /// 叠加计算
-    /// </summary>
-    Stacking,
-
-    /// <summary>
-    /// 取最小值
-    /// </summary> 
-    MinValueOnly,
-
-    /// <summary>
-    /// 取最大值
-    /// </summary>
-    MaxValueOnly,
-}
