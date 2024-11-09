@@ -20,7 +20,6 @@ namespace Miros.Core
 
         public float BaseValue { get; private set; }
         public float CurrentValue { get; private set; }
-
         public float MinValue { get; private set; }
         public float MaxValue { get; private set; }
 

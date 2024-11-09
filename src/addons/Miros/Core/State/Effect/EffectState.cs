@@ -14,12 +14,11 @@ public class EffectState : AbsState
     public bool IsActive {get;private set;}
 
 
-    public List<Modifier> Modifiers { get; private set; }
+
     public List<ExecutionCalculation> Executions { get; private set; }
     public List<GrantedAbilityFromEffect> GrantedAbilities { get; private set; }
     public EffectTagContainer TagContainer { get; private set; }
-
-
+    public float StackCount { get; internal set; }
 
     public readonly CueState[] CueOnExecute;
     public readonly CueState[] CueOnRemove;
@@ -43,17 +42,6 @@ public class EffectState : AbsState
     public readonly EffectState[] RoutineExpirationEffectClasses;
 
 
-    public EffectState(string name, GameplayTag tag)
-    {
-        Name = name;
-        Tag = tag;
-        DurationPolicy = effect.DurationPolicy;
-        Duration = effect.Duration;
-        Period = effect.Period;
-        Modifiers = new List<GameplayEffectModifier>(effect.Modifiers);
-        Executions = new List<ExecutionCalculation>(effect.Executions);
-        GrantedAbilities = new List<GrantedAbilityFromEffect>(effect.GrantedAbilities);
-        TagContainer = effect.TagContainer;
-    }
+
 
 }
