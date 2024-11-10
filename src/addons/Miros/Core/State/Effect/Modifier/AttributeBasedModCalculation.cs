@@ -2,22 +2,24 @@ namespace Miros.Core;
 
 public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 {
+    /// <summary>
+    /// 属性来源
+    /// </summary>
     public enum AttributeFrom
     {
-        Source,
-
-        Target
+        Source, // 来源
+        Target // 目标
     }
 
-    public enum GEAttributeCaptureType
+    public enum EffectAttributeCaptureType
     {
         SnapShot, // 快照
         Track // 实时
     }
 
-    public GEAttributeCaptureType captureType; // 捕获方式
+    public EffectAttributeCaptureType captureType; // 捕获方式
 
-    public AttributeFrom attributeFromType; // 捕获目标
+    public AttributeFrom attributeFromType; // 属性来源
 
     public string attributeName; // 属性的名称
 
@@ -29,32 +31,32 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 
     public float b = 0; // 常量
 
-    public override float CalculateMagnitude(Effect state, float modifierMagnitude)
+    public override float CalculateMagnitude(Effect effect, float modifierMagnitude)
     {
         if (attributeFromType == AttributeFrom.Source)
         {
-            if (captureType == GEAttributeCaptureType.SnapShot)
+            if (captureType == EffectAttributeCaptureType.SnapShot)
             {
-                var snapShot = state.SnapshotSourceAttributes;
+                var snapShot = effect.SnapshotSourceAttributes;
                 var attribute = snapShot[attributeName];
                 return attribute * k + b;
             }
             else
             {
-                var attribute = state.Source.GetAttributeCurrentValue(attributeSetName, attributeShortName);
+                var attribute = effect.Source.GetAttributeCurrentValue(attributeSetName, attributeShortName);
                 return (attribute ?? 1) * k + b;
             }
         }
 
-        if (captureType == GEAttributeCaptureType.SnapShot)
+        if (captureType == EffectAttributeCaptureType.SnapShot)
         {
-            var snapShot = state.SnapshotTargetAttributes;
+            var snapShot = effect.SnapshotTargetAttributes;
             var attribute = snapShot[attributeName];
             return attribute * k + b;
         }
         else
         {
-            var attribute = state.Owner.GetAttributeCurrentValue(attributeSetName, attributeShortName);
+            var attribute = effect.Owner.GetAttributeCurrentValue(attributeSetName, attributeShortName);
             return (attribute ?? 1) * k + b;
         }
     }

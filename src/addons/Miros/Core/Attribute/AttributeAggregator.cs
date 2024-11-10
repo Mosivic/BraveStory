@@ -59,42 +59,38 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class AttributeAggregator
+public class AttributeAggregator(AttributeBase attribute, Persona owner)
 {
-    private Persona _owner;
-    private AttributeBase _processedAttribute;
-
-    private List<Tuple<Effect, Modifier>> _modifierCache =
-        new List<Tuple<Effect, Modifier>>();
-
-    public AttributeAggregator(AttributeBase attribute, Persona owner)
-    {
-        _processedAttribute = attribute;
-        _owner = owner;
-    }
+    private readonly Persona _owner = owner;
+    private readonly AttributeBase _processedAttribute = attribute;
+    private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
 
     public void OnEnable()
     {
+        // 注册基础值变化事件
         _processedAttribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
-        // Assuming _owner has a method to register gameplay effect changes
+        // 注册游戏效果容器变化事件
         _owner.EffectContainer.RegisterOnEffectContainerIsDirty(RefreshModifierCache);
     }
 
     public void OnDisable()
     {
+        // 注销基础值变化事件
         _processedAttribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
-        // Assuming _owner has a method to unregister gameplay effect changes
+        // 注销游戏效果容器变化事件
         _owner.EffectContainer.UnregisterOnEffectContainerIsDirty(RefreshModifierCache);
     }
 
     /// <summary>
     /// 刷新修改器缓存
+    /// 当游戏效果被添加或移除时触发
     /// </summary>
     void RefreshModifierCache()
     {
+        // 注销属性变化事件
         UnregisterAttributeChangedListen();
         _modifierCache.Clear();
-        // Assuming _owner has a method to get gameplay effects
+
         var effects = _owner.EffectContainer.Effects();
         foreach (var ge in effects)
         {
@@ -110,7 +106,6 @@ public class AttributeAggregator
                 }
             }
         }
-
         UpdateCurrentValueWhenModifierIsDirty();
     }
 
@@ -259,7 +254,7 @@ public class AttributeAggregator
     private void TryUnregisterAttributeChangedListen(Effect ge, Modifier modifier)
     {
         if (modifier.MMC is AttributeBasedModCalculation mmc &&
-            mmc.captureType == AttributeBasedModCalculation.GEAttributeCaptureType.Track)
+            mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track)
         {
             if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
             {
@@ -284,7 +279,7 @@ public class AttributeAggregator
     private void TryRegisterAttributeChangedListen(Effect ge, Modifier modifier)
     {
         if (modifier.MMC is AttributeBasedModCalculation mmc &&
-            mmc.captureType == AttributeBasedModCalculation.GEAttributeCaptureType.Track)
+            mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track)
         {
             if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
             {
@@ -312,16 +307,16 @@ public class AttributeAggregator
         if (_modifierCache.Count == 0) return;
         foreach (var tuple in _modifierCache)
         {
-            var ge = tuple.Item1;
+            var effect = tuple.Item1;
             var modifier = tuple.Item2;
             if (modifier.MMC is AttributeBasedModCalculation mmc &&
-                mmc.captureType == AttributeBasedModCalculation.GEAttributeCaptureType.Track &&
+                mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track &&
                 attribute.Name == mmc.attributeName)
             {
                 if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target &&
-                    attribute.Owner == ge.Owner) ||
+                    attribute.Owner == effect.Owner) ||
                     (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Source &&
-                    attribute.Owner == ge.Source))
+                    attribute.Owner == effect.Source))
                 {
                     UpdateCurrentValueWhenModifierIsDirty();
                     break;

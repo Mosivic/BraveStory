@@ -8,7 +8,7 @@ namespace Miros.Core
 {
     public class CustomAttrSet:AttributeSet
     {
-        Dictionary<string,AttributeBase> _attributes = new Dictionary<string,AttributeBase>();
+        Dictionary<string,AttributeBase> _attributes = [];
 
         public void AddAttribute(AttributeBase attribute)
         {

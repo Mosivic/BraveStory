@@ -10,11 +10,11 @@ namespace Miros.Core
         public readonly string SetName;
         public readonly string ShortName;
         
-        protected event Action<AttributeBase, float, float> OnPostCurrentValueChange;
-        protected event Action<AttributeBase, float, float> OnPostBaseValueChange;
-        protected event Action<AttributeBase, float> OnPreCurrentValueChange;
-        protected event Func<AttributeBase, float, float> OnPreBaseValueChange;
-        protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners;
+        protected event Action<AttributeBase, float> OnPreCurrentValueChange; // 当前值变化前的事件
+        protected event Action<AttributeBase, float, float> OnPostCurrentValueChange; // 当前值变化后的事件
+        protected event Func<AttributeBase, float, float> OnPreBaseValueChange; // 基础值变化前的事件
+        protected event Action<AttributeBase, float, float> OnPostBaseValueChange; // 基础值变化后的事件
+        protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners; // 基础值变化前的事件监听器
 
         private AttributeValue _value;
 

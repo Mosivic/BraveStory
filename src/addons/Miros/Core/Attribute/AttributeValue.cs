@@ -52,7 +52,7 @@ namespace Miros.Core
 			MaxValue = max;
 		}
 
-		public bool IsSupportOperation(ModifierOperation  operation)
+		public bool IsSupportOperation(ModifierOperation operation)
 		{
 			return SupportedOperation.HasFlag((SupportedOperation)(1 << (int)operation));
 		}

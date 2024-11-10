@@ -7,11 +7,12 @@ public class AttributeSetContainer(Persona owner)
 {
     private readonly Persona _owner = owner;
 
-    private readonly Dictionary<string, AttributeSet> _attributeSets = new Dictionary<string, AttributeSet>();
-
-    private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = new();
-
+    private readonly Dictionary<string, AttributeSet> _attributeSets = [];
     public Dictionary<string, AttributeSet> Sets => _attributeSets;
+
+    private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
+
+    
 
 
     /// <summary>
@@ -43,7 +44,6 @@ public class AttributeSetContainer(Persona owner)
                 _attributeAggregators.Add(attrSet[attr], attrAggt);
             }
         }
-
         attrSet.SetOwner(_owner);
     }
 
@@ -87,7 +87,6 @@ public class AttributeSetContainer(Persona owner)
     /// </summary>
     /// <param name="attrSetType">要获取的属性集类型，必须继承自AttributeSet</param>
     /// <param name="attributeSet">获取到的属性集</param>
-    /// <returns>是否成功获取到属性集</returns>
     public bool TryGetAttributeSet(Type attrSetType, out AttributeSet attributeSet)
     {
         if (_attributeSets.TryGetValue(AttributeSetUtil.AttributeSetName(attrSetType), out var set))
@@ -110,7 +109,7 @@ public class AttributeSetContainer(Persona owner)
     {
         return _attributeSets.TryGetValue(attrSetName, out var set)
             ? set[attrShortName].Value
-            : (AttributeValue?)null;
+            : null;
     }
 
     /// <summary>
@@ -156,7 +155,7 @@ public class AttributeSetContainer(Persona owner)
     /// <returns>快照</returns>
     public Dictionary<string, float> Snapshot()
     {
-        Dictionary<string, float> snapshot = new Dictionary<string, float>();
+        Dictionary<string, float> snapshot = [];
         foreach (var attributeSet in _attributeSets)
         {
             foreach (var name in attributeSet.Value.AttributeNames)
@@ -165,7 +164,6 @@ public class AttributeSetContainer(Persona owner)
                 snapshot.Add(attr.Name, attr.CurrentValue);
             }
         }
-
         return snapshot;
     }
 
