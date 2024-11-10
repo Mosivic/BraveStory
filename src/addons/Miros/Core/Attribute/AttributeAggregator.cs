@@ -77,14 +77,14 @@ public class AttributeAggregator
     {
         _processedAttribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
         // Assuming _owner has a method to register gameplay effect changes
-        _owner.EffectContainer.RegisterOnGameplayEffectContainerIsDirty(RefreshModifierCache);
+        _owner.EffectContainer.RegisterOnEffectContainerIsDirty(RefreshModifierCache);
     }
 
     public void OnDisable()
     {
         _processedAttribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
         // Assuming _owner has a method to unregister gameplay effect changes
-        _owner.EffectContainer.UnregisterOnGameplayEffectContainerIsDirty(RefreshModifierCache);
+        _owner.EffectContainer.UnregisterOnEffectContainerIsDirty(RefreshModifierCache);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ public class AttributeAggregator
         UnregisterAttributeChangedListen();
         _modifierCache.Clear();
         // Assuming _owner has a method to get gameplay effects
-        var effects = _owner.EffectContainer.GameplayEffects();
+        var effects = _owner.EffectContainer.Effects();
         foreach (var ge in effects)
         {
             if (ge.IsActive)
