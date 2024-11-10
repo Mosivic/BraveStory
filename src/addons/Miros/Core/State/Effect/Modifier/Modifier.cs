@@ -1,14 +1,6 @@
 ﻿namespace Miros.Core;
 
-public enum ModifierOperation
-{
-    Add,
-    Minus,
-    Multiply,
-    Divide,
-    Override,
-    Invalid
-}
+
 
 public enum ModifierMagnitudeType
 {
@@ -32,7 +24,7 @@ public class Modifier
     public ModifierMagnitudeCalculation MMC; // 幅度计算
 
     
-    public float CalculateMagnitude(EffectState state, float modifierMagnitude)
+    public float CalculateMagnitude(Effect state, float modifierMagnitude)
     {
         return MMC == null ? Magnitude : MMC.CalculateMagnitude(state, modifierMagnitude);
     }

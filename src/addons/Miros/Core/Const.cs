@@ -11,10 +11,10 @@ public enum CompareType
 
 public enum RunningStatus
 {
-    NoRun,
-    Running,
-    Succeed,
-    Failed
+    NoRun, //未运行
+    Running, //运行中
+    Succeed, //成功
+    Failed //失败
 }
 
 public enum StateStackType
@@ -124,13 +124,50 @@ public enum ExpirationPolicy
                     //TODO :可以达到Duration结束时减少两层并刷新Duration这样复杂的效果。
 }
 
+public enum ModifierOperation
+{
+    Add = 0, //加
+    Minus = 1, //减
+    Multiply = 2, //乘
+    Divide = 3, //除
+    Override = 4, //覆盖
+    Invalid = 5 //无效
+}
+
 [Flags]
 public enum SupportedOperation
 {
     None = 0,
-    Add = 1 << 0,
-    Multiply = 1 << 1,
-    Divide = 1 << 2,
-    Override = 1 << 3,
-    All = Add | Multiply | Divide | Override
+    Add = 1 << 0, //加
+    Multiply = 1 << 1, //乘
+    Divide = 1 << 2, //除
+    Override = 1 << 3, //覆盖
+    All = Add | Multiply | Divide | Override //所有
+}
+
+
+public enum CalculateMode
+{
+    Stacking, //堆叠
+    MinValueOnly, //最小值
+    MaxValueOnly, //最大值
+}
+
+
+public enum TagMatchType
+{
+    Explicit,           // 精确匹配
+    IncludeParentTags,  // 包含父标签
+    IncludeChildTags    // 包含子标签
+}
+
+
+public enum AbilityActivateResult
+{
+    Success, //激活成功
+    FailHasActivated, //已经激活
+    FailTagRequirement, //标签不匹配
+    FailCost, //消耗不足
+    FailCooldown, //冷却不足
+    FailOtherReason //其他原因
 }

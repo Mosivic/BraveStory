@@ -16,7 +16,7 @@ public partial class HitBox : Area2D
 {
     public event EventHandler<HitEventArgs> OnHit;
     
-    private BuffState _buffState;
+    private Buff _buffState;
 
     public HitBox()
     {
@@ -24,7 +24,7 @@ public partial class HitBox : Area2D
     }
 
 
-    public void SetBuffState(BuffState buffState)
+    public void SetBuffState(Buff buffState)
     {
         _buffState = buffState;
     }

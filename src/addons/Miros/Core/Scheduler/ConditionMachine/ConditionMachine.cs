@@ -6,8 +6,8 @@ namespace Miros.Core;
 
 public class ConditionMachine : AbsScheduler, IScheduler
 {
-    protected readonly Dictionary<GameplayTag, List<IJob>> RunningJobs = new();
-    protected Dictionary<GameplayTag, List<IJob>> WaitingJobs { get; set; } = new();
+    protected readonly Dictionary<Tag, List<IJob>> RunningJobs = new();
+    protected Dictionary<Tag, List<IJob>> WaitingJobs { get; set; } = new();
 
     public void AddJob(IJob job)
     {
@@ -90,7 +90,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
     }
 
 
-    private void PushRunningJob(GameplayTag layer, IJob job)
+    private void PushRunningJob(Tag layer, IJob job)
     {
         WaitingJobs[layer].Remove(job);
         if (job.State.IsStack)
@@ -110,7 +110,7 @@ public class ConditionMachine : AbsScheduler, IScheduler
     }
 
 
-    private void PopRunningJob(GameplayTag layer, IJob job)
+    private void PopRunningJob(Tag layer, IJob job)
     {
         RunningJobs[layer].Remove(job);
         var index = WaitingJobs[layer].FindIndex(j => job.State.Priority > j.State.Priority);
@@ -119,17 +119,17 @@ public class ConditionMachine : AbsScheduler, IScheduler
         job.Exit();
     }
 
-    public AbsState GetNowState(GameplayTag Layer)
+    public AbsState GetNowState(Tag Layer)
     {
         throw new NotImplementedException();
     }
 
-    public AbsState GetLastState(GameplayTag Layer)
+    public AbsState GetLastState(Tag Layer)
     {
         throw new NotImplementedException();
     }
 
-    public double GetCurrentStateTime(GameplayTag layer)
+    public double GetCurrentStateTime(Tag layer)
     {
         throw new NotImplementedException();
     }

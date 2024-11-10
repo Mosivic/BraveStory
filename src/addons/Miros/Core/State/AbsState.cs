@@ -7,10 +7,11 @@ public abstract class AbsState
 {
     // Core
     public required string Name { get; init; }
-    public required GameplayTag Tag {get;init;}
+    public required Tag Tag {get;init;}
     public Type JobType { get; init; } = typeof(JobSimple);
     public int Priority { get; init; } = 0;
-    public object Source { get; init; }
+    public Persona Source { get; init; }
+    public string Description { get; init; }
     
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
 

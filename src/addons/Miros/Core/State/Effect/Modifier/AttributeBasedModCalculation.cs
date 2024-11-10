@@ -29,7 +29,7 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 
     public float b = 0; // 常量
 
-    public override float CalculateMagnitude(EffectState state, float modifierMagnitude)
+    public override float CalculateMagnitude(Effect state, float modifierMagnitude)
     {
         if (attributeFromType == AttributeFrom.Source)
         {

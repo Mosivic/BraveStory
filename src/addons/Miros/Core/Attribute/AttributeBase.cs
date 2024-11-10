@@ -17,8 +17,8 @@ namespace Miros.Core
         protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners;
 
         private AttributeValue _value;
-        private object _owner;
-        public object Owner => _owner;
+
+        public Persona Owner { get; private set; }
 
         public AttributeBase(string attrSetName, string attrName, float value = 0,
             CalculateMode calculateMode = CalculateMode.Stacking,
@@ -39,9 +39,9 @@ namespace Miros.Core
         public CalculateMode CalculateMode => _value.CalculateMode;
         public SupportedOperation SupportedOperation => _value.SupportedOperation;
 
-        public void SetOwner(object owner)
+        public void SetOwner(Persona owner)
         {
-            _owner = owner;
+            Owner = owner;
         }
 
         public void SetMinValue(float min)

@@ -44,7 +44,7 @@ public partial class Character : CharacterBody2D
 	}
 
 
-	protected bool WaitOverTime(GameplayTag layer, double time)
+	protected bool WaitOverTime(Tag layer, double time)
 	{
 		return _connect.GetCurrentStateTime(layer) > time;
 	}

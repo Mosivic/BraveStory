@@ -7,7 +7,7 @@ public class ScalableFloatModCalculation : ModifierMagnitudeCalculation
 
     private float b = 0f;
 
-    public override float CalculateMagnitude(EffectState state, float input)
+    public override float CalculateMagnitude(Effect state, float input)
     {
         return input * k + b;
     }

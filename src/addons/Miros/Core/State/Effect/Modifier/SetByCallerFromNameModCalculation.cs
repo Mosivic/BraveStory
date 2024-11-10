@@ -4,7 +4,7 @@ namespace Miros.Core;
 public class SetByCallerFromNameModCalculation : ModifierMagnitudeCalculation
 {
     private string valueName;
-    public override float CalculateMagnitude(EffectState state, float input)
+    public override float CalculateMagnitude(Effect state, float input)
     {
         var value = state.GetMapValue(valueName);
 #if GODOT

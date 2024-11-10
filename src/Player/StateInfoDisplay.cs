@@ -7,7 +7,7 @@ public partial class StateInfoDisplay : Node2D
 {
     private Label _label;
     private MultiLayerStateMachineConnect _connect;
-    private GameplayTag _layerTag;
+    private Tag _layerTag;
     private Node2D _target;
 
     [Export] public Vector2 Offset { get; set; } = new Vector2(-15, -25);
@@ -32,7 +32,7 @@ public partial class StateInfoDisplay : Node2D
         }
     }
 
-    public void Setup(MultiLayerStateMachineConnect connect, GameplayTag layerTag)
+    public void Setup(MultiLayerStateMachineConnect connect, Tag layerTag)
     {
         _connect = connect;
         _layerTag = layerTag;

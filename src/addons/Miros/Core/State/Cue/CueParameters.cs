@@ -2,7 +2,7 @@ namespace Miros.Core;
 
 public struct CueParameters
 {
-    public EffectState sourceGameplayEffectSpec;
+    public Effect sourceGameplayEffectSpec;
 
     // public AbilityState sourceAbilitySpec;
 

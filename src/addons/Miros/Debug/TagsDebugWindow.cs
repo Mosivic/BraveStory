@@ -6,12 +6,12 @@ using Miros.Core;
 public partial class TagDebugWindow : Control
 {
     private Tree _tagTree;
-    private HashSet<GameplayTag> _tags;
+    private HashSet<Tag> _tags;
     
     private const float UPDATE_INTERVAL = 0.1f; // 更新间隔（秒）
     private float _timeSinceLastUpdate;
 
-    public TagDebugWindow(HashSet<GameplayTag> tags)
+    public TagDebugWindow(HashSet<Tag> tags)
     {
         _tags = tags;
     }

@@ -9,7 +9,7 @@ public class StackModCalculation : ModifierMagnitudeCalculation
 
     public float b = 0;
 
-    public override float CalculateMagnitude(EffectState state, float modifierMagnitude)
+    public override float CalculateMagnitude(Effect state, float modifierMagnitude)
     {
         if (state.Stacking.stackingType == StackingType.None) return 0;
 

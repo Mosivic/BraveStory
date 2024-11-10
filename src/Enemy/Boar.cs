@@ -24,7 +24,7 @@ public partial class Boar : Character
 		// 设置初始朝向为左边
 		_graphics.Scale = new Vector2(-1, 1);
 
-		var ownedTags = new GameplayTagContainer([Tags.Enemy]);
+		var ownedTags = new TagContainer([Tags.Enemy]);
 
 		// States
 		var idle = new HostState<Boar>(this)

@@ -33,7 +33,7 @@ public partial class Player : Character
 		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-		var ownedTags = new GameplayTagContainer([Tags.Player]);
+		var ownedTags = new TagContainer([Tags.Player]);
 
 		// Idle  
 		var idle = new HostState<Player>(this)
@@ -212,7 +212,7 @@ public partial class Player : Character
 			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED
 		};
 
-		var addHpBuff = new BuffState
+		var addHpBuff = new Buff
 		{
 			Name = "AddHp",
 			Tag = Tags.LayerBuff,
@@ -434,7 +434,7 @@ public partial class Player : Character
 
 	protected override void HandleHit(object sender, HitEventArgs e)
 	{
-		_hitBox.SetBuffState(new BuffState
+		_hitBox.SetBuffState(new Buff
 		{
 			Name = "TestBuff",
 			Tag = Tags.LayerBuff,

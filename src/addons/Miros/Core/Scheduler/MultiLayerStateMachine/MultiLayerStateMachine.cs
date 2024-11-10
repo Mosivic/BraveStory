@@ -4,17 +4,17 @@ using Miros.Core;
 
 public class MultiLayerStateMachine:AbsScheduler, IScheduler
 {
-    private readonly Dictionary<GameplayTag, StateLayer> _layers = new();
+    private readonly Dictionary<Tag, StateLayer> _layers = new();
     private Dictionary<AbsState, IJob> _jobs = new();
-    private GameplayTagContainer _ownedTags;
+    private TagContainer _ownedTags;
     
     
-    public void SetOwnedTags(GameplayTagContainer ownedTags){
+    public void SetOwnedTags(TagContainer ownedTags){
         _ownedTags = ownedTags;
     }
 
     
-    public void AddLayer(GameplayTag layer,AbsState defaultState,StateTransitionContainer transitionContainer){
+    public void AddLayer(Tag layer,AbsState defaultState,StateTransitionContainer transitionContainer){
         _layers[layer] = new StateLayer(layer,defaultState,transitionContainer,_jobs,_ownedTags);
     }
 
@@ -49,7 +49,7 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
         }
     }
 
-    public AbsState GetNowState(GameplayTag layer)
+    public AbsState GetNowState(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetNowState();
@@ -57,7 +57,7 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
         return null;
     }
 
-    public AbsState GetLastState(GameplayTag layer)
+    public AbsState GetLastState(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetLastState();
@@ -65,7 +65,7 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
         return null;
     }
 
-    public double GetCurrentStateTime(GameplayTag layer)
+    public double GetCurrentStateTime(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetCurrentStateTime();

@@ -7,7 +7,7 @@ namespace Miros.Core;
 
 public class StateLayer
 {
-    public GameplayTag Layer { get; }
+    public Tag Layer { get; }
     private readonly AbsState _defaultState;
     private AbsState _currentState;
     private AbsState _lastState;
@@ -17,14 +17,14 @@ public class StateLayer
 
     private readonly Dictionary<AbsState, IJob> _jobs;
 
-    private GameplayTagContainer _ownedTags;
+    private TagContainer _ownedTags;
 
     private double _currentStateTime;
     
-    public StateLayer(GameplayTag layerTag,AbsState defaultState,
+    public StateLayer(Tag layerTag,AbsState defaultState,
         StateTransitionContainer transitionRuleContainer,
         Dictionary<AbsState, IJob> jobs,
-        GameplayTagContainer ownedTags)
+        TagContainer ownedTags)
     {
         Layer = layerTag;
         _defaultState = defaultState;

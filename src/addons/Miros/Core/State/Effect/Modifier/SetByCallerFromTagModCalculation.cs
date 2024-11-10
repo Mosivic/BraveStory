@@ -3,9 +3,9 @@ namespace Miros.Core;
 
 public class SetByCallerFromTagModCalculation : ModifierMagnitudeCalculation
 {
-    private GameplayTag tag;
+    private Tag tag;
 
-    public override float CalculateMagnitude(EffectState state, float input)
+    public override float CalculateMagnitude(Effect state, float input)
     {
         var value = state.GetMapValue(tag);
 #if GODOT

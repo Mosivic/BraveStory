@@ -2,7 +2,7 @@
 
 namespace Miros.Core;
 
-public class JobBuff(BuffState buffState) : AbsJobBase(buffState)
+public class JobBuff(Buff buffState) : AbsJobBase(buffState)
 {
     public override void Enter()
     {
