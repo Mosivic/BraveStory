@@ -14,8 +14,8 @@ public abstract class Effect : AbsState
     public event Action<Persona, Effect> OnImmunity;
     public event Action<int, int> OnStackCountChanged;
 
-    public Persona Source { get; private set; }
-    public Persona Owner { get; private set; }
+    public new Persona Source { get; private set; }
+    public new Persona Owner { get; private set; }
     public DurationPolicy DurationPolicy { get; private set; }
     public new float Duration { get; set; }
     public new float Period { get; set; }

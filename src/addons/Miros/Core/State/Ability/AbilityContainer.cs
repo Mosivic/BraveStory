@@ -56,7 +56,7 @@ public class AbilityContainer
         var tags = _abilities[abilityName].CancelAbilityTags;
         foreach (var kv in _abilities)
         {
-            var abilityTag = kv.Value.Tag;
+            var abilityTag = kv.Value.Tags;
             if (abilityTag.HasAnyTags(tags))
             {
                 _abilities[kv.Key].TryCancelAbility();
@@ -82,7 +82,7 @@ public class AbilityContainer
     {
         foreach (var kv in _abilities)  
         {
-            var abilityTag = kv.Value.Tag;
+            var abilityTag = kv.Value.Tags;
             if (abilityTag.HasAnyTags(tags))
             {
                 _abilities[kv.Key].TryCancelAbility();

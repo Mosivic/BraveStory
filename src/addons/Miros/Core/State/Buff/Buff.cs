@@ -3,20 +3,12 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-/// <summary>
-///     持续策略
-/// </summary>
-public enum BuffDurationPolicy //持续策略
-{
-    Instant, //立即生效
-    Infinite, //永久生效
-    Duration //规定时长
-}
+
 
 /// <summary>
 ///     Buff中断并恢复的处理策略
 /// </summary>
-public enum BuffPeriodicInhibitionPolicy
+public enum PeriodicInhibitionPolicy
 {
     Resume, //恢复衔接
     Reset, //重置
@@ -26,7 +18,7 @@ public enum BuffPeriodicInhibitionPolicy
 /// <summary>
 ///     当一层buff到期后的处理策略
 /// </summary>
-public enum BuffStackExpirationPolicy
+public enum StackExpirationPolicy
 {
     ClearAllStack,
     RemoveOneStackAndRefreshDuration,
@@ -36,12 +28,12 @@ public enum BuffStackExpirationPolicy
 public class Buff : AbsState
 {
     // Core
-    public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
+    public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public List<Modifier> Modifiers { get; set; } = new();
 
     // Period 
     public bool IsExecutePeriodicEffectOnStart { get; set; } = true;
-    public BuffPeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = BuffPeriodicInhibitionPolicy.Resume;
+    public PeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = PeriodicInhibitionPolicy.Resume;
 
     // Chance
     public bool HasChance { get; init; } = false;
@@ -50,7 +42,7 @@ public class Buff : AbsState
     // Stacking
     public bool StackIsRefreshDuration { get; init; } = false;
     public bool StackIsResetPeriod { get; init; } = false;
-    public BuffStackExpirationPolicy StackExpirationPolicy { get; set; }
+    public StackExpirationPolicy StackExpirationPolicy { get; set; }
 
     // Stacking Overflow
     public List<AbsState> OnStackOverflowStates { get; set; }

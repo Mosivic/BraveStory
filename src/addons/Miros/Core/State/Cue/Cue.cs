@@ -6,7 +6,7 @@ public abstract class Cue: AbsState
     public Tag[] RequiredTags;
     public Tag[] ImmunityTags;
     protected CueParameters _parameters { get; set; }
-    public Persona Owner { get; protected set; }
+    public new Persona Owner { get; protected set; }
 
     public virtual bool Triggerable(Persona owner)
     {

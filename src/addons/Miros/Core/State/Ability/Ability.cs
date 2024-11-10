@@ -21,7 +21,6 @@ public abstract class Ability : AbsState
     public float CooldownTime { get; protected set; }
     public Effect Cost { get; protected set; }
 
-    public Persona Owner { get; protected set; }
 
     protected object[] _abilityArguments = Array.Empty<object>();
 
@@ -166,7 +165,7 @@ public abstract class Ability : AbsState
     {
         return Cooldown == null
             ? new CooldownTimer { TimeRemaining = 0, Duration = CooldownTime }
-            : Owner.CheckCooldownFromTags(Cooldown.TagContainer.GrantedTags);
+            : Owner.CheckCooldownFromTags(Cooldown.GrantedTags);
     }
 
 
@@ -177,12 +176,12 @@ public abstract class Ability : AbsState
     /// </summary>
     public void DoCost()
     {
-        if (Cost != null) Owner.ApplyGameplayEffectToSelf(Cost);
+        if (Cost != null) Owner.ApplyEffectToSelf(Cost);
 
         if (Cooldown != null)
         {
-            var cdSpec = Owner.ApplyGameplayEffectToSelf(Cooldown);
-            cdSpec.Duration = CooldownTime; // Actually, it should be set by the ability's cooldown time.
+            Owner.ApplyEffectToSelf(Cooldown);
+             // Actually, it should be set by the ability's cooldown time.
         }
     }
 
@@ -195,7 +194,7 @@ public abstract class Ability : AbsState
         {
             IsActive = true;
             ActiveCount++;
-            Owner.TagAggregator.ApplyGameplayAbilityDynamicTag(this);
+            Owner.TagAggregator.ApplyAbilityDynamicTag(this);
 
             ActivateAbility(_abilityArguments);
         }
@@ -208,7 +207,7 @@ public abstract class Ability : AbsState
     {
         if (!IsActive) return;
         IsActive = false;
-        Owner.TagAggregator.RestoreGameplayAbilityDynamicTags(this);
+        Owner.TagAggregator.RestoreAbilityDynamicTags(this);
         EndAbility();
         _onEndAbility?.Invoke();
     }
@@ -218,7 +217,7 @@ public abstract class Ability : AbsState
         if (!IsActive) return;
         IsActive = false;
 
-        Owner.TagAggregator.RestoreGameplayAbilityDynamicTags(this);
+        Owner.TagAggregator.RestoreAbilityDynamicTags(this);
         CancelAbility();
         _onCancelAbility?.Invoke();
     }

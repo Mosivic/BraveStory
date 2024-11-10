@@ -18,7 +18,7 @@ public class TagEventContainerExample
         _tags.TagsChanged += OnTagsChanged;
     }
     
-    private void OnTagAdded(object sender, GameplayTagEventArgs e)
+    private void OnTagAdded(object sender, TagEventArgs e)
     {
         GD.Print($"Tag added: {e.Tag}");
         
@@ -29,7 +29,7 @@ public class TagEventContainerExample
         }
     }
     
-    private void OnTagRemoved(object sender, GameplayTagEventArgs e)
+    private void OnTagRemoved(object sender, TagEventArgs e)
     {
         GD.Print($"Tag removed: {e.Tag}");
         
@@ -40,7 +40,7 @@ public class TagEventContainerExample
         }
     }
     
-    private void OnTagsChanged(object sender, GameplayTagContainerEventArgs e)
+    private void OnTagsChanged(object sender, TagContainerEventArgs e)
     {
         GD.Print($"Tags changed: {string.Join(", ", e.Tags)}");
         

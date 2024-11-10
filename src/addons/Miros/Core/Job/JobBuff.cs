@@ -113,40 +113,40 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         if (buffState.HasChance && new Random().NextDouble() > buffState.Chance)
             return;
 
-        for (var i = 0; i < buffState.Modifiers.Count; i++)
-        {
-            var modifier = buffState.Modifiers[i];
-            modifier.Record = modifier.Property;
-            switch (modifier.Operator)
-            {
-                case ModifierOperation.Add:
-                    modifier.Property += modifier.Affect;
-                    break;
-                case ModifierOperation.Multiply:
-                    modifier.Property *= modifier.Affect;
-                    break;
-                case ModifierOperation.Divide:
-                    modifier.Property /= modifier.Affect;
-                    break;
-                case ModifierOperation.Override:
-                    modifier.Property = modifier.Affect;
-                    break;
-                case ModifierOperation.Invalid:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+        // for (var i = 0; i < buffState.Modifiers.Count; i++)
+        // {
+        //     var modifier = buffState.Modifiers[i];
+        //     modifier.Record = modifier.Property;
+        //     switch (modifier.Operator)
+        //     {
+        //         case ModifierOperation.Add:
+        //             modifier.Property += modifier.Affect;
+        //             break;
+        //         case ModifierOperation.Multiply:
+        //             modifier.Property *= modifier.Affect;
+        //             break;
+        //         case ModifierOperation.Divide:
+        //             modifier.Property /= modifier.Affect;
+        //             break;
+        //         case ModifierOperation.Override:
+        //             modifier.Property = modifier.Affect;
+        //             break;
+        //         case ModifierOperation.Invalid:
+        //             break;
+        //         default:
+        //             throw new ArgumentOutOfRangeException();
+        //     }
 
-            buffState.OnApplyModifierFunc?.Invoke(modifier);
-        }
+        //     buffState.OnApplyModifierFunc?.Invoke(modifier);
+        // }
     }
 
     private void CancelModifiers()
     {
-        foreach (var modifier in buffState.Modifiers)
-        {
-            modifier.Property = modifier.Record;
-            buffState.OnCancelModifierFunc?.Invoke(modifier);
-        }
+        // foreach (var modifier in buffState.Modifiers)
+        // {
+        //     modifier.Property = modifier.Record;
+        //     buffState.OnCancelModifierFunc?.Invoke(modifier);
+        // }
     }
 }
