@@ -33,7 +33,7 @@ public interface IPersona
 
     void RemoveEffect(Effect effect);
 
-    void Tick();
+    void Tick(double delta);
 
     Dictionary<string, float> DataSnapshot();
 

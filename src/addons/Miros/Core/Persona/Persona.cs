@@ -5,7 +5,9 @@ using Godot;
 namespace Miros.Core;
 
 public abstract class Persona : AbsPersona, IPersona
-{
+{   
+
+    public string Name { get; set; }
     public int Level { get; protected set; }
 
     public bool Enabled { get; set; }
@@ -188,10 +190,10 @@ public abstract class Persona : AbsPersona, IPersona
         return value;
     }
 
-    public void Tick()
+    public void Tick(double delta)
     {
         AbilityContainer.Tick();
-        EffectContainer.Tick();
+        EffectContainer.Tick(delta);
     }
 
     public Dictionary<string, float> DataSnapshot()

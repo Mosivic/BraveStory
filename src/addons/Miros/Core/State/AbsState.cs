@@ -10,7 +10,7 @@ public abstract class AbsState
     public required Tag Tag {get;init;}
     public Type JobType { get; init; } = typeof(JobSimple);
     public int Priority { get; init; } = 0;
-    public Persona Source { get; init; }
+
     public string Description { get; init; }
     
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;

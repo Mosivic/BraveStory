@@ -1,23 +1,41 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace Miros.Core;
 
 public abstract class Effect : AbsState
 {
+    private Dictionary<Tag, float> _valueMapWithTag = new Dictionary<Tag, float>();
+    private Dictionary<string, float> _valueMapWithName = new Dictionary<string, float>();
+    private List<CueDurational> _cueDurationalSpecs = new List<CueDurational>();
+
+
+    public event Action<Persona, Effect> OnImmunity;
+    public event Action<int, int> OnStackCountChanged;
+
+    public Persona Source { get; private set; }
     public Persona Owner { get; private set; }
     public DurationPolicy DurationPolicy { get; private set; }
-    public float Duration { get; set; }
-    public float Period { get; set; }
+    public new float Duration { get; set; }
+    public new float Period { get; set; }
     public float ActivationTime { get; set; }
     public float Level { get; set; }
     public bool IsApplied { get; set; }
     public bool IsActive { get; set; }
+    public int StackCount { get; private set; } = 1;
 
-    public List<ExecutionCalculation> Executions { get; set; }
-    public List<GrantedAbilityFromEffect> GrantedAbilities { get; set; }
-    public float StackCount { get; internal set; }
+    public ExecutionCalculation[] Executions { get; set; }
+    public GrantedAbilityFromEffect[] GrantedAbilities { get; set; }
+    public EffectPeriodTicker PeriodTicker { get; }
+    public Effect PeriodExecution { get; private set; }
+    public Modifier[] Modifiers { get; private set; }
+    public GrantedAbilityFromEffect[] GrantedAbility { get; private set; }
 
+
+
+    public Dictionary<string, float> SnapshotSourceAttributes { get; private set; }
+    public Dictionary<string, float> SnapshotTargetAttributes { get; private set; }
     public Cue[] CueOnExecute { get; set; }
     public Cue[] CueOnRemove { get; set; }
     public Cue[] CueOnAdd { get; set; }
@@ -25,15 +43,9 @@ public abstract class Effect : AbsState
     public Cue[] CueOnDeactivate { get; set; }
     public Cue[] CueDurational { get; set; }
 
-    // Modifiers
-    public readonly Modifier[] Modifiers;
-    public readonly ExecutionCalculation[] Executions; // TODO: this should be a list of execution calculations
-
-    // Granted Ability
-    public readonly GrantedAbilityFromEffect[] GrantedAbilities;
 
     //Stacking
-    public readonly GameplayEffectStacking Stacking;
+    public EffectStacking Stacking { get; private set; }
 
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;
@@ -63,7 +75,7 @@ public abstract class Effect : AbsState
     ///   2. 非Instant GE每次被激活时；
     ///   3. Period Execution GE(非Instant GE中的PeriodExecution)的每个周期到期时。
     /// </summary>
-    public TagSet RemoveGameplayEffectsWithTags;
+    public TagSet RemoveEffectsWithTags;
 
     /// <summary>
     /// ApplicationRequiredTags和ApplicationImmunityTags是一对条件：
@@ -93,22 +105,24 @@ public abstract class Effect : AbsState
     public TagSet OngoingRequiredTags;
 
 
-    public void Tick()
+    public void Init(Persona source, Persona owner, float level = 1)
     {
-
-    }
-
-    private static GrantedAbilityFromEffect[] GetGrantedAbilities(IEnumerable<GrantedAbilityConfig> grantedAbilities)
-    {
-        var grantedAbilityList = new List<GrantedAbilityFromEffect>();
-        foreach (var grantedAbilityConfig in grantedAbilities)
+        Source = source;
+        Owner = owner;
+        Level = level;
+        if (DurationPolicy != DurationPolicy.Instant)
         {
-            if (grantedAbilityConfig.AbilityAsset == null) continue;
-            grantedAbilityList.Add(new GrantedAbilityFromEffect(grantedAbilityConfig));
+            // PeriodExecution = PeriodExecution?.CreateSpec(source, owner);
+            SetGrantedAbility(GrantedAbilities);
         }
-
-        return grantedAbilityList.ToArray();
+        CaptureAttributesSnapshot();
     }
+
+    public void Tick(double delta)
+    {
+        PeriodTicker.Tick(delta);
+    }
+
 
     public bool CanApplyTo(Persona target)
     {
@@ -127,11 +141,339 @@ public abstract class Effect : AbsState
 
     public bool StackEqual(Effect effect)
     {
-        if (Stacking.stackingType == StackingType.None) return false;
-        if (effect.Stacking.stackingType == StackingType.None) return false;
-        if (string.IsNullOrEmpty(Stacking.stackingCodeName)) return false;
-        if (string.IsNullOrEmpty(effect.Stacking.stackingCodeName)) return false;
+        if (Stacking.StackingType == StackingType.None) return false;
+        if (effect.Stacking.StackingType == StackingType.None) return false;
+        if (string.IsNullOrEmpty(Stacking.StackingCodeName)) return false;
+        if (string.IsNullOrEmpty(effect.Stacking.StackingCodeName)) return false;
 
-        return Stacking.stackingHashCode == effect.Stacking.stackingHashCode;
+        return Stacking.StackingHashCode == effect.Stacking.StackingHashCode;
+    }
+
+
+    public float DurationRemaining()
+    {
+        if (DurationPolicy == DurationPolicy.Infinite)
+            return -1;
+
+        return Mathf.Max(0, Duration - (Time.GetTicksMsec() - ActivationTime));
+    }
+
+
+
+    public void SetGrantedAbility(GrantedAbilityFromEffect[] grantedAbility)
+    {
+        GrantedAbility = grantedAbility;
+        for (var i = 0; i < grantedAbility.Length; i++)
+        {
+            GrantedAbility[i] = grantedAbility[i];
+        }
+    }
+
+    public void SetStacking(EffectStacking stacking)
+    {
+        Stacking = stacking;
+    }
+
+    public void Apply()
+    {
+        if (IsApplied) return;
+        IsApplied = true;
+
+        if (CanRunning(Owner))
+        {
+            Activate();
+        }
+    }
+
+    public void DisApply()
+    {
+        if (!IsApplied) return;
+        IsApplied = false;
+        Deactivate();
+    }
+
+    public void Activate()
+    {
+        if (IsActive) return;
+        IsActive = true;
+        ActivationTime = Time.GetTicksMsec();
+        TriggerOnActivation();
+    }
+
+    public void Deactivate()
+    {
+        if (!IsActive) return;
+        IsActive = false;
+        TriggerOnDeactivation();
+    }
+
+
+    void TriggerInstantCues(Cue[] cues)
+    {
+        foreach (var cue in cues) cue.ApplyFrom(this);
+    }
+
+    private void TriggerCueOnExecute()
+    {
+        if (CueOnExecute == null || CueOnExecute.Length <= 0) return;
+        TriggerInstantCues(CueOnExecute);
+    }
+
+    private void TriggerCueOnAdd()
+    {
+        if (CueOnAdd != null && CueOnAdd.Length > 0)
+            TriggerInstantCues(CueOnAdd);
+
+        if (CueDurational != null && CueDurational.Length > 0)
+        {
+            _cueDurationalSpecs.Clear();
+            foreach (var cueDurational in CueDurational)
+            {
+                var cueSpec = (CueDurational)cueDurational.ApplyFrom(this);
+                if (cueSpec != null) _cueDurationalSpecs.Add(cueSpec);
+            }
+
+            foreach (var cue in _cueDurationalSpecs) cue.OnAdd();
+        }
+    }
+
+    private void TriggerCueOnRemove()
+    {
+        if (CueOnRemove != null && CueOnRemove.Length > 0)
+            TriggerInstantCues(CueOnRemove);
+
+        if (CueDurational != null && CueDurational.Length > 0)
+        {
+            foreach (var cue in _cueDurationalSpecs) cue.OnRemove();
+
+            _cueDurationalSpecs = null;
+        }
+    }
+
+    private void TriggerCueOnActivation()
+    {
+        if (CueOnActivate != null && CueOnActivate.Length > 0)
+            TriggerInstantCues(CueOnActivate);
+
+        if (CueDurational != null && CueDurational.Length > 0)
+            foreach (var cue in _cueDurationalSpecs)
+                cue.OnGameplayEffectActivate();
+    }
+
+    private void TriggerCueOnDeactivation()
+    {
+        if (CueOnDeactivate != null && CueOnDeactivate.Length > 0)
+            TriggerInstantCues(CueOnDeactivate);
+
+        if (CueDurational != null && CueDurational.Length > 0)
+            foreach (var cue in _cueDurationalSpecs)
+                cue.OnGameplayEffectDeactivate();
+    }
+
+    private void CueOnTick()
+    {
+        if (CueDurational == null || CueDurational.Length <= 0) return;
+        foreach (var cue in _cueDurationalSpecs) cue.OnTick();
+    }
+
+    public void TriggerOnExecute()
+    {
+        Owner.EffectContainer.RemoveEffectWithAnyTags(RemoveEffectsWithTags);
+        Owner.ApplyModFromInstantEffect(this);
+
+        TriggerCueOnExecute();
+    }
+
+    public void TriggerOnAdd()
+    {
+        TriggerCueOnAdd();
+    }
+
+    public void TriggerOnRemove()
+    {
+        TriggerCueOnRemove();
+
+        TryRemoveGrantedAbilities();
+    }
+
+    private void TriggerOnActivation()
+    {
+        TriggerCueOnActivation();
+        Owner.TagAggregator.ApplyEffectDynamicTag(this);
+        Owner.EffectContainer.RemoveEffectWithAnyTags(RemoveEffectsWithTags);
+
+        TryActivateGrantedAbilities();
+    }
+
+    private void TriggerOnDeactivation()
+    {
+        TriggerCueOnDeactivation();
+        Owner.TagAggregator.RestoreEffectDynamicTags(this);
+
+        TryDeactivateGrantedAbilities();
+    }
+
+    public void TriggerOnTick()
+    {
+        if (DurationPolicy == DurationPolicy.Duration ||
+            DurationPolicy == DurationPolicy.Infinite)
+            CueOnTick();
+    }
+
+    public void TriggerOnImmunity()
+    {
+        // TODO 免疫触发事件逻辑需要调整
+        // onImmunity?.Invoke(Owner, this);
+        // onImmunity = null;
+    }
+
+    public void RemoveSelf()
+    {
+        Owner.EffectContainer.RemoveEffect(this);
+    }
+
+    private void CaptureAttributesSnapshot()
+    {
+        SnapshotSourceAttributes = Source.DataSnapshot();
+        SnapshotTargetAttributes = Source == Owner ? SnapshotSourceAttributes : Owner.DataSnapshot();
+    }
+
+    public void RegisterValue(Tag tag, float value)
+    {
+        _valueMapWithTag[tag] = value;
+    }
+
+    public void RegisterValue(string name, float value)
+    {
+        _valueMapWithName[name] = value;
+    }
+
+    public bool UnregisterValue(Tag tag)
+    {
+        return _valueMapWithTag.Remove(tag);
+    }
+
+    public bool UnregisterValue(string name)
+    {
+        return _valueMapWithName.Remove(name);
+    }
+
+    public float? GetMapValue(Tag tag)
+    {
+        return _valueMapWithTag.TryGetValue(tag, out var value) ? value : (float?)null;
+    }
+
+    public float? GetMapValue(string name)
+    {
+        return _valueMapWithName.TryGetValue(name, out var value) ? value : (float?)null;
+    }
+
+    private void TryActivateGrantedAbilities()
+    {
+        foreach (var grantedAbility in GrantedAbility)
+        {
+            if (grantedAbility.ActivationPolicy == GrantedAbilityActivationPolicy.SyncWithEffect)
+            {
+                Owner.TryActivateAbility(grantedAbility.AbilityName);
+            }
+        }
+    }
+
+    private void TryDeactivateGrantedAbilities()
+    {
+        foreach (var grantedAbility in GrantedAbility)
+        {
+            if (grantedAbility.DeactivationPolicy == GrantedAbilityDeactivationPolicy.SyncWithEffect)
+            {
+                Owner.TryEndAbility(grantedAbility.AbilityName);
+            }
+        }
+    }
+
+    private void TryRemoveGrantedAbilities()
+    {
+        foreach (var grantedAbility in GrantedAbility)
+        {
+            if (grantedAbility.RemovePolicy == GrantedAbilityRemovePolicy.SyncWithEffect)
+            {
+                Owner.TryCancelAbility(grantedAbility.AbilityName);
+                Owner.RemoveAbility(grantedAbility.AbilityName);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>Stack Count是否变化</returns>
+    public bool RefreshStack()
+    {
+        var oldStackCount = StackCount;
+        RefreshStack(StackCount + 1);
+        OnStackCountChange(oldStackCount, StackCount);
+        return oldStackCount != StackCount;
+    }
+
+    public void RefreshStack(int stackCount)
+    {
+        if (stackCount <= Stacking.LimitCount)
+        {
+            // 更新栈数
+            StackCount = Mathf.Max(1, stackCount); // 最小层数为1
+                                                   // 是否刷新Duration
+            if (Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
+            {
+                RefreshDuration();
+            }
+            // 是否重置Period
+            if (Stacking.PeriodResetPolicy == PeriodResetPolicy.ResetOnSuccessfulApplication)
+            {
+                PeriodTicker.ResetPeriod();
+            }
+        }
+        else
+        {
+            // 溢出GE生效
+            foreach (var overflowEffect in Stacking.OverflowEffects)
+                Owner.ApplyEffectToSelf(overflowEffect);
+
+            if (Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
+            {
+                if (Stacking.DenyOverflowApplication)
+                {
+                    //当DenyOverflowApplication为True是才有效，当Overflow时是否直接删除所有层数
+                    if (Stacking.ClearStackOnOverflow)
+                    {
+                        RemoveSelf();
+                    }
+                }
+                else
+                {
+                    RefreshDuration();
+                }
+            }
+        }
+    }
+
+    public void RefreshDuration()
+    {
+        ActivationTime = Time.GetTicksMsec();
+    }
+
+    private void OnStackCountChange(int oldStackCount, int newStackCount)
+    {
+
+        OnStackCountChanged?.Invoke(oldStackCount, newStackCount);
+    }
+
+    public void RegisterOnStackCountChanged(Action<int, int> callback)
+    {
+        OnStackCountChanged += callback;
+    }
+
+    public void UnregisterOnStackCountChanged(Action<int, int> callback)
+    {
+        OnStackCountChanged -= callback;
     }
 }

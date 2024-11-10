@@ -42,12 +42,12 @@ public class TagAggregator
     public void OnEnable()
     {
         // 有 GC, 无法避免
-        OnTagIsDirty += _owner.EffectContainer.RefreshEffectState;
+        OnTagIsDirty += _owner.EffectContainer.RefreshEffectStatus;
     }
 
     public void OnDisable()
     {
-        OnTagIsDirty -= _owner.EffectContainer.RefreshEffectState;
+        OnTagIsDirty -= _owner.EffectContainer.RefreshEffectStatus;
     }
 
 
@@ -211,10 +211,14 @@ public class TagAggregator
         return TryRemoveDynamicTag(ref _dynamicRemovedTags, source, tag);
     }
 
+    /// <summary>
+    /// 应用Effect的动态标签
+    /// </summary>
+    /// <param name="source"></param>
     public void ApplyEffectDynamicTag(Effect source)
     {
         var tagIsDirty = false;
-        var grantedTagSet = source.TagContainer.GrantedTags;
+        var grantedTagSet = source.GrantedTags;
         foreach (var tag in grantedTagSet.Tags)
         {
             var dirty = TryAddDynamicAddedTag(source, tag);
@@ -227,7 +231,7 @@ public class TagAggregator
     public void ApplyAbilityDynamicTag(Ability source)
     {
         var tagIsDirty = false;
-        var activationOwnedTag = source.Tag.ActivationOwnedTag;
+        var activationOwnedTag = source.ActivationOwnedTags;
         foreach (var tag in activationOwnedTag.Tags)
         {
             var dirty = TryAddDynamicAddedTag(source, tag);
@@ -251,12 +255,12 @@ public class TagAggregator
 
     public void RestoreEffectDynamicTags(Effect effect)
     {
-        RestoreDynamicTags(effect, effect.TagContainer.GrantedTags);
+        RestoreDynamicTags(effect, effect.GrantedTags);
     }
 
     public void RestoreAbilityDynamicTags(Ability ability)
     {
-        RestoreDynamicTags(ability, ability.ActivationOwnedTag);
+        RestoreDynamicTags(ability, ability.ActivationOwnedTags);
     }
 
     public bool HasTag(Tag tag)

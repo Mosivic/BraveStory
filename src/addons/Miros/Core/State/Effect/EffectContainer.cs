@@ -21,7 +21,7 @@ public class EffectContainer
         return _effects;
     }
 
-    public void Tick()
+    public void Tick(double delta)
     {
         _cachedEffects.AddRange(_effects);
 
@@ -29,7 +29,7 @@ public class EffectContainer
         {
             if (effect.IsActive)
             {
-                effect.Tick();
+                effect.Tick(delta);
             }
         }
 
@@ -108,14 +108,14 @@ public class EffectContainer
         }
 
         // Check GE Stacking
-        if (effect.Stacking.stackingType == StackingType.None)
+        if (effect.Stacking.StackingType == StackingType.None)
         {
             return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
         }
 
         // 处理GE堆叠
         // 基于Target类型GE堆叠
-        if (effect.Stacking.stackingType == StackingType.AggregateByTarget)
+        if (effect.Stacking.StackingType == StackingType.AggregateByTarget)
         {
             GetStackingEffectSpecByData(effect, out var geSpec);
             // 新添加GE
@@ -127,7 +127,7 @@ public class EffectContainer
         }
 
         // 基于Source类型GE堆叠
-        if (effect.Stacking.stackingType == StackingType.AggregateBySource)
+        if (effect.Stacking.StackingType == StackingType.AggregateBySource)
         {
             GetStackingEffectSpecByDataFrom(effect, source, out var geSpec);
             if (geSpec == null)
@@ -141,7 +141,7 @@ public class EffectContainer
     }
 
 
-    public void RefreshGameplayEffectState()
+    public void RefreshEffectStatus()
     {
         foreach (var effect in _effects)
         {
@@ -214,24 +214,24 @@ public class EffectContainer
 
     private void GetStackingEffectSpecByData(Effect effect, out Effect spec)
     {
-        foreach (var gameplayEffectSpec in _effects)
-            if (gameplayEffectSpec.GameplayEffect.StackEqual(effect))
+        foreach (var _effect in _effects)
+            if (_effect.StackEqual(effect))
             {
-                spec = gameplayEffectSpec;
+                spec = _effect;
                 return;
             }
 
         spec = null;
     }
 
-    private void GetStackingEffectSpecByDataFrom(GameplayEffect effect, AbilitySystemComponent source,
-        out GameplayEffectSpec spec)
+    private void GetStackingEffectSpecByDataFrom(Effect effect, Persona source,
+        out Effect spec)
     {
-        foreach (var gameplayEffectSpec in _effects)
-            if (gameplayEffectSpec.Source == source &&
-                gameplayEffectSpec.GameplayEffect.StackEqual(effect))
+        foreach (var _effect in _effects)
+            if (_effect.Source == source &&
+                _effect.StackEqual(effect))
             {
-                spec = gameplayEffectSpec;
+                spec = _effect;
                 return;
             }
 
@@ -241,6 +241,31 @@ public class EffectContainer
     private void OnRefreshStackCountMakeContainerDirty()
     {
         OnGameplayEffectContainerIsDirty?.Invoke();
+    }
+
+
+    private Effect Operation_AddNewGameplayEffectSpec(Persona source, Effect effectSpec,
+    bool overwriteEffectLevel, int effectLevel)
+    {
+        var level = overwriteEffectLevel ? effectLevel : source.Level;
+        effectSpec.Init(source, _owner, level);
+        _effects.Add(effectSpec);
+        effectSpec.TriggerOnAdd();
+        effectSpec.Apply();
+
+        // If the gameplay effect was removed immediately after being applied, return false
+        if (!_effects.Contains(effectSpec))
+        {
+#if UNITY_EDITOR
+                UnityEngine.Debug.LogWarning(
+                    $"Effect {effectSpec.Effect.EffectName} was removed immediately after being applied. This may indicate a problem with the RemoveEffectWithAnyTags.");
+#endif
+            // No need to trigger OnGameplayEffectContainerIsDirty, it has already been triggered when it was removed.
+            return null;
+        }
+
+        OnGameplayEffectContainerIsDirty?.Invoke();
+        return effectSpec;
     }
 
 }

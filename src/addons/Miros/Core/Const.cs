@@ -171,3 +171,14 @@ public enum AbilityActivateResult
     FailCooldown, //冷却不足
     FailOtherReason //其他原因
 }
+
+
+
+public enum DurationPolicy //持续策略
+{
+    Instant, //立即生效
+    Infinite, //永久生效
+    Duration //规定时长
+}
+
+

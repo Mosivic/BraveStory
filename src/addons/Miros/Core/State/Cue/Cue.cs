@@ -5,7 +5,7 @@ public abstract class Cue: AbsState
 {
     public Tag[] RequiredTags;
     public Tag[] ImmunityTags;
-    protected readonly CueParameters _parameters;
+    protected CueParameters _parameters { get; set; }
     public Persona Owner { get; protected set; }
 
     public virtual bool Triggerable(Persona owner)
@@ -21,5 +21,16 @@ public abstract class Cue: AbsState
 
         return true;
     }
+
+
+    public abstract Cue ApplyFrom(Effect effect);
+    public abstract Cue ApplyFrom(Ability ability, params object[] customArguments);
+    public abstract void Trigger();
+
+    public abstract void OnAdd();
+    public abstract void OnRemove();
+    public abstract void OnGameplayEffectActivate();
+    public abstract void OnGameplayEffectDeactivate();
+    public abstract void OnTick();
 }
 

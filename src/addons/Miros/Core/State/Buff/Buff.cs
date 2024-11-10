@@ -6,7 +6,7 @@ namespace Miros.Core;
 /// <summary>
 ///     持续策略
 /// </summary>
-public enum DurationPolicy //持续策略
+public enum BuffDurationPolicy //持续策略
 {
     Instant, //立即生效
     Infinite, //永久生效
@@ -16,7 +16,7 @@ public enum DurationPolicy //持续策略
 /// <summary>
 ///     Buff中断并恢复的处理策略
 /// </summary>
-public enum PeriodicInhibitionPolicy
+public enum BuffPeriodicInhibitionPolicy
 {
     Resume, //恢复衔接
     Reset, //重置
@@ -36,12 +36,12 @@ public enum BuffStackExpirationPolicy
 public class Buff : AbsState
 {
     // Core
-    public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
+    public BuffDurationPolicy DurationPolicy { get; set; } = BuffDurationPolicy.Instant;
     public List<Modifier> Modifiers { get; set; } = new();
 
     // Period 
     public bool IsExecutePeriodicEffectOnStart { get; set; } = true;
-    public PeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = PeriodicInhibitionPolicy.Resume;
+    public BuffPeriodicInhibitionPolicy PeriodicInhibitionPolicy { get; set; } = BuffPeriodicInhibitionPolicy.Resume;
 
     // Chance
     public bool HasChance { get; init; } = false;

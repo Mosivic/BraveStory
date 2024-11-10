@@ -5,17 +5,17 @@ namespace Miros.Core;
 public abstract class Ability : AbsState
 {
     //描述性质的标签，用来描述Ability的特性表现，比如伤害、治疗、控制等。
-    public TagSet Tags;
+    public TagSet Tags { get; protected set; }
     //Ability激活时，Ability持有者当前持有的所有Ability中，拥有【任意】这些标签的Ability会被取消。
-    public TagSet CancelAbilityTags;
+    public TagSet CancelAbilityTags { get; protected set; }
     //Ability激活时，Ability持有者当前持有的所有Ability中，拥有【任意】这些标签的Ability会被阻塞激活。
-    public TagSet BlockAbilityTags;
+    public TagSet BlockAbilityTags { get; protected set; }
     //Ability激活时，持有者会获得这些标签，Ability被失活时，这些标签也会被移除。
-    public TagSet ActivationOwnedTags;
+    public TagSet ActivationOwnedTags { get; protected set; }
     //Ability只有在其拥有者拥有【所有】这些标签时才可激活。
-    public TagSet ActivationRequiredTags;
+    public TagSet ActivationRequiredTags { get; protected set; }
     //Ability在其拥有者拥有【任意】这些标签时不能被激活。
-    public TagSet ActivationBlockedTags;
+    public TagSet ActivationBlockedTags { get; protected set; }
 
     public Effect Cooldown { get; protected set; }
     public float CooldownTime { get; protected set; }
@@ -169,12 +169,11 @@ public abstract class Ability : AbsState
             : Owner.CheckCooldownFromTags(Cooldown.TagContainer.GrantedTags);
     }
 
+
     /// <summary>
-    ///     Some skills include wind-up and follow-through, where the wind-up may be interrupted, causing the skill not to be
-    ///     successfully released.
-    ///     Therefore, the actual timing and logic of skill release (triggering costs and initiating cooldown) should be
-    ///     determined by developers within the AbilitySpec,
-    ///     rather than being systematically standardized.
+    ///     一些技能包含前摇和后摇阶段，前摇阶段可能被打断导致技能释放失败。
+    ///     因此，技能释放的实际时机和逻辑（触发消耗和启动冷却）应该由开发者在 Ability 中决定，
+    ///     而不是由系统统一规定。
     /// </summary>
     public void DoCost()
     {
@@ -183,7 +182,7 @@ public abstract class Ability : AbsState
         if (Cooldown != null)
         {
             var cdSpec = Owner.ApplyGameplayEffectToSelf(Cooldown);
-            cdSpec.SetDuration(CooldownTime); // Actually, it should be set by the ability's cooldown time.
+            cdSpec.Duration = CooldownTime; // Actually, it should be set by the ability's cooldown time.
         }
     }
 

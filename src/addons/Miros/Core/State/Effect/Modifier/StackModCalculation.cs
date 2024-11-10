@@ -11,7 +11,7 @@ public class StackModCalculation : ModifierMagnitudeCalculation
 
     public override float CalculateMagnitude(Effect state, float modifierMagnitude)
     {
-        if (state.Stacking.stackingType == StackingType.None) return 0;
+        if (state.Stacking.StackingType == StackingType.None) return 0;
 
         var stackCount = state.StackCount;
         return stackCount * k + b;

@@ -2,9 +2,9 @@ namespace Miros.Core;
 
 public struct CueParameters
 {
-    public Effect sourceGameplayEffectSpec;
+    public Effect sourceEffect;
 
-    // public AbilityState sourceAbilitySpec;
+    public Ability sourceAbility;
 
     public object[] customArguments;
     // AggregatedSourceTags
