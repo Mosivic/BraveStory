@@ -6,52 +6,62 @@ namespace Miros.Core;
 
 public class EffectPeriodTicker
 {
-    private float _periodRemaining;
+    private double _periodRemaining;
+    private double _durationRemaining;
+    private readonly EffectJob _effectJob;
     private readonly Effect _effect;
 
-    public EffectPeriodTicker(Effect effect)
+    public EffectPeriodTicker(EffectJob effectJob, Effect effect)
     {
+        _effectJob = effectJob;
         _effect = effect;
         _periodRemaining = Period;
     }
 
-    private float Period => _effect.Period;
+    private double Period => _effect.Period;
+    private double ActivationTime => _effect.ActivationTime;
+    private double Duration => _effect.Duration;
+    private DurationPolicy DurationPolicy => _effect.DurationPolicy;
+    private StackingType StackingType => _effect.Stacking.StackingType;
+    private ExpirationPolicy ExpirationPolicy => _effect.Stacking.ExpirationPolicy;
+    private int StackCount => _effect.StackCount;
 
     public void Tick(double delta)
     {
-        _effect.PeriodExecution?.TriggerOnTick();
-
+        //_effect.PeriodExecution?.TriggerOnTick();
+        _effect.ActivationTime += delta;
+        UpdateDuration(delta);
         UpdatePeriod(delta);
+    
 
-        if (_effect.DurationPolicy == DurationPolicy.Duration && _effect.DurationRemaining() <= 0)
+        if (DurationPolicy == DurationPolicy.Duration && _durationRemaining<= 0)
         {
             // 处理STACKING
-            if (_effect.Stacking.StackingType == StackingType.None)
+            if (StackingType == StackingType.None)
             {
-                _effect.RemoveSelf();
+                _effectJob.RemoveSelf();
             }
             else
             {
-                if (_effect.Stacking.ExpirationPolicy == ExpirationPolicy.ClearEntireStack)
+                if (ExpirationPolicy == ExpirationPolicy.ClearEntireStack)
                 {
-                    _effect.RemoveSelf();
+                    _effectJob.RemoveSelf();
                 }
-                else if (_effect.Stacking.ExpirationPolicy == ExpirationPolicy.RemoveSingleStackAndRefreshDuration)
+                else if (ExpirationPolicy == ExpirationPolicy.RemoveSingleStackAndRefreshDuration)
                 {
-                    if (_effect.StackCount > 1)
+                    if (StackCount > 1)
                     {
-                        _effect.RefreshStack(_effect.StackCount - 1);
-                        _effect.RefreshDuration();
+                        _effectJob.RefreshStack(StackCount - 1);
                     }
                     else
                     {
-                        _effect.RemoveSelf();
+                        _effectJob.RemoveSelf();
                     }
                 }
-                else if (_effect.Stacking.ExpirationPolicy == ExpirationPolicy.RefreshDuration)
+                else if (ExpirationPolicy == ExpirationPolicy.RefreshDuration)
                 {
                     //持续时间结束时,再次刷新Duration，这相当于无限Duration，
-                    _effect.RefreshDuration();
+                    ResetDuration();
                 }
             }
         }
@@ -65,31 +75,41 @@ public class EffectPeriodTicker
         // 前提: Period不会动态修改
         if (Period <= 0) return;
 
-        var actualDuration = Time.GetTicksMsec() - _effect.ActivationTime;
-        if (actualDuration < Mathf.Epsilon)
+        if (ActivationTime < Mathf.Epsilon)
         {
             // 第一次执行
             return;
         }
-
-        var dt = (float)delta;
-        var excessDuration = actualDuration - _effect.Duration;
+        var excessDuration = ActivationTime - Duration;
         if (excessDuration >= 0)
         {
             // 如果超出了持续时间，就减去超出的时间, 此时应该是最后一次执行
-            dt -= excessDuration;
+            delta -= excessDuration;
             // 为了避免误差, 保证最后一次边界得到执行机会
-            dt += 0.0001f;
+            delta += 0.0001f;
         }
 
-        _periodRemaining -= dt;
+        _periodRemaining -= delta;
 
         while (_periodRemaining < 0)
         {
             // 不能直接将_periodRemaining置为0, 这将累计误差
             _periodRemaining += Period;
-            _effect.PeriodExecution?.TriggerOnExecute();
+            //_effect.PeriodExecution?.TriggerOnExecute();
         }
+    }
+
+    private void UpdateDuration(double delta)
+    {
+        if (DurationPolicy == DurationPolicy.Infinite)
+            return ;
+
+        _durationRemaining -= delta;
+    }
+
+    public void ResetDuration()
+    {
+        _durationRemaining = Duration;
     }
 
     public void ResetPeriod()

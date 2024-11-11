@@ -8,28 +8,15 @@ public abstract class AbsState
     // Core
     public required string Name { get; init; }
     public required Tag Tag {get;init;}
-    public Type JobType { get; init; } = typeof(JobSimple);
+    public Type JobType { get; init; } = typeof(NativeJob);
     public int Priority { get; init; } = 0;
 
     public Persona Owner { get; protected set; }
     public Persona Source { get; protected set; }
+    
     public string Description { get; init; }
     
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
-
-    // Duration
-    public double Duration { get; init; } = 0;
-    public double DurationElapsed { get; set; }
-    // Period
-    public double Period { get; set; } = 0;
-    public double PeriodElapsed { get; set; }
-
-    // Stack
-    public int StackMaxCount { get; init; } = 1;
-    public int StackCurrentCount { get; set; } = 1;
-    public Dictionary<object, int> StackSourceCountDict { get; set; }
-    public bool IsStack { get; init; } = false;
-    public StateStackType StackType { get; init; } = StateStackType.Target;
 
     // Function
     public Func<AbsState, bool> EnterCondition { get; init; }

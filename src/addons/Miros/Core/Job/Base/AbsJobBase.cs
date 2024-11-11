@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-
-
+﻿
 namespace Miros.Core;
 
-public abstract class AbsJobBase : AbsJob, IJob
+public abstract class AbsJobBase(AbsState state) : AbsJob(state), IJob
 {
-    private protected readonly AbsState state;
-
-    protected AbsJobBase(AbsState state) : base(state)
-    {
-        this.state = state;
-    }
+    private protected readonly AbsState state = state;
 
     public AbsState State => state;
 
@@ -22,7 +14,7 @@ public abstract class AbsJobBase : AbsJob, IJob
         _Enter();
     }
 
-    public void Exit()
+    public virtual void Exit()
     {
         if(CanExit())
             OnSucceed();
@@ -81,7 +73,4 @@ public abstract class AbsJobBase : AbsJob, IJob
         state.Status = RunningStatus.Failed;
         _OnFailed();
     }
-
-
-
 }

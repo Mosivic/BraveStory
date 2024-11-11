@@ -65,7 +65,7 @@ public abstract class Persona : AbsPersona, IPersona
     public void Init(Tag[] baseTags, Type[] attrSetTypes, Ability[] baseAbilities, int level)
     {
         Prepare();
-        SetLevel(level);
+        Level = level;
         if (baseTags != null) TagAggregator.Init(baseTags);
 
         if (attrSetTypes != null)
@@ -81,12 +81,6 @@ public abstract class Persona : AbsPersona, IPersona
         }
     }
 
-
-
-    public void SetLevel(int level)
-    {
-        Level = level;
-    }
 
     #region Tag Check
     public bool HasTag(Tag gameplayTag)
@@ -126,7 +120,7 @@ public abstract class Persona : AbsPersona, IPersona
 
     #endregion
 
-    #region  Effect CURD
+    #region Effect CURD
     public void AddEffect(Effect effect)
     {
         EffectContainer.AddEffect(this, effect);

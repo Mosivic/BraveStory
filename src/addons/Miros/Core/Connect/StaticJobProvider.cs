@@ -24,7 +24,7 @@ public class StaticJobProvider : IJobProvider
     private IJob CreateJob(AbsState state)
     {
         var type = state.JobType;
-        var job = (JobSimple)Activator.CreateInstance(type, [state]);
+        var job = (NativeJob)Activator.CreateInstance(type, [state]);
         _statesJob[state] = job;
         return job;
     }

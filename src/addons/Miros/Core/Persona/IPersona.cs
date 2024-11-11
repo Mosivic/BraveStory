@@ -21,6 +21,7 @@ public interface IPersona
     void RemoveFixedTags(TagSet tags);
 
     void RemoveFixedTag(Tag tag);
+    
     void AddEffect(Effect effect);
 
     void ApplyEffectTo(Effect effect, IPersona target);
