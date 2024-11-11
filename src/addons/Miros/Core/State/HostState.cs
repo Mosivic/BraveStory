@@ -1,7 +1,7 @@
 
 namespace Miros.Core;
 
-public class HostState<THost> : AbsState
+public class HostState<THost> : AbsState<HostState<THost>>
 {
     public THost Host { get; set; }
     

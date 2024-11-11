@@ -55,7 +55,7 @@ public class EffectContainer(Persona owner)
         var removeList = new List<Effect>();
         foreach (var effect in _effects)
         {
-            var assetTags = effect.AssetTags;
+            var assetTags = effect.OwnedTags;
             if (!assetTags.Empty && assetTags.HasAnyTags(tags))
             {
                 removeList.Add(effect);
@@ -70,12 +70,12 @@ public class EffectContainer(Persona owner)
     }
 
 
-    public void RemoveEffect(Effect effect)
-    {
-        _effects.Remove(effect);
-        effect.DisApply();
-        effect.TriggerOnRemove();
-    }
+    // public void RemoveEffect(Effect effect)
+    // {
+    //     _effects.Remove(effect);
+    //     effect.DisApply();
+    //     effect.TriggerOnRemove();
+    // }
 
 
     public Effect AddEffect(Persona source, Effect effect, bool overwriteEffectLevel = false, int effectLevel = 0)

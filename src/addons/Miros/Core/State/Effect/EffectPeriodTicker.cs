@@ -8,18 +8,16 @@ public class EffectPeriodTicker
 {
     private double _periodRemaining;
     private double _durationRemaining;
-    private readonly EffectJob _effectJob;
     private readonly Effect _effect;
 
-    public EffectPeriodTicker(EffectJob effectJob, Effect effect)
+    public EffectPeriodTicker(Effect effect)
     {
-        _effectJob = effectJob;
         _effect = effect;
         _periodRemaining = Period;
+        _durationRemaining = Duration;
     }
 
     private double Period => _effect.Period;
-    private double ActivationTime => _effect.ActivationTime;
     private double Duration => _effect.Duration;
     private DurationPolicy DurationPolicy => _effect.DurationPolicy;
     private StackingType StackingType => _effect.Stacking.StackingType;
@@ -29,7 +27,6 @@ public class EffectPeriodTicker
     public void Tick(double delta)
     {
         //_effect.PeriodExecution?.TriggerOnTick();
-        _effect.ActivationTime += delta;
         UpdateDuration(delta);
         UpdatePeriod(delta);
     
@@ -39,23 +36,23 @@ public class EffectPeriodTicker
             // 处理STACKING
             if (StackingType == StackingType.None)
             {
-                _effectJob.RemoveSelf();
+                _effect.Status = RunningStatus.Succeed;
             }
             else
             {
                 if (ExpirationPolicy == ExpirationPolicy.ClearEntireStack)
                 {
-                    _effectJob.RemoveSelf();
+                    _effect.Status = RunningStatus.Succeed;
                 }
                 else if (ExpirationPolicy == ExpirationPolicy.RemoveSingleStackAndRefreshDuration)
                 {
                     if (StackCount > 1)
                     {
-                        _effectJob.RefreshStack(StackCount - 1);
+                        RefreshStack(StackCount - 1);
                     }
                     else
                     {
-                        _effectJob.RemoveSelf();
+                        _effect.Status = RunningStatus.Succeed;
                     }
                 }
                 else if (ExpirationPolicy == ExpirationPolicy.RefreshDuration)
@@ -75,20 +72,12 @@ public class EffectPeriodTicker
         // 前提: Period不会动态修改
         if (Period <= 0) return;
 
-        if (ActivationTime < Mathf.Epsilon)
+        if (_periodRemaining < Mathf.Epsilon)
         {
             // 第一次执行
             return;
         }
-        var excessDuration = ActivationTime - Duration;
-        if (excessDuration >= 0)
-        {
-            // 如果超出了持续时间，就减去超出的时间, 此时应该是最后一次执行
-            delta -= excessDuration;
-            // 为了避免误差, 保证最后一次边界得到执行机会
-            delta += 0.0001f;
-        }
-
+        
         _periodRemaining -= delta;
 
         while (_periodRemaining < 0)
@@ -115,5 +104,55 @@ public class EffectPeriodTicker
     public void ResetPeriod()
     {
         _periodRemaining = Period;
+    }
+
+
+    private bool RefreshStack()
+    {
+        var oldStackCount = _effect.StackCount;
+        RefreshStack(_effect.StackCount + 1);
+        _effect.RaiseOnStackCountChanged(oldStackCount, _effect.StackCount);
+        return oldStackCount != _effect.StackCount;
+    }
+
+    private void RefreshStack(int stackCount)
+    {
+        if (stackCount <= _effect.Stacking.LimitCount)
+        {
+            // 更新栈数
+            _effect.StackCount = Mathf.Max(1, stackCount); // 最小层数为1
+                                                          // 是否刷新Duration
+            if (_effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
+            {
+                _effect.PeriodTicker.ResetDuration();
+            }
+            // 是否重置Period
+            if (_effect.Stacking.PeriodResetPolicy == PeriodResetPolicy.ResetOnSuccessfulApplication)
+            {
+                _effect.PeriodTicker.ResetPeriod();
+            }
+        }
+        else
+        {
+            // 溢出GE生效
+            foreach (var overflowEffect in _effect.Stacking.OverflowEffects)
+                _effect.Owner.ApplyEffectToSelf(overflowEffect);
+
+            if (_effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
+            {
+                if (_effect.Stacking.DenyOverflowApplication)
+                {
+                    //当DenyOverflowApplication为True是才有效，当Overflow时是否直接删除所有层数
+                    if (_effect.Stacking.ClearStackOnOverflow)
+                    {
+                        _effect.Status = RunningStatus.Succeed;
+                    }
+                }
+                else
+                {
+                    _effect.PeriodTicker.ResetDuration();
+                }
+            }
+        }
     }
 }

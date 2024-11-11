@@ -1,5 +1,4 @@
 using System;
-using Godot;
 
 namespace Miros.Core;
 
@@ -8,7 +7,11 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
 
     public override void Enter()
     {
+        effect.IsActive = true;
+        TriggerOnActivation();
+
         CaptureAttributesSnapshot();
+
         if (effect.DurationPolicy != DurationPolicy.Instant)
         {
             if (effect.GrantedAbility.Length > 0)
@@ -16,6 +19,9 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
                 TryActivateGrantedAbilities();
             }
         }
+
+
+        base.Enter();
     }
 
     public override void Update(double delta)
@@ -23,38 +29,42 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
         if (effect.Status != RunningStatus.Running) return;
     
         effect.PeriodTicker.Tick(delta);
-
+        base.Update(delta);
     }
 
     public override void Exit()
     {
-        effect.CueDurationalSpecs = null;
+        effect.IsActive = false;
+        TriggerOnDeactivation();
+
+        effect.CueDurational = null;
+
+
+        DisApply();
+        TriggerOnRemove();
+        base.Exit();
     }
 
 
-    
+    // public bool CanApplyTo(Persona target)
+    // {
+    //     return target.HasAllTags(effect.ApplicationRequiredTags);
+    // }
 
-    
+    // public bool CanRunning(Persona target)
+    // {
+    //     return target.HasAllTags(effect.OngoingRequiredTags);
+    // }
 
-    public bool CanApplyTo(Persona target)
-    {
-        return target.HasAllTags(effect.ApplicationRequiredTags);
-    }
+    // public bool IsImmune(Persona target)
+    // {
+    //     return target.HasAnyTags(effect.ApplicationImmunityTags);
+    // }
 
-    public bool CanRunning(Persona target)
-    {
-        return target.HasAllTags(effect.OngoingRequiredTags);
-    }
-
-    public bool IsImmune(Persona target)
-    {
-        return target.HasAnyTags(effect.ApplicationImmunityTags);
-    }
-
-    public void RemoveSelf()
-    {
-        effect.Owner.RemoveEffect(effect);
-    }
+    // public void RemoveSelf()
+    // {
+    //     effect.Owner.RemoveEffect(effect);
+    // }
 
     private void CaptureAttributesSnapshot()
     {
@@ -106,56 +116,6 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
         return effect.Stacking.StackingHashCode == anotherEffect.Stacking.StackingHashCode;
     }
 
-    public bool RefreshStack()
-    {
-        var oldStackCount = effect.StackCount;
-        RefreshStack(effect.StackCount + 1);
-        effect.RaiseOnStackCountChanged(oldStackCount, effect.StackCount);
-        return oldStackCount != effect.StackCount;
-    }
-
-    public void RefreshStack(int stackCount)
-    {
-        if (stackCount <= effect.Stacking.LimitCount)
-        {
-            // 更新栈数
-            effect.StackCount = Mathf.Max(1, stackCount); // 最小层数为1
-                                                          // 是否刷新Duration
-            if (effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
-            {
-                effect.PeriodTicker.ResetDuration();
-            }
-            // 是否重置Period
-            if (effect.Stacking.PeriodResetPolicy == PeriodResetPolicy.ResetOnSuccessfulApplication)
-            {
-                effect.PeriodTicker.ResetPeriod();
-            }
-        }
-        else
-        {
-            // 溢出GE生效
-            foreach (var overflowEffect in effect.Stacking.OverflowEffects)
-                effect.Owner.ApplyEffectToSelf(overflowEffect);
-
-            if (effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
-            {
-                if (effect.Stacking.DenyOverflowApplication)
-                {
-                    //当DenyOverflowApplication为True是才有效，当Overflow时是否直接删除所有层数
-                    if (effect.Stacking.ClearStackOnOverflow)
-                    {
-                        RemoveSelf();
-                    }
-                }
-                else
-                {
-                    effect.PeriodTicker.ResetDuration();
-                }
-            }
-        }
-    }
-
-
     public void RegisterOnStackCountChanged(Action<int, int> callback)
     {
         effect.OnStackCountChanged += callback;
@@ -186,21 +146,6 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
         if (!effect.IsApplied) return;
         effect.IsApplied = false;
         Deactivate();
-    }
-
-    public void Activate()
-    {
-        if (effect.IsActive) return;
-        effect.IsActive = true;
-        effect.ActivationTime = Time.GetTicksMsec();
-        TriggerOnActivation();
-    }
-
-    public void Deactivate()
-    {
-        if (!effect.IsActive) return;
-        effect.IsActive = false;
-        TriggerOnDeactivation();
     }
 
 
@@ -312,14 +257,14 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
 
         if (effect.CueDurational != null && effect.CueDurational.Length > 0)
         {
-            effect.CueDurationalSpecs.Clear();
+            effect.CueDurational.Clear();
             foreach (var cueDurational in effect.CueDurational)
             {
                 var cueSpec = (CueDurational)cueDurational.ApplyFrom(effect);
-                if (cueSpec != null) effect.CueDurationalSpecs.Add(cueSpec);
+                if (cueSpec != null) effect.CueDurational.Add(cueSpec);
             }
 
-            foreach (var cue in effect.CueDurationalSpecs) cue.OnAdd();
+            foreach (var cue in effect.CueDurational) cue.OnAdd();
         }
     }
 
@@ -330,9 +275,9 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
 
         if (effect.CueDurational != null && effect.CueDurational.Length > 0)
         {
-            foreach (var cue in effect.CueDurationalSpecs) cue.OnRemove();
+            foreach (var cue in effect.CueDurational) cue.OnRemove();
 
-            effect.CueDurationalSpecs = null;
+            effect.CueDurational = null;
         }
     }
 
@@ -342,7 +287,7 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
             TriggerInstantCues(effect.CueOnActivate);
 
         if (effect.CueDurational != null && effect.CueDurational.Length > 0)
-            foreach (var cue in effect.CueDurationalSpecs)
+            foreach (var cue in effect.CueDurational)
                 cue.OnGameplayEffectActivate();
     }
 
@@ -352,14 +297,14 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
             TriggerInstantCues(effect.CueOnDeactivate);
 
         if (effect.CueDurational != null && effect.CueDurational.Length > 0)
-            foreach (var cue in effect.CueDurationalSpecs)
+            foreach (var cue in effect.CueDurational)
                 cue.OnGameplayEffectDeactivate();
     }
 
     private void CueOnTick()
     {
         if (effect.CueDurational == null || effect.CueDurational.Length <= 0) return;
-        foreach (var cue in effect.CueDurationalSpecs) cue.OnTick();
+        foreach (var cue in effect.CueDurational) cue.OnTick();
     }
     #endregion
 }

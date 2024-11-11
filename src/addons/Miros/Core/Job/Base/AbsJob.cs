@@ -1,45 +1,32 @@
-﻿namespace Miros.Core;
+﻿using System;
+
+namespace Miros.Core;
 // 对自定义回调函数的处理
 
-public abstract class AbsJob(AbsState state)
+public abstract class AbsJob
 {
-    protected virtual void _Enter()
+
+    public event Action OnEnter;
+    public event Action OnExit;
+    public event Action<double> OnUpdate;
+    public event Action<double> OnPhysicsUpdate;
+    public event Action OnSucceed;
+    public event Action OnFailed;
+    public event Action OnPause;
+    public event Action OnResume;
+
+
+    protected NativeJob State { get; }
+
+    protected AbsJob(NativeJob state)
     {
-        state.EnterFunc?.Invoke(state);
+        State = state;
+        RegisterHandlers();
     }
 
-    protected virtual void _Exit()
+    protected virtual void RegisterHandlers()
     {
-        state.ExitFunc?.Invoke(state);
+        State.RegisterHandler(new StandardDelegateHandler<NativeJob>(State));
     }
 
-    protected virtual void _Pause()
-    {
-        state.PauseFunc?.Invoke(state);
-    }
-
-    protected virtual void _Resume()
-    {
-        state.ResumeFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnSucceed()
-    {
-        state.OnSucceedFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnFailed()
-    {
-        state.OnFailedFunc?.Invoke(state);
-    }
-
-    protected virtual void _Update(double delta)
-    {
-        state.UpdateFunc?.Invoke(state, delta);
-    }
-
-    protected virtual void _PhysicsUpdate(double delta)
-    {
-        state.PhysicsUpdateFunc?.Invoke(state, delta);
-    }
 }
