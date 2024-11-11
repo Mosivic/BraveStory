@@ -1,5 +1,5 @@
 namespace Miros.Core;
 
-public class AbilityJob(AbsState state) : AbsJobBase(state)
+public class AbilityJob(Ability ability) : NativeJob(ability)
 {
 }

@@ -2,20 +2,27 @@ using System;
 
 namespace Miros.Core;
 
-public readonly struct DurationDelegateComponent : IStateComponent<NativeJob>
+public readonly struct EffectDelegateComponent : IStateComponent<EffectJob>
 {
-    public Action<NativeState> OnDurationOverFunc { get; init; }
-    public Action<NativeState> OnPeriodOverFunc { get; init; }
+    public Action<EffectJob> OnDurationOveredFunc { get; init; }
+    public Action<EffectJob> OnPeriodOveredFunc { get; init; }
+    public Action<EffectJob> OnStackedFunc { get; init; }
+    public Action<EffectJob> OnStackOverflowedFunc { get; init; }
 
-    public void RegisterHandler(NativeJob job)
+
+    public void RegisterHandler(EffectJob job)
     {
-        job.OnDurationOver += OnDurationOverFunc;
-        job.OnPeriodOver += OnPeriodOverFunc;
+        job.OnDurationOvered += OnDurationOveredFunc;
+        job.OnPeriodOvered += OnPeriodOveredFunc;
+        job.OnStacked += OnStackedFunc;
+        job.OnStackOverflowed += OnStackOverflowedFunc;
     }
 
-    public void UnregisterHandler(NativeJob job)
+    public void UnregisterHandler(EffectJob job)
     {
-        job.OnDurationOver -= OnDurationOverFunc;
-        job.OnPeriodOver -= OnPeriodOverFunc;
+        job.OnDurationOvered -= OnDurationOveredFunc;
+        job.OnPeriodOvered -= OnPeriodOveredFunc;
+        job.OnStacked -= OnStackedFunc;
+        job.OnStackOverflowed -= OnStackOverflowedFunc;
     }
 }

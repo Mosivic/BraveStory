@@ -16,6 +16,6 @@ public abstract class AbsState<T> where T : AbsState<T>
     public Persona Source { get; protected set; }
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
 
-    public Dictionary<Type, IStateComponent> Components { get; set; } = new();
+    public Dictionary<Type, IStateComponent<NativeJob>> Components { get; set; } = new();
 
 }

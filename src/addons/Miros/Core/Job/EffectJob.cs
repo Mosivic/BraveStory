@@ -2,8 +2,13 @@ using System;
 
 namespace Miros.Core;
 
-public class EffectJob(Effect effect) : AbsJobBase(effect)
+public class EffectJob(Effect effect) : NativeJob(effect)
 {
+    public event Action<EffectJob> OnStacked;
+    public event Action<EffectJob> OnStackOverflowed;
+    public event Action<EffectJob> OnDurationOvered;
+    public event Action<EffectJob> OnPeriodOvered;
+
 
     public override void Enter()
     {
@@ -11,7 +16,7 @@ public class EffectJob(Effect effect) : AbsJobBase(effect)
         TriggerOnActivation();
 
         CaptureAttributesSnapshot();
-
+        
         if (effect.DurationPolicy != DurationPolicy.Instant)
         {
             if (effect.GrantedAbility.Length > 0)

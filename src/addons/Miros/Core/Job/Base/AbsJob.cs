@@ -3,98 +3,71 @@
 namespace Miros.Core;
 // 对自定义回调函数的处理
 
-public abstract class AbsJob
+public abstract class AbsJob(NativeState state)
 {
-    public event Action<NativeState> OnEnter;
-    public event Action<NativeState> OnExit;
-    public event Action<NativeState, double> OnUpdate;
-    public event Action<NativeState, double> OnPhysicsUpdate;
-    public event Action<NativeState> OnSucceed;
+    public event Action<NativeState> OnEntered;
+    public event Action<NativeState> OnExited;
+    public event Action<NativeState, double> OnUpdated;
+    public event Action<NativeState, double> OnPhysicsUpdated;
+    public event Action<NativeState> OnSucceeded;
     public event Action<NativeState> OnFailed;
-    public event Action<NativeState> OnPause;
-    public event Action<NativeState> OnResume;
+    public event Action<NativeState> OnPaused;
+    public event Action<NativeState> OnResumed;
 
     public event Func<NativeState, bool> EnterCondition;
     public event Func<NativeState, bool> ExitCondition;
 
 
-    protected NativeState State { get; }
 
-    protected AbsJob(NativeState state)
+
+
+    protected virtual void OnEnter()
     {
-        State = state;
-        RegisterHandlers();
+        OnEntered?.Invoke(state); 
     }
 
-    /// <summary>
-    /// 注册组件的事件处理器
-    /// </summary>
-    protected virtual void RegisterHandlers()
+    protected virtual void OnExit()
     {
-        foreach (var component in State.Components.Values)
-        {
-            component.RegisterHandler();
-        }
+        OnExited?.Invoke(state);
     }
 
-    /// <summary>
-    /// 注销组件的事件处理器
-    /// </summary>
-    protected virtual void UnregisterHandlers()
+    protected virtual void OnPause()
     {
-        foreach (var component in State.Components.Values)
-        {
-            component.UnregisterHandler();
-        }
+        OnPaused?.Invoke(state);
     }
 
-    protected virtual void _Enter()
+    protected virtual void OnResume()
     {
-        OnEnter?.Invoke(State); 
-    }
-
-    protected virtual void _Exit()
-    {
-        OnExit?.Invoke(State);
-    }
-
-    protected virtual void _Pause()
-    {
-        OnPause?.Invoke(State);
-    }
-
-    protected virtual void _Resume()
-    {
-        OnResume?.Invoke(State);
+        OnResumed?.Invoke(state);
     }       
 
-    protected virtual void _Update(double delta)
+    protected virtual void OnUpdate(double delta)
     {
-        OnUpdate?.Invoke(State, delta);
+        OnUpdated?.Invoke(state, delta);
     }   
 
-    protected virtual void _PhysicsUpdate(double delta)
+    protected virtual void OnPhysicsUpdate(double delta)
     {
-        OnPhysicsUpdate?.Invoke(State, delta);
+        OnPhysicsUpdated?.Invoke(state, delta);
     }
 
-    protected virtual void _Succeed()
+    protected virtual void OnSucceed()
     {
-        OnSucceed?.Invoke(State );
+        OnSucceeded?.Invoke(state );
     }
 
-    protected virtual void _Failed()
+    protected virtual void OnFail()
     {
-        OnFailed?.Invoke(State);
+        OnFailed?.Invoke(state);
     }
 
-    protected virtual bool _CanEnter()
+    protected virtual bool OnCanEnter()
     {
-        return EnterCondition?.Invoke(State) ?? true;
+        return EnterCondition?.Invoke(state) ?? true;
     }
 
-    protected virtual bool _CanExit()
+    protected virtual bool OnCanExit()
     {
-        return ExitCondition?.Invoke(State) ?? true;
+        return ExitCondition?.Invoke(state) ?? true;
     }
 }   

@@ -22,28 +22,28 @@ public class StandardDelegateComponent: IStateComponent<NativeJob>
 
     public void RegisterHandler(NativeJob job)
     {
-        job.OnEnter += EnterFunc;
-        job.OnExit += ExitFunc;
-        job.OnSucceed += OnSucceedFunc;
+        job.OnEntered += EnterFunc;
+        job.OnExited += ExitFunc;
+        job.OnSucceeded += OnSucceedFunc;
         job.OnFailed += OnFailedFunc;
-        job.OnPause += PauseFunc;
-        job.OnResume += ResumeFunc;
-        job.OnUpdate += UpdateFunc;
-        job.OnPhysicsUpdate += PhysicsUpdateFunc;
+        job.OnPaused += PauseFunc;
+        job.OnResumed += ResumeFunc;
+        job.OnUpdated += UpdateFunc;
+        job.OnPhysicsUpdated += PhysicsUpdateFunc;
         job.EnterCondition += EnterCondition;
         job.ExitCondition += ExitCondition;
     }
 
     public void UnregisterHandler(NativeJob job)
     {
-        job.OnEnter -= EnterFunc;
-        job.OnExit -= ExitFunc;
-        job.OnSucceed -= OnSucceedFunc;
+        job.OnEntered -= EnterFunc;
+        job.OnExited -= ExitFunc;
+        job.OnSucceeded -= OnSucceedFunc;
         job.OnFailed -= OnFailedFunc;
-        job.OnPause -= PauseFunc;
-        job.OnResume -= ResumeFunc;
-        job.OnUpdate -= UpdateFunc;
-        job.OnPhysicsUpdate -= PhysicsUpdateFunc;
+        job.OnPaused -= PauseFunc;
+        job.OnResumed -= ResumeFunc;
+        job.OnUpdated -= UpdateFunc;
+        job.OnPhysicsUpdated -= PhysicsUpdateFunc;
         job.EnterCondition -= EnterCondition;
         job.ExitCondition -= ExitCondition;
     }

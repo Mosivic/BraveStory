@@ -3,6 +3,7 @@ using System.Linq;
 using BraveStory;
 using Miros.Core;
 using Godot;
+using System;
 
 
 
@@ -39,20 +40,16 @@ public partial class Player : Character
 		var idle = new HostState<Player>(this)
 		{
 			Name = "Idle",
-			Components = new List<IStateComponent<NativeJob>>
+			Components = new Dictionary<Type, IStateComponent<NativeJob>>
 			{
-				new StandardDelegateComponent()
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent()
 				{
-					EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
-				},
-				new TagComponent()
+                    EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
+				}},
+				{ typeof(TagComponent), new TagComponent()
 				{
 					OwnedTags = new TagSet(Tags.Idle)
-				},
-				new StackDelegateComponent()
-				{
-					OnStackFunc = s => GD.Print("Stack")
-				}
+				}}
 			},
 		};
 		// Jump

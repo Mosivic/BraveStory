@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class JobBuff(Buff buffState) : AbsJobBase(buffState)
+public class JobBuff(Buff buffState) : NativeJob(buffState)
 {
     public override void Enter()
     {
@@ -113,7 +113,7 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         base.OnSucceed();
     }
 
-    protected override void OnFailed()
+    protected override void OnFail()
     {
         switch (buffState.DurationPolicy)
         {
@@ -128,7 +128,7 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
                 throw new ArgumentOutOfRangeException();
         }
 
-        base.OnFailed();
+        base.OnFail();
     }
 
 
@@ -148,12 +148,12 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
 
     protected virtual void OnStack()
     {
-        _OnStack();
+
     }
 
     protected virtual void OnStackOverflow()
     {
-        _OnStackOverflow();
+
     }
 
     protected virtual void OnDurationOver()
@@ -164,14 +164,14 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         if (buffState.StackCurrentCount == 0)
             buffState.Status = RunningStatus.Succeed;
 
-        _OnDurationOVer();
+
     }
 
     protected virtual void OnPeriodOver()
     {
         ApplyModifiers();
         buffState.PeriodElapsed = 0;
-        _OnPeriodOver();
+
     }
 
     private void ApplyModifiers()
@@ -216,23 +216,5 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
     }
 
 
-    protected virtual void _OnPeriodOver()
-    {
-        state.OnPeriodOverFunc?.Invoke(state);
-    }
 
-    protected virtual void _OnStack()
-    {
-        state.OnStackFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnStackOverflow()
-    {
-        state.OnStackOverflowFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnDurationOVer()
-    {
-        state.OnDurationOverFunc?.Invoke(state);
-    }
 }

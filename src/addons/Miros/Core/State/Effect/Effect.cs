@@ -4,7 +4,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public abstract class Effect : AbsState<Effect>
+public abstract class Effect : NativeState
 {
     public Dictionary<Tag, float> ValueMapWithTag { get; } = [];
     public Dictionary<string, float> ValueMapWithName { get; } = [];
