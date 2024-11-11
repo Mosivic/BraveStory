@@ -1,7 +1,7 @@
 namespace Miros.Core;
 
-public interface IStateComponent<T> where T : AbsState<T>
+public interface IStateComponent<TJob> where TJob : NativeJob
 {
-    void RegisterHandler(T state);
-    void UnregisterHandler(T state);
+    void RegisterHandler(TJob job);
+    void UnregisterHandler(TJob job);
 }

@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public struct TagComponent : IStateComponent
+public struct TagComponent : IStateComponent<NativeJob>
 {
     /// <summary>
     /// 游戏效果(GE)拥有的标签, 它们自身没有任何功能且只用于描述GameplayEffect。
@@ -53,4 +53,14 @@ public struct TagComponent : IStateComponent
     ///   2. 标签发生变化时，如果满足条件则激活GE，否则使GE失效。
     /// </summary>
     public TagSet OngoingRequiredTags;
+
+    public void RegisterHandler(NativeJob job)
+    {
+        return;
+    }
+
+    public void UnregisterHandler(NativeJob job)
+    {
+        return;
+    }
 }

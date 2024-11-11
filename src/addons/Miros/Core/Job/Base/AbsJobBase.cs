@@ -1,11 +1,11 @@
 ﻿
 namespace Miros.Core;
 
-public abstract class AbsJobBase(AbsState state) : AbsJob(state), IJob
+public abstract class AbsJobBase(NativeState state) : AbsJob(state), IJob
 {
-    private protected readonly AbsState state = state;
+    protected readonly NativeState state = state;
 
-    public AbsState State => state;
+    NativeState IJob.State => state;
 
     public virtual void Enter()
     {
@@ -17,9 +17,9 @@ public abstract class AbsJobBase(AbsState state) : AbsJob(state), IJob
     public virtual void Exit()
     {
         if(CanExit())
-            OnSucceed();
+            Succeed();
         else
-            OnFailed();
+            Failed();
 
         _Exit();
     }
@@ -41,13 +41,13 @@ public abstract class AbsJobBase(AbsState state) : AbsJob(state), IJob
 
     public virtual bool CanEnter()
     {
-        return state.EnterCondition?.Invoke(state) ?? true;
+        return _CanEnter();
     }
 
 
     public virtual bool CanExit()
     {
-        return state.ExitCondition?.Invoke(state) ?? true;
+        return _CanExit();
     }
     
 
@@ -62,15 +62,15 @@ public abstract class AbsJobBase(AbsState state) : AbsJob(state), IJob
         _PhysicsUpdate(delta);
     }
 
-    protected virtual void OnSucceed()
+    protected virtual void Succeed()
     {
         state.Status = RunningStatus.Succeed;
-        _OnSucceed();
+        _Succeed();
     }
 
-    protected virtual void OnFailed()
+    protected virtual void Failed()
     {
         state.Status = RunningStatus.Failed;
-        _OnFailed();
+        _Failed();
     }
 }

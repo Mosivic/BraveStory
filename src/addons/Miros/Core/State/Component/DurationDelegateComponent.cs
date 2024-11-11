@@ -2,8 +2,20 @@ using System;
 
 namespace Miros.Core;
 
-public readonly struct DurationDelegateComponent<T> : IStateComponent<T> where T : AbsState<T>
+public readonly struct DurationDelegateComponent : IStateComponent<NativeJob>
 {
-    public Action<T> OnDurationOverFunc { get; init; }
-    public Action<T> OnPeriodOverFunc { get; init; }
+    public Action<NativeState> OnDurationOverFunc { get; init; }
+    public Action<NativeState> OnPeriodOverFunc { get; init; }
+
+    public void RegisterHandler(NativeJob job)
+    {
+        job.OnDurationOver += OnDurationOverFunc;
+        job.OnPeriodOver += OnPeriodOverFunc;
+    }
+
+    public void UnregisterHandler(NativeJob job)
+    {
+        job.OnDurationOver -= OnDurationOverFunc;
+        job.OnPeriodOver -= OnPeriodOverFunc;
+    }
 }

@@ -39,8 +39,21 @@ public partial class Player : Character
 		var idle = new HostState<Player>(this)
 		{
 			Name = "Idle",
-			Tag = Tags.Idle,
-			EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
+			Components = new List<IStateComponent<NativeJob>>
+			{
+				new StandardDelegateComponent()
+				{
+					EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
+				},
+				new TagComponent()
+				{
+					OwnedTags = new TagSet(Tags.Idle)
+				},
+				new StackDelegateComponent()
+				{
+					OnStackFunc = s => GD.Print("Stack")
+				}
+			},
 		};
 		// Jump
 		var jump = new HostState<Player>(this)
