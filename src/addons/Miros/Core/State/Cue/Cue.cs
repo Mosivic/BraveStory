@@ -22,11 +22,9 @@ public abstract class Cue: AbsState
         return true;
     }
 
-
     public abstract Cue ApplyFrom(Effect effect);
     public abstract Cue ApplyFrom(Ability ability, params object[] customArguments);
     public abstract void Trigger();
-
     public abstract void OnAdd();
     public abstract void OnRemove();
     public abstract void OnGameplayEffectActivate();

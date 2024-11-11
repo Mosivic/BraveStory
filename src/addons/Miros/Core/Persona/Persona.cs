@@ -5,7 +5,7 @@ using Godot;
 namespace Miros.Core;
 
 public abstract class Persona : AbsPersona, IPersona
-{   
+{
 
     public string Name { get; set; }
     public int Level { get; protected set; }
@@ -88,6 +88,7 @@ public abstract class Persona : AbsPersona, IPersona
         Level = level;
     }
 
+    #region Tag Check
     public bool HasTag(Tag gameplayTag)
     {
         return TagAggregator.HasTag(gameplayTag);
@@ -123,6 +124,9 @@ public abstract class Persona : AbsPersona, IPersona
         TagAggregator.RemoveFixedTag(gameplayTag);
     }
 
+    #endregion
+
+    #region  Effect CURD
     public void AddEffect(Effect effect)
     {
         EffectContainer.AddEffect(this, effect);
@@ -156,6 +160,17 @@ public abstract class Persona : AbsPersona, IPersona
         ApplyEffectTo(effect, this);
     }
 
+    public void ClearEffect()
+    {
+        // _abilityContainer = new AbilityContainer(this);
+        // GameplayEffectContainer = new GameplayEffectContainer(this);
+        // _attributeSetContainer = new AttributeSetContainer(this);
+        // tagAggregator = new GameplayTagAggregator(this);
+        EffectContainer.ClearEffect();
+    }
+    #endregion
+
+    #region Ability CURD and Control
     public void GrantAbility(Ability ability)
     {
         AbilityContainer.GrantAbility(ability);
@@ -166,6 +181,29 @@ public abstract class Persona : AbsPersona, IPersona
         AbilityContainer.RemoveAbility(abilityName);
     }
 
+    public bool TryActivateAbility(string abilityName, params object[] args)
+    {
+        return AbilityContainer.TryActivateAbility(abilityName, args);
+    }
+
+    public void TryEndAbility(string abilityName)
+    {
+        AbilityContainer.EndAbility(abilityName);
+    }
+
+    public void TryCancelAbility(string abilityName)
+    {
+        AbilityContainer.CancelAbility(abilityName);
+    }
+
+    private void DisableAllAbilities()
+    {
+        AbilityContainer.CancelAllAbilities();
+    }
+
+    #endregion
+
+    #region Attrubute Setget
     public AttributeValue? GetAttributeAttributeValue(string attrSetName, string attrShortName)
     {
         var value = AttributeSetContainer.GetAttributeAttributeValue(attrSetName, attrShortName);
@@ -190,31 +228,27 @@ public abstract class Persona : AbsPersona, IPersona
         return value;
     }
 
+    public Dictionary<string, float> DataSnapshot()
+    {
+        return AttributeSetContainer.Snapshot();
+    }
+
+    public T AttrSet<T>() where T : AttributeSet
+    {
+        AttributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
+        return attrSet;
+    }
+
+    #endregion
+
+
     public void Tick(double delta)
     {
         AbilityContainer.Tick();
         EffectContainer.Tick(delta);
     }
 
-    public Dictionary<string, float> DataSnapshot()
-    {
-        return AttributeSetContainer.Snapshot();
-    }
 
-    public bool TryActivateAbility(string abilityName, params object[] args)
-    {
-        return AbilityContainer.TryActivateAbility(abilityName, args);
-    }
-
-    public void TryEndAbility(string abilityName)
-    {
-        AbilityContainer.EndAbility(abilityName);
-    }
-
-    public void TryCancelAbility(string abilityName)
-    {
-        AbilityContainer.CancelAbility(abilityName);
-    }
 
     public void ApplyModFromInstantEffect(Effect effect)
     {
@@ -267,26 +301,10 @@ public abstract class Persona : AbsPersona, IPersona
         return EffectContainer.CheckCooldownFromTags(tags);
     }
 
-    public T AttrSet<T>() where T : AttributeSet
-    {
-        AttributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
-        return attrSet;
-    }
-
-    public void ClearEffect()
-    {
-        // _abilityContainer = new AbilityContainer(this);
-        // GameplayEffectContainer = new GameplayEffectContainer(this);
-        // _attributeSetContainer = new AttributeSetContainer(this);
-        // tagAggregator = new GameplayTagAggregator(this);
-        EffectContainer.ClearEffect();
-    }
 
 
-    private void DisableAllAbilities()
-    {
-        AbilityContainer.CancelAllAbilities();
-    }
+
+
 
 }
 
