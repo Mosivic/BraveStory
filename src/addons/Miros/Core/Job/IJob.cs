@@ -7,7 +7,6 @@ public interface IJob
     void Exit();
     void Pause();
     void Resume();
-    void Stack(object source);
     bool CanEnter();
     bool CanExit();
     void Update(double delta);

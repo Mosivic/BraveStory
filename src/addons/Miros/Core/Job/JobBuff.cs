@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Miros.Core;
 
@@ -22,6 +23,9 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
             ApplyModifiers();
         }
 
+        buffState.StackCurrentCount = buffState.StackMaxCount;
+        buffState.PeriodElapsed = 0;
+        buffState.DurationElapsed = 0;
         base.Enter();
     }
 
@@ -41,14 +45,54 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         base.Resume();
     }
 
-    public override void Stack(object source)
+    public void Stack(object source)
     {
         if (buffState.StackIsRefreshDuration)
             buffState.DurationElapsed = 0;
         if (buffState.StackIsResetPeriod)
             buffState.PeriodElapsed = 0;
 
-        base.Stack(source);
+        switch (buffState.StackType)
+        {
+            case StateStackType.Source:
+                buffState.StackSourceCountDict ??= new Dictionary<object, int>
+                    { { buffState.Source, 1 } };
+
+                //Not have stackState in Dict
+                if (buffState.StackSourceCountDict.TryAdd(source, 1))
+                {
+                    buffState.StackCurrentCount += 1;
+                    OnStack();
+                }
+                //Have stackState in Dict AND stackStateCount less than maxCount
+                else if (buffState.StackSourceCountDict[buffState.Source] < buffState.StackMaxCount)
+                {
+                    buffState.StackSourceCountDict.Add(source, 1);
+                    buffState.StackCurrentCount += 1;
+                    OnStack();
+                }
+                //Have stackState in Dict AND Overflow
+                else
+                {
+                    OnStackOverflow();
+                }
+
+                break;
+            case StateStackType.Target:
+                if (buffState.StackCurrentCount < buffState.StackMaxCount)
+                {
+                    buffState.StackCurrentCount += 1;
+                    OnStack();
+                }
+                else
+                {
+                    OnStackOverflow();
+                }
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     protected override void OnSucceed()
@@ -87,25 +131,47 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         base.OnFailed();
     }
 
-    protected override void OnPeriodOver()
+
+
+    public override void Update(double delta)
+    {
+        if (state.Status != RunningStatus.Running) return;
+        buffState.DurationElapsed += delta;
+        buffState.PeriodElapsed += delta;
+
+        if (buffState.Duration > 0 && buffState.DurationElapsed > buffState.Duration) OnDurationOver();
+        if (buffState.Period > 0 && buffState.PeriodElapsed > buffState.Period) OnPeriodOver();
+
+        base.Update(delta);
+    }
+
+
+    protected virtual void OnStack()
+    {
+        _OnStack();
+    }
+
+    protected virtual void OnStackOverflow()
+    {
+        _OnStackOverflow();
+    }
+
+    protected virtual void OnDurationOver()
+    {
+        buffState.StackCurrentCount -= 1;
+        buffState.DurationElapsed = 0;
+
+        if (buffState.StackCurrentCount == 0)
+            buffState.Status = RunningStatus.Succeed;
+
+        _OnDurationOVer();
+    }
+
+    protected virtual void OnPeriodOver()
     {
         ApplyModifiers();
-        base.OnPeriodOver();
-    }
-
-    protected override void OnStack()
-    {
-        base.OnStack();
-    }
-
-    protected override void OnStackOverflow()
-    {
-        base.OnStackOverflow();
-    }
-
-    protected override void OnDurationOver()
-    {
-        base.OnDurationOver();
+        buffState.PeriodElapsed = 0;
+        _OnPeriodOver();
     }
 
     private void ApplyModifiers()
@@ -140,7 +206,6 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         //     buffState.OnApplyModifierFunc?.Invoke(modifier);
         // }
     }
-
     private void CancelModifiers()
     {
         // foreach (var modifier in buffState.Modifiers)
@@ -148,5 +213,26 @@ public class JobBuff(Buff buffState) : AbsJobBase(buffState)
         //     modifier.Property = modifier.Record;
         //     buffState.OnCancelModifierFunc?.Invoke(modifier);
         // }
+    }
+
+
+    protected virtual void _OnPeriodOver()
+    {
+        state.OnPeriodOverFunc?.Invoke(state);
+    }
+
+    protected virtual void _OnStack()
+    {
+        state.OnStackFunc?.Invoke(state);
+    }
+
+    protected virtual void _OnStackOverflow()
+    {
+        state.OnStackOverflowFunc?.Invoke(state);
+    }
+
+    protected virtual void _OnDurationOVer()
+    {
+        state.OnDurationOverFunc?.Invoke(state);
     }
 }

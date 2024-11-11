@@ -39,6 +39,21 @@ public class Buff : AbsState
     public bool HasChance { get; init; } = false;
     public float Chance { get; init; } = 1.0f; //0.0 ~ 1.0
 
+
+    // Duration
+    public double Duration { get; init; } = 0;
+    public double DurationElapsed { get; set; }
+    // Period
+    public double Period { get; set; } = 0;
+    public double PeriodElapsed { get; set; }
+
+    // Stack
+    public int StackMaxCount { get; init; } = 1;
+    public int StackCurrentCount { get; set; } = 1;
+    public Dictionary<object, int> StackSourceCountDict { get; set; }
+    public bool IsStack { get; init; } = false;
+    public StateStackType StackType { get; init; } = StateStackType.Target;
+
     // Stacking
     public bool StackIsRefreshDuration { get; init; } = false;
     public bool StackIsResetPeriod { get; init; } = false;

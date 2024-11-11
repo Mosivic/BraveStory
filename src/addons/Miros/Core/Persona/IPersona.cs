@@ -8,8 +8,6 @@ public interface IPersona
 
     void Init(Tag[] baseTags, Type[] attrSetTypes, Ability[] baseAbilities, int level);
 
-    void SetLevel(int level);
-
     bool HasTag(Tag tag);
 
     bool HasAllTags(TagSet tags);

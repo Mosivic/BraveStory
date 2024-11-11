@@ -1,25 +1,19 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace Miros.Core;
 
-public class EffectContainer
+public class EffectContainer(Persona owner)
 {
-    private readonly Persona _owner;
-    private readonly List<Effect> _effects = new List<Effect>();
-    private readonly List<Effect> _cachedEffects = new List<Effect>();
+    private readonly Persona _owner = owner;
+    private readonly List<Effect> _effects = [];
+    private readonly List<Effect> _cachedEffects = [];
+    public List<Effect> Effects => _effects;
 
-    public EffectContainer(Persona owner)
-    {
-        _owner = owner;
-    }
 
     private event Action OnGameplayEffectContainerIsDirty;
 
-    public List<Effect> Effects()
-    {
-        return _effects;
-    }
 
     public void Tick(double delta)
     {
@@ -83,9 +77,7 @@ public class EffectContainer
         effect.TriggerOnRemove();
     }
 
-    /// <summary>
-    /// 添加GE
-    /// </summary>
+
     public Effect AddEffect(Persona source, Effect effect, bool overwriteEffectLevel = false, int effectLevel = 0)
     {
         if (!effect.CanApplyTo(_owner)) return null;
@@ -117,24 +109,24 @@ public class EffectContainer
         // 基于Target类型GE堆叠
         if (effect.Stacking.StackingType == StackingType.AggregateByTarget)
         {
-            GetStackingEffectSpecByData(effect, out var geSpec);
+            GetStackingEffectByData(effect, out var ge);
             // 新添加GE
-            if (geSpec == null)
+            if (ge == null)
                 return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-            bool stackCountChange = geSpec.RefreshStack();
+            bool stackCountChange = ge.RefreshStack();
             if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-            return geSpec;
+            return ge;
         }
 
         // 基于Source类型GE堆叠
         if (effect.Stacking.StackingType == StackingType.AggregateBySource)
         {
-            GetStackingEffectSpecByDataFrom(effect, source, out var geSpec);
-            if (geSpec == null)
+            GetStackingEffectByDataFrom(effect, source, out var ge);
+            if (ge == null)
                 return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-            bool stackCountChange = geSpec.RefreshStack();
+            bool stackCountChange = ge.RefreshStack();
             if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-            return geSpec;
+            return ge;
         }
 
         return null;
@@ -195,7 +187,6 @@ public class EffectContainer
                     }
             }
         }
-
         return new CooldownTimer { TimeRemaining = longestCooldown, Duration = maxDuration };
     }
 
@@ -212,30 +203,28 @@ public class EffectContainer
         OnGameplayEffectContainerIsDirty?.Invoke();
     }
 
-    private void GetStackingEffectSpecByData(Effect effect, out Effect spec)
+    private void GetStackingEffectByData(Effect effect, out Effect ge)
     {
         foreach (var _effect in _effects)
             if (_effect.StackEqual(effect))
             {
-                spec = _effect;
+                ge = _effect;
                 return;
             }
-
-        spec = null;
+        ge = null;
     }
 
-    private void GetStackingEffectSpecByDataFrom(Effect effect, Persona source,
-        out Effect spec)
+    private void GetStackingEffectByDataFrom(Effect effect, Persona source,
+        out Effect ge)
     {
         foreach (var _effect in _effects)
             if (_effect.Source == source &&
                 _effect.StackEqual(effect))
             {
-                spec = _effect;
+                ge = _effect;
                 return;
             }
-
-        spec = null;
+        ge = null;
     }
 
     private void OnRefreshStackCountMakeContainerDirty()
@@ -256,9 +245,8 @@ public class EffectContainer
         // If the gameplay effect was removed immediately after being applied, return false
         if (!_effects.Contains(effectSpec))
         {
-#if UNITY_EDITOR
-                UnityEngine.Debug.LogWarning(
-                    $"Effect {effectSpec.Effect.EffectName} was removed immediately after being applied. This may indicate a problem with the RemoveEffectWithAnyTags.");
+#if GODOT4
+            GD.Print($"Effect {effectSpec.Name} was removed immediately after being applied. This may indicate a problem with the RemoveEffectWithAnyTags.");
 #endif
             // No need to trigger OnGameplayEffectContainerIsDirty, it has already been triggered when it was removed.
             return null;

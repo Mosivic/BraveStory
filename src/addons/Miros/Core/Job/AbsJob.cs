@@ -33,34 +33,13 @@ public abstract class AbsJob(AbsState state)
         state.OnFailedFunc?.Invoke(state);
     }
 
-
-    protected virtual void _OnPeriodOver()
+    protected virtual void _Update(double delta)
     {
-        state.OnPeriodOverFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnStack()
-    {
-        state.OnStackFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnStackOverflow()
-    {
-        state.OnStackOverflowFunc?.Invoke(state);
-    }
-
-    protected virtual void _OnDurationOVer()
-    {
-        state.OnDurationOverFunc?.Invoke(state);
+        state.UpdateFunc?.Invoke(state, delta);
     }
 
     protected virtual void _PhysicsUpdate(double delta)
     {
         state.PhysicsUpdateFunc?.Invoke(state, delta);
-    }
-
-    protected virtual void _Update(double delta)
-    {
-        state.UpdateFunc?.Invoke(state, delta);
     }
 }

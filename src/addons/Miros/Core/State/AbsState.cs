@@ -11,8 +11,8 @@ public abstract class AbsState
     public Type JobType { get; init; } = typeof(JobSimple);
     public int Priority { get; init; } = 0;
 
-    public Persona Owner { get; init; }
-    public Persona Source { get; init; }
+    public Persona Owner { get; protected set; }
+    public Persona Source { get; protected set; }
     public string Description { get; init; }
     
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
@@ -21,7 +21,7 @@ public abstract class AbsState
     public double Duration { get; init; } = 0;
     public double DurationElapsed { get; set; }
     // Period
-    public double Period { get; init; } = 0;
+    public double Period { get; set; } = 0;
     public double PeriodElapsed { get; set; }
 
     // Stack
