@@ -5,6 +5,7 @@ namespace Miros.Core;
 public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
     where TJob : JobBase
 {
+    protected Persona _owner;
     protected List<TJob> _jobs = [];
 
     public virtual void AddJob(TJob job)
@@ -14,7 +15,7 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
 
     public virtual void RemoveJob(TJob job)
     {
-        if (job.Status == RunningStatus.Running)
+        if (job.IsActive)
             job.Exit();
         _jobs.Remove(job);
     }

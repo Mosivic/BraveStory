@@ -16,6 +16,7 @@ public class State
     public Persona Owner { get; protected set; }
     public Persona Source { get; protected set; }
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
+    public bool IsActive => Status == RunningStatus.Running;
 
     public Dictionary<Type, IStateComponent<JobBase>> Components { get; set; } = new();
 

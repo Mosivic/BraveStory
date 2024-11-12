@@ -4,8 +4,8 @@ public interface IJob
 {
     void Enter();
     void Exit();
-    void Pause();
-    void Resume();
+    void Deactivate(); // 停用
+    void Activate(); // 启用
     bool CanEnter();
     bool CanExit();
     void Update(double delta);

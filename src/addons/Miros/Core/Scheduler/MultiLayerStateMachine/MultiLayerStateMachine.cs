@@ -13,7 +13,7 @@ public class MultiLayerStateMachine:SchedulerBase<JobBase>
 
     public override bool HasJobRunning(JobBase job)
     {
-        return job.Status == RunningStatus.Running;
+        return job.IsActive;
     }
 
     public override void Update(double delta)

@@ -29,7 +29,7 @@ public class JobBuff(Buff buff) : JobBase(buff)
         base.Enter();
     }
 
-    public override void Resume()
+    public override void Activate()
     {
         buff.Status = RunningStatus.Running;
         if (buff.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.Reset)
@@ -42,7 +42,7 @@ public class JobBuff(Buff buff) : JobBase(buff)
             buff.PeriodElapsed = 0;
         }
 
-        base.Resume();
+        base.Activate();
     }
 
     public void Stack(object source)

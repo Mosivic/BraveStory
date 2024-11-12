@@ -3,7 +3,7 @@ using System;
 namespace Miros.Core;
 
 // GE堆栈数据结构
-public struct EffectStacking
+public struct StackingComponent : IStateComponent<EffectJob>
 {
     public string StackingCodeName { get; set; } // 实际允许不会使用，而是使用stackingCodeName的hash值, 即stackingHashCode
     public int StackingHashCode { get => StackingCodeName?.GetHashCode() ?? 0; set => StackingCodeName = value.ToString(); }
@@ -19,14 +19,14 @@ public struct EffectStacking
     public Effect[] OverflowEffects { get; set; } // 超过StackLimitCount数量的Effect被Apply时将会调用该OverflowEffects
 
 
-    public static EffectStacking None
+    public void Activate(EffectJob job)
     {
-        get
-        {
-            var stack = new EffectStacking();
-            stack.StackingType = StackingType.None;
-            return stack;
-        }
+        
+    }
+
+    public void Deactivate(EffectJob job)
+    {
+        
     }
 }
 

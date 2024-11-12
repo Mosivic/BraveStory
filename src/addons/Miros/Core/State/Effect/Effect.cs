@@ -6,9 +6,6 @@ namespace Miros.Core;
 
 public abstract class Effect : State
 {
-    public Dictionary<Tag, float> ValueMapWithTag { get; } = [];
-    public Dictionary<string, float> ValueMapWithName { get; } = [];
-
     public event Action<Persona, Effect> OnImmunity; 
     public event Action<int, int> OnStackCountChanged;
 

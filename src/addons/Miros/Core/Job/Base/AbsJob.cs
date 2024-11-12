@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 
 namespace Miros.Core;
 // 对自定义回调函数的处理
@@ -10,8 +11,7 @@ public abstract class AbsJob(State state)
     public string Description => state.Description;
     public int Priority => state.Priority;
     public Tag Layer => state.Layer;
-    public RunningStatus Status => state.Status;
-
+    public bool IsActive => state.IsActive;
 
 
     public event Action<State> OnEntered;

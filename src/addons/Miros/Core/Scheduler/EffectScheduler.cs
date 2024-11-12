@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using Godot;
 
 namespace Miros.Core;
-
-public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
+// _jobs 即为运行的 EffectJob
+public class EffectScheduler : SchedulerBase<EffectJob>
 {
-    private readonly Persona _owner = owner;
-
     private event Action OnEffectsIsDirty;
-
 
     public override void Update(double delta)
     {
@@ -27,10 +24,30 @@ public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
     }
 
 
+    private void UpdateEffect()
+    {
+        
+    }
+
+    public override void AddJob(EffectJob job)
+    {
+        if(!job.CanEnter()) return;
+
+        if(job.CanStack && job.IsActive)
+        {
+            job.Stacking();
+        }else
+        {
+            base.AddJob(job);
+            job.Activate();
+            job.Enter();
+        }
+        
+    }
 
     public Effect AddEffect(Persona source, Effect effect, bool overwriteEffectLevel = false, int effectLevel = 0)
     {
-        if (!effect.CanApplyTo(_owner)) return null;
+        if (!effect.(_owner)) return null;
 
         if (effect.IsImmune(_owner))
         {

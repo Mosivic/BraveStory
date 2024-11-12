@@ -21,10 +21,24 @@ public abstract class Persona : AbsPersona, IPersona
     public TagAggregator TagAggregator { get; private set; }
     public AttributeSetContainer AttributeSetContainer { get; private set; }
 
-
     private IJobProvider _jobProvider;
     private Dictionary<Type, IScheduler<JobBase>> _schedulers = [];
     private List<StateJobMap> _stateJobMaps = [];
+
+
+    public EffectScheduler GetEffectScheduler()
+    {
+        if(_schedulers.TryGetValue(typeof(EffectJob),out var scheduler))
+        {
+            return scheduler as EffectScheduler;
+        }
+        return null;
+    }
+
+    public Effect[] GetEffects()
+    {
+        return _stateJobMaps.Where(map => map.Job is EffectJob).Select(map => map.State as Effect).ToArray();
+    }
 
 
     public void AddScheduler<TState>(IScheduler<JobBase> scheduler, HashSet<TState> states)
@@ -229,10 +243,6 @@ public abstract class Persona : AbsPersona, IPersona
     #endregion
 
 
-
-
-
-
     #region Attrubute Setget
     public AttributeValue? GetAttributeAttributeValue(string attrSetName, string attrShortName)
     {
@@ -317,12 +327,6 @@ public abstract class Persona : AbsPersona, IPersona
                 .ChangeAttributeBase(modifier.AttributeShortName, baseValue);
         }
     }
-
-
-
-
-
-
 }
 
 

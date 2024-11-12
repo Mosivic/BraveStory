@@ -9,7 +9,7 @@ public abstract class JobBase : AbsJob, IJob
 
     private readonly State state;
     
-    public virtual void Enter()
+    public virtual void Enter() 
     {
         state.Status = RunningStatus.Running;
         
@@ -22,7 +22,7 @@ public abstract class JobBase : AbsJob, IJob
     }
 
 
-    public virtual void Exit()
+    public virtual void Exit() 
     {
         if(CanExit())
             Succeed();
@@ -38,14 +38,14 @@ public abstract class JobBase : AbsJob, IJob
     }
 
 
-    public virtual void Pause()
+    public virtual void Deactivate()
     {
         state.Status = RunningStatus.NoRun;
         OnPause();
     }
 
 
-    public virtual void Resume()
+    public virtual void Activate()
     {
         state.Status = RunningStatus.Running;
         OnResume();

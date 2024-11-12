@@ -134,6 +134,7 @@ public enum ModifierOperation
     Invalid = 5 //无效
 }
 
+
 [Flags]
 public enum SupportedOperation
 {
@@ -182,3 +183,8 @@ public enum DurationPolicy //持续策略
 }
 
 
+public enum RunningCompletePolicy
+{
+    Remove, //移除
+    Keep //保持
+}
