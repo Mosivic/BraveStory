@@ -119,18 +119,18 @@ public class ConditionMachine : AbsScheduler<JobBase>, IScheduler<JobBase>
 		job.Exit();
 	}
 
-	public AbsState GetNowState(Tag Layer)
+	public JobBase GetNowJob(Tag Layer)
 	{
-		throw new NotImplementedException();
+		return null;
 	}
 
-	public AbsState GetLastState(Tag Layer)
+	public JobBase GetLastJob(Tag Layer)
 	{
-		throw new NotImplementedException();
+		return null;
 	}
 
-	public double GetCurrentStateTime(Tag layer)
+	public double GetCurrentJobTime(Tag layer)
 	{
-		throw new NotImplementedException();
+		return 0;
 	}
 }

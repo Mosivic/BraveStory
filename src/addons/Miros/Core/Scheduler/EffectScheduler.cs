@@ -4,18 +4,25 @@ using Godot;
 
 namespace Miros.Core;
 
-public class EffectScheduler(Persona owner):AbsScheduler<EffectJob>,IScheduler<EffectJob>
+public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
 {
     private readonly Persona _owner = owner;
-    private readonly List<Effect> _effects = [];
-    private readonly List<Effect> _cachedEffects = [];
-    public List<Effect> Effects => _effects;
 
 
-    private Dictionary<Effect, IJob> _jobs = [];
+    private List<EffectJob> _jobs = [];
 
     private event Action OnEffectsIsDirty;
 
+
+    public override void Update(double delta)
+    {
+        
+    }
+
+    public void PhysicsUpdate(double delta)
+    {
+        return;
+    }
 
     public void Tick(double delta)
     {
@@ -192,18 +199,6 @@ public class EffectScheduler(Persona owner):AbsScheduler<EffectJob>,IScheduler<E
         return new CooldownTimer { TimeRemaining = longestCooldown, Duration = maxDuration };
     }
 
-    public void ClearEffect()
-    {
-        foreach (var effect in _effects)
-        {
-            effect.DisApply();
-            effect.TriggerOnRemove();
-        }
-
-        _effects.Clear();
-
-        OnEffectsIsDirty?.Invoke();
-    }
 
     private void GetStackingEffectByData(Effect effect, out Effect ge)
     {
@@ -260,41 +255,33 @@ public class EffectScheduler(Persona owner):AbsScheduler<EffectJob>,IScheduler<E
 
     public void AddJob(EffectJob job)
     {
-        _jobs.TryAdd(job.State,job);
+        _jobs.Add(job);
     }
 
     public void RemoveJob(EffectJob job)
     {
-        _jobs.Remove(job.State);
+        _jobs.Remove(job);
     }
 
-    public AbsState GetNowState(Tag layer)
+    public EffectJob GetNowJob(Tag layer)
     {
         throw new NotImplementedException();
     }
 
-    public AbsState GetLastState(Tag layer)
+    public EffectJob GetLastJob(Tag layer)
     {
         throw new NotImplementedException();
     }
 
-    public double GetCurrentStateTime(Tag layer)
+    public double GetCurrentJobTime(Tag layer)
     {
         throw new NotImplementedException();
     }
 
     public bool HasJobRunning(EffectJob job)
     {
-        return _jobs.ContainsKey(job.State);
+        return _jobs.Contains(job);
     }
 
-    public void Update(double delta)
-    {
-        throw new NotImplementedException();
-    }
 
-    public void PhysicsUpdate(double delta)
-    {
-        throw new NotImplementedException();
-    }
 }

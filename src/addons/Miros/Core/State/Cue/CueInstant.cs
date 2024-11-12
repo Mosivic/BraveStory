@@ -7,7 +7,7 @@ public abstract class CueInstant : Cue
     {
         if (Triggerable(effect.Owner))
         {
-            _parameters = new CueParameters { sourceEffect = effect };
+            SourceEffect = effect ;
             Trigger();
         }
         return this;
@@ -17,7 +17,8 @@ public abstract class CueInstant : Cue
     {
         if (Triggerable(ability.Owner))
         {
-            _parameters = new CueParameters { sourceAbility = ability, customArguments = customArguments };
+            SourceAbility = ability;
+            CustomArguments = customArguments;
             Trigger();
         }
         return this;

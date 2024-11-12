@@ -16,7 +16,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
     {
         base.Enter();
 
-        effect.IsActive = true;
+
         TriggerOnActivation();
 
         CaptureAttributesSnapshot();
@@ -28,6 +28,8 @@ public class EffectJob(Effect effect) : JobBase(effect)
                 TryActivateGrantedAbilities();
             }
         }
+
+
     }
 
     public override void Update(double delta)
@@ -40,16 +42,13 @@ public class EffectJob(Effect effect) : JobBase(effect)
 
     public override void Exit()
     {
-        effect.IsActive = false;
         TriggerOnDeactivation();
+        TryRemoveGrantedAbilities();
 
-        effect.CueDurational = null;
 
-
-        DisApply();
-        TriggerOnRemove();
         base.Exit();
     }
+
 
 
     // public bool CanApplyTo(Persona target)
@@ -67,10 +66,6 @@ public class EffectJob(Effect effect) : JobBase(effect)
     //     return target.HasAnyTags(effect.ApplicationImmunityTags);
     // }
 
-    // public void RemoveSelf()
-    // {
-    //     effect.Owner.RemoveEffect(effect);
-    // }
 
 
     // 捕获属性快照
@@ -80,37 +75,37 @@ public class EffectJob(Effect effect) : JobBase(effect)
         effect.SnapshotTargetAttributes = effect.Source == effect.Owner ? effect.SnapshotSourceAttributes : effect.Owner.DataSnapshot();
     }
 
-    #region Value
-    public void RegisterValue(Tag tag, float value)
-    {
-        effect.ValueMapWithTag[tag] = value;
-    }
+    // #region Value
+    // public void RegisterValue(Tag tag, float value)
+    // {
+    //     effect.ValueMapWithTag[tag] = value;
+    // }
 
-    public void RegisterValue(string name, float value)
-    {
-        effect.ValueMapWithName[name] = value;
-    }
+    // public void RegisterValue(string name, float value)
+    // {
+    //     effect.ValueMapWithName[name] = value;
+    // }
 
-    public bool UnregisterValue(Tag tag)
-    {
-        return effect.ValueMapWithTag.Remove(tag);
-    }
+    // public bool UnregisterValue(Tag tag)
+    // {
+    //     return effect.ValueMapWithTag.Remove(tag);
+    // }
 
-    public bool UnregisterValue(string name)
-    {
-        return effect.ValueMapWithName.Remove(name);
-    }
+    // public bool UnregisterValue(string name)
+    // {
+    //     return effect.ValueMapWithName.Remove(name);
+    // }
 
-    public float? GetMapValue(Tag tag)
-    {
-        return effect.ValueMapWithTag.TryGetValue(tag, out var value) ? value : (float?)null;
-    }
+    // public float? GetMapValue(Tag tag)
+    // {
+    //     return effect.ValueMapWithTag.TryGetValue(tag, out var value) ? value : (float?)null;
+    // }
 
-    public float? GetMapValue(string name)
-    {
-        return effect.ValueMapWithName.TryGetValue(name, out var value) ? value : (float?)null;
-    }
-    #endregion
+    // public float? GetMapValue(string name)
+    // {
+    //     return effect.ValueMapWithName.TryGetValue(name, out var value) ? value : (float?)null;
+    // }
+    // #endregion
 
 
     #region Stack
@@ -138,24 +133,6 @@ public class EffectJob(Effect effect) : JobBase(effect)
 
 
     #region Apply
-    public void Apply()
-    {
-        if (effect.IsApplied) return;
-        effect.IsApplied = true;
-
-        if (CanRunning(effect.Owner))
-        {
-            Activate();
-        }
-    }
-
-    public void DisApply()
-    {
-        if (!effect.IsApplied) return;
-        effect.IsApplied = false;
-        Deactivate();
-    }
-
 
 
     public void TriggerOnExecute()
@@ -163,23 +140,11 @@ public class EffectJob(Effect effect) : JobBase(effect)
         effect.Owner.EffectContainer.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
         effect.Owner.ApplyModFromInstantEffect(effect);
 
-        TriggerCueOnExecute();
     }
 
-    public void TriggerOnAdd()
-    {
-        TriggerCueOnAdd();
-    }
-
-    public void TriggerOnRemove()
-    {
-        TriggerCueOnRemove();
-        TryRemoveGrantedAbilities();
-    }
 
     private void TriggerOnActivation()
     {
-        TriggerCueOnActivation();
         effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
         effect.Owner.EffectContainer.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
@@ -188,17 +153,9 @@ public class EffectJob(Effect effect) : JobBase(effect)
 
     private void TriggerOnDeactivation()
     {
-        TriggerCueOnDeactivation();
         effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
 
         TryDeactivateGrantedAbilities();
-    }
-
-    public void TriggerOnTick()
-    {
-        if (effect.DurationPolicy == DurationPolicy.Duration ||
-            effect.DurationPolicy == DurationPolicy.Infinite)
-            CueOnTick();
     }
 
     public void TriggerOnImmunity()
@@ -246,73 +203,5 @@ public class EffectJob(Effect effect) : JobBase(effect)
     }
     #endregion
 
-    #region Cue
-    private void TriggerInstantCues(Cue[] cues)
-    {
-        foreach (var cue in cues) cue.ApplyFrom(effect);
-    }
 
-    private void TriggerCueOnExecute()
-    {
-        if (effect.CueOnExecute == null || effect.CueOnExecute.Length <= 0) return;
-        TriggerInstantCues(effect.CueOnExecute);
-    }
-
-    private void TriggerCueOnAdd()
-    {
-        if (effect.CueOnAdd != null && effect.CueOnAdd.Length > 0)
-            TriggerInstantCues(effect.CueOnAdd);
-
-        if (effect.CueDurational != null && effect.CueDurational.Length > 0)
-        {
-            effect.CueDurational.Clear();
-            foreach (var cueDurational in effect.CueDurational)
-            {
-                var cueSpec = (CueDurational)cueDurational.ApplyFrom(effect);
-                if (cueSpec != null) effect.CueDurational.Add(cueSpec);
-            }
-
-            foreach (var cue in effect.CueDurational) cue.OnAdd();
-        }
-    }
-
-    private void TriggerCueOnRemove()
-    {
-        if (effect.CueOnRemove != null && effect.CueOnRemove.Length > 0)
-            TriggerInstantCues(effect.CueOnRemove);
-
-        if (effect.CueDurational != null && effect.CueDurational.Length > 0)
-        {
-            foreach (var cue in effect.CueDurational) cue.OnRemove();
-
-            effect.CueDurational = null;
-        }
-    }
-
-    private void TriggerCueOnActivation()
-    {
-        if (effect.CueOnActivate != null && effect.CueOnActivate.Length > 0)
-            TriggerInstantCues(effect.CueOnActivate);
-
-        if (effect.CueDurational != null && effect.CueDurational.Length > 0)
-            foreach (var cue in effect.CueDurational)
-                cue.OnGameplayEffectActivate();
-    }
-
-    private void TriggerCueOnDeactivation()
-    {
-        if (effect.CueOnDeactivate != null && effect.CueOnDeactivate.Length > 0)
-            TriggerInstantCues(effect.CueOnDeactivate);
-
-        if (effect.CueDurational != null && effect.CueDurational.Length > 0)
-            foreach (var cue in effect.CueDurational)
-                cue.OnGameplayEffectDeactivate();
-    }
-
-    private void CueOnTick()
-    {
-        if (effect.CueDurational == null || effect.CueDurational.Length <= 0) return;
-        foreach (var cue in effect.CueDurational) cue.OnTick();
-    }
-    #endregion
 }

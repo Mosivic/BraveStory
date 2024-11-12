@@ -2,38 +2,21 @@ using System.Collections.Generic;
 
 using Miros.Core;
 
-public class MultiLayerStateMachine:AbsScheduler<JobBase>, IScheduler<JobBase>
+public class MultiLayerStateMachine:SchedulerBase<JobBase>
 {
     private readonly Dictionary<Tag, StateLayer> _layers = [];
-    private HashSet<JobBase> _jobs = [];
-    private TagContainer _ownedTags;
-    
-    
-    public void SetOwnedTags(TagContainer ownedTags){
-        _ownedTags = ownedTags;
-    }
 
 
     public void AddLayer(Tag layer,JobBase defaultJob,StateTransitionContainer transitionContainer){
         _layers[layer] = new StateLayer(layer,defaultJob,transitionContainer);
     }
 
-    public void AddJob(JobBase job)
-    {
-        _jobs.Add(job);
-    }
-
-    public void RemoveJob(JobBase job)
-    {
-        _jobs.Remove(job);
-    }
-
-    public bool HasJobRunning(JobBase job)
+    public override bool HasJobRunning(JobBase job)
     {
         return job.Status == RunningStatus.Running;
     }
 
-    public void Update(double delta)
+    public override void Update(double delta)
     {
         foreach (var key in _layers.Keys)
         {
@@ -41,7 +24,7 @@ public class MultiLayerStateMachine:AbsScheduler<JobBase>, IScheduler<JobBase>
         }
     }
 
-    public void PhysicsUpdate(double delta)
+    public override void PhysicsUpdate(double delta)
     {
         foreach (var key in _layers.Keys)
         {
@@ -49,7 +32,7 @@ public class MultiLayerStateMachine:AbsScheduler<JobBase>, IScheduler<JobBase>
         }
     }
 
-    public JobBase GetNowJob(Tag layer)
+    public override JobBase GetNowJob(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetNowJob();
@@ -57,7 +40,7 @@ public class MultiLayerStateMachine:AbsScheduler<JobBase>, IScheduler<JobBase>
         return null;
     }
 
-    public JobBase GetLastJob(Tag layer)
+    public override JobBase GetLastJob(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetLastJob();
@@ -65,7 +48,7 @@ public class MultiLayerStateMachine:AbsScheduler<JobBase>, IScheduler<JobBase>
         return null;
     }
     
-    public double GetCurrentJobTime(Tag layer)
+    public override double GetCurrentJobTime(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetCurrentJobTime();

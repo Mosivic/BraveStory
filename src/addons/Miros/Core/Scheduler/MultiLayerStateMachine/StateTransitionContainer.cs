@@ -5,8 +5,8 @@ using System.Linq;
 namespace Miros.Core;
 public class StateTransitionContainer
 {
-    private readonly Dictionary<JobBase, HashSet<StateTransition>> _transitions = new();
-    private readonly HashSet<StateTransition> _anyTransitions = new();
+    private readonly Dictionary<JobBase, HashSet<StateTransition>> _transitions = [];
+    private readonly HashSet<StateTransition> _anyTransitions = [];
     
 
     public void AddTransition(JobBase fromJob,JobBase toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
@@ -14,7 +14,7 @@ public class StateTransitionContainer
         var transition = new StateTransition(toJob,condition,mode);
         if(!_transitions.ContainsKey(fromJob))
         {
-            _transitions[fromJob] = new();
+            _transitions[fromJob] = [];
         }
         _transitions[fromJob].Add(transition);
     }
