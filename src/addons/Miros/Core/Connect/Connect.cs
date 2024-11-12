@@ -1,44 +1,58 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class Connect<TJobProvider, TScheduler> : IConnect
+public class Connect<TJobProvider> : IConnect
     where TJobProvider : IJobProvider, new()
-    where TScheduler : IScheduler, new()
 {
     protected TJobProvider _jobProvider = new();
-    protected TScheduler _scheduler = new();
+    protected Dictionary<Type,IScheduler> _schedulers = [];
 
-    public Connect(HashSet<AbsState> states)
+    
+    public void AddScheduler<TState>(IScheduler scheduler,HashSet<TState> states)
+        where TState : AbsState
     {
+        _schedulers[typeof(TState)] = scheduler;
         foreach(var state in states){
             var job = _jobProvider.GetJob(state);
-            _scheduler.AddJob(job);
+            scheduler.AddJob(job);
         }
     }
 
-
     public void AddState(AbsState state)
     {
+        var type = state.GetType();
+        if(!_schedulers.TryGetValue(type,out var scheduler)){
+            return;
+        }
         var job = _jobProvider.GetJob(state);
-        _scheduler.AddJob(job);
+        scheduler.AddJob(job);
     }
 
 
     public void RemoveState(AbsState state)
     {
+        var type = state.GetType();
+        if(!_schedulers.TryGetValue(type,out var scheduler)){
+            return;
+        }
         var job = _jobProvider.GetJob(state);
-        _scheduler.RemoveJob(job);
+        scheduler.RemoveJob(job);
     }
 
     public void Update(double delta)
     {
-        _scheduler.Update(delta);
+        foreach(var scheduler in _schedulers.Values){
+            scheduler.Update(delta);
+        }
     }
 
     public void PhysicsUpdate(double delta)
     {
-        _scheduler.PhysicsUpdate(delta);
+        foreach(var scheduler in _schedulers.Values){
+            scheduler.PhysicsUpdate(delta);
+        }
     }
 
 
@@ -47,16 +61,25 @@ public class Connect<TJobProvider, TScheduler> : IConnect
         return _jobProvider.GetAllJobs();
     }
 
-    public AbsState GetNowState(Tag layer){
-        return _scheduler.GetNowState(layer);
+    public AbsState GetNowState(Type stateType,Tag layer){
+        if(!_schedulers.TryGetValue(stateType,out var scheduler)){
+            return null;
+        }
+        return scheduler.GetNowState(layer);
     }
 
-    public AbsState GetLastState(Tag layer){
-        return _scheduler.GetLastState(layer);
+    public AbsState GetLastState(Type stateType,Tag layer){
+        if(!_schedulers.TryGetValue(stateType,out var scheduler)){
+            return null;
+        }
+        return scheduler.GetLastState(layer);
     }
 
-    public double GetCurrentStateTime(Tag layer){
-        return _scheduler.GetCurrentStateTime(layer);
+    public double GetCurrentStateTime(Type stateType,Tag layer){
+        if(!_schedulers.TryGetValue(stateType,out var scheduler)){
+            return 0;
+        }
+        return scheduler.GetCurrentStateTime(layer);
     }
 
 }
