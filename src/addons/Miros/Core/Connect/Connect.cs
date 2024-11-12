@@ -20,22 +20,32 @@ public class Connect<TJobProvider> : IConnect
         }
     }
 
-    public void AddState(AbsState state)
+    public void AddState<TState>(TState state)
+        where TState : AbsState
     {
         var type = state.GetType();
         if(!_schedulers.TryGetValue(type,out var scheduler)){
+#if GODOT4 &&DEBUG
+            throw new Exception($"[Miros.Connect] scheduler of {type} not found");
+#else
             return;
+ #endif
         }
         var job = _jobProvider.GetJob(state);
         scheduler.AddJob(job);
     }
 
 
-    public void RemoveState(AbsState state)
+    public void RemoveState<TState>(TState state)
+        where TState : AbsState
     {
         var type = state.GetType();
         if(!_schedulers.TryGetValue(type,out var scheduler)){
+#if GODOT4 &&DEBUG
+            throw new Exception($"[Miros.Connect] scheduler of {type} not found");
+#else
             return;
+#endif
         }
         var job = _jobProvider.GetJob(state);
         scheduler.RemoveJob(job);

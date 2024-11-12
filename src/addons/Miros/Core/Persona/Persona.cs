@@ -11,7 +11,7 @@ public abstract class Persona : AbsPersona, IPersona
     public int Level { get; protected set; }
 
     public bool Enabled { get; set; }
-    public EffectContainer EffectContainer { get; private set; }
+    public EffectScheduler EffectContainer { get; private set; }
 
     public TagAggregator TagAggregator { get; private set; }
 
@@ -26,7 +26,7 @@ public abstract class Persona : AbsPersona, IPersona
     {
         if (_ready) return;
         AbilityContainer = new AbilityContainer(this);
-        EffectContainer = new EffectContainer(this);
+        EffectContainer = new EffectScheduler(this);
         AttributeSetContainer = new AttributeSetContainer(this);
         TagAggregator = new TagAggregator(this);
         _ready = true;

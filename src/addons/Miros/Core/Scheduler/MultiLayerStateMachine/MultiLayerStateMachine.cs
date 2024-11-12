@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 using Miros.Core;
 
-public class MultiLayerStateMachine:AbsScheduler, IScheduler
+public class MultiLayerStateMachine:AbsScheduler<NativeJob>, IScheduler<NativeJob>
 {
-    private readonly Dictionary<Tag, StateLayer> _layers = new();
-    private Dictionary<AbsState, IJob> _jobs = new();
+    private readonly Dictionary<Tag, StateLayer> _layers = [];
+    private HashSet<NativeJob> _jobs = [];
     private TagContainer _ownedTags;
     
     
@@ -13,24 +13,24 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
         _ownedTags = ownedTags;
     }
 
-    
-    public void AddLayer(Tag layer,AbsState defaultState,StateTransitionContainer transitionContainer){
-        _layers[layer] = new StateLayer(layer,defaultState,transitionContainer,_jobs,_ownedTags);
+
+    public void AddLayer(Tag layer,NativeJob defaultJob,StateTransitionContainer transitionContainer){
+        _layers[layer] = new StateLayer(layer,defaultJob,transitionContainer);
     }
 
-    public void AddJob(IJob job)
+    public void AddJob(NativeJob job)
     {
-        _jobs.TryAdd(job.State,job);
+        _jobs.Add(job);
     }
 
-    public void RemoveJob(IJob job)
+    public void RemoveJob(NativeJob job)
     {
-        _jobs.Remove(job.State);
+        _jobs.Remove(job);
     }
 
-    public bool HasJobRunning(IJob job)
+    public bool HasJobRunning(NativeJob job)
     {
-        return job.State.Status == RunningStatus.Running;
+        return job.Status == RunningStatus.Running;
     }
 
     public void Update(double delta)
@@ -49,18 +49,18 @@ public class MultiLayerStateMachine:AbsScheduler, IScheduler
         }
     }
 
-    public AbsState GetNowState(Tag layer)
+    public NativeJob GetNowJob(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
-            return _layers[layer].GetNowState();
+            return _layers[layer].GetNowJob();
         }
         return null;
     }
 
-    public AbsState GetLastState(Tag layer)
+    public NativeJob GetLastJob(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
-            return _layers[layer].GetLastState();
+            return _layers[layer].GetLastJob();
         }
         return null;
     }

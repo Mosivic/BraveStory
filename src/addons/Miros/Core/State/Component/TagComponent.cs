@@ -54,13 +54,15 @@ public struct TagComponent : IStateComponent<NativeJob>
     /// </summary>
     public TagSet OngoingRequiredTags;
 
-    public void RegisterHandler(NativeJob job)
+    public void Activate(NativeJob job)
     {
         return;
     }
 
-    public void UnregisterHandler(NativeJob job)
+    public void Deactivate(NativeJob job)
     {
         return;
     }
+
+
 }

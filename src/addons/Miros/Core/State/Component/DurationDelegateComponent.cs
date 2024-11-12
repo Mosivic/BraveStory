@@ -9,17 +9,17 @@ public readonly struct EffectDelegateComponent : IStateComponent<EffectJob>
     public Action<EffectJob> OnStackedFunc { get; init; }
     public Action<EffectJob> OnStackOverflowedFunc { get; init; }
 
-    public void Active(EffectJob job)
+    public void Activate(EffectJob job)
     {
-        RegisterHandler(job);
+        RegisterEvents(job);
     }
 
-    public void DeActive(EffectJob job)
+    public void Deactivate(EffectJob job)
     {
-        UnregisterHandler(job);
+        UnregisterEvents(job);
     }
 
-    public void RegisterHandler(EffectJob job)
+    public void RegisterEvents(EffectJob job)
     {
         job.OnDurationOvered += OnDurationOveredFunc;
         job.OnPeriodOvered += OnPeriodOveredFunc;
@@ -27,7 +27,7 @@ public readonly struct EffectDelegateComponent : IStateComponent<EffectJob>
         job.OnStackOverflowed += OnStackOverflowedFunc;
     }
 
-    public void UnregisterHandler(EffectJob job)
+    public void UnregisterEvents(EffectJob job)
     {
         job.OnDurationOvered -= OnDurationOveredFunc;
         job.OnPeriodOvered -= OnPeriodOveredFunc;

@@ -4,7 +4,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class EffectContainer(Persona owner)
+public class EffectScheduler(Persona owner):AbsScheduler<EffectJob>,IScheduler<EffectJob>
 {
     private readonly Persona _owner = owner;
     private readonly List<Effect> _effects = [];
@@ -12,7 +12,9 @@ public class EffectContainer(Persona owner)
     public List<Effect> Effects => _effects;
 
 
-    private event Action OnGameplayEffectContainerIsDirty;
+    private Dictionary<Effect, IJob> _jobs = [];
+
+    private event Action OnEffectsIsDirty;
 
 
     public void Tick(double delta)
@@ -34,14 +36,14 @@ public class EffectContainer(Persona owner)
     /// 注册GE容器变化事件
     /// </summary>
     /// <param name="action"></param>
-    public void RegisterOnEffectContainerIsDirty(Action action)
+    public void RegisterOnEffectsIsDirty(Action action)
     {
-        OnGameplayEffectContainerIsDirty += action;
+        OnEffectsIsDirty += action;
     }
 
-    public void UnregisterOnEffectContainerIsDirty(Action action)
+    public void UnregisterOnEffectsIsDirty(Action action)
     {
-        OnGameplayEffectContainerIsDirty -= action;
+        OnEffectsIsDirty -= action;
     }
 
     /// <summary>
@@ -150,7 +152,7 @@ public class EffectContainer(Persona owner)
             }
         }
 
-        OnGameplayEffectContainerIsDirty?.Invoke();
+        OnEffectsIsDirty?.Invoke();
     }
 
     /// <summary>
@@ -200,7 +202,7 @@ public class EffectContainer(Persona owner)
 
         _effects.Clear();
 
-        OnGameplayEffectContainerIsDirty?.Invoke();
+        OnEffectsIsDirty?.Invoke();
     }
 
     private void GetStackingEffectByData(Effect effect, out Effect ge)
@@ -229,7 +231,7 @@ public class EffectContainer(Persona owner)
 
     private void OnRefreshStackCountMakeContainerDirty()
     {
-        OnGameplayEffectContainerIsDirty?.Invoke();
+        OnEffectsIsDirty?.Invoke();
     }
 
 
@@ -252,8 +254,47 @@ public class EffectContainer(Persona owner)
             return null;
         }
 
-        OnGameplayEffectContainerIsDirty?.Invoke();
+        OnEffectsIsDirty?.Invoke();
         return effectSpec;
     }
 
+    public void AddJob(EffectJob job)
+    {
+        _jobs.TryAdd(job.State,job);
+    }
+
+    public void RemoveJob(EffectJob job)
+    {
+        _jobs.Remove(job.State);
+    }
+
+    public AbsState GetNowState(Tag layer)
+    {
+        throw new NotImplementedException();
+    }
+
+    public AbsState GetLastState(Tag layer)
+    {
+        throw new NotImplementedException();
+    }
+
+    public double GetCurrentStateTime(Tag layer)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasJobRunning(EffectJob job)
+    {
+        return _jobs.ContainsKey(job.State);
+    }
+
+    public void Update(double delta)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void PhysicsUpdate(double delta)
+    {
+        throw new NotImplementedException();
+    }
 }

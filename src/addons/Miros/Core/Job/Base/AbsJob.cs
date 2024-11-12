@@ -5,6 +5,15 @@ namespace Miros.Core;
 
 public abstract class AbsJob(AbsState state)
 {
+
+    public string Name => state.Name;
+    public string Description => state.Description;
+    public int Priority => state.Priority;
+    public Tag Layer => state.Layer;
+    public RunningStatus Status => state.Status;
+
+
+
     public event Action<AbsState> OnEntered;
     public event Action<AbsState> OnExited;
     public event Action<AbsState, double> OnUpdated;
@@ -16,7 +25,6 @@ public abstract class AbsJob(AbsState state)
 
     public event Func<AbsState, bool> EnterCondition;
     public event Func<AbsState, bool> ExitCondition;
-
 
 
 

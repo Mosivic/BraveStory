@@ -8,70 +8,64 @@ namespace Miros.Core;
 public class StateLayer
 {
 	public Tag Layer { get; }
-	private readonly AbsState _defaultState;
-	private AbsState _currentState;
-	private AbsState _lastState;
-	private AbsState _delayState = null;
-
+	private readonly NativeJob _defaultJob;
+	private NativeJob _currentJob;
+	private NativeJob _lastJob;
+	private NativeJob _delayJob = null;
 	private readonly StateTransitionContainer _transitionContainer;
 
-	private readonly Dictionary<AbsState, IJob> _jobs;
-
-	private TagContainer _ownedTags;
 
 	private double _currentStateTime;
 	
-	public StateLayer(Tag layerTag,AbsState defaultState,
-		StateTransitionContainer transitionRuleContainer,
-		Dictionary<AbsState, IJob> jobs,
-		TagContainer ownedTags)
+	public StateLayer(Tag layerTag,NativeJob defaultJob,
+		StateTransitionContainer transitionRuleContainer)
 	{
 		Layer = layerTag;
-		_defaultState = defaultState;
-		_currentState = defaultState;
+		_defaultJob = defaultJob;
+		_currentJob = defaultJob;
+		_lastJob = defaultJob;
+		_delayJob = null;
 		_transitionContainer = transitionRuleContainer;
-		_jobs = jobs;
-		_ownedTags = ownedTags;
 	}
 
 	public void Update(double delta)
 	{
 		ProcessNextState();
 		
-		_jobs[_currentState].Update(delta);
+		_currentJob.Update(delta);
 		_currentStateTime += delta;
 	}
 	
 	public void PhysicsUpdate(double delta)
 	{
-		_jobs[_currentState].PhysicsUpdate(delta);
+		_currentJob.PhysicsUpdate(delta);
 	}
 	
 
 	private void ProcessNextState()
 	{
-		if(_delayState != null)
+		if(_delayJob != null)
 		{
-			if(_jobs[_currentState].CanExit())
+			if(_currentJob.CanExit())
 			{
-				TransformState(_delayState);
-				_delayState = null;
+				TransformState(_delayJob);
+				_delayJob = null;
 				return;
 			}
 
 			return;
 		}
 
-		var transitions = _transitionContainer.GetPossibleTransition(_currentState);
+		var transitions = _transitionContainer.GetPossibleTransition(_currentJob);
 
 		// 使用LINQ获取优先级最高且可进入的状态
 		var nextTransition = transitions
-			.OrderByDescending(t => t.ToState.Priority)
+			.OrderByDescending(t => t.ToJob.Priority)
 			.Where(t => t.Mode switch
 			{
-				StateTransitionMode.Normal => t.CanTransition() && _jobs[_currentState].CanExit() && _jobs[t.ToState].CanEnter(),
-				StateTransitionMode.Force => t.CanTransition() && _jobs[t.ToState].CanEnter(),
-				StateTransitionMode.DelayFront => t.CanTransition() && _jobs[t.ToState].CanEnter(),
+				StateTransitionMode.Normal => t.CanTransition() && _currentJob.CanExit() && t.ToJob.CanEnter(),
+				StateTransitionMode.Force => t.CanTransition() && t.ToJob.CanEnter(),
+				StateTransitionMode.DelayFront => t.CanTransition() && t.ToJob.CanEnter(),
 				_ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
 			})
 			.FirstOrDefault();
@@ -80,59 +74,56 @@ public class StateLayer
 		
 		if(nextTransition.Mode == StateTransitionMode.DelayFront)
 		{
-			_delayState = nextTransition.ToState;
+			_delayJob = nextTransition.ToJob;
 
-			if(_jobs[_currentState].CanExit())
+			if(_currentJob.CanExit())
 			{
-				TransformState(nextTransition.ToState);
-				_delayState = null;
+				TransformState(nextTransition.ToJob);
+				_delayJob = null;
 			}
 		}
 		else
 		{
-			TransformState(nextTransition.ToState);
+			TransformState(nextTransition.ToJob);
 		}
 	}
 
-	private void TransformState(AbsState nextState)
+	private void TransformState(NativeJob nextJob)
 	{
-		var nextJob = _jobs[nextState];
-		var currentJob = _jobs[_currentState];
-		
 		// 检查是否可以堆叠
 		// if (nextState.IsStack)
 		// {
 		//     nextJob.Stack(nextState.Source);
 		// }
 		
-		currentJob.Exit();
+		_currentJob.Exit();
 		nextJob.Enter();
 		
-		_ownedTags.RemoveTag(_currentState.Tag);
-		_ownedTags.AddTag(nextState.Tag);
+		// Tags
+		// _ownedTags.RemoveTag(_currentState.Tag);
+		// _ownedTags.AddTag(nextState.Tag);
 		
-		_lastState = _currentState;
-		_currentState = nextState;
+		_lastJob = _currentJob;
+		_currentJob = nextJob;
 		_currentStateTime = 0.0;
 		
 #if DEBUG && true
-		GD.Print($"[{Engine.GetProcessFrames()}] {_lastState.Name} -> {_currentState.Name}.");
+		GD.Print($"[{Engine.GetProcessFrames()}] {_lastJob.Name} -> {_currentJob.Name}.");
 #endif
 	}
 
-	public AbsState GetNowState()
+	public NativeJob GetNowJob()
 	{
-		return _currentState;
+		return _currentJob;
 	}
 
-	public AbsState GetLastState()
+	public NativeJob GetLastJob()
 	{
-		return _lastState;
+		return _lastJob;
 	}
 
 	public double GetCurrentStateTime()
 	{
 		return _currentStateTime;
 	}
-
 }

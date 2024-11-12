@@ -3,18 +3,13 @@ namespace Miros.Core;
 
 public abstract class NativeJob(AbsState state) : AbsJob(state), IJob
 {
-    protected readonly AbsState state = state;
-
-    AbsState IJob.State => state;
-
-
     public virtual void Enter()
     {
         state.Status = RunningStatus.Running;
         
         foreach (var component in state.Components.Values)
         {
-            component.Active(this);
+            component.Activate(this);
         }
 
         OnEnter();
@@ -30,7 +25,7 @@ public abstract class NativeJob(AbsState state) : AbsJob(state), IJob
 
         foreach (var component in state.Components.Values)
         {
-            component.DeActive(this);
+            component.Deactivate(this);
         }    
 
         OnExit();

@@ -19,18 +19,18 @@ public class StandardDelegateComponent: IStateComponent<NativeJob>
     public Action<AbsState, double> UpdateFunc { get; init; }
     public Action<AbsState, double> PhysicsUpdateFunc { get; init; }
 
-    public void Active(NativeJob job)
+    public void Activate(NativeJob job)
     {
-        RegisterHandler(job);
+        RegisterEvents(job);
     }
 
-    public void DeActive(NativeJob job)
+    public void Deactivate(NativeJob job)
     {
-        UnregisterHandler(job);
+        UnregisterEvents(job);
     }
 
 
-    public void RegisterHandler(NativeJob job)
+    public void RegisterEvents(NativeJob job)
     {
         job.OnEntered += EnterFunc;
         job.OnExited += ExitFunc;
@@ -44,7 +44,7 @@ public class StandardDelegateComponent: IStateComponent<NativeJob>
         job.ExitCondition += ExitCondition;
     }
 
-    public void UnregisterHandler(NativeJob job)
+    public void UnregisterEvents(NativeJob job)
     {
         job.OnEntered -= EnterFunc;
         job.OnExited -= ExitFunc;
