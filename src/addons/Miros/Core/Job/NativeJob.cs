@@ -1,41 +1,25 @@
 ﻿
 namespace Miros.Core;
 
-public abstract class NativeJob(NativeState state) : AbsJob(state), IJob
+public abstract class NativeJob(AbsState state) : AbsJob(state), IJob
 {
-    protected readonly NativeState state = state;
+    protected readonly AbsState state = state;
 
-    NativeState IJob.State => state;
-
-    /// <summary>
-    /// 注册组件的事件处理器
-    /// </summary>
-    protected virtual void RegisterHandlers()
-    {
-        foreach (var component in state.Components.Values)
-        {
-            component.RegisterHandler(this);
-        }
-    }
-
-    /// <summary>
-    /// 注销组件的事件处理器
-    /// </summary>
-    protected virtual void UnregisterHandlers()
-    {
-        foreach (var component in state.Components.Values)
-        {
-            component.UnregisterHandler(this);
-        }
-    }
+    AbsState IJob.State => state;
 
 
     public virtual void Enter()
     {
         state.Status = RunningStatus.Running;
+        
+        foreach (var component in state.Components.Values)
+        {
+            component.Active(this);
+        }
 
         OnEnter();
     }
+
 
     public virtual void Exit()
     {
@@ -43,6 +27,11 @@ public abstract class NativeJob(NativeState state) : AbsJob(state), IJob
             Succeed();
         else
             Failed();
+
+        foreach (var component in state.Components.Values)
+        {
+            component.DeActive(this);
+        }    
 
         OnExit();
     }
@@ -80,16 +69,19 @@ public abstract class NativeJob(NativeState state) : AbsJob(state), IJob
         OnUpdate(delta);
     }
 
+
     public virtual void PhysicsUpdate(double delta)
     {
         OnPhysicsUpdate(delta);
     }
+
 
     protected virtual void Succeed()
     {
         state.Status = RunningStatus.Succeed;
         OnSucceed();
     }
+
 
     protected virtual void Failed()
     {

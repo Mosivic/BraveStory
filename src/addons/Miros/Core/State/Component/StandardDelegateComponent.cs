@@ -4,21 +4,31 @@ namespace Miros.Core;
 
 public class StandardDelegateComponent: IStateComponent<NativeJob>
 {
-    public Func<NativeState, bool> EnterCondition { get; init; }
-    public Func<NativeState, bool> ExitCondition { get; init; }
-    public Action<NativeState> EnterFunc { get; init; }
-    public Action<NativeState> ExitFunc { get; init; }
-    public Action<NativeState> OnSucceedFunc { get; init; }
-    public Action<NativeState> OnFailedFunc { get; init; }
-    public Action<NativeState> PauseFunc { get; init; }
-    public Action<NativeState> ResumeFunc { get; init; }
-    public Action<NativeState> OnStackFunc { get; init; }
-    public Action<NativeState> OnStackOverflowFunc { get; init; }
-    public Action<NativeState> OnDurationOverFunc { get; init; }
-    public Action<NativeState> OnPeriodOverFunc { get; init; }
-    public Action<NativeState, double> UpdateFunc { get; init; }
-    public Action<NativeState, double> PhysicsUpdateFunc { get; init; }
-    
+    public Func<AbsState, bool> EnterCondition { get; init; }
+    public Func<AbsState, bool> ExitCondition { get; init; }
+    public Action<AbsState> EnterFunc { get; init; }
+    public Action<AbsState> ExitFunc { get; init; }
+    public Action<AbsState> OnSucceedFunc { get; init; }
+    public Action<AbsState> OnFailedFunc { get; init; }
+    public Action<AbsState> PauseFunc { get; init; }
+    public Action<AbsState> ResumeFunc { get; init; }
+    public Action<AbsState> OnStackFunc { get; init; }
+    public Action<AbsState> OnStackOverflowFunc { get; init; }
+    public Action<AbsState> OnDurationOverFunc { get; init; }
+    public Action<AbsState> OnPeriodOverFunc { get; init; }
+    public Action<AbsState, double> UpdateFunc { get; init; }
+    public Action<AbsState, double> PhysicsUpdateFunc { get; init; }
+
+    public void Active(NativeJob job)
+    {
+        RegisterHandler(job);
+    }
+
+    public void DeActive(NativeJob job)
+    {
+        UnregisterHandler(job);
+    }
+
 
     public void RegisterHandler(NativeJob job)
     {

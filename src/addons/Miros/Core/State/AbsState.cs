@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public abstract class AbsState<T> where T : AbsState<T>
+public abstract class AbsState
 {
     // Core
     public required string Name { get; init; }

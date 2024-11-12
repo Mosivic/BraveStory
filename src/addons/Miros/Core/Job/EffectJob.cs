@@ -12,6 +12,8 @@ public class EffectJob(Effect effect) : NativeJob(effect)
 
     public override void Enter()
     {
+        base.Enter();
+
         effect.IsActive = true;
         TriggerOnActivation();
 
@@ -24,9 +26,6 @@ public class EffectJob(Effect effect) : NativeJob(effect)
                 TryActivateGrantedAbilities();
             }
         }
-
-
-        base.Enter();
     }
 
     public override void Update(double delta)

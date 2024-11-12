@@ -25,7 +25,7 @@ public enum StackExpirationPolicy
     RefreshDuration
 }
 
-public class Buff : NativeState
+public class Buff : AbsState
 {
     // Core
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
@@ -60,12 +60,12 @@ public class Buff : NativeState
     public StackExpirationPolicy StackExpirationPolicy { get; set; }
 
     // Stacking Overflow
-    public List<NativeState> OnStackOverflowStates { get; set; }
+    public List<AbsState> OnStackOverflowStates { get; set; }
     public bool IsClearStackOnOverflow { get; set; }
 
     // Expiration
-    public List<NativeState> OnSucceedStates { get; set; }
-    public List<NativeState> OnFailedStates { get; set; }
+    public List<AbsState> OnSucceedStates { get; set; }
+    public List<AbsState> OnFailedStates { get; set; }
 
     // Immunity
 

@@ -3,20 +3,19 @@
 namespace Miros.Core;
 // 对自定义回调函数的处理
 
-public abstract class AbsJob(NativeState state)
+public abstract class AbsJob(AbsState state)
 {
-    public event Action<NativeState> OnEntered;
-    public event Action<NativeState> OnExited;
-    public event Action<NativeState, double> OnUpdated;
-    public event Action<NativeState, double> OnPhysicsUpdated;
-    public event Action<NativeState> OnSucceeded;
-    public event Action<NativeState> OnFailed;
-    public event Action<NativeState> OnPaused;
-    public event Action<NativeState> OnResumed;
+    public event Action<AbsState> OnEntered;
+    public event Action<AbsState> OnExited;
+    public event Action<AbsState, double> OnUpdated;
+    public event Action<AbsState, double> OnPhysicsUpdated;
+    public event Action<AbsState> OnSucceeded;
+    public event Action<AbsState> OnFailed;
+    public event Action<AbsState> OnPaused;
+    public event Action<AbsState> OnResumed;
 
-    public event Func<NativeState, bool> EnterCondition;
-    public event Func<NativeState, bool> ExitCondition;
-
+    public event Func<AbsState, bool> EnterCondition;
+    public event Func<AbsState, bool> ExitCondition;
 
 
 

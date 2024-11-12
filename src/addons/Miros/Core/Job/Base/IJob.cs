@@ -2,7 +2,7 @@
 
 public interface IJob
 {
-    NativeState State { get; }
+    AbsState State { get; }
     void Enter();
     void Exit();
     void Pause();
