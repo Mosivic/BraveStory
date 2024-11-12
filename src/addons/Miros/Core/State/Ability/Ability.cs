@@ -2,7 +2,7 @@ using System;
 
 namespace Miros.Core;
 
-public abstract class Ability : AbsState
+public abstract class Ability : State
 {
     //描述性质的标签，用来描述Ability的特性表现，比如伤害、治疗、控制等。
     public TagSet Tags { get; protected set; }
@@ -165,7 +165,7 @@ public abstract class Ability : AbsState
     {
         return Cooldown == null
             ? new CooldownTimer { TimeRemaining = 0, Duration = CooldownTime }
-            : Owner.CheckCooldownFromTags(Cooldown.Components. GrantedTags);
+            : Owner.CheckCooldownFromTags(Cooldown.GrantedTags);
     }
 
 
@@ -176,11 +176,11 @@ public abstract class Ability : AbsState
     /// </summary>
     public void DoCost()
     {
-        if (Cost != null) Owner.ApplyEffectToSelf(Cost);
+        if (Cost != null) Owner.AddStateTo(Cost, Owner);
 
         if (Cooldown != null)
         {
-            Owner.ApplyEffectToSelf(Cooldown);
+            Owner.AddStateTo(Cooldown, Owner);
              // Actually, it should be set by the ability's cooldown time.
         }
     }

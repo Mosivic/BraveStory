@@ -37,7 +37,7 @@ public partial class Player : Character
 		var ownedTags = new TagContainer([Tags.Player]);
 
 		// Idle  
-		var idle = new AbsState
+		var idle = new State
 		{
 			Name = "Idle",
 			Layer = Tags.LayerMovement,
@@ -50,7 +50,7 @@ public partial class Player : Character
 			},
 		};
 		// Jump
-		var jump = new AbsState
+		var jump = new State
 		{
 			Name = "Jump",
 			Layer = Tags.LayerMovement,
@@ -67,7 +67,7 @@ public partial class Player : Character
 		};
 
 		// Wall Jump
-		var wall_jump = new AbsState
+		var wall_jump = new State
 		{
 			Name = "WallJump",
 			Layer = Tags.LayerMovement,
@@ -86,7 +86,7 @@ public partial class Player : Character
 		};
 
 		// Run
-		var run = new AbsState
+		var run = new State
 		{
 			Layer = Tags.LayerMovement,
 			Name = "Run",
@@ -102,7 +102,7 @@ public partial class Player : Character
 		};
 
 		// Fall
-		var fall = new AbsState
+		var fall = new State
 		{
 			Layer = Tags.LayerMovement,
 			Name = "Fall",
@@ -129,7 +129,7 @@ public partial class Player : Character
 
 
 		// Double Jump
-		var doubleJump = new AbsState
+		var doubleJump = new State
 		{
 			Name = "DoubleJump",
 			Layer = Tags.LayerMovement,
@@ -148,7 +148,7 @@ public partial class Player : Character
 		};
 
 		// Wall Slide
-		var wallSlide = new AbsState
+		var wallSlide = new State
 		{
 			Name = "WallSliding",
 			Layer = Tags.LayerMovement,
@@ -162,7 +162,7 @@ public partial class Player : Character
 			},
 		};
 
-		var attack1 = new AbsState
+		var attack1 = new State
 		{
 			Name = "Attack1",
 			Layer = Tags.LayerMovement,
@@ -174,7 +174,7 @@ public partial class Player : Character
 			},
 		};
 
-		var attack11 = new AbsState
+		var attack11 = new State
 		{
 			Name = "Attack11",
 			Layer = Tags.LayerMovement,
@@ -186,7 +186,7 @@ public partial class Player : Character
 			},
 		};
 
-		var attack111 = new AbsState
+		var attack111 = new State
 		{
 			Name = "Attack111",
 			Layer = Tags.LayerMovement,
@@ -198,7 +198,7 @@ public partial class Player : Character
 			},
 		};
 
-		var hit = new AbsState
+		var hit = new State
 		{
 			Name = "Hit",
 			Layer = Tags.LayerMovement,
@@ -210,7 +210,7 @@ public partial class Player : Character
 			},
 		};
 
-		var die = new AbsState
+		var die = new State
 		{
 			Name = "Die",
 			Layer = Tags.LayerMovement,
@@ -231,7 +231,7 @@ public partial class Player : Character
 
 
 		// Sliding
-		var sliding = new AbsState
+		var sliding = new State
 		{
 			Name = "Sliding",
 			Layer = Tags.LayerMovement,

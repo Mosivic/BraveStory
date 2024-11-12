@@ -1,85 +1,193 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Godot;
 
 namespace Miros.Core;
 
+struct StateJobMap
+{
+    public State State;
+    public JobBase Job;
+}
+
 public abstract class Persona : AbsPersona, IPersona
 {
-
     public string Name { get; set; }
     public int Level { get; protected set; }
-
     public bool Enabled { get; set; }
-    public EffectScheduler EffectContainer { get; private set; }
 
     public TagAggregator TagAggregator { get; private set; }
-
-    public AbilityContainer AbilityContainer { get; private set; }
-
     public AttributeSetContainer AttributeSetContainer { get; private set; }
 
-    private bool _ready;
+
+    private IJobProvider _jobProvider;
+    private Dictionary<Type, IScheduler<JobBase>> _schedulers = [];
+    private List<StateJobMap> _stateJobMaps = [];
 
 
-    private void Prepare()
+    public void AddScheduler<TState>(IScheduler<JobBase> scheduler, HashSet<TState> states)
+        where TState : State
     {
-        if (_ready) return;
-        AbilityContainer = new AbilityContainer(this);
-        EffectContainer = new EffectScheduler(this);
-        AttributeSetContainer = new AttributeSetContainer(this);
-        TagAggregator = new TagAggregator(this);
-        _ready = true;
+        _schedulers[typeof(TState)] = scheduler;
+        foreach (var state in states)
+        {
+            var job = _jobProvider.GetJob(state);
+            scheduler.AddJob(job);
+            _stateJobMaps.Add(new StateJobMap { State = state, Job = job });
+        }
+    }
+
+    public void AddState<TState>(TState state)
+        where TState : State
+    {
+        var type = state.GetType();
+        if (!_schedulers.TryGetValue(type, out var scheduler))
+        {
+#if GODOT4 &&DEBUG
+            throw new Exception($"[Miros.Connect] scheduler of {type} not found");
+#else
+            return;
+#endif
+        }
+        var job = _jobProvider.GetJob(state);
+        scheduler.AddJob(job);
+        _stateJobMaps.Add(new StateJobMap { State = state, Job = job });
+    }
+
+
+    public void AddStateTo(State state, IPersona target)
+    {
+        target.AddState(state);
+    }
+
+
+    public void RemoveState<TState>(TState state)
+        where TState : State
+    {
+        var type = state.GetType();
+        if (!_schedulers.TryGetValue(type, out var scheduler))
+        {
+#if GODOT4 &&DEBUG
+            throw new Exception($"[Miros.Connect] scheduler of {type} not found");
+#else
+            return;
+#endif
+        }
+        var job = _stateJobMaps.FirstOrDefault(map => map.State == state).Job;
+        scheduler.RemoveJob(job);
+    }
+
+    public void RemoveEffectWithAnyTags(TagSet tags)
+    {
+        if (tags.Empty) return;
+        if (!_schedulers.TryGetValue(typeof(EffectJob), out var scheduler))
+        {
+            return;
+        }
+        var jobs = scheduler.GetAllJobs();
+        var removeList = new List<State>();
+        
+        foreach (var job in jobs)
+        {
+            var effectJob = job as EffectJob;
+            Effect effect = _stateJobMaps.FirstOrDefault(map => map.Job == effectJob).State as Effect;
+
+            var ownedTags = effect.OwnedTags;
+            if (!ownedTags.Empty && ownedTags.HasAnyTags(tags))
+                removeList.Add(effect);
+
+            var grantedTags = effect.GrantedTags;
+            if (!grantedTags.Empty && grantedTags.HasAnyTags(tags))
+                removeList.Add(effect);
+        }
+
+        foreach (var effect in removeList) RemoveState(effect);
+    }
+
+
+    public void Update(double delta)
+    {
+        foreach (var scheduler in _schedulers.Values)
+        {
+            scheduler.Update(delta);
+        }
+    }
+
+    public void PhysicsUpdate(double delta)
+    {
+        foreach (var scheduler in _schedulers.Values)
+        {
+            scheduler.PhysicsUpdate(delta);
+        }
+    }
+
+    public JobBase[] GetAllJobs()
+    {
+        return [.. _stateJobMaps.Select(map => map.Job)];
+    }
+
+
+    public JobBase GetNowJob(Type stateType, Tag layer)
+    {
+        if (!_schedulers.TryGetValue(stateType, out var scheduler))
+        {
+            return null;
+        }
+        return scheduler.GetNowJob(layer);
+    }
+
+    public JobBase GetLastJob(Type stateType, Tag layer)
+    {
+        if (!_schedulers.TryGetValue(stateType, out var scheduler))
+        {
+            return null;
+        }
+        return scheduler.GetLastJob(layer);
+    }
+
+    public double GetCurrentJobTime(Type stateType, Tag layer)
+    {
+        if (!_schedulers.TryGetValue(stateType, out var scheduler))
+        {
+            return 0;
+        }
+        return scheduler.GetCurrentJobTime(layer);
     }
 
     public void Enable()
     {
+        AttributeSetContainer = new AttributeSetContainer(this);
+        TagAggregator = new TagAggregator(this);
         AttributeSetContainer.OnEnable();
     }
 
     public void Disable()
     {
         AttributeSetContainer.OnDisable();
-        DisableAllAbilities();
-        ClearEffect();
         TagAggregator?.OnDisable();
     }
 
-    private void Awake()
-    {
-        Prepare();
-    }
 
-    private void OnEnable()
-    {
-        Prepare();
-        TagAggregator?.OnEnable();
-        Enable();
-    }
+    // public void Init(Tag[] baseTags, Type[] attrSetTypes, Ability[] baseAbilities, int level)
+    // {
+    //     Prepare();
+    //     Level = level;
+    //     if (baseTags != null) TagAggregator.Init(baseTags);
 
-    private void OnDisable()
-    {
-        Disable();
-    }
+    //     if (attrSetTypes != null)
+    //     {
+    //         foreach (var attrSetType in attrSetTypes)
+    //             AttributeSetContainer.AddAttributeSet(attrSetType);
+    //     }
 
-    public void Init(Tag[] baseTags, Type[] attrSetTypes, Ability[] baseAbilities, int level)
-    {
-        Prepare();
-        Level = level;
-        if (baseTags != null) TagAggregator.Init(baseTags);
-
-        if (attrSetTypes != null)
-        {
-            foreach (var attrSetType in attrSetTypes)
-                AttributeSetContainer.AddAttributeSet(attrSetType);
-        }
-
-        if (baseAbilities != null)
-        {
-            foreach (var ability in baseAbilities)
-                AbilityContainer.GrantAbility(ability);
-        }
-    }
+    //     if (baseAbilities != null)
+    //     {
+    //         foreach (var ability in baseAbilities)
+    //             AbilityContainer.GrantAbility(ability);
+    //     }
+    // }
 
 
     #region Tag Check
@@ -120,82 +228,10 @@ public abstract class Persona : AbsPersona, IPersona
 
     #endregion
 
-    #region Effect CURD
-    public void AddEffect(Effect effect)
-    {
-        EffectContainer.AddEffect(this, effect);
-    }
-
-    public void RemoveEffect(Effect effect)
-    {
-        EffectContainer.RemoveEffect(effect);
-    }
-
-    public void RemoveEffectWithAnyTags(TagSet tags)
-    {
-        EffectContainer.RemoveEffectWithAnyTags(tags);
-    }
-
-    public void ApplyEffectTo(Effect effect, IPersona target)
-    {
-        target.AddEffect(effect);
-    }
 
 
-    public void ApplyEffectTo(Effect effect, IPersona target, int effectLevel)
-    {
-        effect.Level = effectLevel;
-        target.AddEffect(effect);
-    }
 
 
-    public void ApplyEffectToSelf(Effect effect)
-    {
-        ApplyEffectTo(effect, this);
-    }
-
-    public void ClearEffect()
-    {
-        // _abilityContainer = new AbilityContainer(this);
-        // GameplayEffectContainer = new GameplayEffectContainer(this);
-        // _attributeSetContainer = new AttributeSetContainer(this);
-        // tagAggregator = new GameplayTagAggregator(this);
-        EffectContainer.ClearEffect();
-    }
-    #endregion
-
-    #region Ability CURD and Control
-    public void GrantAbility(Ability ability)
-    {
-        AbilityContainer.GrantAbility(ability);
-    }
-
-    public void RemoveAbility(string abilityName)
-    {
-        AbilityContainer.RemoveAbility(abilityName);
-    }
-
-    public bool TryActivateAbility(string abilityName, params object[] args)
-    {
-        return AbilityContainer.TryActivateAbility(abilityName, args);
-    }
-
-    public void TryEndAbility(string abilityName)
-    {
-        AbilityContainer.EndAbility(abilityName);
-    }
-
-    public void TryCancelAbility(string abilityName)
-    {
-        AbilityContainer.CancelAbility(abilityName);
-    }
-
-    private void DisableAllAbilities()
-    {
-        AbilityContainer.CancelAllAbilities();
-    }
-
-    #endregion
 
     #region Attrubute Setget
     public AttributeValue? GetAttributeAttributeValue(string attrSetName, string attrShortName)
@@ -234,14 +270,6 @@ public abstract class Persona : AbsPersona, IPersona
     }
 
     #endregion
-
-
-    public void Tick(double delta)
-    {
-        AbilityContainer.Tick();
-        EffectContainer.Tick(delta);
-    }
-
 
 
     public void ApplyModFromInstantEffect(Effect effect)
@@ -288,11 +316,6 @@ public abstract class Persona : AbsPersona, IPersona
             AttributeSetContainer.Sets[modifier.AttributeSetName]
                 .ChangeAttributeBase(modifier.AttributeShortName, baseValue);
         }
-    }
-
-    public CooldownTimer CheckCooldownFromTags(TagSet tags)
-    {
-        return EffectContainer.CheckCooldownFromTags(tags);
     }
 
 

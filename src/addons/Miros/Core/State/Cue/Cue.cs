@@ -1,7 +1,7 @@
 
 namespace Miros.Core;
 
-public abstract class Cue: AbsState
+public abstract class Cue: State
 {
     public TagSet RequiredTags;
     public TagSet ImmunityTags;

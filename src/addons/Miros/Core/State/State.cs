@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class AbsState
+public class State
 {
     // Core
     public required string Name { get; init; }

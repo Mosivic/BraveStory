@@ -3,7 +3,7 @@
 namespace Miros.Core;
 // 对自定义回调函数的处理
 
-public abstract class AbsJob(AbsState state)
+public abstract class AbsJob(State state)
 {
 
     public string Name => state.Name;
@@ -14,17 +14,17 @@ public abstract class AbsJob(AbsState state)
 
 
 
-    public event Action<AbsState> OnEntered;
-    public event Action<AbsState> OnExited;
-    public event Action<AbsState, double> OnUpdated;
-    public event Action<AbsState, double> OnPhysicsUpdated;
-    public event Action<AbsState> OnSucceeded;
-    public event Action<AbsState> OnFailed;
-    public event Action<AbsState> OnPaused;
-    public event Action<AbsState> OnResumed;
+    public event Action<State> OnEntered;
+    public event Action<State> OnExited;
+    public event Action<State, double> OnUpdated;
+    public event Action<State, double> OnPhysicsUpdated;
+    public event Action<State> OnSucceeded;
+    public event Action<State> OnFailed;
+    public event Action<State> OnPaused;
+    public event Action<State> OnResumed;
 
-    public event Func<AbsState, bool> EnterCondition;
-    public event Func<AbsState, bool> ExitCondition;
+    public event Func<State, bool> EnterCondition;
+    public event Func<State, bool> ExitCondition;
 
 
     protected void OnEnter()

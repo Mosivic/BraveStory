@@ -2,12 +2,12 @@
 
 public abstract class JobBase : AbsJob, IJob
 {
-    protected JobBase(AbsState state) : base(state)
+    protected JobBase(State state) : base(state)
     {
         this.state = state;
     }
 
-    private readonly AbsState state;
+    private readonly State state;
     
     public virtual void Enter()
     {

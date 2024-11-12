@@ -14,6 +14,8 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
 
     public virtual void RemoveJob(TJob job)
     {
+        if (job.Status == RunningStatus.Running)
+            job.Exit();
         _jobs.Remove(job);
     }
 
@@ -46,5 +48,10 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
     public virtual void Update(double delta)
     {
         return;
+    }
+
+    public virtual TJob[] GetAllJobs()
+    {
+        return [.. _jobs];
     }
 }

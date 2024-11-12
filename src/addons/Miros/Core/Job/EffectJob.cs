@@ -11,25 +11,15 @@ public class EffectJob(Effect effect) : JobBase(effect)
     public event Action<EffectJob> OnPeriodOvered;
 
 
-
     public override void Enter()
     {
         base.Enter();
-
-
-        TriggerOnActivation();
-
         CaptureAttributesSnapshot();
-        
-        if (effect.DurationPolicy != DurationPolicy.Instant)
-        {
-            if (effect.GrantedAbility.Length > 0)
-            {
-                TryActivateGrantedAbilities();
-            }
-        }
 
+        effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
+        effect.Owner.EffectContainer.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
+        TryActivateGrantedAbilities();
     }
 
     public override void Update(double delta)
@@ -42,9 +32,9 @@ public class EffectJob(Effect effect) : JobBase(effect)
 
     public override void Exit()
     {
-        TriggerOnDeactivation();
         TryRemoveGrantedAbilities();
-
+        effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
+        TryDeactivateGrantedAbilities();
 
         base.Exit();
     }
@@ -143,27 +133,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
     }
 
 
-    private void TriggerOnActivation()
-    {
-        effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
-        effect.Owner.EffectContainer.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
-        TryActivateGrantedAbilities();
-    }
-
-    private void TriggerOnDeactivation()
-    {
-        effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
-
-        TryDeactivateGrantedAbilities();
-    }
-
-    public void TriggerOnImmunity()
-    {
-        // TODO 免疫触发事件逻辑需要调整
-        // onImmunity?.Invoke(Owner, this);
-        // onImmunity = null;
-    }
     #endregion
 
 

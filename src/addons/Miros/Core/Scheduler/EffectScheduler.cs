@@ -8,9 +8,6 @@ public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
 {
     private readonly Persona _owner = owner;
 
-
-    private List<EffectJob> _jobs = [];
-
     private event Action OnEffectsIsDirty;
 
 
@@ -19,30 +16,6 @@ public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
         
     }
 
-    public void PhysicsUpdate(double delta)
-    {
-        return;
-    }
-
-    public void Tick(double delta)
-    {
-        _cachedEffects.AddRange(_effects);
-
-        foreach (var effect in _cachedEffects)
-        {
-            if (effect.IsActive)
-            {
-                effect.Tick(delta);
-            }
-        }
-
-        _cachedEffects.Clear();
-    }
-
-    /// <summary>
-    /// 注册GE容器变化事件
-    /// </summary>
-    /// <param name="action"></param>
     public void RegisterOnEffectsIsDirty(Action action)
     {
         OnEffectsIsDirty += action;
@@ -53,38 +26,6 @@ public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
         OnEffectsIsDirty -= action;
     }
 
-    /// <summary>
-    /// 移除包含任意指定标签的GE
-    /// </summary>
-    /// <param name="tags"></param>
-    public void RemoveEffectWithAnyTags(TagSet tags)
-    {
-        if (tags.Empty) return;
-
-        var removeList = new List<Effect>();
-        foreach (var effect in _effects)
-        {
-            var assetTags = effect.OwnedTags;
-            if (!assetTags.Empty && assetTags.HasAnyTags(tags))
-            {
-                removeList.Add(effect);
-                continue;
-            }
-
-            var grantedTags = effect.GrantedTags;
-            if (!grantedTags.Empty && grantedTags.HasAnyTags(tags)) removeList.Add(effect);
-        }
-
-        foreach (var effect in removeList) RemoveEffect(effect);
-    }
-
-
-    // public void RemoveEffect(Effect effect)
-    // {
-    //     _effects.Remove(effect);
-    //     effect.DisApply();
-    //     effect.TriggerOnRemove();
-    // }
 
 
     public Effect AddEffect(Persona source, Effect effect, bool overwriteEffectLevel = false, int effectLevel = 0)
@@ -252,36 +193,5 @@ public class EffectScheduler(Persona owner):SchedulerBase<EffectJob>
         OnEffectsIsDirty?.Invoke();
         return effectSpec;
     }
-
-    public void AddJob(EffectJob job)
-    {
-        _jobs.Add(job);
-    }
-
-    public void RemoveJob(EffectJob job)
-    {
-        _jobs.Remove(job);
-    }
-
-    public EffectJob GetNowJob(Tag layer)
-    {
-        throw new NotImplementedException();
-    }
-
-    public EffectJob GetLastJob(Tag layer)
-    {
-        throw new NotImplementedException();
-    }
-
-    public double GetCurrentJobTime(Tag layer)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool HasJobRunning(EffectJob job)
-    {
-        return _jobs.Contains(job);
-    }
-
 
 }

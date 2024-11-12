@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class ConditionMachine : AbsScheduler<JobBase>, IScheduler<JobBase>
+public class ConditionMachine : SchedulerBase<JobBase>
 {
 	protected readonly Dictionary<Tag, List<JobBase>> RunningJobs = new();
 	protected Dictionary<Tag, List<JobBase>> WaitingJobs { get; set; } = new();
 
-	public void AddJob(JobBase job)
+	public override void AddJob(JobBase job)
 	{
 		var layer = job.Layer;
 
@@ -24,20 +24,20 @@ public class ConditionMachine : AbsScheduler<JobBase>, IScheduler<JobBase>
 	}
 
 
-	public void RemoveJob(JobBase job)
+	public override void RemoveJob(JobBase job)
 	{
 		var layer = job.Layer;
 		if (WaitingJobs.ContainsKey(layer) && WaitingJobs[layer].Contains(job))
 			WaitingJobs[layer].Remove(job);
 	}
 
-	public bool HasJobRunning(JobBase job)
+	public override  bool HasJobRunning(JobBase job)
 	{
 		return RunningJobs[job.Layer].Contains(job);
 	}
 
 
-	public void Update(double delta)
+	public override void Update(double delta)
 	{
 		WaitingJobsToRunningJobs();
 
@@ -53,7 +53,7 @@ public class ConditionMachine : AbsScheduler<JobBase>, IScheduler<JobBase>
 	}
 
 
-	public void PhysicsUpdate(double delta)
+	public override void PhysicsUpdate(double delta)
 	{
 		foreach (var layer in RunningJobs.Keys)
 			for (var i = 0; i < RunningJobs[layer].Count; i++)
@@ -117,20 +117,5 @@ public class ConditionMachine : AbsScheduler<JobBase>, IScheduler<JobBase>
 		WaitingJobs[layer].Insert(index + 1, job);
 
 		job.Exit();
-	}
-
-	public JobBase GetNowJob(Tag Layer)
-	{
-		return null;
-	}
-
-	public JobBase GetLastJob(Tag Layer)
-	{
-		return null;
-	}
-
-	public double GetCurrentJobTime(Tag layer)
-	{
-		return 0;
 	}
 }

@@ -8,6 +8,7 @@ public interface IScheduler<TJob>
     void RemoveJob(TJob job);
     TJob GetNowJob(Tag layer);
     TJob GetLastJob(Tag layer);
+    TJob[] GetAllJobs();
     double GetCurrentJobTime(Tag layer);
     bool HasJobRunning(TJob job);
     void Update(double delta);

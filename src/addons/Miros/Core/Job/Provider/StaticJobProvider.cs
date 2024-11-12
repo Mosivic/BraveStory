@@ -7,21 +7,21 @@ namespace Miros.Core;
 
 public class StaticJobProvider : IJobProvider
 {
-    private readonly Dictionary<AbsState, IJob> _statesJob = new();
+    private readonly Dictionary<State, JobBase> _statesJob = [];
 
-    public IJob GetJob(AbsState state)
+    public JobBase GetJob(State state)
     {
         if (_statesJob.TryGetValue(state, out var job))
             return job;
         return CreateJob(state);
     }
 
-    public IJob[] GetAllJobs()
+    public JobBase[] GetAllJobs()
     {
         return _statesJob.Values.ToArray();
     }
 
-    private IJob CreateJob(AbsState state)
+    private JobBase CreateJob(State state)
     {
         var type = state.JobType;
         var job = (JobBase)Activator.CreateInstance(type, [state]);
