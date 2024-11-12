@@ -37,65 +37,81 @@ public partial class Player : Character
 		var ownedTags = new TagContainer([Tags.Player]);
 
 		// Idle  
-		var idle = new HostState<Player>(this)
+		var idle = new AbsState
 		{
 			Name = "Idle",
-			Components = new Dictionary<Type, IStateComponent<NativeJob>>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent()
-				{
-                    EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; }
-				}},
-				{ typeof(TagComponent), new TagComponent()
-				{
-					OwnedTags = new TagSet(Tags.Idle)
-				}}
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; } } },
+				{ typeof(TagComponent), new TagComponent
+					{ OwnedTags = new(Tags.Idle) } }
 			},
 		};
 		// Jump
-		var jump = new HostState<Player>(this)
+		var jump = new AbsState
 		{
 			Name = "Jump",
-			Tag = Tags.Jump,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("jump");
-				Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
-				_jumpCount++;
-
-			},
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s =>{
+						PlayAnimation("jump");
+						Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+						_jumpCount++;
+					} }
+				},
+			}
 		};
 
 		// Wall Jump
-		var wall_jump = new HostState<Player>(this)
+		var wall_jump = new AbsState
 		{
 			Name = "WallJump",
-			Tag = Tags.WallJump,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("jump");
-				float wallJumpDirectionX = _graphics.Scale.X;
-				Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
-				_jumpCount = 0;
-			},
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s =>
+					{
+						PlayAnimation("jump");
+						float wallJumpDirectionX = _graphics.Scale.X;
+						Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
+						_jumpCount = 0;
+					} }
+				},
+			}
 		};
 
 		// Run
-		var run = new HostState<Player>(this)
+		var run = new AbsState
 		{
-			Tag = Tags.Run,
+			Layer = Tags.LayerMovement,
 			Name = "Run",
-			EnterFunc = s => PlayAnimation("run"),
-			PhysicsUpdateFunc = (state, d) => Move(d)
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{
+						EnterFunc = s => PlayAnimation("run"),
+						PhysicsUpdateFunc = (state, d) => Move(d)
+					}
+				},
+			},
 		};
 
 		// Fall
-		var fall = new HostState<Player>(this)
+		var fall = new AbsState
 		{
+			Layer = Tags.LayerMovement,
 			Name = "Fall",
-			Tag = Tags.Fall,
-			EnterFunc = s => PlayAnimation("fall"),
-			PhysicsUpdateFunc = (state, d) => Fall(d)
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("fall"),
+					PhysicsUpdateFunc = (state, d) => Fall(d) } }
+			},
 		};
 
 		// // Landing
@@ -113,113 +129,136 @@ public partial class Player : Character
 
 
 		// Double Jump
-		var doubleJump = new HostState<Player>(this)
+		var doubleJump = new AbsState
 		{
 			Name = "DoubleJump",
-			Tag = Tags.DoubleJump,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("jump");
-				Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
-				_jumpCount += 1;
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s =>
+						{
+							PlayAnimation("jump");
+							Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+							_jumpCount += 1;
+						}
+					}
+				},
 			},
-			PhysicsUpdateFunc = (state, d) => Move(d)
 		};
 
 		// Wall Slide
-		var wallSlide = new HostState<Player>(this)
+		var wallSlide = new AbsState
 		{
 			Name = "WallSliding",
-			Tag = Tags.WallSlide,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("wall_sliding");
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("wall_sliding"),
+					PhysicsUpdateFunc = (state, d) => WallSlide(d)
+					}
+				},
 			},
-			PhysicsUpdateFunc = (state, d) => WallSlide(d)
 		};
 
-		var attack1 = new HostState<Player>(this)
+		var attack1 = new AbsState
 		{
 			Name = "Attack1",
-			Tag = Tags.Attack,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("attack1");
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("attack1"),
+					ExitCondition = s => IsAnimationFinished() } }
 			},
-			ExitCondition = s => IsAnimationFinished()
 		};
 
-		var attack11 = new HostState<Player>(this)
+		var attack11 = new AbsState
 		{
 			Name = "Attack11",
-			Tag = Tags.Attack,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("attack11");
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("attack11"),
+					ExitCondition = s => IsAnimationFinished() } }
 			},
-			ExitCondition = s => IsAnimationFinished()
 		};
 
-		var attack111 = new HostState<Player>(this)
+		var attack111 = new AbsState
 		{
 			Name = "Attack111",
-			Tag = Tags.Attack,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("attack111");
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("attack111"),
+					ExitCondition = s => IsAnimationFinished() } }
 			},
-			ExitCondition = s => IsAnimationFinished()
 		};
 
-		var hit = new HostState<Player>(this)
+		var hit = new AbsState
 		{
 			Name = "Hit",
-			Tag = Tags.Hit,
-			EnterFunc = s => PlayAnimation("hit"),
-			ExitFunc = s => _hasHit = false
+			Layer = Tags.LayerMovement,
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("hit"),
+					ExitFunc = s => _hasHit = false } }
+			},
 		};
 
-		var die = new HostState<Player>(this)
+		var die = new AbsState
 		{
 			Name = "Die",
-			Tag = Tags.Die,
-			EnterFunc = s => {
-				PlayAnimation("die");
-				Interactions.Clear();
-			},
-			PhysicsUpdateFunc = (s, d) =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				if (IsAnimationFinished()) QueueFree();
-			}
-			
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s =>
+					{
+						PlayAnimation("die");
+						Interactions.Clear();
+					},
+					PhysicsUpdateFunc = (s, d) =>
+					{
+						if (IsAnimationFinished()) QueueFree();
+					} } }
+			},
 		};
 
 
 		// Sliding
-		var sliding = new HostState<Player>(this)
+		var sliding = new AbsState
 		{
 			Name = "Sliding",
-			Tag = Tags.LayerMovement,
-			EnterFunc = s =>
+			Layer = Tags.LayerMovement,
+			Components = new()
 			{
-				PlayAnimation("sliding_start");
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s =>
+					{
+						PlayAnimation("sliding_start");
 				_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
-				_hurtBox.SetDeferred("monitorable", false);
+						_hurtBox.SetDeferred("monitorable", false);
+					},
+					ExitFunc = s => _hurtBox.SetDeferred("monitorable", true),
+					PhysicsUpdateFunc = (state, d) =>
+					{
+						if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
+						{
+							PlayAnimation("sliding_loop");
+						}
+						else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
+						{
+							PlayAnimation("sliding_end");
+						}
+						Slide(d);
+					},
+					ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED } }
 			},
-			ExitFunc = s => _hurtBox.SetDeferred("monitorable", true),
-			PhysicsUpdateFunc = (state, d) =>
-			{
-				if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
-				{
-					PlayAnimation("sliding_loop");
-				}
-				else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
-				{
-					PlayAnimation("sliding_end");
-				}
-				Slide(d);
-			},
-			ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED
 		};
 
 		var addHpBuff = new Buff
@@ -330,13 +369,17 @@ public partial class Player : Character
 	{
 		base._Process(delta);
 
-		if(Interactions.Count!=0){
+		if (Interactions.Count != 0)
+		{
 			_animatedSprite.Visible = true;
-			if(Input.IsActionJustPressed("interact")){
+			if (Input.IsActionJustPressed("interact"))
+			{
 				Interactions.Last().Interact();
 			}
-		}else{
-			_animatedSprite.Visible =false;
+		}
+		else
+		{
+			_animatedSprite.Visible = false;
 		}
 	}
 

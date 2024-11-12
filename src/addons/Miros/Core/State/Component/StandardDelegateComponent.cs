@@ -2,7 +2,7 @@ using System;
 
 namespace Miros.Core;
 
-public class StandardDelegateComponent: IStateComponent<NativeJob>
+public class StandardDelegateComponent: IStateComponent<JobBase>
 {
     public Func<AbsState, bool> EnterCondition { get; init; }
     public Func<AbsState, bool> ExitCondition { get; init; }
@@ -19,18 +19,18 @@ public class StandardDelegateComponent: IStateComponent<NativeJob>
     public Action<AbsState, double> UpdateFunc { get; init; }
     public Action<AbsState, double> PhysicsUpdateFunc { get; init; }
 
-    public void Activate(NativeJob job)
+    public void Activate(JobBase job)
     {
         RegisterEvents(job);
     }
 
-    public void Deactivate(NativeJob job)
+    public void Deactivate(JobBase job)
     {
         UnregisterEvents(job);
     }
 
 
-    public void RegisterEvents(NativeJob job)
+    public void RegisterEvents(JobBase job)
     {
         job.OnEntered += EnterFunc;
         job.OnExited += ExitFunc;
@@ -44,7 +44,7 @@ public class StandardDelegateComponent: IStateComponent<NativeJob>
         job.ExitCondition += ExitCondition;
     }
 
-    public void UnregisterEvents(NativeJob job)
+    public void UnregisterEvents(JobBase job)
     {
         job.OnEntered -= EnterFunc;
         job.OnExited -= ExitFunc;

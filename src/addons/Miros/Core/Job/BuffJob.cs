@@ -3,43 +3,43 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class JobBuff(Buff buffState) : NativeJob(buffState)
+public class JobBuff(Buff buff) : JobBase(buff)
 {
     public override void Enter()
     {
-        if (buffState.DurationPolicy == DurationPolicy.Instant)
+        if (buff.DurationPolicy == DurationPolicy.Instant)
         {
             ApplyModifiers();
-            buffState.Status = RunningStatus.Succeed;
+            buff.Status = RunningStatus.Succeed;
         }
-        else if (buffState.DurationPolicy == DurationPolicy.Infinite)
+        else if (buff.DurationPolicy == DurationPolicy.Infinite)
         {
-            if (buffState.Period > 0 && buffState.IsExecutePeriodicEffectOnStart == false) return;
+            if (buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
-        else if (buffState.DurationPolicy == DurationPolicy.Duration)
+        else if (buff.DurationPolicy == DurationPolicy.Duration)
         {
-            if (buffState.Period > 0 && buffState.IsExecutePeriodicEffectOnStart == false) return;
+            if (buff.Period > 0 && buff.IsExecutePeriodicEffectOnStart == false) return;
             ApplyModifiers();
         }
 
-        buffState.StackCurrentCount = buffState.StackMaxCount;
-        buffState.PeriodElapsed = 0;
-        buffState.DurationElapsed = 0;
+        buff.StackCurrentCount = buff.StackMaxCount;
+        buff.PeriodElapsed = 0;
+        buff.DurationElapsed = 0;
         base.Enter();
     }
 
     public override void Resume()
     {
-        buffState.Status = RunningStatus.Running;
-        if (buffState.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.Reset)
+        buff.Status = RunningStatus.Running;
+        if (buff.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.Reset)
         {
-            buffState.PeriodElapsed = 0;
+            buff.PeriodElapsed = 0;
         }
-        else if (buffState.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.ExecuteAndReset)
+        else if (buff.PeriodicInhibitionPolicy == PeriodicInhibitionPolicy.ExecuteAndReset)
         {
             ApplyModifiers();
-            buffState.PeriodElapsed = 0;
+            buff.PeriodElapsed = 0;
         }
 
         base.Resume();
@@ -47,28 +47,28 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
 
     public void Stack(object source)
     {
-        if (buffState.StackIsRefreshDuration)
-            buffState.DurationElapsed = 0;
-        if (buffState.StackIsResetPeriod)
-            buffState.PeriodElapsed = 0;
+        if (buff.StackIsRefreshDuration)
+            buff.DurationElapsed = 0;
+        if (buff.StackIsResetPeriod)
+            buff.PeriodElapsed = 0;
 
-        switch (buffState.StackType)
+        switch (buff.StackType)
         {
             case StateStackType.Source:
-                buffState.StackSourceCountDict ??= new Dictionary<object, int>
-                    { { buffState.Source, 1 } };
+                buff.StackSourceCountDict ??= new Dictionary<object, int>
+                    { { buff.Source, 1 } };
 
                 //Not have stackState in Dict
-                if (buffState.StackSourceCountDict.TryAdd(source, 1))
+                if (buff.StackSourceCountDict.TryAdd(source, 1))
                 {
-                    buffState.StackCurrentCount += 1;
+                    buff.StackCurrentCount += 1;
                     OnStack();
                 }
                 //Have stackState in Dict AND stackStateCount less than maxCount
-                else if (buffState.StackSourceCountDict[buffState.Source] < buffState.StackMaxCount)
+                else if (buff.StackSourceCountDict[buff.Source] < buff.StackMaxCount)
                 {
-                    buffState.StackSourceCountDict.Add(source, 1);
-                    buffState.StackCurrentCount += 1;
+                    buff.StackSourceCountDict.Add(source, 1);
+                    buff.StackCurrentCount += 1;
                     OnStack();
                 }
                 //Have stackState in Dict AND Overflow
@@ -79,9 +79,9 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
 
                 break;
             case StateStackType.Target:
-                if (buffState.StackCurrentCount < buffState.StackMaxCount)
+                if (buff.StackCurrentCount < buff.StackMaxCount)
                 {
-                    buffState.StackCurrentCount += 1;
+                    buff.StackCurrentCount += 1;
                     OnStack();
                 }
                 else
@@ -95,9 +95,9 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
         }
     }
 
-    protected override void OnSucceed()
+    protected override void Succeed()
     {
-        switch (buffState.DurationPolicy)
+        switch (buff.DurationPolicy)
         {
             case DurationPolicy.Instant:
                 break;
@@ -110,12 +110,12 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
                 throw new ArgumentOutOfRangeException();
         }
 
-        base.OnSucceed();
+        base.Succeed();
     }
 
-    protected override void OnFail()
+    protected override void Failed()
     {
-        switch (buffState.DurationPolicy)
+        switch (buff.DurationPolicy)
         {
             case DurationPolicy.Instant:
                 break;
@@ -128,19 +128,19 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
                 throw new ArgumentOutOfRangeException();
         }
 
-        base.OnFail();
+        base.Failed();
     }
 
 
 
     public override void Update(double delta)
     {
-        if (state.Status != RunningStatus.Running) return;
-        buffState.DurationElapsed += delta;
-        buffState.PeriodElapsed += delta;
+        if (buff.Status != RunningStatus.Running) return;
+        buff.DurationElapsed += delta;
+        buff.PeriodElapsed += delta;
 
-        if (buffState.Duration > 0 && buffState.DurationElapsed > buffState.Duration) OnDurationOver();
-        if (buffState.Period > 0 && buffState.PeriodElapsed > buffState.Period) OnPeriodOver();
+        if (buff.Duration > 0 && buff.DurationElapsed > buff.Duration) OnDurationOver();
+        if (buff.Period > 0 && buff.PeriodElapsed > buff.Period) OnPeriodOver();
 
         base.Update(delta);
     }
@@ -158,11 +158,11 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
 
     protected virtual void OnDurationOver()
     {
-        buffState.StackCurrentCount -= 1;
-        buffState.DurationElapsed = 0;
+        buff.StackCurrentCount -= 1;
+        buff.DurationElapsed = 0;
 
-        if (buffState.StackCurrentCount == 0)
-            buffState.Status = RunningStatus.Succeed;
+        if (buff.StackCurrentCount == 0)
+            buff.Status = RunningStatus.Succeed;
 
 
     }
@@ -170,18 +170,18 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
     protected virtual void OnPeriodOver()
     {
         ApplyModifiers();
-        buffState.PeriodElapsed = 0;
+        buff.PeriodElapsed = 0;
 
     }
 
     private void ApplyModifiers()
     {
-        if (buffState.HasChance && new Random().NextDouble() > buffState.Chance)
+        if (buff.HasChance && new Random().NextDouble() > buff.Chance)
             return;
 
-        // for (var i = 0; i < buffState.Modifiers.Count; i++)
+        // for (var i = 0; i < buff.Modifiers.Count; i++)
         // {
-        //     var modifier = buffState.Modifiers[i];
+        //     var modifier = buff.Modifiers[i];
         //     modifier.Record = modifier.Property;
         //     switch (modifier.Operator)
         //     {
@@ -203,15 +203,15 @@ public class JobBuff(Buff buffState) : NativeJob(buffState)
         //             throw new ArgumentOutOfRangeException();
         //     }
 
-        //     buffState.OnApplyModifierFunc?.Invoke(modifier);
+        //     buff.OnApplyModifierFunc?.Invoke(modifier);
         // }
     }
     private void CancelModifiers()
     {
-        // foreach (var modifier in buffState.Modifiers)
+        // foreach (var modifier in buff.Modifiers)
         // {
         //     modifier.Property = modifier.Record;
-        //     buffState.OnCancelModifierFunc?.Invoke(modifier);
+        //     buff.OnCancelModifierFunc?.Invoke(modifier);
         // }
     }
 

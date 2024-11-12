@@ -5,11 +5,11 @@ using System.Linq;
 namespace Miros.Core;
 public class StateTransitionContainer
 {
-    private readonly Dictionary<NativeJob, HashSet<StateTransition>> _transitions = new();
+    private readonly Dictionary<JobBase, HashSet<StateTransition>> _transitions = new();
     private readonly HashSet<StateTransition> _anyTransitions = new();
     
 
-    public void AddTransition(NativeJob fromJob,NativeJob toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
+    public void AddTransition(JobBase fromJob,JobBase toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
         var transition = new StateTransition(toJob,condition,mode);
         if(!_transitions.ContainsKey(fromJob))
@@ -19,14 +19,14 @@ public class StateTransitionContainer
         _transitions[fromJob].Add(transition);
     }
 
-    public void AddAnyTransition(NativeJob toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
+    public void AddAnyTransition(JobBase toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
         var transition = new StateTransition(toJob,condition,mode);
         _anyTransitions.Add(transition);
     }
 
     
-    public bool CanTransitionTo(NativeJob fromJob, NativeJob toJob)
+    public bool CanTransitionTo(JobBase fromJob, JobBase toJob)
     {
         if (!_transitions.TryGetValue(fromJob, out var rules))
         {
@@ -38,7 +38,7 @@ public class StateTransitionContainer
     }
     
     // 返回满足转换条件的所有状态
-    public IEnumerable<StateTransition> GetPossibleTransition(NativeJob fromJob)
+    public IEnumerable<StateTransition> GetPossibleTransition(JobBase fromJob)
     {
         if (!_transitions.TryGetValue(fromJob, out var rules))
         {
@@ -48,7 +48,7 @@ public class StateTransitionContainer
         return rules.Union(_anyTransitions).Where(r => r.CanTransition());
     }
 
-    public IEnumerable<NativeJob> GetAllJobs()
+    public IEnumerable<JobBase> GetAllJobs()
     {
         var fromTransitions = _transitions.Values
             .SelectMany(transitions => transitions.Select(t => t.ToJob));
@@ -60,7 +60,7 @@ public class StateTransitionContainer
 
 
     // 添加链式调用方法
-    public StateTransitionContainer AddTransitionGroup(NativeJob fromJob, IEnumerable<StateTransition> transitions)
+    public StateTransitionContainer AddTransitionGroup(JobBase fromJob, IEnumerable<StateTransition> transitions)
     {
         foreach (var transition in transitions)
         {

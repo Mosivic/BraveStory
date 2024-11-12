@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class EffectJob(Effect effect) : NativeJob(effect)
+public class EffectJob(Effect effect) : JobBase(effect)
 {
     public event Action<EffectJob> OnStacked;
     public event Action<EffectJob> OnStackOverflowed;
     public event Action<EffectJob> OnDurationOvered;
     public event Action<EffectJob> OnPeriodOvered;
+
 
 
     public override void Enter()
@@ -70,6 +72,8 @@ public class EffectJob(Effect effect) : NativeJob(effect)
     //     effect.Owner.RemoveEffect(effect);
     // }
 
+
+    // 捕获属性快照
     private void CaptureAttributesSnapshot()
     {
         effect.SnapshotSourceAttributes = effect.Source.DataSnapshot();

@@ -8,16 +8,16 @@ namespace Miros.Core;
 public class StateLayer
 {
 	public Tag Layer { get; }
-	private readonly NativeJob _defaultJob;
-	private NativeJob _currentJob;
-	private NativeJob _lastJob;
-	private NativeJob _delayJob = null;
+	private readonly JobBase _defaultJob;
+	private JobBase _currentJob;
+	private JobBase _lastJob;
+	private JobBase _delayJob = null;
 	private readonly StateTransitionContainer _transitionContainer;
 
 
 	private double _currentStateTime;
 	
-	public StateLayer(Tag layerTag,NativeJob defaultJob,
+	public StateLayer(Tag layerTag,JobBase defaultJob,
 		StateTransitionContainer transitionRuleContainer)
 	{
 		Layer = layerTag;
@@ -88,7 +88,7 @@ public class StateLayer
 		}
 	}
 
-	private void TransformState(NativeJob nextJob)
+	private void TransformState(JobBase nextJob)
 	{
 		// 检查是否可以堆叠
 		// if (nextState.IsStack)
@@ -112,17 +112,17 @@ public class StateLayer
 #endif
 	}
 
-	public NativeJob GetNowJob()
+	public JobBase GetNowJob()
 	{
 		return _currentJob;
 	}
 
-	public NativeJob GetLastJob()
+	public JobBase GetLastJob()
 	{
 		return _lastJob;
 	}
 
-	public double GetCurrentStateTime()
+	public double GetCurrentJobTime()
 	{
 		return _currentStateTime;
 	}

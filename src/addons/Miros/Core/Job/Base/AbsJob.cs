@@ -27,54 +27,53 @@ public abstract class AbsJob(AbsState state)
     public event Func<AbsState, bool> ExitCondition;
 
 
-
-    protected virtual void OnEnter()
+    protected void OnEnter()
     {
-        OnEntered?.Invoke(state); 
+        OnEntered?.Invoke(state);
     }
 
-    protected virtual void OnExit()
+    protected void OnExit()
     {
         OnExited?.Invoke(state);
     }
 
-    protected virtual void OnPause()
+    protected void OnPause()
     {
         OnPaused?.Invoke(state);
     }
 
-    protected virtual void OnResume()
+    protected void OnResume()
     {
         OnResumed?.Invoke(state);
-    }       
+    }
 
-    protected virtual void OnUpdate(double delta)
+    protected void OnUpdate(double delta)
     {
         OnUpdated?.Invoke(state, delta);
-    }   
+    }
 
-    protected virtual void OnPhysicsUpdate(double delta)
+    protected void OnPhysicsUpdate(double delta)
     {
         OnPhysicsUpdated?.Invoke(state, delta);
     }
 
-    protected virtual void OnSucceed()
+    protected void OnSucceed()
     {
-        OnSucceeded?.Invoke(state );
+        OnSucceeded?.Invoke(state);
     }
 
-    protected virtual void OnFail()
+    protected void OnFail()
     {
         OnFailed?.Invoke(state);
     }
 
-    protected virtual bool OnCanEnter()
+    protected bool OnCanEnter()
     {
         return EnterCondition?.Invoke(state) ?? true;
     }
 
-    protected virtual bool OnCanExit()
+    protected bool OnCanExit()
     {
         return ExitCondition?.Invoke(state) ?? true;
     }
-}   
+}

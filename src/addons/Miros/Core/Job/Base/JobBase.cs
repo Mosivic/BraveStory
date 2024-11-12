@@ -1,8 +1,14 @@
-﻿
-namespace Miros.Core;
+﻿namespace Miros.Core;
 
-public abstract class NativeJob(AbsState state) : AbsJob(state), IJob
+public abstract class JobBase : AbsJob, IJob
 {
+    protected JobBase(AbsState state) : base(state)
+    {
+        this.state = state;
+    }
+
+    private readonly AbsState state;
+    
     public virtual void Enter()
     {
         state.Status = RunningStatus.Running;

@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class ConditionMachine : AbsScheduler<NativeJob>, IScheduler<NativeJob>
+public class ConditionMachine : AbsScheduler<JobBase>, IScheduler<JobBase>
 {
-	protected readonly Dictionary<Tag, List<NativeJob>> RunningJobs = new();
-	protected Dictionary<Tag, List<NativeJob>> WaitingJobs { get; set; } = new();
+	protected readonly Dictionary<Tag, List<JobBase>> RunningJobs = new();
+	protected Dictionary<Tag, List<JobBase>> WaitingJobs { get; set; } = new();
 
-	public void AddJob(NativeJob job)
+	public void AddJob(JobBase job)
 	{
 		var layer = job.Layer;
 
@@ -24,14 +24,14 @@ public class ConditionMachine : AbsScheduler<NativeJob>, IScheduler<NativeJob>
 	}
 
 
-	public void RemoveJob(NativeJob job)
+	public void RemoveJob(JobBase job)
 	{
 		var layer = job.Layer;
 		if (WaitingJobs.ContainsKey(layer) && WaitingJobs[layer].Contains(job))
 			WaitingJobs[layer].Remove(job);
 	}
 
-	public bool HasJobRunning(NativeJob job)
+	public bool HasJobRunning(JobBase job)
 	{
 		return RunningJobs[job.Layer].Contains(job);
 	}
@@ -90,7 +90,7 @@ public class ConditionMachine : AbsScheduler<NativeJob>, IScheduler<NativeJob>
 	}
 
 
-	private void PushRunningJob(Tag layer, NativeJob job)
+	private void PushRunningJob(Tag layer, JobBase job)
 	{
 		WaitingJobs[layer].Remove(job);
 		// if (job.State.IsStack)
@@ -110,7 +110,7 @@ public class ConditionMachine : AbsScheduler<NativeJob>, IScheduler<NativeJob>
 	}
 
 
-	private void PopRunningJob(Tag layer, NativeJob job)
+	private void PopRunningJob(Tag layer, JobBase job)
 	{
 		RunningJobs[layer].Remove(job);
 		var index = WaitingJobs[layer].FindIndex(j => job.Priority > j.Priority);

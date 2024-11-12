@@ -2,7 +2,7 @@
 namespace Miros.Core;
 
 public interface IScheduler<TJob>
-    where TJob : IJob
+    where TJob : JobBase
 {
     void AddJob(TJob job);
     void RemoveJob(TJob job);

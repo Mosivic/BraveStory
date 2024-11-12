@@ -2,6 +2,6 @@
 
 public interface IJobProvider
 {
-    IJob GetJob(AbsState state);
-    IJob[] GetAllJobs();
+    JobBase GetJob(AbsState state);
+    JobBase[] GetAllJobs();
 }

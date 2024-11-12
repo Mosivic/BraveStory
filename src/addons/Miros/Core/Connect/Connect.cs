@@ -7,10 +7,10 @@ public class Connect<TJobProvider> : IConnect
     where TJobProvider : IJobProvider, new()
 {
     protected TJobProvider _jobProvider = new();
-    protected Dictionary<Type,IScheduler> _schedulers = [];
+    protected Dictionary<Type,IScheduler<JobBase>> _schedulers = [];
 
     
-    public void AddScheduler<TState>(IScheduler scheduler,HashSet<TState> states)
+    public void AddScheduler<TState>(IScheduler<JobBase> scheduler,HashSet<TState> states)
         where TState : AbsState
     {
         _schedulers[typeof(TState)] = scheduler;
@@ -71,25 +71,25 @@ public class Connect<TJobProvider> : IConnect
         return _jobProvider.GetAllJobs();
     }
 
-    public AbsState GetNowState(Type stateType,Tag layer){
+    public JobBase GetNowJob(Type stateType,Tag layer){
         if(!_schedulers.TryGetValue(stateType,out var scheduler)){
             return null;
         }
-        return scheduler.GetNowState(layer);
+        return scheduler.GetNowJob(layer);
     }
 
-    public AbsState GetLastState(Type stateType,Tag layer){
+    public JobBase GetLastJob(Type stateType,Tag layer){
         if(!_schedulers.TryGetValue(stateType,out var scheduler)){
             return null;
         }
-        return scheduler.GetLastState(layer);
+        return scheduler.GetLastJob(layer);
     }
 
-    public double GetCurrentStateTime(Type stateType,Tag layer){
+    public double GetCurrentJobTime(Type stateType,Tag layer){
         if(!_schedulers.TryGetValue(stateType,out var scheduler)){
             return 0;
         }
-        return scheduler.GetCurrentStateTime(layer);
+        return scheduler.GetCurrentJobTime(layer);
     }
 
 }

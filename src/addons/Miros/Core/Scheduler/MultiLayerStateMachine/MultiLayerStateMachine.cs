@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 using Miros.Core;
 
-public class MultiLayerStateMachine:AbsScheduler<NativeJob>, IScheduler<NativeJob>
+public class MultiLayerStateMachine:AbsScheduler<JobBase>, IScheduler<JobBase>
 {
     private readonly Dictionary<Tag, StateLayer> _layers = [];
-    private HashSet<NativeJob> _jobs = [];
+    private HashSet<JobBase> _jobs = [];
     private TagContainer _ownedTags;
     
     
@@ -14,21 +14,21 @@ public class MultiLayerStateMachine:AbsScheduler<NativeJob>, IScheduler<NativeJo
     }
 
 
-    public void AddLayer(Tag layer,NativeJob defaultJob,StateTransitionContainer transitionContainer){
+    public void AddLayer(Tag layer,JobBase defaultJob,StateTransitionContainer transitionContainer){
         _layers[layer] = new StateLayer(layer,defaultJob,transitionContainer);
     }
 
-    public void AddJob(NativeJob job)
+    public void AddJob(JobBase job)
     {
         _jobs.Add(job);
     }
 
-    public void RemoveJob(NativeJob job)
+    public void RemoveJob(JobBase job)
     {
         _jobs.Remove(job);
     }
 
-    public bool HasJobRunning(NativeJob job)
+    public bool HasJobRunning(JobBase job)
     {
         return job.Status == RunningStatus.Running;
     }
@@ -49,7 +49,7 @@ public class MultiLayerStateMachine:AbsScheduler<NativeJob>, IScheduler<NativeJo
         }
     }
 
-    public NativeJob GetNowJob(Tag layer)
+    public JobBase GetNowJob(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetNowJob();
@@ -57,19 +57,21 @@ public class MultiLayerStateMachine:AbsScheduler<NativeJob>, IScheduler<NativeJo
         return null;
     }
 
-    public NativeJob GetLastJob(Tag layer)
+    public JobBase GetLastJob(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
             return _layers[layer].GetLastJob();
         }
         return null;
     }
-
-    public double GetCurrentStateTime(Tag layer)
+    
+    public double GetCurrentJobTime(Tag layer)
     {
         if(_layers.ContainsKey(layer)){
-            return _layers[layer].GetCurrentStateTime();
+            return _layers[layer].GetCurrentJobTime();
         }
         return 0;
     }
+
+
 }

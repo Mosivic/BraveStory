@@ -165,7 +165,7 @@ public abstract class Ability : AbsState
     {
         return Cooldown == null
             ? new CooldownTimer { TimeRemaining = 0, Duration = CooldownTime }
-            : Owner.CheckCooldownFromTags(Cooldown.GrantedTags);
+            : Owner.CheckCooldownFromTags(Cooldown.Components. GrantedTags);
     }
 
 
