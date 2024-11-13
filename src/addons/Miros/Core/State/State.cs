@@ -6,7 +6,7 @@ namespace Miros.Core;
 public class State
 {
     // Core
-    public required string Name { get; init; }
+    public string Name { get; init; }
     public required Tag Sign { get; init; }
     public string Description { get; init; }
     

@@ -26,6 +26,15 @@ public abstract class Persona : AbsPersona, IPersona
     private List<StateJobMap> _stateJobMaps = [];
 
 
+    public AbilityScheduler AbilityScheduler()
+    {
+        if(_schedulers.TryGetValue(typeof(Ability),out var scheduler))
+        {
+            return scheduler as AbilityScheduler;
+        }
+        return null;
+    }
+
     public EffectScheduler GetEffectScheduler()
     {
         if(_schedulers.TryGetValue(typeof(EffectJob),out var scheduler))

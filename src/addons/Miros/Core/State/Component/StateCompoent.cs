@@ -1,7 +1,13 @@
 namespace Miros.Core;
 
-public interface IStateComponent<TJob> where TJob : JobBase
+public class StateComponent<TJob> where TJob : JobBase
 {
-    void Activate(TJob job);
-    void Deactivate(TJob job);
+    public virtual void Activate(TJob job)
+    {
+
+    }
+    public virtual void Deactivate(TJob job)
+    {
+
+    }
 }

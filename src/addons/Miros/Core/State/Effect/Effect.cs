@@ -13,7 +13,6 @@ public abstract class Effect : State
     public  double Duration { get; set; } 
     public double Period { get; set; }
     public float Level { get; set; } = 1;
-    public int StackCount { get;  set; } = 1;
 
     public ExecutionCalculation[] Executions { get; set; }
     public EffectPeriodTicker PeriodTicker { get; }

@@ -40,6 +40,7 @@ public partial class Player : Character
 		var idle = new State
 		{
 			Name = "Idle",
+			Sign = Tags.Idle,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -53,6 +54,7 @@ public partial class Player : Character
 		var jump = new State
 		{
 			Name = "Jump",
+			Sign = Tags.Jump,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -70,6 +72,7 @@ public partial class Player : Character
 		var wall_jump = new State
 		{
 			Name = "WallJump",
+			Sign = Tags.Jump,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -90,6 +93,7 @@ public partial class Player : Character
 		{
 			Layer = Tags.LayerMovement,
 			Name = "Run",
+			Sign = Tags.Run,
 			Components = new()
 			{
 				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
@@ -106,6 +110,7 @@ public partial class Player : Character
 		{
 			Layer = Tags.LayerMovement,
 			Name = "Fall",
+			Sign = Tags.Fall,
 			Components = new()
 			{
 				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
@@ -132,6 +137,7 @@ public partial class Player : Character
 		var doubleJump = new State
 		{
 			Name = "DoubleJump",
+			Sign = Tags.Jump,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -151,6 +157,7 @@ public partial class Player : Character
 		var wallSlide = new State
 		{
 			Name = "WallSliding",
+			Sign = Tags.WallSlide,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -165,6 +172,7 @@ public partial class Player : Character
 		var attack1 = new State
 		{
 			Name = "Attack1",
+			Sign = Tags.Attack,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -177,6 +185,7 @@ public partial class Player : Character
 		var attack11 = new State
 		{
 			Name = "Attack11",
+			Sign = Tags.Attack,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -189,6 +198,7 @@ public partial class Player : Character
 		var attack111 = new State
 		{
 			Name = "Attack111",
+			Sign = Tags.Attack,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -201,6 +211,7 @@ public partial class Player : Character
 		var hit = new State
 		{
 			Name = "Hit",
+			Sign = Tags.Hit,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -213,6 +224,7 @@ public partial class Player : Character
 		var die = new State
 		{
 			Name = "Die",
+			Sign = Tags.Die,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -234,6 +246,7 @@ public partial class Player : Character
 		var sliding = new State
 		{
 			Name = "Sliding",
+			Sign = Tags.Sliding,
 			Layer = Tags.LayerMovement,
 			Components = new()
 			{
@@ -264,7 +277,7 @@ public partial class Player : Character
 		var addHpBuff = new Buff
 		{
 			Name = "AddHp",
-			Tag = Tags.LayerBuff,
+			Sign = Tags.LayerBuff,
 			JobType = typeof(JobBuff),
 			Modifiers =
 			[

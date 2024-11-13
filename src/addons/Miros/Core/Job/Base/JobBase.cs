@@ -38,7 +38,7 @@ public abstract class JobBase(State state) : AbsJob(state), IJob
 
     public virtual void Stack()
     {
-
+   
     }
 
 

@@ -5,6 +5,8 @@ namespace Miros.Core;
 // GE堆栈数据结构
 public class StackingComponent : StateComponent<EffectJob>
 {
+    public int StackCount { get;  set; } = 1;
+    
     public required Tag StackingGroupTag { get; set; } // 堆叠组标签, 用于区分不同的堆栈组,同一组的 Effect 可以共同触发堆叠
     public StackingType StackingType { get; set; } // 堆叠类型
     public int LimitCount { get; set; } // 堆叠上限

@@ -2,13 +2,14 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class AbilityContainer
+public class AbilityScheduler
 {
     private readonly Persona _owner;
     private readonly Dictionary<string, Ability> _abilities = new();
     private readonly List<Ability> _cachedAbilities = new();
 
-    public AbilityContainer(Persona owner)
+    public Dictionary<string, Ability> Abilities => _abilities;
+    public AbilityScheduler(Persona owner)
     {
         _owner = owner;
     }

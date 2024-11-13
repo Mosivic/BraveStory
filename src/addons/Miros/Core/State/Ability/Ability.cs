@@ -105,7 +105,7 @@ public abstract class Ability : State
         if (IsActive) return AbilityActivateResult.FailHasActivated;
         if (!CheckGameplayTagsValidTpActivate()) return AbilityActivateResult.FailTagRequirement;
         if (!CheckCost()) return AbilityActivateResult.FailCost;
-        if (CheckCooldown().TimeRemaining > 0) return AbilityActivateResult.FailCooldown;
+        // if (CheckCooldown().TimeRemaining > 0) return AbilityActivateResult.FailCooldown;
 
         return AbilityActivateResult.Success;
     }
@@ -120,7 +120,7 @@ public abstract class Ability : State
         var notHasAnyTags = !Owner.HasAnyTags(ActivationBlockedTags);
         var notBlockedByOtherAbility = true;
 
-        foreach (var kv in Owner.AbilityContainer.Ability())
+        foreach (var kv in Owner.AbilityScheduler().Abilities)
         {
             var ability = kv.Value;
             if (ability.IsActive)
@@ -161,12 +161,12 @@ public abstract class Ability : State
         return true;
     }
 
-    protected virtual CooldownTimer CheckCooldown()
-    {
-        return Cooldown == null
-            ? new CooldownTimer { TimeRemaining = 0, Duration = CooldownTime }
-            : Owner.CheckCooldownFromTags(Cooldown.GrantedTags);
-    }
+    // protected virtual CooldownTimer CheckCooldown()
+    // {
+    //     return Cooldown == null
+    //         ? new CooldownTimer { TimeRemaining = 0, Duration = CooldownTime }
+    //         : Owner.CheckCooldownFromTags(Cooldown.GrantedTags);
+    // }
 
 
     /// <summary>

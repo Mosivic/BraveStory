@@ -27,11 +27,13 @@ public class EffectJob(Effect effect) : JobBase(effect)
         }
     }
 
+
     public override void Update(double delta)
     {
         base.Update(delta);
         effect.PeriodTicker.Tick(delta);
     }
+
 
     public override void Exit()
     {
@@ -42,17 +44,57 @@ public class EffectJob(Effect effect) : JobBase(effect)
         // TryDeactivateGrantedAbilities();
     }
 
+
+    public override void Stack()
+    {
+        var stackingComponent = GetComponent<StackingComponent>();
+        if (effect.DurationPolicy == DurationPolicy.Instant)
+        {
+            return ;
+        }
+
+        // // Check GE Stacking
+        // if (stackingComponent.StackingType == StackingType.None)
+        // {
+        //     return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
+        // }
+
+        // // 处理GE堆叠
+        // // 基于Target类型GE堆叠
+        // if (stackingComponent.StackingType == StackingType.AggregateByTarget)
+        // {
+        //     GetStackingEffectByData(effect, out var ge);
+        //     // 新添加GE
+        //     if (ge == null)
+        //         return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
+        //     bool stackCountChange = ge.RefreshStack();
+        //     if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
+        //     return ge;
+        // }
+
+        // // 基于Source类型GE堆叠
+        // if (stackingComponent.StackingType == StackingType.AggregateBySource)
+        // {
+        //     GetStackingEffectByDataFrom(effect, source, out var ge);
+        //     if (ge == null)
+        //         return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
+        //     bool stackCountChange = ge.RefreshStack();
+        //     if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
+        //     return ge;
+        // }
+    }
+
+
     public override bool CanEnter()
     {
         return effect.Owner.HasAllTags(effect.ApplicationRequiredTags);
     }
 
+
     public override bool CanExit()
     {
         return effect.Owner.HasAllTags(effect.OngoingRequiredTags) || effect.Owner.HasAnyTags(effect.ApplicationImmunityTags);
     }
-
-
 
 
     // 捕获属性快照
@@ -63,17 +105,6 @@ public class EffectJob(Effect effect) : JobBase(effect)
     }
 
 
-    #region Stack
-    public bool StackEqual(Effect anotherEffect)
-    {
-        if (effect.Stacking.StackingType == StackingType.None) return false;
-        if (anotherEffect.Stacking.StackingType == StackingType.None) return false;
-        if (string.IsNullOrEmpty(effect.Stacking.StackingCodeName)) return false;
-        if (string.IsNullOrEmpty(anotherEffect.Stacking.StackingCodeName)) return false;
-
-        return effect.Stacking.StackingHashCode == anotherEffect.Stacking.StackingHashCode;
-    }
-
     public void RegisterOnStackCountChanged(Action<int, int> callback)
     {
         effect.OnStackCountChanged += callback;
@@ -83,9 +114,6 @@ public class EffectJob(Effect effect) : JobBase(effect)
     {
         effect.OnStackCountChanged -= callback;
     }
-
-    #endregion
-
 
 
     // #region GrantedAbility
