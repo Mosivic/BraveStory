@@ -7,7 +7,7 @@ public class BurningTagHandler : TagEventHandler
 	private float _damageAccumulator = 0f;
 	
 	public BurningTagHandler() 
-		: base(TagManager.Instance.RequestGameplayTag("Status.Burning"))
+		: base(TagManager.Instance.RequestTag("Status.Burning"))
 	{
 	}
 	

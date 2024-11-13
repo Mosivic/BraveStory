@@ -4,6 +4,40 @@ using Miros.Core;
 
 namespace BraveStory
 {
+    public class MagicData
+    {
+        public int magicDamage = 5;
+        public bool elementType = true;
+    }
+
+    public class SwordData
+    {
+        public float attackSpeed = 1.2f;
+        public string weaponType = "melee";
+    }
+
+    public class WeaponData
+    {
+        public int baseDamage = 10;
+        public int durabilityMax = 100;
+    }
+
+    public class ItemData
+    {
+        public float weight = 1.0f;
+        public bool stackable = false;
+    }
+
+    public class BuffData
+    {
+        public int duration = 10;
+    }
+
+    public class DebuffData
+    {
+        public int duration = 5;
+    }
+
     public class BaseData
     {
         public float Gravity = 980.0f;
@@ -45,99 +79,73 @@ namespace BraveStory
         public float WalkSpeed = 80.0f;
     }
 
-    public class MagicData
-    {
-        public int magicDamage = 5;
-        public bool elementType = true;
-    }
-
-    public class SwordData
-    {
-        public float attackSpeed = 1.2f;
-        public string weaponType = "melee";
-    }
-
-    public class WeaponData
-    {
-        public int baseDamage = 10;
-        public int durabilityMax = 100;
-    }
-
-    public class ItemData
-    {
-        public float weight = 1.0f;
-        public bool stackable = false;
-    }
-
-    public class BuffData
-    {
-        public int duration = 10;
-    }
-
-    public class DebuffData
-    {
-        public int duration = 5;
-    }
-
     public static class Tags
     {
         private static TagManager TagManager => TagManager.Instance;
 
-        public static Tag Base { get; } = TagManager.RequestGameplayTag("Character.Base");
+        public static Tag LayerMovement { get; } = TagManager.RequestTag("StateLayer.LayerMovement");
 
-        public static Tag Warrior { get; } = TagManager.RequestGameplayTag("Character.Warrior");
+        public static Tag LayerBuff { get; } = TagManager.RequestTag("StateLayer.LayerBuff");
 
-        public static Tag Player { get; } = TagManager.RequestGameplayTag("Character.Player");
+        public static Tag Magic { get; } = TagManager.RequestTag("Item.Weapon.Sword.Magic");
 
-        public static Tag Enemy { get; } = TagManager.RequestGameplayTag("Character.Enemy");
+        public static Tag Sword { get; } = TagManager.RequestTag("Item.Weapon.Sword");
 
-        public static Tag Magic { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword.Magic");
+        public static Tag Weapon { get; } = TagManager.RequestTag("Item.Weapon");
 
-        public static Tag Sword { get; } = TagManager.RequestGameplayTag("Item.Weapon.Sword");
+        public static Tag Item { get; } = TagManager.RequestTag("Item");
 
-        public static Tag Weapon { get; } = TagManager.RequestGameplayTag("Item.Weapon");
+        public static Tag Buff { get; } = TagManager.RequestTag("Effect.Buff");
 
-        public static Tag Item { get; } = TagManager.RequestGameplayTag("Item");
+        public static Tag Debuff { get; } = TagManager.RequestTag("Effect.Debuff");
 
-        public static Tag Buff { get; } = TagManager.RequestGameplayTag("Effect.Buff");
+        public static Tag Effect { get; } = TagManager.RequestTag("Effect");
 
-        public static Tag Debuff { get; } = TagManager.RequestGameplayTag("Effect.Debuff");
+        public static Tag Character { get; } = TagManager.RequestTag("Character");
 
-        public static Tag Effect { get; } = TagManager.RequestGameplayTag("Effect");
+        public static Tag Idle { get; } = TagManager.RequestTag("State.Action.Idle");
 
-        public static Tag Character { get; } = TagManager.RequestGameplayTag("Character");
+        public static Tag Run { get; } = TagManager.RequestTag("State.Action.Run");
 
-        public static Tag LayerMovement { get; } = TagManager.RequestGameplayTag("StateLayer.LayerMovement");
+        public static Tag Walk { get; } = TagManager.RequestTag("State.Action.Walk");
 
-        public static Tag LayerBuff { get; } = TagManager.RequestGameplayTag("StateLayer.LayerBuff");
+        public static Tag Jump { get; } = TagManager.RequestTag("State.Action.Jump");
 
-        public static Tag Idle { get; } = TagManager.RequestGameplayTag("State.Action.Idle");
+        public static Tag Fall { get; } = TagManager.RequestTag("State.Action.Fall");
 
-        public static Tag Run { get; } = TagManager.RequestGameplayTag("State.Action.Run");
+        public static Tag Attack { get; } = TagManager.RequestTag("State.Action.Attack");
 
-        public static Tag Walk { get; } = TagManager.RequestGameplayTag("State.Action.Walk");
+        public static Tag DoubleJump { get; } = TagManager.RequestTag("State.Action.DoubleJump");
 
-        public static Tag Jump { get; } = TagManager.RequestGameplayTag("State.Action.Jump");
+        public static Tag WallJump { get; } = TagManager.RequestTag("State.Action.WallJump");
 
-        public static Tag Fall { get; } = TagManager.RequestGameplayTag("State.Action.Fall");
+        public static Tag Landing { get; } = TagManager.RequestTag("State.Action.Landing");
 
-        public static Tag Attack { get; } = TagManager.RequestGameplayTag("State.Action.Attack");
+        public static Tag WallSlide { get; } = TagManager.RequestTag("State.Action.WallSlide");
 
-        public static Tag DoubleJump { get; } = TagManager.RequestGameplayTag("State.Action.DoubleJump");
+        public static Tag Hit { get; } = TagManager.RequestTag("State.Action.Hit");
 
-        public static Tag WallJump { get; } = TagManager.RequestGameplayTag("State.Action.WallJump");
+        public static Tag Sliding { get; } = TagManager.RequestTag("State.Action.Sliding");
 
-        public static Tag Landing { get; } = TagManager.RequestGameplayTag("State.Action.Landing");
+        public static Tag Attack1 { get; } = TagManager.RequestTag("State.Action.Attack1");
 
-        public static Tag WallSlide { get; } = TagManager.RequestGameplayTag("State.Action.WallSlide");
+        public static Tag Attack11 { get; } = TagManager.RequestTag("State.Action.Attack11");
 
-        public static Tag Hit { get; } = TagManager.RequestGameplayTag("State.Action.Hit");
+        public static Tag Attack111 { get; } = TagManager.RequestTag("State.Action.Attack111");
 
-        public static Tag Action { get; } = TagManager.RequestGameplayTag("State.Action");
+        public static Tag Action { get; } = TagManager.RequestTag("State.Action");
 
-        public static Tag Die { get; } = TagManager.RequestGameplayTag("State.Status.Die");
+        public static Tag Die { get; } = TagManager.RequestTag("State.Status.Die");
 
-        public static Tag Status { get; } = TagManager.RequestGameplayTag("State.Status");
+        public static Tag Status { get; } = TagManager.RequestTag("State.Status");
+
+        public static Tag Base { get; } = TagManager.RequestTag("Character.Base");
+
+        public static Tag Warrior { get; } = TagManager.RequestTag("Character.Warrior");
+
+        public static Tag Player { get; } = TagManager.RequestTag("Character.Player");
+
+        public static Tag Enemy { get; } = TagManager.RequestTag("Character.Enemy");
 
     }
 }

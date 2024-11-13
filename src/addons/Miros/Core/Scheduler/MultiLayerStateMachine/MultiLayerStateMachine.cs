@@ -7,8 +7,8 @@ public class MultiLayerStateMachine:SchedulerBase<JobBase>
     private readonly Dictionary<Tag, StateLayer> _layers = [];
 
 
-    public void AddLayer(Tag layer,JobBase defaultJob,StateTransitionContainer transitionContainer){
-        _layers[layer] = new StateLayer(layer,defaultJob,transitionContainer);
+    public void AddLayer(Tag layer,Tag defaultJobSign,StateTransitionContainer transitionContainer){
+        _layers[layer] = new StateLayer(layer,defaultJobSign,transitionContainer,_jobs);
     }
 
     public override bool HasJobRunning(JobBase job)

@@ -193,7 +193,7 @@ public partial class GameplayTagTreeView : Tree
     
     private void OnTagAdded(string tagName, TreeItem parentItem)
     {
-        var tag = _tagManager.RequestGameplayTag(tagName);
+        var tag = _tagManager.RequestTag(tagName);
         if (parentItem != null)
         {
             CreateTagTreeItem(tag, parentItem);
@@ -210,7 +210,7 @@ public partial class GameplayTagTreeView : Tree
         
         // 获取要删除的标签路径
         string tagPath = _itemToDelete.GetText(1);
-        var tagToDelete = _tagManager.RequestGameplayTag(tagPath);
+        var tagToDelete = _tagManager.RequestTag(tagPath);
         
         // 递归删除所有子标签
         DeleteTagAndChildren(_itemToDelete);

@@ -20,7 +20,7 @@ public class TagManager
     
     private TagManager() { }
     
-    public Tag RequestGameplayTag(string tagName)
+    public Tag RequestTag(string tagName)
     {
         if (string.IsNullOrEmpty(tagName)) return default;
         
@@ -37,7 +37,7 @@ public class TagManager
         if (parts.Length > 1)
         {
             var parentTagName = string.Join(".", parts.Take(parts.Length - 1));
-            var parentTag = RequestGameplayTag(parentTagName);
+            var parentTag = RequestTag(parentTagName);
             
             if (!_tagHierarchy.ContainsKey(parentTag))
             {
@@ -88,7 +88,7 @@ public class TagManager
         {
             if (i > 0) currentPath += ".";
             currentPath += parts[i];
-            yield return RequestGameplayTag(currentPath);
+            yield return RequestTag(currentPath);
         }
     }
     
@@ -186,7 +186,7 @@ public class TagManager
         
         if (!string.IsNullOrEmpty(oldParentPath))
         {
-            var oldParentTag = RequestGameplayTag(oldParentPath);
+            var oldParentTag = RequestTag(oldParentPath);
             if (_tagHierarchy.TryGetValue(oldParentTag, out var oldParentChildren))
             {
                 oldParentChildren.Remove(oldTag);
@@ -195,7 +195,7 @@ public class TagManager
         
         if (!string.IsNullOrEmpty(newParentPath))
         {
-            var newParentTag = RequestGameplayTag(newParentPath);
+            var newParentTag = RequestTag(newParentPath);
             if (!_tagHierarchy.ContainsKey(newParentTag))
             {
                 _tagHierarchy[newParentTag] = new HashSet<Tag>();
@@ -235,6 +235,6 @@ public class TagManager
         string parentPath = GetParentPath(tagPath);
         
         return string.IsNullOrEmpty(parentPath) ? 
-            default : RequestGameplayTag(parentPath);
+            default : RequestTag(parentPath);
     }
 } 

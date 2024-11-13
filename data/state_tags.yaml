@@ -13,6 +13,10 @@ tags:
       - name: Landing
       - name: WallSlide
       - name: Hit
+      - name: Sliding
+      - name: Attack1
+      - name: Attack11
+      - name: Attack111
   - name: Status
     children:
       - name: Die

@@ -6,7 +6,7 @@ namespace BraveStory;
 public partial class StateInfoDisplay : Node2D
 {
     private Label _label;
-    private MultiLayerStateMachineConnect _connect;
+    // private MultiLayerStateMachineConnect _connect;
     private Tag _layerTag;
     private Node2D _target;
 
@@ -32,25 +32,25 @@ public partial class StateInfoDisplay : Node2D
         }
     }
 
-    public void Setup(MultiLayerStateMachineConnect connect, Tag layerTag)
-    {
-        _connect = connect;
-        _layerTag = layerTag;
-    }
+    // public void Setup(MultiLayerStateMachineConnect connect, Tag layerTag)
+    // {
+    //     _connect = connect;
+    //     _layerTag = layerTag;
+    // }
 
-    public override void _Process(double delta)
-    {
-        if (_target != null)
-        {
-            GlobalPosition = _target.GlobalPosition + Offset;
-        }
+    // public override void _Process(double delta)
+    // {
+    //     if (_target != null)
+    //     {
+    //         GlobalPosition = _target.GlobalPosition + Offset;
+    //     }
 
-        if (_connect == null) return;
+    //     if (_connect == null) return;
 
-        var currentState = _connect.GetNowState(_layerTag);
-        if (currentState != null)
-        {
-            _label.Text = $"{currentState.Name} - {currentState.Status}";
-        }
-    }
+    //     var currentState = _connect.GetNowState(_layerTag);
+    //     if (currentState != null)
+    //     {
+    //         _label.Text = $"{currentState.Name} - {currentState.Status}";
+    //     }
+    // }
 } 

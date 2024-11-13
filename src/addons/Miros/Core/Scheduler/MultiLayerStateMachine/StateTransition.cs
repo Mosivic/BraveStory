@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Miros.Core;
 public class StateTransition
 {
-    public JobBase ToJob { get; }
+    public Tag ToJobSign { get; }
     public Func<bool> Condition { get; }
     public StateTransitionMode Mode { get; }
-    public StateTransition(JobBase toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
+    public StateTransition(Tag toJobSign,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
-        ToJob = toJob;
+        ToJobSign = toJobSign;
         Condition = condition;
         Mode = mode;
     }

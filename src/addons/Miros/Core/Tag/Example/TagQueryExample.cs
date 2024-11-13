@@ -7,10 +7,10 @@ public class GameplayTagQueryExample
         var tagManager = TagManager.Instance;
         
         // 创建一些标签
-        var combatTag = tagManager.RequestGameplayTag("Combat");
-        var meleeTag = tagManager.RequestGameplayTag("Combat.Melee");
-        var swordTag = tagManager.RequestGameplayTag("Combat.Melee.Sword");
-        var stunTag = tagManager.RequestGameplayTag("Status.Stun");
+        var combatTag = tagManager.RequestTag("Combat");
+        var meleeTag = tagManager.RequestTag("Combat.Melee");
+        var swordTag = tagManager.RequestTag("Combat.Melee.Sword");
+        var stunTag = tagManager.RequestTag("Status.Stun");
         
         // 创建一个标签容器
         var container = new TagContainer([]);

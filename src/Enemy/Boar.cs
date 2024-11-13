@@ -27,129 +27,91 @@ public partial class Boar : Character
 		var ownedTags = new TagContainer([Tags.Enemy]);
 
 		// States
-		var idle = new State
-		{
-			Name = "Idle",
-			Sign = Tags.Idle,
-			Priority = 5,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("idle") } }
-			}
-		};
+		var idle = new State("Idle", Tags.Idle)
+		.OnEnter(s => PlayAnimation("idle"));
 
-		var walk = new State
-		{
-			Name = "Walk",
-			Sign = Tags.Walk,
-			Priority = 10,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("walk"),
-					PhysicsUpdateFunc = (state, d) => Patrol(d) } }
-			}
-		};
 
-		var run = new State
-		{
-			Name = "Run",
-			Sign = Tags.Run,
-			Priority = 15,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("run"),
-					PhysicsUpdateFunc = (state, d) => Chase(d) } }
-			}
-		};
+		var walk = new State("Walk", Tags.Walk)
+		.OnEnter(s => PlayAnimation("walk"))
+		.OnPhysicsUpdate((s, d) => Patrol(d));
 
-		var hit = new State
+
+
+		var run = new State("Run", Tags.Run)
+		.OnEnter(s => PlayAnimation("run"))
+		.OnPhysicsUpdate((s, d) => Chase(d));
+
+
+
+		var hit = new State("Hit", Tags.Hit)
+		.OnEnter(s =>
 		{
-			Name = "Hit",
-			Sign = Tags.Hit,
-			Priority = 20,
-			Components = new()
+			PlayAnimation("hit");
+			// 方式1：根据玩家位置计算击退方向
+			var playerPos = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
+			if (playerPos.HasValue)
 			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s =>
-			{
-				PlayAnimation("hit");
-				// 方式1：根据玩家位置计算击退方向
-				var playerPos = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
-				if (playerPos.HasValue)
-				{
 					var direction = (GlobalPosition - playerPos.Value).Normalized();
 					_knockbackVelocity = direction * 300f; // 击退力度
 						}
-					},
-					PhysicsUpdateFunc = (s, d) =>
-					{
-						// 应用击退力
-						var velocity = Velocity;
-						velocity += _knockbackVelocity;
-						velocity.Y += (float)d * _data.Gravity;
-						// 逐渐减弱击退效果
-						_knockbackVelocity *= 0.8f;
-						Velocity = velocity;
-						MoveAndSlide();
-					},
-					ExitFunc = s =>
-					{
-						_hasHit = false;
-						_knockbackVelocity = Vector2.Zero;
-					}
-				}
-			}
-		};
-
-		var die = new State
+		})
+		.OnPhysicsUpdate((s, d) =>
 		{
-			Name = "Die",
-			Sign = Tags.Die,
-			Priority = 20,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-				{ EnterFunc = s => PlayAnimation("die"),
-					PhysicsUpdateFunc = (s, d) =>
-					{
-						if (IsAnimationFinished()) QueueFree();
-					} }
-			}}
-		};
+			// 应用击退力
+			var velocity = Velocity;
+			velocity += _knockbackVelocity;
+			velocity.Y += (float)d * _data.Gravity;
+			// 逐渐减弱击退效果
+			_knockbackVelocity *= 0.8f;
+			Velocity = velocity;
+			MoveAndSlide();
+		})
+		.OnExit((s) =>
+		{
+			_hasHit = false;
+			_knockbackVelocity = Vector2.Zero;
+		});
+
+		var die = new State("Die", Tags.Die)
+		.OnEnter(s => PlayAnimation("die"))
+		.OnPhysicsUpdate((s, d) =>
+		{
+			// 应用击退力
+			Velocity = Velocity * 0.9f;
+			MoveAndSlide();
+		})
+		.OnExit((s) => QueueFree());
 
 		// Transitions
 		var transitions = new StateTransitionContainer();
 
 		// Idle
-		transitions.AddTransition(idle, walk, () => !_playerChecker.IsColliding());
-		transitions.AddTransition(idle, run, () => _playerChecker.IsColliding());
-
+		transitions.AddTransition(Tags.Idle, Tags.Walk, () => !_playerChecker.IsColliding());
+		transitions.AddTransition(Tags.Idle, Tags.Run, () => _playerChecker.IsColliding());
 
 		// Walk 
-		transitions.AddTransition(walk, idle, () =>
+		transitions.AddTransition(Tags.Walk, Tags.Idle, () =>
 			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
 			(!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
-		transitions.AddTransition(walk, run, () => _playerChecker.IsColliding());
+		transitions.AddTransition(Tags.Walk, Tags.Run, () => _playerChecker.IsColliding());
 
 		// Run 
-		transitions.AddTransition(run, idle, () => !_playerChecker.IsColliding());
+		transitions.AddTransition(Tags.Run, Tags.Idle, () => !_playerChecker.IsColliding());
 
 		// Hit 
-		transitions.AddAnyTransition(hit, () => _hasHit);
-		transitions.AddTransition(hit, idle, IsAnimationFinished);
+		transitions.AddAnyTransition(Tags.Hit, () => _hasHit);
+		transitions.AddTransition(Tags.Hit, Tags.Idle, IsAnimationFinished);
 
 		// Die
-		transitions.AddAnyTransition(die, () => _hp <= 0);
+		transitions.AddAnyTransition(Tags.Die, () => _hp <= 0);
 
-		// Register states and transitions
-		_connect = new MultiLayerStateMachineConnect([idle, walk, run, hit, die], ownedTags);
-		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
+		var stateMachine = new MultiLayerStateMachine();
+		stateMachine.AddLayer(Tags.LayerMovement, Tags.Idle, transitions);
+		_persona.AddScheduler(stateMachine, [idle, walk, run, hit, die]);
+
 
 		// State Info Display
-		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
+		// GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
 	}
 
 

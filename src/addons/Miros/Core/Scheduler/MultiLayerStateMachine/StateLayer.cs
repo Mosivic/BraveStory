@@ -13,19 +13,24 @@ public class StateLayer
 	private JobBase _lastJob;
 	private JobBase _delayJob = null;
 	private readonly StateTransitionContainer _transitionContainer;
-
-
+	private readonly Dictionary<Tag,JobBase> _jobs;
 	private double _currentStateTime;
 	
-	public StateLayer(Tag layerTag,JobBase defaultJob,
-		StateTransitionContainer transitionRuleContainer)
+	public StateLayer(Tag layerTag,Tag defaultJobSign,
+		StateTransitionContainer transitionRuleContainer,Dictionary<Tag,JobBase> jobs)
 	{
 		Layer = layerTag;
-		_defaultJob = defaultJob;
-		_currentJob = defaultJob;
-		_lastJob = defaultJob;
+		_jobs = jobs;
+		_defaultJob = GetJobBySign(defaultJobSign);
+		_currentJob = _defaultJob;
+		_lastJob = _defaultJob;
 		_delayJob = null;
 		_transitionContainer = transitionRuleContainer;
+	}
+	
+	private JobBase GetJobBySign(Tag jobSign)
+	{
+		return _jobs.GetValueOrDefault(jobSign) ?? _defaultJob;
 	}
 
 	public void Update(double delta)
@@ -56,16 +61,16 @@ public class StateLayer
 			return;
 		}
 
-		var transitions = _transitionContainer.GetPossibleTransition(_currentJob);
+		var transitions = _transitionContainer.GetPossibleTransition(_currentJob.Sign);
 
 		// 使用LINQ获取优先级最高且可进入的状态
 		var nextTransition = transitions
-			.OrderByDescending(t => t.ToJob.Priority)
+			.OrderByDescending(t => GetJobBySign(t.ToJobSign).Priority)
 			.Where(t => t.Mode switch
 			{
-				StateTransitionMode.Normal => t.CanTransition() && _currentJob.CanExit() && t.ToJob.CanEnter(),
-				StateTransitionMode.Force => t.CanTransition() && t.ToJob.CanEnter(),
-				StateTransitionMode.DelayFront => t.CanTransition() && t.ToJob.CanEnter(),
+				StateTransitionMode.Normal => t.CanTransition() && _currentJob.CanExit() && GetJobBySign(t.ToJobSign).CanEnter(),
+				StateTransitionMode.Force => t.CanTransition() && GetJobBySign(t.ToJobSign).CanEnter(),
+				StateTransitionMode.DelayFront => t.CanTransition() && GetJobBySign(t.ToJobSign).CanEnter(),
 				_ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
 			})
 			.FirstOrDefault();
@@ -74,17 +79,17 @@ public class StateLayer
 		
 		if(nextTransition.Mode == StateTransitionMode.DelayFront)
 		{
-			_delayJob = nextTransition.ToJob;
+			_delayJob = GetJobBySign(nextTransition.ToJobSign);
 
 			if(_currentJob.CanExit())
 			{
-				TransformState(nextTransition.ToJob);
+				TransformState(_delayJob);
 				_delayJob = null;
 			}
 		}
 		else
 		{
-			TransformState(nextTransition.ToJob);
+			TransformState(GetJobBySign(nextTransition.ToJobSign));
 		}
 	}
 
@@ -95,7 +100,7 @@ public class StateLayer
 		// {
 		//     nextJob.Stack(nextState.Source);
 		// }
-		
+
 		_currentJob.Exit();
 		nextJob.Enter();
 		

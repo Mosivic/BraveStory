@@ -6,18 +6,18 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
     where TJob : JobBase
 {
     protected Persona _owner;
-    protected List<TJob> _jobs = [];
+    protected Dictionary<Tag,TJob> _jobs = [];
 
     public virtual void AddJob(TJob job)
     {
-        _jobs.Add(job);
+        _jobs[job.Sign] = job;
     }
 
     public virtual void RemoveJob(TJob job)
     {
         if (job.IsActive)
             job.Exit();
-        _jobs.Remove(job);
+        _jobs.Remove(job.Sign);
     }
 
     public virtual double GetCurrentJobTime(Tag layer)
@@ -53,6 +53,6 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
 
     public virtual TJob[] GetAllJobs()
     {
-        return [.. _jobs];
+        return [.. _jobs.Values];
     }
 }

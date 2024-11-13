@@ -8,6 +8,7 @@ namespace Miros.Core;
 
 struct StateJobMap
 {
+    public Tag Sign;
     public State State;
     public JobBase Job;
     public SchedulerBase<JobBase> Scheduler;
@@ -58,7 +59,7 @@ public class Persona : AbsPersona, IPersona
         {
             var job = _jobProvider.GetJob(state);
             scheduler.AddJob(job);
-            _stateJobMaps.Add(new StateJobMap { State = state, Job = job, Scheduler = scheduler });
+            _stateJobMaps.Add(new StateJobMap { Sign = state.Sign, State = state, Job = job, Scheduler = scheduler });
         }
     }
 
@@ -76,7 +77,7 @@ public class Persona : AbsPersona, IPersona
         }
         var job = _jobProvider.GetJob(state);
         scheduler.AddJob(job);
-        _stateJobMaps.Add(new StateJobMap { State = state, Job = job, Scheduler = scheduler });
+        _stateJobMaps.Add(new StateJobMap { Sign = state.Sign, State = state, Job = job, Scheduler = scheduler });
     }
 
 

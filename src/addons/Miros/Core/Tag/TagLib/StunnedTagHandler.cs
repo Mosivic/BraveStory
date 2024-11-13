@@ -4,7 +4,7 @@ namespace Miros.Core;
 public class StunnedTagHandler : TagEventHandler
 {
     public StunnedTagHandler() 
-        : base(TagManager.Instance.RequestGameplayTag("Status.Stunned"))
+        : base(TagManager.Instance.RequestTag("Status.Stunned"))
     {
     }
     

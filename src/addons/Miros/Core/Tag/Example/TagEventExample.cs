@@ -32,7 +32,7 @@ public partial class TagEventExample : Node
     // 测试方法
     public void TestStun()
     {
-        var stunnedTag = TagManager.Instance.RequestGameplayTag("Status.Stunned");
+        var stunnedTag = TagManager.Instance.RequestTag("Status.Stunned");
         _tags.AddTag(stunnedTag);
         
         // 3秒后解除眩晕
@@ -41,7 +41,7 @@ public partial class TagEventExample : Node
     
     private void RemoveStun()
     {
-        var stunnedTag = TagManager.Instance.RequestGameplayTag("Status.Stunned");
+        var stunnedTag = TagManager.Instance.RequestTag("Status.Stunned");
         _tags.RemoveTag(stunnedTag);
     }
 }

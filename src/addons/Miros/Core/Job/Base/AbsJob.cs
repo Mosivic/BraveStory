@@ -11,7 +11,6 @@ public abstract class AbsJob(State state)
     public string Description => state.Description;
     public Tag Sign => state.Sign;
     public int Priority => state.Priority;
-    public Tag Layer => state.Layer;
     public bool IsActive => state.IsActive;
 
     public event Action<State> OnEntered;

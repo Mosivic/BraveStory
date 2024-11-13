@@ -6,11 +6,11 @@ public class GameplayTagFilterExample
         var tagManager = TagManager.Instance;
         
         // 创建一些测试标签
-        var weaponTag = tagManager.RequestGameplayTag("Item.Weapon");
-        var meleeTag = tagManager.RequestGameplayTag("Item.Weapon.Melee");
-        var swordTag = tagManager.RequestGameplayTag("Item.Weapon.Melee.Sword");
-        var brokenTag = tagManager.RequestGameplayTag("Status.Broken");
-        var rareTag = tagManager.RequestGameplayTag("Quality.Rare");
+        var weaponTag = tagManager.RequestTag("Item.Weapon");
+        var meleeTag = tagManager.RequestTag("Item.Weapon.Melee");
+        var swordTag = tagManager.RequestTag("Item.Weapon.Melee.Sword");
+        var brokenTag = tagManager.RequestTag("Status.Broken");
+        var rareTag = tagManager.RequestTag("Quality.Rare");
         
         // 创建一个测试物品
         var itemTags = new TagContainer([]);

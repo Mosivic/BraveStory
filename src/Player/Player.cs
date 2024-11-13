@@ -95,15 +95,15 @@ public partial class Player : Character
 		.OnEnter(s => PlayAnimation("wall_sliding"))
 		.OnPhysicsUpdate((s, delta) => WallSlide(delta));
 
-		var attack1 = new State("Attack1", Tags.Attack)
+		var attack1 = new State("Attack1", Tags.Attack1)
 		.OnEnter(s => PlayAnimation("attack1"))
 		.OnExitCondition(s => IsAnimationFinished());
 
-		var attack11 = new State("Attack11", Tags.Attack)
+		var attack11 = new State("Attack11", Tags.Attack11)
 		.OnEnter(s => PlayAnimation("attack11"))
 		.OnExitCondition(s => IsAnimationFinished());
 
-		var attack111 = new State("Attack111", Tags.Attack)
+		var attack111 = new State("Attack111", Tags.Attack111)
 		.OnEnter(s => PlayAnimation("attack111"))
 		.OnExitCondition(s => IsAnimationFinished());
 
@@ -122,7 +122,7 @@ public partial class Player : Character
 
 
 		// Sliding
-		var sliding = new State("Sliding", Tags.WallSlide)
+		var sliding = new State("Sliding", Tags.Sliding)
 		.OnEnter(s => {
 			PlayAnimation("sliding_start");
 			_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
@@ -166,86 +166,80 @@ public partial class Player : Character
 		// 	Priority = 0
 		// };
 
-		_persona = new Persona();
-		_persona.AddScheduler(new MultiLayerStateMachine(), 
-		[idle, run, jump, doubleJump, fall, wallSlide, wall_jump, attack1, attack11, attack111, hit, die, sliding]);
 
 		// 转换规则
 		var transitions = new StateTransitionContainer();
 
 		transitions
-			.AddTransitionGroup(idle, [
-				new(run, KeyDownMove),
-				new(fall, () => !IsOnFloor()),
-				new(jump, KeyDownJump),
-				new(attack1, KeyDownAttack),
-				new(sliding, KeyDownSliding)
+			.AddTransitionGroup(Tags.Idle, [
+				new(Tags.Run, KeyDownMove),
+				new(Tags.Fall, () => !IsOnFloor()),
+				new(Tags.Jump, KeyDownJump),
+				new(Tags.Attack, KeyDownAttack),
+				new(Tags.WallSlide, KeyDownSliding)
 			])
-			.AddTransitionGroup(attack1, [
-				new(idle),
-				new(attack11, () => attack1.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
+			.AddTransitionGroup(Tags.Attack1, [
+				new(Tags.Idle),
+				new(Tags.Attack11, () => attack1.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
 			])
-			.AddTransitionGroup(attack11, [
-				new(idle),
-				new(attack111, () => attack11.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
+			.AddTransitionGroup(Tags.Attack11, [
+				new(Tags.Idle),
+				new(Tags.Attack111, () => attack11.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
 			])
-			.AddTransitionGroup(attack111, [
-				new(idle)
+			.AddTransitionGroup(Tags.Attack111, [
+				new(Tags.Idle)
 			])
-			.AddTransitionGroup(run, [
-				new(idle, () => !KeyDownMove()),
-				new(jump, KeyDownJump),
-				new(attack1, KeyDownAttack),
-				new(sliding, KeyDownSliding)
+			.AddTransitionGroup(Tags.Run, [
+				new(Tags.Idle, () => !KeyDownMove()),
+				new(Tags.Jump, KeyDownJump),
+				new(Tags.Attack, KeyDownAttack),
+				new(Tags.WallSlide, KeyDownSliding)
 			])
-			.AddTransitionGroup(jump, [
-				new(fall)
+			.AddTransitionGroup(Tags.Jump, [
+				new(Tags.Fall)
 			])
-			.AddTransitionGroup(fall, [
-				new(idle, IsOnFloor),
-				new(wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove()),
-				new(doubleJump, () => KeyDownJump() && (_jumpCount < _maxJumpCount))
+			.AddTransitionGroup(Tags.Fall, [
+				new(Tags.Idle, IsOnFloor),
+				new(Tags.WallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove()),
+				new(Tags.DoubleJump, () => KeyDownJump() && (_jumpCount < _maxJumpCount))
 			])
-			.AddTransitionGroup(doubleJump, [
-				new(fall)
+			.AddTransitionGroup(Tags.DoubleJump, [
+				new(Tags.Fall)
 			])
-			.AddTransitionGroup(wallSlide, [
-				new(idle, IsOnFloor),
-				new(fall, () => !_footChecker.IsColliding()),
-				new(wall_jump, KeyDownJump)
+			.AddTransitionGroup(Tags.WallSlide, [
+				new(Tags.Idle, IsOnFloor),
+				new(Tags.Fall, () => !_footChecker.IsColliding()),
+				new(Tags.WallJump, KeyDownJump)
 			])
-			.AddTransitionGroup(wall_jump, [
-				new(fall)
+			.AddTransitionGroup(Tags.WallJump, [
+				new(Tags.Fall)
 			])
-			.AddTransitionGroup(hit, [
-				new(idle, IsAnimationFinished)
+			.AddTransitionGroup(Tags.Hit, [
+				new(Tags.Idle, IsAnimationFinished)
 			])
-			.AddTransitionGroup(sliding, [
-				new(idle)
+			.AddTransitionGroup(Tags.Sliding, [
+				new(Tags.Idle)
 			]);
 
 		// Special transitions that don't fit the group pattern
-		transitions.AddAnyTransition(hit, () => _hasHit, StateTransitionMode.Force);
-		transitions.AddAnyTransition(die, () => _hp <= 0);
+		transitions.AddAnyTransition(Tags.Hit, () => _hasHit, StateTransitionMode.Force);
+		transitions.AddAnyTransition(Tags.Die, () => _hp <= 0);
 
-		// 注册状态和转换
-		_connect = new MultiLayerStateMachineConnect([
-			idle, run, jump, doubleJump, fall, wallSlide,
-			wall_jump,attack1,attack11,attack111,hit,die,
-			sliding], ownedTags);
 
-		_connect.AddLayer(Tags.LayerMovement, idle, transitions);
+		var stateMachine = new MultiLayerStateMachine();
+		stateMachine.AddLayer(Tags.LayerMovement, Tags.Idle, transitions);
+		_persona.AddScheduler(stateMachine, [idle, run, jump, doubleJump, fall, wallSlide, wall_jump, attack1, attack11, attack111, hit, die, sliding]);
 
 		// Canvas Layer
 		var canvasLayer = new CanvasLayer();
 		AddChild(canvasLayer);
 
 		// Debug Window
-		var debugWindow = new TagDebugWindow(ownedTags.GetTags());
-		canvasLayer.AddChild(debugWindow);
+		// var debugWindow = new TagDebugWindow(ownedTags.GetTags());
+		// canvasLayer.AddChild(debugWindow);
 
 		// State Info Display
-		GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
+		// GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
 	}
 
 	public override void _Process(double delta)

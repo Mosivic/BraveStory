@@ -23,7 +23,7 @@ public class TagEventContainerExample
         GD.Print($"Tag added: {e.Tag}");
         
         // 示例：当添加眩晕标签时应用效果
-        if (e.Tag == _tagManager.RequestGameplayTag("Status.Stun"))
+        if (e.Tag == _tagManager.RequestTag("Status.Stun"))
         {
             ApplyStunEffect();
         }
@@ -34,7 +34,7 @@ public class TagEventContainerExample
         GD.Print($"Tag removed: {e.Tag}");
         
         // 示例：当移除眩晕标签时移除效果
-        if (e.Tag == _tagManager.RequestGameplayTag("Status.Stun"))
+        if (e.Tag == _tagManager.RequestTag("Status.Stun"))
         {
             RemoveStunEffect();
         }

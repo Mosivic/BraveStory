@@ -12,7 +12,7 @@ public partial class Character : CharacterBody2D
     protected HurtBox _hurtBox;
     protected bool _hasHit = false;
 
-	protected Persona _persona;
+	protected Persona _persona = new();
 
 
     public override void _Ready()
