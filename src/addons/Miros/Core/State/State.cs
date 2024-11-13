@@ -7,6 +7,7 @@ public class State
 {
     // Core
     public required string Name { get; init; }
+    public required Tag Sign { get; init; }
     public string Description { get; init; }
     
     public Type JobType { get; init; } = typeof(JobBase);
@@ -18,6 +19,6 @@ public class State
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;
 
-    public Dictionary<Type, IStateComponent<JobBase>> Components { get; set; } = new();
+    public Dictionary<Type, StateComponent<JobBase>> Components { get; set; } = new();
 
 }

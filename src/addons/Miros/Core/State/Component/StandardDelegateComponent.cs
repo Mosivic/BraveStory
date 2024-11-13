@@ -2,7 +2,7 @@ using System;
 
 namespace Miros.Core;
 
-public class StandardDelegateComponent: IStateComponent<JobBase>
+public class StandardDelegateComponent: StateComponent<JobBase>
 {
     public Func<State, bool> EnterCondition { get; init; }
     public Func<State, bool> ExitCondition { get; init; }
@@ -19,12 +19,12 @@ public class StandardDelegateComponent: IStateComponent<JobBase>
     public Action<State, double> UpdateFunc { get; init; }
     public Action<State, double> PhysicsUpdateFunc { get; init; }
 
-    public void Activate(JobBase job)
+    public override void Activate(JobBase job)
     {
         RegisterEvents(job);
     }
 
-    public void Deactivate(JobBase job)
+    public override void Deactivate(JobBase job)
     {
         UnregisterEvents(job);
     }

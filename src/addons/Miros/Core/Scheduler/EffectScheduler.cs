@@ -29,21 +29,39 @@ public class EffectScheduler : SchedulerBase<EffectJob>
         
     }
 
+    // 如果存在StackingComponent组件，则检查是否可以堆叠
+    // 如果可以堆叠,检查是否存在相同StackingGroupTag的Job，如果存在，则调用其Stack方法
+    // 如果当前Jobs不存在传入的Job，则将传入的Job添加到Jobs中，并调用其Activate和Enter方法
     public override void AddJob(EffectJob job)
     {
         if(!job.CanEnter()) return;
 
-        if(job.CanStack && job.IsActive)
+        var stackingComponent = job.GetComponent<StackingComponent>();
+        var hasStackingComponent = stackingComponent != null;
+        var hasSameJob = false;
+
+        foreach(var _job in _jobs)
         {
-            job.Stacking();
-        }else
+            if(JobEqual(_job, job)) 
+                hasSameJob = true;
+
+            if(hasStackingComponent && _job.CanStack(stackingComponent.StackingGroupTag))
+                _job.Stack();
+        }
+
+        if(!hasSameJob)
         {
             base.AddJob(job);
             job.Activate();
             job.Enter();
         }
-        
     }
+
+    public bool JobEqual(EffectJob job1, EffectJob job2)
+    {
+        return job1.Sign == job2.Sign;
+    }
+
 
     public Effect AddEffect(Persona source, Effect effect, bool overwriteEffectLevel = false, int effectLevel = 0)
     {

@@ -4,6 +4,7 @@ public interface IJob
 {
     void Enter();
     void Exit();
+    void Stack();
     void Deactivate(); // 停用
     void Activate(); // 启用
     bool CanEnter();

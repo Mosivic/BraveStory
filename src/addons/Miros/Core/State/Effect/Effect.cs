@@ -26,8 +26,6 @@ public abstract class Effect : State
     public Dictionary<string, float> SnapshotTargetAttributes { get;  set; }
 
 
-    //Stacking
-    public EffectStacking Stacking { get; private set; }
 
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;

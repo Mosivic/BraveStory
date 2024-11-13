@@ -2,19 +2,19 @@ using System;
 
 namespace Miros.Core;
 
-public readonly struct EffectDelegateComponent : IStateComponent<EffectJob>
+public class EffectDelegateComponent : StateComponent<EffectJob>
 {
     public Action<EffectJob> OnDurationOveredFunc { get; init; }
     public Action<EffectJob> OnPeriodOveredFunc { get; init; }
     public Action<EffectJob> OnStackedFunc { get; init; }
     public Action<EffectJob> OnStackOverflowedFunc { get; init; }
 
-    public void Activate(EffectJob job)
+    public override void Activate(EffectJob job)
     {
         RegisterEvents(job);
     }
 
-    public void Deactivate(EffectJob job)
+    public override void Deactivate(EffectJob job)
     {
         UnregisterEvents(job);
     }

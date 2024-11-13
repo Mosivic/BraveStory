@@ -10,7 +10,6 @@ public class EffectJob(Effect effect) : JobBase(effect)
     public event Action<EffectJob> OnDurationOvered;
     public event Action<EffectJob> OnPeriodOvered;
 
-    public bool CanStack => effect.Stacking.StackingType != StackingType.None;
     
     public override void Enter()
     {
@@ -54,10 +53,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
     }
 
 
-    public void Stacking()
-    {
-        
-    }
+
 
     // 捕获属性快照
     private void CaptureAttributesSnapshot()
@@ -87,6 +83,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
     {
         effect.OnStackCountChanged -= callback;
     }
+
     #endregion
 
 
@@ -126,6 +123,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
     //     }
     // }
     // #endregion
+
 
 
 }

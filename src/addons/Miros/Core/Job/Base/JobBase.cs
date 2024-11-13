@@ -1,13 +1,11 @@
-﻿namespace Miros.Core;
+﻿using System;
 
-public abstract class JobBase : AbsJob, IJob
+namespace Miros.Core;
+
+public abstract class JobBase(State state) : AbsJob(state), IJob
 {
-    protected JobBase(State state) : base(state)
-    {
-        this.state = state;
-    }
 
-    private readonly State state;
+    private readonly State state = state;
     
     public virtual void Enter() 
     {
@@ -38,6 +36,12 @@ public abstract class JobBase : AbsJob, IJob
     }
 
 
+    public virtual void Stack()
+    {
+
+    }
+
+
     public virtual void Deactivate()
     {
         state.Status = RunningStatus.NoRun;
@@ -64,6 +68,34 @@ public abstract class JobBase : AbsJob, IJob
     }
     
 
+
+    public T GetComponent<T>() where T : class
+    {
+        return state.Components.TryGetValue(typeof(T), out var component) ? component as T : null;
+    }
+
+
+
+   /// <summary>
+   /// 是否可以堆叠
+   /// 仅当当前Job处于激活状态时，同时存在组件StackingComponent并且组件的StackingGroupTag与传入destackingGroupTag相等时，返回true
+   /// </summary>
+   /// <param name="stackingGroupTag"></param>
+   /// <returns></returns>
+    public virtual bool CanStack(Tag stackingGroupTag)
+    {
+        var canStack = false;
+        if(state.IsActive)
+        {
+            var stackingComponent = GetComponent<StackingComponent>();
+            if(stackingComponent != null)
+            {
+                canStack = stackingComponent.StackingGroupTag == stackingGroupTag;
+            }
+        }
+        return canStack;
+    }
+
     public virtual void Update(double delta)
     {
         if (state.Status != RunningStatus.Running) return;
@@ -89,4 +121,5 @@ public abstract class JobBase : AbsJob, IJob
         state.Status = RunningStatus.Failed;
         OnFail();
     }
+
 }
