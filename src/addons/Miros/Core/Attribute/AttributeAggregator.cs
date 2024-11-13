@@ -8,21 +8,21 @@ public class AttributeAggregator(AttributeBase attribute,Persona owner)
 	private readonly AttributeBase _processedAttribute = attribute;
 	private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
 
-	public void OnEnable()
-	{
-		// 注册基础值变化事件
-		_processedAttribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
-		// 注册游戏效果容器变化事件
-		owner.GetEffectScheduler()?.RegisterOnEffectsIsDirty(RefreshModifierCache);
-	}
+	// public void OnEnable()
+	// {
+	// 	// 注册基础值变化事件
+	// 	_processedAttribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
+	// 	// 注册游戏效果容器变化事件
+	// 	owner.GetEffectScheduler()?.RegisterOnEffectsIsDirty(RefreshModifierCache);
+	// }
 	
-	public void OnDisable()
-	{
-		// 注销基础值变化事件
-		_processedAttribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
-		// 注销游戏效果容器变化事件
-		owner.GetEffectScheduler()?.UnregisterOnEffectsIsDirty(RefreshModifierCache);
-	}
+	// public void OnDisable()
+	// {
+	// 	// 注销基础值变化事件
+	// 	_processedAttribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
+	// 	// 注销游戏效果容器变化事件
+	// 	owner.GetEffectScheduler()?.UnregisterOnEffectsIsDirty(RefreshModifierCache);
+	// }
 
 	/// <summary>
 	/// 刷新修改器缓存

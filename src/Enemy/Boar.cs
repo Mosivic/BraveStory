@@ -27,38 +27,53 @@ public partial class Boar : Character
 		var ownedTags = new TagContainer([Tags.Enemy]);
 
 		// States
-		var idle = new HostState<Boar>(this)
+		var idle = new State
 		{
 			Name = "Idle",
-			Tag = Tags.Idle,
+			Sign = Tags.Idle,
 			Priority = 5,
-			EnterFunc = s => PlayAnimation("idle")
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("idle") } }
+			}
 		};
 
-		var walk = new HostState<Boar>(this)
+		var walk = new State
 		{
 			Name = "Walk",
-			Tag = Tags.Walk,
+			Sign = Tags.Walk,
 			Priority = 10,
-			EnterFunc = s => PlayAnimation("walk"),
-			PhysicsUpdateFunc = (state, d) => Patrol(d)
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("walk"),
+					PhysicsUpdateFunc = (state, d) => Patrol(d) } }
+			}
 		};
 
-		var run = new HostState<Boar>(this)
+		var run = new State
 		{
 			Name = "Run",
-			Tag = Tags.Run,
+			Sign = Tags.Run,
 			Priority = 15,
-			EnterFunc = s => PlayAnimation("run"),
-			PhysicsUpdateFunc = (state, d) => Chase(d)
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s => PlayAnimation("run"),
+					PhysicsUpdateFunc = (state, d) => Chase(d) } }
+			}
 		};
 
-		var hit = new HostState<Boar>(this)
+		var hit = new State
 		{
 			Name = "Hit",
-			Tag = Tags.Hit,
+			Sign = Tags.Hit,
 			Priority = 20,
-			EnterFunc = s =>
+			Components = new()
+			{
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+					{ EnterFunc = s =>
 			{
 				PlayAnimation("hit");
 				// 方式1：根据玩家位置计算击退方向
@@ -67,36 +82,42 @@ public partial class Boar : Character
 				{
 					var direction = (GlobalPosition - playerPos.Value).Normalized();
 					_knockbackVelocity = direction * 300f; // 击退力度
+						}
+					},
+					PhysicsUpdateFunc = (s, d) =>
+					{
+						// 应用击退力
+						var velocity = Velocity;
+						velocity += _knockbackVelocity;
+						velocity.Y += (float)d * _data.Gravity;
+						// 逐渐减弱击退效果
+						_knockbackVelocity *= 0.8f;
+						Velocity = velocity;
+						MoveAndSlide();
+					},
+					ExitFunc = s =>
+					{
+						_hasHit = false;
+						_knockbackVelocity = Vector2.Zero;
+					}
 				}
-			},
-			PhysicsUpdateFunc = (s, d) =>
-			{
-				// 应用击退力
-				var velocity = Velocity;
-				velocity += _knockbackVelocity;
-				velocity.Y += (float)d * _data.Gravity;
-				// 逐渐减弱击退效果
-				_knockbackVelocity *= 0.8f;
-				Velocity = velocity;
-				MoveAndSlide();
-			},
-			ExitFunc = s =>
-			{
-				_hasHit = false;
-				_knockbackVelocity = Vector2.Zero;
 			}
 		};
 
-		var die = new HostState<Boar>(this)
+		var die = new State
 		{
 			Name = "Die",
-			Tag = Tags.Die,
+			Sign = Tags.Die,
 			Priority = 20,
-			EnterFunc = s => PlayAnimation("die"),
-			PhysicsUpdateFunc = (s, d) =>
+			Components = new()
 			{
-				if (IsAnimationFinished()) QueueFree();
-			}
+				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
+				{ EnterFunc = s => PlayAnimation("die"),
+					PhysicsUpdateFunc = (s, d) =>
+					{
+						if (IsAnimationFinished()) QueueFree();
+					} }
+			}}
 		};
 
 		// Transitions
@@ -109,7 +130,7 @@ public partial class Boar : Character
 
 		// Walk 
 		transitions.AddTransition(walk, idle, () =>
-			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && WaitOverTime(Tags.LayerMovement, 2)) ||
+			(!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
 			(!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
 		transitions.AddTransition(walk, run, () => _playerChecker.IsColliding());
 

@@ -10,9 +10,10 @@ struct StateJobMap
 {
     public State State;
     public JobBase Job;
+    public SchedulerBase<JobBase> Scheduler;
 }
 
-public abstract class Persona : AbsPersona, IPersona
+public class Persona : AbsPersona, IPersona
 {
     public string Name { get; set; }
     public int Level { get; protected set; }
@@ -22,27 +23,27 @@ public abstract class Persona : AbsPersona, IPersona
     public AttributeSetContainer AttributeSetContainer { get; private set; }
 
     private IJobProvider _jobProvider;
-    private Dictionary<Type, IScheduler<JobBase>> _schedulers = [];
+    private Dictionary<Type, SchedulerBase<JobBase>> _schedulers = [];
     private List<StateJobMap> _stateJobMaps = [];
 
 
-    public AbilityScheduler AbilityScheduler()
-    {
-        if(_schedulers.TryGetValue(typeof(Ability),out var scheduler))
-        {
-            return scheduler as AbilityScheduler;
-        }
-        return null;
-    }
+    // public AbilityScheduler AbilityScheduler()
+    // {
+    //     if(_schedulers.TryGetValue(typeof(AbilityScheduler),out var scheduler))
+    //     {
+    //         return scheduler as AbilityScheduler;
+    //     }
+    //     return null;
+    // }
 
-    public EffectScheduler GetEffectScheduler()
-    {
-        if(_schedulers.TryGetValue(typeof(EffectJob),out var scheduler))
-        {
-            return scheduler as EffectScheduler;
-        }
-        return null;
-    }
+    // public EffectScheduler GetEffectScheduler()
+    // {
+    //     if(_schedulers.TryGetValue(typeof(EffectJob),out var scheduler))
+    //     {
+    //         return scheduler as EffectScheduler;
+    //     }
+    //     return null;
+    // }
 
     public Effect[] GetEffects()
     {
@@ -50,15 +51,14 @@ public abstract class Persona : AbsPersona, IPersona
     }
 
 
-    public void AddScheduler<TState>(IScheduler<JobBase> scheduler, HashSet<TState> states)
-        where TState : State
+    public void AddScheduler(SchedulerBase<JobBase> scheduler, HashSet<State> states)
     {
-        _schedulers[typeof(TState)] = scheduler;
+        // _schedulers[typeof(TState)] = scheduler;
         foreach (var state in states)
         {
             var job = _jobProvider.GetJob(state);
             scheduler.AddJob(job);
-            _stateJobMaps.Add(new StateJobMap { State = state, Job = job });
+            _stateJobMaps.Add(new StateJobMap { State = state, Job = job, Scheduler = scheduler });
         }
     }
 
@@ -76,7 +76,7 @@ public abstract class Persona : AbsPersona, IPersona
         }
         var job = _jobProvider.GetJob(state);
         scheduler.AddJob(job);
-        _stateJobMaps.Add(new StateJobMap { State = state, Job = job });
+        _stateJobMaps.Add(new StateJobMap { State = state, Job = job, Scheduler = scheduler });
     }
 
 

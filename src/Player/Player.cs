@@ -34,90 +34,38 @@ public partial class Player : Character
 		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-		var ownedTags = new TagContainer([Tags.Player]);
-
 		// Idle  
-		var idle = new State
-		{
-			Name = "Idle",
-			Sign = Tags.Idle,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => { PlayAnimation("idle"); _jumpCount = 0; } } },
-				{ typeof(TagComponent), new TagComponent
-					{ OwnedTags = new(Tags.Idle) } }
-			},
-		};
+		var idle = new State("Idle", Tags.Idle)
+		.OnEnter(s => { PlayAnimation("idle"); _jumpCount = 0; });
+
 		// Jump
-		var jump = new State
-		{
-			Name = "Jump",
-			Sign = Tags.Jump,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s =>{
-						PlayAnimation("jump");
-						Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
-						_jumpCount++;
-					} }
-				},
-			}
-		};
+		var jump = new State("Jump", Tags.Jump)
+		.OnEnter(s => {
+			PlayAnimation("jump");
+			Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+			_jumpCount++;
+		});
 
 		// Wall Jump
-		var wall_jump = new State
-		{
-			Name = "WallJump",
-			Sign = Tags.Jump,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s =>
-					{
-						PlayAnimation("jump");
-						float wallJumpDirectionX = _graphics.Scale.X;
-						Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
-						_jumpCount = 0;
-					} }
-				},
-			}
-		};
+		var wall_jump = new State("WallJump", Tags.Jump)
+		.OnEnter(s => {
+			PlayAnimation("jump");
+			float wallJumpDirectionX = _graphics.Scale.X;
+			Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
+			_jumpCount = 0;
+		});
+
 
 		// Run
-		var run = new State
-		{
-			Layer = Tags.LayerMovement,
-			Name = "Run",
-			Sign = Tags.Run,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{
-						EnterFunc = s => PlayAnimation("run"),
-						PhysicsUpdateFunc = (state, d) => Move(d)
-					}
-				},
-			},
-		};
+		var run = new State("Run", Tags.Run)
+		.OnEnter(s => PlayAnimation("run"))
+		.OnPhysicsUpdate((s, delta) => Move(delta));
+
 
 		// Fall
-		var fall = new State
-		{
-			Layer = Tags.LayerMovement,
-			Name = "Fall",
-			Sign = Tags.Fall,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("fall"),
-					PhysicsUpdateFunc = (state, d) => Fall(d) } }
-			},
-		};
+		var fall = new State("Fall", Tags.Fall)
+		.OnEnter(s => PlayAnimation("fall"))
+		.OnPhysicsUpdate((s, delta) => Fall(delta));
 
 		// // Landing
 		// var landing = new PlayerState(this, _data)
@@ -134,171 +82,93 @@ public partial class Player : Character
 
 
 		// Double Jump
-		var doubleJump = new State
-		{
-			Name = "DoubleJump",
-			Sign = Tags.Jump,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s =>
-						{
-							PlayAnimation("jump");
-							Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
-							_jumpCount += 1;
-						}
-					}
-				},
-			},
-		};
+		var doubleJump = new State("DoubleJump", Tags.Jump)
+		.OnEnter(s => {
+			PlayAnimation("jump");
+			Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+			_jumpCount++;
+		});
+				
 
 		// Wall Slide
-		var wallSlide = new State
-		{
-			Name = "WallSliding",
-			Sign = Tags.WallSlide,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("wall_sliding"),
-					PhysicsUpdateFunc = (state, d) => WallSlide(d)
-					}
-				},
-			},
-		};
+		var wallSlide = new State("WallSlide", Tags.WallSlide)
+		.OnEnter(s => PlayAnimation("wall_sliding"))
+		.OnPhysicsUpdate((s, delta) => WallSlide(delta));
 
-		var attack1 = new State
-		{
-			Name = "Attack1",
-			Sign = Tags.Attack,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("attack1"),
-					ExitCondition = s => IsAnimationFinished() } }
-			},
-		};
+		var attack1 = new State("Attack1", Tags.Attack)
+		.OnEnter(s => PlayAnimation("attack1"))
+		.OnExitCondition(s => IsAnimationFinished());
 
-		var attack11 = new State
-		{
-			Name = "Attack11",
-			Sign = Tags.Attack,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("attack11"),
-					ExitCondition = s => IsAnimationFinished() } }
-			},
-		};
+		var attack11 = new State("Attack11", Tags.Attack)
+		.OnEnter(s => PlayAnimation("attack11"))
+		.OnExitCondition(s => IsAnimationFinished());
 
-		var attack111 = new State
-		{
-			Name = "Attack111",
-			Sign = Tags.Attack,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("attack111"),
-					ExitCondition = s => IsAnimationFinished() } }
-			},
-		};
+		var attack111 = new State("Attack111", Tags.Attack)
+		.OnEnter(s => PlayAnimation("attack111"))
+		.OnExitCondition(s => IsAnimationFinished());
 
-		var hit = new State
-		{
-			Name = "Hit",
-			Sign = Tags.Hit,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s => PlayAnimation("hit"),
-					ExitFunc = s => _hasHit = false } }
-			},
-		};
+		var hit = new State("Hit", Tags.Hit)
+		.OnEnter(s => PlayAnimation("hit"))
+		.OnExit(s => _hasHit = false);
 
-		var die = new State
-		{
-			Name = "Die",
-			Sign = Tags.Die,
-			Layer = Tags.LayerMovement,
-			Components = new()
-			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s =>
-					{
-						PlayAnimation("die");
-						Interactions.Clear();
-					},
-					PhysicsUpdateFunc = (s, d) =>
-					{
-						if (IsAnimationFinished()) QueueFree();
-					} } }
-			},
-		};
+		var die = new State("Die", Tags.Die)
+		.OnEnter(s => {
+			PlayAnimation("die");
+			Interactions.Clear();
+		})
+		.OnPhysicsUpdate((s, delta) => {
+			if (IsAnimationFinished()) QueueFree();
+		});
 
 
 		// Sliding
-		var sliding = new State
-		{
-			Name = "Sliding",
-			Sign = Tags.Sliding,
-			Layer = Tags.LayerMovement,
-			Components = new()
+		var sliding = new State("Sliding", Tags.WallSlide)
+		.OnEnter(s => {
+			PlayAnimation("sliding_start");
+			_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
+		})
+		.OnExit(s => _hurtBox.SetDeferred("monitorable", true))
+		.OnPhysicsUpdate((s, delta) => {
+			if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
 			{
-				{ typeof(StandardDelegateComponent), new StandardDelegateComponent
-					{ EnterFunc = s =>
-					{
-						PlayAnimation("sliding_start");
-				_slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
-						_hurtBox.SetDeferred("monitorable", false);
-					},
-					ExitFunc = s => _hurtBox.SetDeferred("monitorable", true),
-					PhysicsUpdateFunc = (state, d) =>
-					{
-						if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
-						{
-							PlayAnimation("sliding_loop");
-						}
-						else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
-						{
-							PlayAnimation("sliding_end");
-						}
-						Slide(d);
-					},
-					ExitCondition = s => Mathf.Abs(Velocity.X) < MIN_SLIDING_SPEED } }
-			},
-		};
+				PlayAnimation("sliding_loop");
+			}
+			else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
+			{
+				PlayAnimation("sliding_end");
+			}
+			Slide(delta);
+		});
 
-		var addHpBuff = new Buff
-		{
-			Name = "AddHp",
-			Sign = Tags.LayerBuff,
-			JobType = typeof(JobBuff),
-			Modifiers =
-			[
-				// new Modifier
-				// {
-				// 	Property = Data.RunSpeed,
-				// 	Affect = -10,
-				// 	Operator = ModifierOperation.Add
-				// }
-			],
-			DurationPolicy = DurationPolicy.Duration,
-			Duration = 3,
-			Period = 1,
-			StackMaxCount = 3,
-			OnPeriodOverFunc = state => GD.Print("PeriodOver"),
-			EnterFunc = _ => GD.Print("Enter"),
-			ExitFunc = _ => GD.Print("Exit"),
-			OnDurationOverFunc = _ => GD.Print("DurationOver"),
-			OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {Data.RunSpeed}"),
-			Priority = 0
-		};
+		// var addHpBuff = new Buff
+		// {
+		// 	Name = "AddHp",
+		// 	Sign = Tags.LayerBuff,
+		// 	JobType = typeof(JobBuff),
+		// 	Modifiers =
+		// 	[
+		// 		// new Modifier
+		// 		// {
+		// 		// 	Property = Data.RunSpeed,
+		// 		// 	Affect = -10,
+		// 		// 	Operator = ModifierOperation.Add
+		// 		// }
+		// 	],
+		// 	DurationPolicy = DurationPolicy.Duration,
+		// 	Duration = 3,
+		// 	Period = 1,
+		// 	StackMaxCount = 3,
+		// 	OnPeriodOverFunc = state => GD.Print("PeriodOver"),
+		// 	EnterFunc = _ => GD.Print("Enter"),
+		// 	ExitFunc = _ => GD.Print("Exit"),
+		// 	OnDurationOverFunc = _ => GD.Print("DurationOver"),
+		// 	OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {Data.RunSpeed}"),
+		// 	Priority = 0
+		// };
+
+		_persona = new Persona();
+		_persona.AddScheduler(new MultiLayerStateMachine(), 
+		[idle, run, jump, doubleJump, fall, wallSlide, wall_jump, attack1, attack11, attack111, hit, die, sliding]);
 
 		// 转换规则
 		var transitions = new StateTransitionContainer();
@@ -313,11 +183,11 @@ public partial class Player : Character
 			])
 			.AddTransitionGroup(attack1, [
 				new(idle),
-				new(attack11, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.DelayFront)
+				new(attack11, () => attack1.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
 			])
 			.AddTransitionGroup(attack11, [
 				new(idle),
-				new(attack111, () => WaitOverTime(Tags.LayerMovement, 0.2f) && KeyDownAttack(), StateTransitionMode.DelayFront)
+				new(attack111, () => attack11.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
 			])
 			.AddTransitionGroup(attack111, [
 				new(idle)
@@ -503,7 +373,7 @@ public partial class Player : Character
 		_hitBox.SetBuffState(new Buff
 		{
 			Name = "TestBuff",
-			Tag = Tags.LayerBuff,
+			Sign = Tags.LayerBuff,
 			JobType = typeof(JobBuff),
 		});
 	}

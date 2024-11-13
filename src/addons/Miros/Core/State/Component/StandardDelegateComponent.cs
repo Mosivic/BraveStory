@@ -4,20 +4,20 @@ namespace Miros.Core;
 
 public class StandardDelegateComponent: StateComponent<JobBase>
 {
-    public Func<State, bool> EnterCondition { get; init; }
-    public Func<State, bool> ExitCondition { get; init; }
-    public Action<State> EnterFunc { get; init; }
-    public Action<State> ExitFunc { get; init; }
-    public Action<State> OnSucceedFunc { get; init; }
-    public Action<State> OnFailedFunc { get; init; }
-    public Action<State> PauseFunc { get; init; }
-    public Action<State> ResumeFunc { get; init; }
-    public Action<State> OnStackFunc { get; init; }
-    public Action<State> OnStackOverflowFunc { get; init; }
-    public Action<State> OnDurationOverFunc { get; init; }
-    public Action<State> OnPeriodOverFunc { get; init; }
-    public Action<State, double> UpdateFunc { get; init; }
-    public Action<State, double> PhysicsUpdateFunc { get; init; }
+    public Func<State, bool> EnterCondition { get; set; }
+    public Func<State, bool> ExitCondition { get; set; }
+    public Action<State> EnterFunc { get; set; }
+    public Action<State> ExitFunc { get; set; }
+    public Action<State> OnSucceedFunc { get; set; }
+    public Action<State> OnFailedFunc { get; set; }
+    public Action<State> PauseFunc { get; set; }
+    public Action<State> ResumeFunc { get; set; }
+    public Action<State> OnStackFunc { get; set; }
+    public Action<State> OnStackOverflowFunc { get; set; }
+    public Action<State> OnDurationOverFunc { get; set; }
+    public Action<State> OnPeriodOverFunc { get; set; }
+    public Action<State, double> UpdateFunc { get; set; }
+    public Action<State, double> PhysicsUpdateFunc { get; set; }
 
     public override void Activate(JobBase job)
     {

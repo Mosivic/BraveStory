@@ -10,6 +10,7 @@ public abstract class JobBase(State state) : AbsJob(state), IJob
     public virtual void Enter() 
     {
         state.Status = RunningStatus.Running;
+        state.RunningTime = 0;
         
         foreach (var component in state.Components.Values)
         {
@@ -38,7 +39,7 @@ public abstract class JobBase(State state) : AbsJob(state), IJob
 
     public virtual void Stack()
     {
-   
+
     }
 
 
@@ -99,6 +100,7 @@ public abstract class JobBase(State state) : AbsJob(state), IJob
     public virtual void Update(double delta)
     {
         if (state.Status != RunningStatus.Running) return;
+        state.RunningTime += delta;
         OnUpdate(delta);
     }
 

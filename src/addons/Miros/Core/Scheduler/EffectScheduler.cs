@@ -61,5 +61,5 @@ public class EffectScheduler : SchedulerBase<EffectJob>
     {
         return job1.Sign == job2.Sign;
     }
- 
+
 }

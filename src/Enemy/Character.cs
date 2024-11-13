@@ -12,7 +12,7 @@ public partial class Character : CharacterBody2D
     protected HurtBox _hurtBox;
     protected bool _hasHit = false;
 
-	protected MultiLayerStateMachineConnect _connect;
+	protected Persona _persona;
 
 
     public override void _Ready()
@@ -34,21 +34,14 @@ public partial class Character : CharacterBody2D
 
     public override void _Process(double delta)
 	{
-		_connect.Update(delta);
+		_persona.Update(delta);
 	}
 
 
 	public override void _PhysicsProcess(double delta)
 	{
-		_connect.PhysicsUpdate(delta);
+		_persona.PhysicsUpdate(delta);
 	}
-
-
-	protected bool WaitOverTime(Tag layer, double time)
-	{
-		return _connect.GetCurrentStateTime(layer) > time;
-	}
-
 
     protected bool IsAnimationFinished()
 	{
