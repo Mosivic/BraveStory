@@ -1,7 +1,7 @@
 
 namespace Miros.Core;
 
-public abstract class CueInstant : Cue  
+public abstract class CueInstant(string name, Tag sign) : Cue(name, sign)
 {
     // public override Cue ApplyFrom(Effect effect)
     // {

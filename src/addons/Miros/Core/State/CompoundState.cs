@@ -2,7 +2,7 @@
 
 namespace Miros.Core;
 
-public class CompoundState : State
+public class CompoundState(string name, Tag sign) : State(name, sign)
 {
     public int ChildIndex { get; set; } = -1;
     public int Cost { get; set; }

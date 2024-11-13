@@ -2,11 +2,13 @@
 
 namespace Miros.Core;
 
-public abstract class JobBase(State state) : AbsJob(state), IJob
+public class JobBase(State state) : AbsJob(state), IJob
 {
 
     private readonly State state = state;
     
+
+
     public virtual void Enter() 
     {
         state.Status = RunningStatus.Running;

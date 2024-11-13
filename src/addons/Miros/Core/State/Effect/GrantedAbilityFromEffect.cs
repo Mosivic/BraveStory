@@ -26,37 +26,37 @@ public class GrantedAbilityFromEffect
         AbilityName = Ability.Name;
         Owner = SourceEffect.Owner;
 
-        if (Owner.AbilityContainer.HasAbility(AbilityName))
-        {
-            GD.PrintErr($"GrantedAbilityFromEffect: {Owner.Name} already has ability {AbilityName}");
-        }
+        // if (Owner.AbilityContainer.HasAbility(AbilityName))
+        // {
+        //     GD.PrintErr($"GrantedAbilityFromEffect: {Owner.Name} already has ability {AbilityName}");
+        // }
 
-        Owner.GrantAbility(Ability);
-        Ability.SetLevel(AbilityLevel);
+        // Owner.GrantAbility(Ability);
+        // Ability.SetLevel(AbilityLevel);
 
-        // 是否添加时激活
-        if (ActivationPolicy == GrantedAbilityActivationPolicy.WhenAdded)
-        {
-            Owner.TryActivateAbility(AbilityName);
-        }
+        // // 是否添加时激活
+        // if (ActivationPolicy == GrantedAbilityActivationPolicy.WhenAdded)
+        // {
+        //     Owner.TryActivateAbility(AbilityName);
+        // }
 
-        switch (RemovePolicy)
-        {
-            case GrantedAbilityRemovePolicy.WhenEnd:
-                Ability.RegisterEndAbility(RemoveSelf);
-                break;
-            case GrantedAbilityRemovePolicy.WhenCancel:
-                Ability.RegisterCancelAbility(RemoveSelf);
-                break;
-            case GrantedAbilityRemovePolicy.WhenCancelOrEnd:
-                Ability.RegisterEndAbility(RemoveSelf);
-                Ability.RegisterCancelAbility(RemoveSelf);
-                break;
-        }
+        // switch (RemovePolicy)
+        // {
+        //     case GrantedAbilityRemovePolicy.WhenEnd:
+        //         Ability.RegisterEndAbility(RemoveSelf);
+        //         break;
+        //     case GrantedAbilityRemovePolicy.WhenCancel:
+        //         Ability.RegisterCancelAbility(RemoveSelf);
+        //         break;
+        //     case GrantedAbilityRemovePolicy.WhenCancelOrEnd:
+        //         Ability.RegisterEndAbility(RemoveSelf);
+        //         Ability.RegisterCancelAbility(RemoveSelf);
+        //         break;
+        // }
     }
 
-    private void RemoveSelf()
-    {
-        Owner.RemoveAbility(AbilityName);
-    }
+    // private void RemoveSelf()
+    // {
+    //     Owner.RemoveAbility(AbilityName);
+    // }
 }

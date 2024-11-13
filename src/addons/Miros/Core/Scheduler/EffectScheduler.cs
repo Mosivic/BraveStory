@@ -40,7 +40,7 @@ public class EffectScheduler : SchedulerBase<EffectJob>
         var hasStackingComponent = stackingComponent != null;
         var hasSameJob = false;
 
-        foreach(var _job in _jobs)
+        foreach(var _job in _jobs.Values)
         {
             if(JobEqual(_job, job)) 
                 hasSameJob = true;

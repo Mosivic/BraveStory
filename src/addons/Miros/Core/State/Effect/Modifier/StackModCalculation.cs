@@ -13,7 +13,7 @@ public class StackModCalculation : ModifierMagnitudeCalculation
     {
         if (state.Stacking.StackingType == StackingType.None) return 0;
 
-        var stackCount = state.StackCount;
+        var stackCount = state.Stacking.StackCount;
         return stackCount * k + b;
     }
 }

@@ -39,16 +39,16 @@ public class TagAggregator
         _fixedTags.AddRange(tags);
     }
 
-    public void OnEnable()
-    {
-        // 有 GC, 无法避免
-        OnTagIsDirty += _owner.EffectContainer.RefreshEffectStatus;
-    }
+    // public void OnEnable()
+    // {
+    //     // 有 GC, 无法避免
+    //     OnTagIsDirty += _owner.EffectContainer.RefreshEffectStatus;
+    // }
 
-    public void OnDisable()
-    {
-        OnTagIsDirty -= _owner.EffectContainer.RefreshEffectStatus;
-    }
+    // public void OnDisable()
+    // {
+    //     OnTagIsDirty -= _owner.EffectContainer.RefreshEffectStatus;
+    // }
 
 
     private static bool IsTagInList(Tag tag, List<Tag> tags)
@@ -115,153 +115,153 @@ public class TagAggregator
         if (dirty) TagIsDirty(tagSet);
     }
 
-    private bool TryAddDynamicAddedTag<T>(T source, Tag tag)
-    {
-        if (!(source is Effect) && !(source is Ability))
-        {
-            return false;
-        }
+    // private bool TryAddDynamicAddedTag<T>(T source, Tag tag)
+    // {
+    //     if (!(source is Effect) && !(source is Ability))
+    //     {
+    //         return false;
+    //     }
 
-        var dirty = _dynamicRemovedTags.Remove(tag);
-        foreach (var t in _fixedTags)
-        {
-            if (t == tag)
-            {
-                return dirty;
-            }
-        }
+    //     var dirty = _dynamicRemovedTags.Remove(tag);
+    //     foreach (var t in _fixedTags)
+    //     {
+    //         if (t == tag)
+    //         {
+    //             return dirty;
+    //         }
+    //     }
 
-        if (_dynamicAddedTags.TryGetValue(tag, out var addedTag))
-        {
-            foreach (object o in addedTag)
-            {
-                if (source.Equals(o))
-                {
-                    return false;
-                }
-            }
+    //     if (_dynamicAddedTags.TryGetValue(tag, out var addedTag))
+    //     {
+    //         foreach (object o in addedTag)
+    //         {
+    //             if (source.Equals(o))
+    //             {
+    //                 return false;
+    //             }
+    //         }
 
-            addedTag.Add(source);
-        }
-        else
-        {
-            var list = _pool.Get() as List<object>;
-            list.Add(source);
-            _dynamicAddedTags.Add(tag, list);
-        }
+    //         addedTag.Add(source);
+    //     }
+    //     else
+    //     {
+    //         var list = _pool.Get() as List<object>;
+    //         list.Add(source);
+    //         _dynamicAddedTags.Add(tag, list);
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    private bool TryAddDynamicRemovedTag<T>(T source, Tag tag)
-    {
-        if (!(source is Effect) && !(source is Ability)) return false;
-        var dirty = false;
-        if (_dynamicAddedTags.TryGetValue(tag, out var addedTag))
-        {
-            addedTag.Clear();
-            _pool.Return(addedTag);
-            dirty = _dynamicAddedTags.Remove(tag);
-        }
+    // private bool TryAddDynamicRemovedTag<T>(T source, Tag tag)
+    // {
+    //     if (!(source is Effect) && !(source is Ability)) return false;
+    //     var dirty = false;
+    //     if (_dynamicAddedTags.TryGetValue(tag, out var addedTag))
+    //     {
+    //         addedTag.Clear();
+    //         _pool.Return(addedTag);
+    //         dirty = _dynamicAddedTags.Remove(tag);
+    //     }
 
-        if (!IsTagInList(tag, _fixedTags)) return dirty;
+    //     if (!IsTagInList(tag, _fixedTags)) return dirty;
 
-        if (_dynamicRemovedTags.TryGetValue(tag, out var removedTag))
-            removedTag.Add(source);
-        else
-        {
-            var list = _pool.Get() as List<object>;
-            list.Add(source);
-            _dynamicRemovedTags.Add(tag, list);
-        }
+    //     if (_dynamicRemovedTags.TryGetValue(tag, out var removedTag))
+    //         removedTag.Add(source);
+    //     else
+    //     {
+    //         var list = _pool.Get() as List<object>;
+    //         list.Add(source);
+    //         _dynamicRemovedTags.Add(tag, list);
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    private bool TryRemoveDynamicTag<T>(ref Dictionary<Tag, List<object>> dynamicTag, T source,
-        Tag tag)
-    {
-        var dirty = false;
+    // private bool TryRemoveDynamicTag<T>(ref Dictionary<Tag, List<object>> dynamicTag, T source,
+    //     Tag tag)
+    // {
+    //     var dirty = false;
 
-        if (source is Effect || source is Ability)
-        {
-            var hasValue = dynamicTag.TryGetValue(tag, out var tagList);
-            if (hasValue)
-            {
-                tagList.Remove(source);
-                dirty = tagList.Count == 0;
-                if (dirty)
-                {
-                    _pool.Return(tagList);
-                    dynamicTag.Remove(tag);
-                }
-            }
-        }
+    //     if (source is Effect || source is Ability)
+    //     {
+    //         var hasValue = dynamicTag.TryGetValue(tag, out var tagList);
+    //         if (hasValue)
+    //         {
+    //             tagList.Remove(source);
+    //             dirty = tagList.Count == 0;
+    //             if (dirty)
+    //             {
+    //                 _pool.Return(tagList);
+    //                 dynamicTag.Remove(tag);
+    //             }
+    //         }
+    //     }
 
-        return dirty;
-    }
+    //     return dirty;
+    // }
 
-    private bool TryRemoveDynamicAddedTag<T>(T source, Tag tag)
-    {
-        return TryRemoveDynamicTag(ref _dynamicAddedTags, source, tag);
-    }
+    // private bool TryRemoveDynamicAddedTag<T>(T source, Tag tag)
+    // {
+    //     return TryRemoveDynamicTag(ref _dynamicAddedTags, source, tag);
+    // }
 
-    private bool TryRemoveDynamicRemovedTag<T>(T source, Tag tag)
-    {
-        return TryRemoveDynamicTag(ref _dynamicRemovedTags, source, tag);
-    }
+    // private bool TryRemoveDynamicRemovedTag<T>(T source, Tag tag)
+    // {
+    //     return TryRemoveDynamicTag(ref _dynamicRemovedTags, source, tag);
+    // }
 
     /// <summary>
     /// 应用Effect的动态标签
     /// </summary>
     /// <param name="source"></param>
-    public void ApplyEffectDynamicTag(Effect source)
-    {
-        var tagIsDirty = false;
-        var grantedTagSet = source.GrantedTags;
-        foreach (var tag in grantedTagSet.Tags)
-        {
-            var dirty = TryAddDynamicAddedTag(source, tag);
-            tagIsDirty = tagIsDirty || dirty;
-        }
+    // public void ApplyEffectDynamicTag(Effect source)
+    // {
+    //     var tagIsDirty = false;
+    //     var grantedTagSet = source.GrantedTags;
+    //     foreach (var tag in grantedTagSet.Tags)
+    //     {
+    //         var dirty = TryAddDynamicAddedTag(source, tag);
+    //         tagIsDirty = tagIsDirty || dirty;
+    //     }
 
-        if (tagIsDirty) TagIsDirty(grantedTagSet);
-    }
+    //     if (tagIsDirty) TagIsDirty(grantedTagSet);
+    // }
 
-    public void ApplyAbilityDynamicTag(Ability source)
-    {
-        var tagIsDirty = false;
-        var activationOwnedTag = source.ActivationOwnedTags;
-        foreach (var tag in activationOwnedTag.Tags)
-        {
-            var dirty = TryAddDynamicAddedTag(source, tag);
-            tagIsDirty = tagIsDirty || dirty;
-        }
+    // public void ApplyAbilityDynamicTag(Ability source)
+    // {
+    //     var tagIsDirty = false;
+    //     var activationOwnedTag = source.ActivationOwnedTags;
+    //     foreach (var tag in activationOwnedTag.Tags)
+    //     {
+    //         var dirty = TryAddDynamicAddedTag(source, tag);
+    //         tagIsDirty = tagIsDirty || dirty;
+    //     }
 
-        if (tagIsDirty) TagIsDirty(activationOwnedTag);
-    }
+    //     if (tagIsDirty) TagIsDirty(activationOwnedTag);
+    // }
 
-    public void RestoreDynamicTags<T>(T source, TagSet tagSet)
-    {
-        var tagIsDirty = false;
-        foreach (var tag in tagSet.Tags)
-        {
-            var dirty = TryRemoveDynamicAddedTag(source, tag);
-            tagIsDirty = tagIsDirty || dirty;
-        }
+    // public void RestoreDynamicTags<T>(T source, TagSet tagSet)
+    // {
+    //     var tagIsDirty = false;
+    //     foreach (var tag in tagSet.Tags)
+    //     {
+    //         var dirty = TryRemoveDynamicAddedTag(source, tag);
+    //         tagIsDirty = tagIsDirty || dirty;
+    //     }
 
-        if (tagIsDirty) TagIsDirty(tagSet);
-    }
+    //     if (tagIsDirty) TagIsDirty(tagSet);
+    // }
 
-    public void RestoreEffectDynamicTags(Effect effect)
-    {
-        RestoreDynamicTags(effect, effect.GrantedTags);
-    }
+    // public void RestoreEffectDynamicTags(Effect effect)
+    // {
+    //     RestoreDynamicTags(effect, effect.GrantedTags);
+    // }
 
-    public void RestoreAbilityDynamicTags(Ability ability)
-    {
-        RestoreDynamicTags(ability, ability.ActivationOwnedTags);
-    }
+    // public void RestoreAbilityDynamicTags(Ability ability)
+    // {
+    //     RestoreDynamicTags(ability, ability.ActivationOwnedTags);
+    // }
 
     public bool HasTag(Tag tag)
     {

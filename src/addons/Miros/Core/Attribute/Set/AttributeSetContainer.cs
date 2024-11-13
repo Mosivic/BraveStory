@@ -40,7 +40,7 @@ public class AttributeSetContainer(Persona owner)
             if (!_attributeAggregators.ContainsKey(attrSet[attr]))
             {
                 var attrAggt = new AttributeAggregator(attrSet[attr], _owner);
-                if (_owner.Enabled) attrAggt.OnEnable();
+                // if (_owner.Enabled) attrAggt.OnEnable();
                 _attributeAggregators.Add(attrSet[attr], attrAggt);
             }
         }
@@ -170,18 +170,18 @@ public class AttributeSetContainer(Persona owner)
     /// <summary>
     /// 禁用所有属性集。
     /// </summary>
-    public void OnDisable()
-    {
-        foreach (var aggregator in _attributeAggregators)
-            aggregator.Value.OnDisable();
-    }
+    // public void OnDisable()
+    // {
+    //     foreach (var aggregator in _attributeAggregators)
+    //         aggregator.Value.OnDisable();
+    // }
 
     /// <summary>
     /// 启用所有属性集。
     /// </summary>
-    public void OnEnable()
-    {
-        foreach (var aggregator in _attributeAggregators)
-            aggregator.Value.OnEnable();
-    }
+    // public void OnEnable()
+    // {
+    //     foreach (var aggregator in _attributeAggregators)
+    //         aggregator.Value.OnEnable();
+    // }
 }

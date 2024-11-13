@@ -16,7 +16,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
         base.Enter();
         CaptureAttributesSnapshot();
 
-        effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
+        // effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
         effect.Owner.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
         // TryActivateGrantedAbilities();
@@ -40,7 +40,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
         base.Exit();
 
         // TryRemoveGrantedAbilities();
-        effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
+        // effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
         // TryDeactivateGrantedAbilities();
     }
 

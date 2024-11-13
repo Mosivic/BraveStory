@@ -261,8 +261,6 @@ public partial class Player : Character
 	}
 
 
-
-
 	// 添加一个统一处理朝向的方法
 	private void UpdateFacing(float direction)
 	{
@@ -364,10 +362,8 @@ public partial class Player : Character
 
 	protected override void HandleHit(object sender, HitEventArgs e)
 	{
-		_hitBox.SetBuffState(new Buff
+		_hitBox.SetBuffState(new Buff("TestBuff", Tags.LayerBuff)
 		{
-			Name = "TestBuff",
-			Sign = Tags.LayerBuff,
 			JobType = typeof(JobBuff),
 		});
 	}

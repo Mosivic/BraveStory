@@ -11,7 +11,7 @@ public class ConditionMachine : SchedulerBase<JobBase>
 
 	public override void AddJob(JobBase job)
 	{
-		var layer = job.Layer;
+		var layer = job.Sign;
 
 		if (!WaitingJobs.ContainsKey(layer))
 		{
@@ -26,14 +26,14 @@ public class ConditionMachine : SchedulerBase<JobBase>
 
 	public override void RemoveJob(JobBase job)
 	{
-		var layer = job.Layer;
+		var layer = job.Sign;
 		if (WaitingJobs.ContainsKey(layer) && WaitingJobs[layer].Contains(job))
 			WaitingJobs[layer].Remove(job);
 	}
 
 	public override  bool HasJobRunning(JobBase job)
 	{
-		return RunningJobs[job.Layer].Contains(job);
+		return RunningJobs[job.Sign].Contains(job);
 	}
 
 

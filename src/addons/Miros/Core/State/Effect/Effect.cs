@@ -4,7 +4,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public abstract class Effect : State
+public abstract class Effect(string name, Tag sign) : State(name, sign)
 {
     public event Action<Persona, Effect> OnImmunity; 
     public event Action<int, int> OnStackCountChanged;
@@ -24,7 +24,7 @@ public abstract class Effect : State
     public Dictionary<string, float> SnapshotSourceAttributes { get;  set; }
     public Dictionary<string, float> SnapshotTargetAttributes { get;  set; }
 
-
+    public StackingComponent Stacking { get ; set; }
 
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;
@@ -88,4 +88,5 @@ public abstract class Effect : State
     {
         OnStackCountChanged?.Invoke(oldStackCount, newStackCount);
     }
+
 }

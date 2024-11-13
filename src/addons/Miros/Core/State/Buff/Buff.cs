@@ -25,7 +25,7 @@ public enum StackExpirationPolicy
     RefreshDuration
 }
 
-public class Buff : State
+public class Buff(string name, Tag sign) : State(name, sign)
 {
     // Core
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;

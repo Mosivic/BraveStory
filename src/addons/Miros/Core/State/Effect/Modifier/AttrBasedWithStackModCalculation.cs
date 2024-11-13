@@ -46,7 +46,7 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
 
         if (spec.Stacking.StackingType == StackingType.None) return attrMagnitude;
 
-        var stackMagnitude = spec.StackCount * sK + sB;
+        var stackMagnitude = spec.Stacking.StackCount * sK + sB;
 
         return stackMagnitudeOperation switch
         {
