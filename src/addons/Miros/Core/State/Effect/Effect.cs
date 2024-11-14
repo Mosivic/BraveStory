@@ -19,8 +19,6 @@ public abstract class Effect(string name, Tag sign) : State(name, sign)
     public Effect PeriodExecution { get; private set; }
     public Modifier[] Modifiers { get; private set; }
 
-    public GrantedAbilityFromEffect[] GrantedAbility { get; private set; }
-
     public Dictionary<string, float> SnapshotSourceAttributes { get;  set; }
     public Dictionary<string, float> SnapshotTargetAttributes { get;  set; }
 
