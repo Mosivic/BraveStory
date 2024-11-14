@@ -1,24 +1,24 @@
-using Godot;
 using System;
+using Godot;
 
 public partial class GameInitializer : Node
 {
-    // 使用Godot的单例模式
-    public static GameInitializer Instance { get; private set; }
+    // 游戏全局数据
+    private int _gameScore;
+    private float _gameTime;
 
     // 初始化状态标志
-    private bool _isInitialized = false;
-    
-    // 游戏全局数据
-    private int _gameScore = 0;
-    private float _gameTime = 0f;
+    private bool _isInitialized;
 
     // 构造函数
     public GameInitializer()
     {
         Instance = this;
     }
-    
+
+    // 使用Godot的单例模式
+    public static GameInitializer Instance { get; private set; }
+
     // 在游戏启动时调用
     public override void _EnterTree()
     {
@@ -30,11 +30,11 @@ public partial class GameInitializer : Node
     {
         base._Ready();
         if (_isInitialized) return;
-        
+
         InitializeEvaluators();
         InitializeManagers();
         InitializeServices();
-        
+
         _isInitialized = true;
         GD.Print("Game initialization completed!");
     }
@@ -55,7 +55,7 @@ public partial class GameInitializer : Node
             // InitializeAudioManager();
             // InitializeResourceManager();
             // InitializeUIManager();
-            
+
             GD.Print("Managers initialized!");
         }
         catch (Exception e)
@@ -74,7 +74,7 @@ public partial class GameInitializer : Node
             // InitializeSaveSystem();
             // InitializeNetworkService();
             // InitializeAchievementSystem();
-            
+
             GD.Print("Services initialized!");
         }
         catch (Exception e)
@@ -151,6 +151,4 @@ public partial class GameInitializer : Node
     {
         // 实现服务清理逻辑
     }
-
-
-} 
+}

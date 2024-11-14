@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Godot;
 
-
 public interface IHubProvider
 {
     public IHub Hub { get; }

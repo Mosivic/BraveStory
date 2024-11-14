@@ -6,15 +6,14 @@ namespace Miros.Core;
 
 public class TagAggregator
 {
-    private Persona _owner;
+    private static Pool _pool = new(typeof(List<object>), 1024);
 
-    private Dictionary<Tag, List<object>> _dynamicAddedTags = new();
+    private readonly Dictionary<Tag, List<object>> _dynamicAddedTags = new();
 
-    private Dictionary<Tag, List<object>> _dynamicRemovedTags = new();
+    private readonly Dictionary<Tag, List<object>> _dynamicRemovedTags = new();
 
     private readonly List<Tag> _fixedTags = new();
-
-    private static Pool _pool = new Pool(typeof(List<object>), 1024);
+    private Persona _owner;
 
     public TagAggregator(Persona owner)
     {
@@ -54,12 +53,8 @@ public class TagAggregator
     private static bool IsTagInList(Tag tag, List<Tag> tags)
     {
         foreach (var t in tags)
-        {
             if (t == tag)
-            {
                 return true;
-            }
-        }
 
         return false;
     }
@@ -212,7 +207,7 @@ public class TagAggregator
     // }
 
     /// <summary>
-    /// 应用Effect的动态标签
+    ///     应用Effect的动态标签
     /// </summary>
     /// <param name="source"></param>
     // public void ApplyEffectDynamicTag(Effect source)
@@ -262,39 +257,32 @@ public class TagAggregator
     // {
     //     RestoreDynamicTags(ability, ability.ActivationOwnedTags);
     // }
-
     public bool HasTag(Tag tag)
     {
         // LINQ表达式存在GC，且HasTag调用频率很高，所以这里全都使用foreach
         var fixedTagsContainsTag = false;
         foreach (var t in _fixedTags)
-        {
             if (t.HasTag(tag))
             {
                 fixedTagsContainsTag = true;
                 break;
             }
-        }
 
         var dynamicAddedTagsContainsTag = false;
         foreach (var t in _dynamicAddedTags)
-        {
             if (t.Key.HasTag(tag))
             {
                 dynamicAddedTagsContainsTag = true;
                 break;
             }
-        }
 
         var dynamicRemovedTagsContainsTag = false;
         foreach (var t in _dynamicRemovedTags)
-        {
             if (t.Key.HasTag(tag))
             {
                 dynamicRemovedTagsContainsTag = true;
                 break;
             }
-        }
 
         return (fixedTagsContainsTag || dynamicAddedTagsContainsTag) && !dynamicRemovedTagsContainsTag;
     }
@@ -322,9 +310,8 @@ public class TagAggregator
     {
         if (other.Empty) return false;
         foreach (var tag in other.Tags)
-        {
-            if (HasTag(tag)) return true;
-        }
+            if (HasTag(tag))
+                return true;
 
         return false;
         //return !other.Empty && other.Tags.Any(HasTag);
@@ -332,7 +319,7 @@ public class TagAggregator
 
     public bool HasAnyTags(params Tag[] tags)
     {
-        bool hasAny = false;
+        var hasAny = false;
         foreach (var tag in tags)
             if (HasTag(tag))
             {
@@ -348,9 +335,8 @@ public class TagAggregator
     {
         if (other.Empty) return true;
         foreach (var tag in other.Tags)
-        {
-            if (HasTag(tag)) return false;
-        }
+            if (HasTag(tag))
+                return false;
 
         return true;
         //return other.Empty || !other.Tags.Any(HasTag);
@@ -360,13 +346,10 @@ public class TagAggregator
     {
         if (tags.Length == 0) return true;
         foreach (var tag in tags)
-        {
-            if (HasTag(tag)) return false;
-        }
+            if (HasTag(tag))
+                return false;
 
         return true;
         //return !tags.Any(HasTag);
     }
 }
-
-

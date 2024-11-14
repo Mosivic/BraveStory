@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-
-
 /// <summary>
 ///     Buff中断并恢复的处理策略
 /// </summary>
@@ -42,7 +40,9 @@ public class Buff(string name, Tag sign) : State(name, sign)
 
     // Duration
     public double Duration { get; init; } = 0;
+
     public double DurationElapsed { get; set; }
+
     // Period
     public double Period { get; set; } = 0;
     public double PeriodElapsed { get; set; }

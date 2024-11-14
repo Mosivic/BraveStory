@@ -1,4 +1,3 @@
-
 namespace Miros.Core;
 
 public abstract class CueInstant(string name, Tag sign) : Cue(name, sign)
@@ -23,5 +22,4 @@ public abstract class CueInstant(string name, Tag sign) : Cue(name, sign)
     //     }
     //     return this;
     // }
-
 }

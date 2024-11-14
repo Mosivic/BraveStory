@@ -3,7 +3,7 @@ namespace Miros.Core;
 public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 {
     /// <summary>
-    /// 属性来源
+    ///     属性来源
     /// </summary>
     public enum AttributeFrom
     {
@@ -17,8 +17,6 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
         Track // 实时
     }
 
-    public EffectAttributeCaptureType captureType; // 捕获方式
-
     public AttributeFrom attributeFromType; // 属性来源
 
     public string attributeName; // 属性的名称
@@ -27,9 +25,11 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 
     public string attributeShortName;
 
-    public float k = 1; // 系数
-
     public float b = 0; // 常量
+
+    public EffectAttributeCaptureType captureType; // 捕获方式
+
+    public float k = 1; // 系数
 
     public override float CalculateMagnitude(Effect effect, float modifierMagnitude)
     {

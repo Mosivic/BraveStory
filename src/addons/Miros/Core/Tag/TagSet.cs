@@ -1,6 +1,7 @@
 using System;
 
 namespace Miros.Core;
+
 public readonly struct TagSet
 {
     public readonly Tag[] Tags;
@@ -10,10 +11,7 @@ public readonly struct TagSet
     public TagSet(string[] tagNames)
     {
         Tags = new Tag[tagNames.Length];
-        for (var i = 0; i < tagNames.Length; i++)
-        {
-            Tags[i] = new Tag(tagNames[i]);
-        }
+        for (var i = 0; i < tagNames.Length; i++) Tags[i] = new Tag(tagNames[i]);
     }
 
     public TagSet(params Tag[] tags)
@@ -24,9 +22,8 @@ public readonly struct TagSet
     public bool HasTag(Tag tag)
     {
         foreach (var t in Tags)
-        {
-            if (t.HasTag(tag)) return true;
-        }
+            if (t.HasTag(tag))
+                return true;
 
         return false;
     }
@@ -39,9 +36,8 @@ public readonly struct TagSet
     public bool HasAllTags(params Tag[] tags)
     {
         foreach (var tag in tags)
-        {
-            if (!HasTag(tag)) return false;
-        }
+            if (!HasTag(tag))
+                return false;
 
         return true;
     }
@@ -54,9 +50,8 @@ public readonly struct TagSet
     public bool HasAnyTags(params Tag[] tags)
     {
         foreach (var tag in tags)
-        {
-            if (HasTag(tag)) return true;
-        }
+            if (HasTag(tag))
+                return true;
 
         return false;
     }
@@ -69,9 +64,8 @@ public readonly struct TagSet
     public bool HasNoneTags(params Tag[] tags)
     {
         foreach (var tag in tags)
-        {
-            if (HasTag(tag)) return false;
-        }
+            if (HasTag(tag))
+                return false;
 
         return true;
     }

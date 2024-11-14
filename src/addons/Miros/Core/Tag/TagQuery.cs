@@ -1,16 +1,17 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Miros.Core;
+
 public class TagQuery
 {
-    private HashSet<GameplayTagRequirement> _anyRequirements = new();
-    private HashSet<GameplayTagRequirement> _allRequirements = new();
-    private HashSet<GameplayTagRequirement> _noneRequirements = new();
+    private readonly HashSet<GameplayTagRequirement> _allRequirements = new();
+    private readonly HashSet<GameplayTagRequirement> _anyRequirements = new();
+    private readonly HashSet<GameplayTagRequirement> _noneRequirements = new();
 
 
-    public TagQuery(HashSet<Tag> allRequirements = null, HashSet<Tag> anyRequirements = null, HashSet<Tag> noneRequirements = null)
+    public TagQuery(HashSet<Tag> allRequirements = null, HashSet<Tag> anyRequirements = null,
+        HashSet<Tag> noneRequirements = null)
     {
         allRequirements?.ToList().ForEach(r => AddAllTag(r));
         anyRequirements?.ToList().ForEach(r => AddAnyTag(r));

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Miros.Core;
 
@@ -10,7 +9,7 @@ public class EffectJob(Effect effect) : JobBase(effect)
     public event Action<EffectJob> OnDurationOvered;
     public event Action<EffectJob> OnPeriodOvered;
 
-    
+
     public override void Enter()
     {
         base.Enter();
@@ -20,11 +19,8 @@ public class EffectJob(Effect effect) : JobBase(effect)
         effect.Owner.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
         // TryActivateGrantedAbilities();
-    
-        if(effect.DurationPolicy == DurationPolicy.Instant)
-        {
-            effect.Owner.ApplyModFromInstantEffect(effect);
-        }
+
+        if (effect.DurationPolicy == DurationPolicy.Instant) effect.Owner.ApplyModFromInstantEffect(effect);
     }
 
 
@@ -50,7 +46,6 @@ public class EffectJob(Effect effect) : JobBase(effect)
         var stackingComponent = GetComponent<StackingComponent>();
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
-            return ;
         }
 
         // // Check GE Stacking
@@ -93,7 +88,8 @@ public class EffectJob(Effect effect) : JobBase(effect)
 
     public override bool CanExit()
     {
-        return effect.Owner.HasAllTags(effect.OngoingRequiredTags) || effect.Owner.HasAnyTags(effect.ApplicationImmunityTags);
+        return effect.Owner.HasAllTags(effect.OngoingRequiredTags) ||
+               effect.Owner.HasAnyTags(effect.ApplicationImmunityTags);
     }
 
 
@@ -101,7 +97,9 @@ public class EffectJob(Effect effect) : JobBase(effect)
     private void CaptureAttributesSnapshot()
     {
         effect.SnapshotSourceAttributes = effect.Source.DataSnapshot();
-        effect.SnapshotTargetAttributes = effect.Source == effect.Owner ? effect.SnapshotSourceAttributes : effect.Owner.DataSnapshot();
+        effect.SnapshotTargetAttributes = effect.Source == effect.Owner
+            ? effect.SnapshotSourceAttributes
+            : effect.Owner.DataSnapshot();
     }
 
 
@@ -151,7 +149,4 @@ public class EffectJob(Effect effect) : JobBase(effect)
     //     }
     // }
     // #endregion
-
-
-
 }

@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
-using Godot;
 
 namespace Miros.Core;
+
 // _jobs 即为运行的 EffectJob
 public class EffectScheduler : SchedulerBase<EffectJob>
 {
@@ -10,7 +9,6 @@ public class EffectScheduler : SchedulerBase<EffectJob>
 
     public override void Update(double delta)
     {
-        
     }
 
     public void RegisterOnEffectsIsDirty(Action action)
@@ -26,7 +24,6 @@ public class EffectScheduler : SchedulerBase<EffectJob>
 
     private void UpdateEffect()
     {
-        
     }
 
     // 如果存在StackingComponent组件，则检查是否可以堆叠
@@ -34,22 +31,22 @@ public class EffectScheduler : SchedulerBase<EffectJob>
     // 如果当前Jobs不存在传入的Job，则将传入的Job添加到Jobs中，并调用其Activate和Enter方法
     public override void AddJob(EffectJob job)
     {
-        if(!job.CanEnter()) return;
+        if (!job.CanEnter()) return;
 
         var stackingComponent = job.GetComponent<StackingComponent>();
         var hasStackingComponent = stackingComponent != null;
         var hasSameJob = false;
 
-        foreach(var _job in _jobs.Values)
+        foreach (var _job in _jobs.Values)
         {
-            if(JobEqual(_job, job)) 
+            if (JobEqual(_job, job))
                 hasSameJob = true;
 
-            if(hasStackingComponent && _job.CanStack(stackingComponent.StackingGroupTag))
+            if (hasStackingComponent && _job.CanStack(stackingComponent.StackingGroupTag))
                 _job.Stack();
         }
 
-        if(!hasSameJob)
+        if (!hasSameJob)
         {
             base.AddJob(job);
             job.Activate();
@@ -61,5 +58,4 @@ public class EffectScheduler : SchedulerBase<EffectJob>
     {
         return job1.Sign == job2.Sign;
     }
-
 }

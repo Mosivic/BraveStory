@@ -1,17 +1,17 @@
-using Godot;
 using System;
+using Godot;
 using Miros.Core;
 
 public class HurtEventArgs : EventArgs
 {
-    public Area2D Hitbox { get; }
-    public Buff Buff { get; }
-
     public HurtEventArgs(Area2D hitbox, Buff buff)
     {
         Hitbox = hitbox;
         Buff = buff;
     }
+
+    public Area2D Hitbox { get; }
+    public Buff Buff { get; }
 }
 
 public partial class HurtBox : Area2D
@@ -22,4 +22,4 @@ public partial class HurtBox : Area2D
     {
         OnHurt?.Invoke(this, new HurtEventArgs(hitbox, buff));
     }
-}   
+}

@@ -1,22 +1,30 @@
-using Godot;
 using System.Threading.Tasks;
+using Godot;
 
-public partial class RainTransition : CanvasLayer,ISceneTransition
+public partial class RainTransition : CanvasLayer, ISceneTransition
 {
     private AnimationPlayer _animationPlayer;
     private ColorRect _overlay;
-    
-    [Export]
-    public float DistortionStrength { get; set; } = 0.2f;
-    
-    [Export]
-    public float RippleSpeed { get; set; } = 3.0f;
-    
-    [Export]
-    public float FlowSpeed { get; set; } = 1.0f;
-    
-    [Export]
-    public float DropRate { get; set; } = 0.7f;
+
+    [Export] public float DistortionStrength { get; set; } = 0.2f;
+
+    [Export] public float RippleSpeed { get; set; } = 3.0f;
+
+    [Export] public float FlowSpeed { get; set; } = 1.0f;
+
+    [Export] public float DropRate { get; set; } = 0.7f;
+
+    public async Task TransitionOut()
+    {
+        _animationPlayer.Play("rain_out");
+        await ToSignal(_animationPlayer, "animation_finished");
+    }
+
+    public async Task TransitionIn()
+    {
+        _animationPlayer.Play("rain_in");
+        await ToSignal(_animationPlayer, "animation_finished");
+    }
 
     private void UpdateParameters()
     {
@@ -31,7 +39,7 @@ public partial class RainTransition : CanvasLayer,ISceneTransition
     }
 
     /// <summary>
-    /// 设置雨滴效果参数
+    ///     设置雨滴效果参数
     /// </summary>
     public void SetRainParameters(
         float? distortion = null,
@@ -43,21 +51,7 @@ public partial class RainTransition : CanvasLayer,ISceneTransition
         if (rippleSpeed.HasValue) RippleSpeed = rippleSpeed.Value;
         if (flowSpeed.HasValue) FlowSpeed = flowSpeed.Value;
         if (dropRate.HasValue) DropRate = dropRate.Value;
-        
+
         UpdateParameters();
     }
-
-    public async Task TransitionOut()
-    {
-        _animationPlayer.Play("rain_out");
-        await ToSignal(_animationPlayer, "animation_finished");
-    }
-
-    public async Task TransitionIn()
-    {
-        _animationPlayer.Play("rain_in");
-        await ToSignal(_animationPlayer, "animation_finished");
-    }
-    
-
-} 
+}

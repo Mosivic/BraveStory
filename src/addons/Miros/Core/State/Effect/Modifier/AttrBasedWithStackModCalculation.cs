@@ -1,9 +1,7 @@
-
-
 namespace Miros.Core;
 
 /// <summary>
-///  基于属性混合GE堆栈的MMC
+///     基于属性混合GE堆栈的MMC
 /// </summary>
 public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
 {
@@ -13,14 +11,14 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
         Multiply
     }
 
-    /// <summary>
-    /// 堆叠幅值计算
-    /// 公式：StackCount * sK + sB
-    /// </summary>
-    public float sK = 1;
-
 
     public float sB = 0;
+
+    /// <summary>
+    ///     堆叠幅值计算
+    ///     公式：StackCount * sK + sB
+    /// </summary>
+    public float sK = 1;
 
 
     public StackMagnitudeOperation stackMagnitudeOperation;
@@ -55,5 +53,4 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
             _ => attrMagnitude + stackMagnitude
         };
     }
-
 }

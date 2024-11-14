@@ -5,8 +5,8 @@ namespace Miros.Core;
 public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
     where TJob : JobBase
 {
+    protected Dictionary<Tag, TJob> _jobs = [];
     protected Persona _owner;
-    protected Dictionary<Tag,TJob> _jobs = [];
 
     public virtual void AddJob(TJob job)
     {
@@ -42,13 +42,11 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
 
     public virtual void PhysicsUpdate(double delta)
     {
-        return;
     }
 
 
     public virtual void Update(double delta)
     {
-        return;
     }
 
     public virtual TJob[] GetAllJobs()

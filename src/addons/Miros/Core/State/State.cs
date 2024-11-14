@@ -5,11 +5,18 @@ namespace Miros.Core;
 
 public class State
 {
+    // 添加构造函数
+    public State(string name, Tag sign)
+    {
+        Name = name;
+        Sign = sign;
+    }
+
     // Core
     public string Name { get; init; }
     public Tag Sign { get; init; }
     public string Description { get; init; }
-    
+
     public Type JobType { get; init; } = typeof(JobBase);
     public int Priority { get; init; } = 0;
 
@@ -21,13 +28,6 @@ public class State
     public double RunningTime { get; set; } = 0;
 
     public Dictionary<Type, StateComponent<JobBase>> Components { get; set; } = [];
-
-    // 添加构造函数
-    public State(string name, Tag sign)
-    {
-        Name = name;
-        Sign = sign;
-    }
 
     // 添加便捷的组件添加方法
     public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<JobBase>, new()
@@ -134,7 +134,8 @@ public class State
             component = new StandardDelegateComponent();
             Components[typeof(StandardDelegateComponent)] = component;
         }
+
         setup((StandardDelegateComponent)component);
         return this;
-}
+    }
 }

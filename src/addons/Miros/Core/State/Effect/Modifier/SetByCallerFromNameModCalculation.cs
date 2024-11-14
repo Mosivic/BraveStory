@@ -1,9 +1,9 @@
-using Godot;
 namespace Miros.Core;
 
 public class SetByCallerFromNameModCalculation : ModifierMagnitudeCalculation
 {
     private string valueName;
+
     public override float CalculateMagnitude(Effect state, float input)
     {
 //         var value = state.GetMapValue(valueName);

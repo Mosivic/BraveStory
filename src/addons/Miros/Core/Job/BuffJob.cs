@@ -132,7 +132,6 @@ public class JobBuff(Buff buff) : JobBase(buff)
     }
 
 
-
     public override void Update(double delta)
     {
         if (buff.Status != RunningStatus.Running) return;
@@ -148,12 +147,10 @@ public class JobBuff(Buff buff) : JobBase(buff)
 
     protected virtual void OnStack()
     {
-
     }
 
     protected virtual void OnStackOverflow()
     {
-
     }
 
     protected virtual void OnDurationOver()
@@ -163,15 +160,12 @@ public class JobBuff(Buff buff) : JobBase(buff)
 
         if (buff.StackCurrentCount == 0)
             buff.Status = RunningStatus.Succeed;
-
-
     }
 
     protected virtual void OnPeriodOver()
     {
         ApplyModifiers();
         buff.PeriodElapsed = 0;
-
     }
 
     private void ApplyModifiers()
@@ -206,6 +200,7 @@ public class JobBuff(Buff buff) : JobBase(buff)
         //     buff.OnApplyModifierFunc?.Invoke(modifier);
         // }
     }
+
     private void CancelModifiers()
     {
         // foreach (var modifier in buff.Modifiers)
@@ -214,7 +209,4 @@ public class JobBuff(Buff buff) : JobBase(buff)
         //     buff.OnCancelModifierFunc?.Invoke(modifier);
         // }
     }
-
-
-
 }

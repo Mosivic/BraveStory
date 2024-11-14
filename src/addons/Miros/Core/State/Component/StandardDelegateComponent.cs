@@ -2,7 +2,7 @@ using System;
 
 namespace Miros.Core;
 
-public class StandardDelegateComponent: StateComponent<JobBase>
+public class StandardDelegateComponent : StateComponent<JobBase>
 {
     public Func<State, bool> EnterCondition { get; set; }
     public Func<State, bool> ExitCondition { get; set; }

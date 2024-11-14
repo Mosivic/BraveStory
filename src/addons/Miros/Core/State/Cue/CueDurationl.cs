@@ -1,10 +1,7 @@
-
-
 namespace Miros.Core;
 
 public abstract class CueDurational(string name, Tag sign) : Cue(name, sign)
 {
-
     // public override Cue ApplyFrom(Effect effect)
     // {
     //     if (!Triggerable(effect.Owner)) return null;
@@ -20,6 +17,3 @@ public abstract class CueDurational(string name, Tag sign) : Cue(name, sign)
     //     return this;
     // }
 }
-
-
-

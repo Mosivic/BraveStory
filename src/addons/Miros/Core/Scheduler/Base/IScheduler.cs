@@ -1,5 +1,4 @@
-﻿
-namespace Miros.Core;
+﻿namespace Miros.Core;
 
 public interface IScheduler<TJob>
     where TJob : JobBase

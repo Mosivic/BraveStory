@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Miros.Core;
@@ -30,7 +29,7 @@ public interface IPersona
     void RemoveFixedTags(TagSet tags);
 
     void RemoveFixedTag(Tag tag);
-    
+
     void ApplyModFromInstantEffect(Effect effect);
 
     Dictionary<string, float> DataSnapshot();
@@ -40,6 +39,4 @@ public interface IPersona
     float? GetAttributeBaseValue(string setName, string attributeShortName);
 
     T AttrSet<T>() where T : AttributeSet;
-
-}   
-
+}

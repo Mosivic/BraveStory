@@ -23,72 +23,70 @@ public enum StateStackType
     Target //对Buff Target 限制层数
 }
 
-
 public enum GrantedAbilityActivationPolicy
 {
     /// <summary>
-    /// 不激活, 等待用户调用ASC激活
+    ///     不激活, 等待用户调用ASC激活
     /// </summary>
     None,
 
     /// <summary>
-    /// 能力添加时激活（GE添加时激活）
+    ///     能力添加时激活（GE添加时激活）
     /// </summary>
     WhenAdded,
 
     /// <summary>
-    /// 同步GE激活时激活
+    ///     同步GE激活时激活
     /// </summary>
-    SyncWithEffect,
+    SyncWithEffect
 }
 
 /// <summary>
-/// 授予能力的取消激活策略
+///     授予能力的取消激活策略
 /// </summary>
 public enum GrantedAbilityDeactivationPolicy
 {
     /// <summary>
-    /// 无相关取消激活逻辑, 需要用户调用ASC取消激活
+    ///     无相关取消激活逻辑, 需要用户调用ASC取消激活
     /// </summary>
     None,
 
     /// <summary>
-    /// 同步GE，GE失活时取消激活
+    ///     同步GE，GE失活时取消激活
     /// </summary>
-    SyncWithEffect,
+    SyncWithEffect
 }
 
 /// <summary>
-/// 授予能力的移除策略
+///     授予能力的移除策略
 /// </summary>
 public enum GrantedAbilityRemovePolicy
 {
     /// <summary>
-    /// 不移除
+    ///     不移除
     /// </summary>
     None,
 
     /// <summary>
-    /// 同步GE，GE移除时移除
+    ///     同步GE，GE移除时移除
     /// </summary>
     SyncWithEffect,
 
     /// <summary>
-    /// 能力结束时自己移除
+    ///     能力结束时自己移除
     /// </summary>
     WhenEnd,
 
     /// <summary>
-    /// 能力取消时自己移除
+    ///     能力取消时自己移除
     /// </summary>
     WhenCancel,
 
     /// <summary>
-    /// 能力结束或取消时自己移除
+    ///     能力结束或取消时自己移除
     /// </summary>
-    WhenCancelOrEnd,
+    WhenCancelOrEnd
 }
-
 
 public enum StackingType
 {
@@ -120,8 +118,8 @@ public enum ExpirationPolicy
     RemoveSingleStackAndRefreshDuration, //持续时间结束时减少一层，然后重新经历一个Duration，一直持续到层数减为0
 
     RefreshDuration //持续时间结束时,再次刷新Duration，这相当于无限Duration，
-                    //TODO :可以通过调用GameplayEffectsContainer的OnStackCountChange(GameplayEffect ActiveEffect, int OldStackCount, int NewStackCount)来处理层数，
-                    //TODO :可以达到Duration结束时减少两层并刷新Duration这样复杂的效果。
+    //TODO :可以通过调用GameplayEffectsContainer的OnStackCountChange(GameplayEffect ActiveEffect, int OldStackCount, int NewStackCount)来处理层数，
+    //TODO :可以达到Duration结束时减少两层并刷新Duration这样复杂的效果。
 }
 
 public enum ModifierOperation
@@ -134,7 +132,6 @@ public enum ModifierOperation
     Invalid = 5 //无效
 }
 
-
 [Flags]
 public enum SupportedOperation
 {
@@ -146,22 +143,19 @@ public enum SupportedOperation
     All = Add | Multiply | Divide | Override //所有
 }
 
-
 public enum CalculateMode
 {
     Stacking, //堆叠
     MinValueOnly, //最小值
-    MaxValueOnly, //最大值
+    MaxValueOnly //最大值
 }
-
 
 public enum TagMatchType
 {
-    Explicit,           // 精确匹配
-    IncludeParentTags,  // 包含父标签
-    IncludeChildTags    // 包含子标签
+    Explicit, // 精确匹配
+    IncludeParentTags, // 包含父标签
+    IncludeChildTags // 包含子标签
 }
-
 
 public enum AbilityActivateResult
 {
@@ -173,15 +167,12 @@ public enum AbilityActivateResult
     FailOtherReason //其他原因
 }
 
-
-
 public enum DurationPolicy //持续策略
 {
     Instant, //立即生效
     Infinite, //永久生效
     Duration //规定时长
 }
-
 
 public enum RunningCompletePolicy
 {

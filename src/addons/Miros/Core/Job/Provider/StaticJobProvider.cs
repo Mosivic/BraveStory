@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace Miros.Core;
 
 public class StaticJobProvider : IJobProvider
@@ -24,7 +23,7 @@ public class StaticJobProvider : IJobProvider
     private JobBase CreateJob(State state)
     {
         var type = state.JobType;
-        var job = (JobBase)Activator.CreateInstance(type, [state]);
+        var job = (JobBase)Activator.CreateInstance(type, state);
         _statesJob[state] = job;
         return job;
     }

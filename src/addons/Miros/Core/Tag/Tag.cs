@@ -1,16 +1,15 @@
-using System;
 using System.Linq;
 
 namespace Miros.Core;
 
-public  struct Tag
+public struct Tag
 {
     public readonly string _name;
 
-    public int HashCode {get;set;}
-    public string ShortName {get;set;}
-    public int[] AncestorHashCodes{get;set;}
-    public string[] AncestorNames {get;set;}
+    public int HashCode { get; set; }
+    public string ShortName { get; set; }
+    public int[] AncestorHashCodes { get; set; }
+    public string[] AncestorNames { get; set; }
 
 
     public bool IsValid => !string.IsNullOrEmpty(_name);
@@ -49,7 +48,6 @@ public  struct Tag
     }
 
 
-
     public static bool operator ==(Tag x, Tag y)
     {
         return x.HashCode == y.HashCode;
@@ -73,5 +71,4 @@ public  struct Tag
     {
         return HashCode;
     }
-
 }

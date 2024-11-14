@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Reflection.Metadata;
 
 namespace Miros.Core;
 // 对自定义回调函数的处理
 
 public abstract class AbsJob(State state)
 {
-
     public string Name => state.Name;
     public string Description => state.Description;
     public Tag Sign => state.Sign;
