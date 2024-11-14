@@ -11,7 +11,7 @@ public abstract class AttributeSet
     public Persona Owner { get; private set; }
 
     /// <summary>
-    ///     设置属性集的拥有者
+    /// 设置属性集的拥有者
     /// </summary>
     /// <param name="owner">拥有者</param>
     public void SetOwner(Persona owner)
@@ -22,7 +22,7 @@ public abstract class AttributeSet
 
 
     /// <summary>
-    ///     修改属性基础值
+    /// 修改属性基础值
     /// </summary>
     /// <param name="attributeShortName">属性名</param>
     /// <param name="value">新值</param>

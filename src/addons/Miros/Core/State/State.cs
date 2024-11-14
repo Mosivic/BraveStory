@@ -1,31 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
+using BraveStory;
 
 namespace Miros.Core;
 
-public class State
-{
-    // 添加构造函数
-    public State(string name, Tag sign)
-    {
-        Name = name;
-        Sign = sign;
-    }
 
-    // Core
-    public string Name { get; init; }
-    public Tag Sign { get; init; }
-    public string Description { get; init; }
+public struct Transition
+{
+    public Tag ToStateSign;
+    public Func<bool> Condition;
+    public StateTransitionMode Mode;
+}
+
+
+public class State(Tag sign)
+{
+    public Tag Sign { get; init; } = sign;
 
     public Type JobType { get; init; } = typeof(JobBase);
     public int Priority { get; init; } = 0;
 
     public Persona Owner { get; protected set; }
     public Persona Source { get; protected set; }
+
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;
 
     public double RunningTime { get; set; } = 0;
+
+    public HashSet<Transition> Transitions { get; set; } = [];
+
 
     public Dictionary<Type, StateComponent<JobBase>> Components { get; set; } = [];
 
@@ -42,100 +47,126 @@ public class State
     // 扩展现有的 OnEnter 方法族
     public State OnEnter(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.EnterFunc = action);
+        GetStandardDelegateComponent().EnterFunc += action;
+        return this;
     }
 
     public State OnEnterIf(Func<State, bool> condition)
     {
-        return AddOrUpdateDelegate(c => c.EnterCondition = condition);
+        GetStandardDelegateComponent().EnterCondition += condition;
+        return this;
     }
 
     // 退出相关
     public State OnExit(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.ExitFunc = action);
+        GetStandardDelegateComponent().ExitFunc += action;
+        return this;
     }
 
     public State OnExitIf(Func<State, bool> condition)
     {
-        return AddOrUpdateDelegate(c => c.ExitCondition = condition);
+        GetStandardDelegateComponent().ExitCondition += condition;
+        return this;
     }
 
     // 状态结果相关
     public State OnSucceed(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.OnSucceedFunc = action);
+        GetStandardDelegateComponent().OnSucceedFunc += action;
+        return this;
     }
 
     public State OnFail(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.OnFailedFunc = action);
+        GetStandardDelegateComponent().OnFailedFunc += action;
+        return this;
     }
 
     // 暂停/恢复相关
     public State OnPause(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.PauseFunc = action);
+        GetStandardDelegateComponent().PauseFunc += action;
+        return this;
     }
 
     public State OnResume(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.ResumeFunc = action);
+        GetStandardDelegateComponent().ResumeFunc += action;
+        return this;
     }
 
     // 更新循环相关
     public State OnUpdate(Action<State, double> action)
     {
-        return AddOrUpdateDelegate(c => c.UpdateFunc = action);
+        GetStandardDelegateComponent().UpdateFunc += action;
+        return this;
     }
 
     public State OnPhysicsUpdate(Action<State, double> action)
     {
-        return AddOrUpdateDelegate(c => c.PhysicsUpdateFunc = action);
+        GetStandardDelegateComponent().PhysicsUpdateFunc += action;
+        return this;
     }
 
     // 堆栈相关
     public State OnStack(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.OnStackFunc = action);
+        GetStandardDelegateComponent().OnStackFunc += action;
+        return this;
     }
 
     public State OnStackOverflow(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.OnStackOverflowFunc = action);
+        GetStandardDelegateComponent().OnStackOverflowFunc += action;
+        return this;
     }
 
     // 时间相关
     public State OnDurationOver(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.OnDurationOverFunc = action);
+        GetStandardDelegateComponent().OnDurationOverFunc += action;
+        return this;
     }
 
     public State OnPeriodOver(Action<State> action)
     {
-        return AddOrUpdateDelegate(c => c.OnPeriodOverFunc = action);
+        GetStandardDelegateComponent().OnPeriodOverFunc += action;
+        return this;
     }
 
     public State OnEnterCondition(Func<State, bool> condition)
     {
-        return AddOrUpdateDelegate(c => c.EnterCondition = condition);
+        GetStandardDelegateComponent().EnterCondition += condition;
+        return this;
     }
 
     public State OnExitCondition(Func<State, bool> condition)
     {
-        return AddOrUpdateDelegate(c => c.ExitCondition = condition);
+        GetStandardDelegateComponent().ExitCondition += condition;
+        return this;
+    }
+
+    public State To(Tag sign, Func<bool> condition = null, StateTransitionMode mode = StateTransitionMode.Normal)
+    {
+        Transitions.Add(new Transition { ToStateSign = sign, Condition = condition, Mode = mode });
+        return this;
+    }
+
+    public State Any(Func<bool> condition = null, StateTransitionMode mode = StateTransitionMode.Normal)
+    {
+        Transitions.Add(new Transition { ToStateSign = Tags.None, Condition = condition, Mode = mode });
+        return this;
     }
 
     // 辅助方法
-    private State AddOrUpdateDelegate(Action<StandardDelegateComponent> setup)
+    private StandardDelegateComponent GetStandardDelegateComponent()
     {
         if (!Components.TryGetValue(typeof(StandardDelegateComponent), out var component))
         {
             component = new StandardDelegateComponent();
             Components[typeof(StandardDelegateComponent)] = component;
         }
-
-        setup((StandardDelegateComponent)component);
-        return this;
+        return (StandardDelegateComponent)component;
     }
 }

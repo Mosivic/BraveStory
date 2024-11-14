@@ -21,7 +21,7 @@ public class AttributeSetContainer(Persona owner)
     }
 
     /// <summary>
-    ///     向容器中添加一个新的属性集。如果同类型的属性集已存在，则不会重复添加。
+    /// 向容器中添加一个新的属性集。如果同类型的属性集已存在，则不会重复添加。
     /// </summary>
     /// <param name="attrSetType">要添加的属性集类型，必须继承自AttributeSet</param>
     public void AddAttributeSet(Type attrSetType)

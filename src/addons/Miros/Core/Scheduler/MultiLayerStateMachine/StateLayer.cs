@@ -8,31 +8,28 @@ namespace Miros.Core;
 public class StateLayer
 {
     private readonly JobBase _defaultJob;
-    private readonly Dictionary<Tag, JobBase> _jobs;
-    private readonly StateTransitionContainer _transitionContainer;
     private JobBase _currentJob;
     private double _currentStateTime;
     private JobBase _delayJob;
     private JobBase _lastJob;
+    private Dictionary<JobBase, HashSet<StateTransition>> _transitionRules;
+    private HashSet<StateTransition> _anyTransitionRules;
 
-    public StateLayer(Tag layerTag, Tag defaultJobSign,
-        StateTransitionContainer transitionRuleContainer, Dictionary<Tag, JobBase> jobs)
+    public StateLayer(Tag layerTag, JobBase defaultJob,
+        Dictionary<JobBase, HashSet<StateTransition>> transitionRules,
+        HashSet<StateTransition> anyTransitionRules)
     {
         Layer = layerTag;
-        _jobs = jobs;
-        _defaultJob = GetJobBySign(defaultJobSign);
+        _defaultJob = defaultJob;
         _currentJob = _defaultJob;
         _lastJob = _defaultJob;
         _delayJob = null;
-        _transitionContainer = transitionRuleContainer;
+        _transitionRules = transitionRules;
+        _anyTransitionRules = anyTransitionRules;
     }
 
     public Tag Layer { get; }
 
-    private JobBase GetJobBySign(Tag jobSign)
-    {
-        return _jobs.GetValueOrDefault(jobSign) ?? _defaultJob;
-    }
 
     public void Update(double delta)
     {
@@ -62,17 +59,17 @@ public class StateLayer
             return;
         }
 
-        var transitions = _transitionContainer.GetPossibleTransition(_currentJob.Sign);
+        var transitions = GetPosibleTransitions(_currentJob);
 
         // 使用LINQ获取优先级最高且可进入的状态
         var nextTransition = transitions
-            .OrderByDescending(t => GetJobBySign(t.ToJobSign).Priority)
+            .OrderByDescending(t => t.ToJob.Priority)
             .Where(t => t.Mode switch
             {
                 StateTransitionMode.Normal => t.CanTransition() && _currentJob.CanExit() &&
-                                              GetJobBySign(t.ToJobSign).CanEnter(),
-                StateTransitionMode.Force => t.CanTransition() && GetJobBySign(t.ToJobSign).CanEnter(),
-                StateTransitionMode.DelayFront => t.CanTransition() && GetJobBySign(t.ToJobSign).CanEnter(),
+                                                t.ToJob.CanEnter(),
+                StateTransitionMode.Force => t.CanTransition() && t.ToJob.CanEnter(),
+                StateTransitionMode.DelayFront => t.CanTransition() && t.ToJob.CanEnter(),
                 _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
             })
             .FirstOrDefault();
@@ -81,7 +78,7 @@ public class StateLayer
 
         if (nextTransition.Mode == StateTransitionMode.DelayFront)
         {
-            _delayJob = GetJobBySign(nextTransition.ToJobSign);
+            _delayJob = nextTransition.ToJob;
 
             if (_currentJob.CanExit())
             {
@@ -91,7 +88,7 @@ public class StateLayer
         }
         else
         {
-            TransformState(GetJobBySign(nextTransition.ToJobSign));
+            TransformState(nextTransition.ToJob);
         }
     }
 
@@ -113,10 +110,7 @@ public class StateLayer
         _lastJob = _currentJob;
         _currentJob = nextJob;
         _currentStateTime = 0.0;
-
-#if DEBUG && true
-        GD.Print($"[{Engine.GetProcessFrames()}] {_lastJob.Name} -> {_currentJob.Name}.");
-#endif
+        
     }
 
     public JobBase GetNowJob()
@@ -132,5 +126,10 @@ public class StateLayer
     public double GetCurrentJobTime()
     {
         return _currentStateTime;
+    }
+
+    public StateTransition[] GetPosibleTransitions(JobBase job)
+    {
+        return _transitionRules[job].Union(_anyTransitionRules).ToArray();
     }
 }

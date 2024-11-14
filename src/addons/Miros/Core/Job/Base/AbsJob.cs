@@ -5,8 +5,6 @@ namespace Miros.Core;
 
 public abstract class AbsJob(State state)
 {
-    public string Name => state.Name;
-    public string Description => state.Description;
     public Tag Sign => state.Sign;
     public int Priority => state.Priority;
     public bool IsActive => state.IsActive;

@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using BraveStory;
+using Example;
 using Godot;
 using Miros.Core;
+using static BraveStory.TestData;
 
+namespace BraveStory;
 public partial class Player : Character
 {
     private const float INITIAL_SLIDING_SPEED = 400f;
@@ -14,12 +17,11 @@ public partial class Player : Character
     private RayCast2D _handChecker;
     private int _hp = 10;
 
-
+    private PlayerData Data;
     private int _jumpCount;
     private int _maxJumpCount = 2;
     private float _slidingSpeed;
 
-    private PlayerData Data { get; } = new();
     public HashSet<Interactable> Interactions { get; set; } = new();
 
 
@@ -31,212 +33,139 @@ public partial class Player : Character
         _footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
         _animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
+        _persona = new Persona(this,new StaticJobProvider());
+        _persona.AttributeSetContainer.AddAttributeSet(typeof(PlayerAttributeSet));
+        Data = new PlayerData();
+
         // Idle  
-        var idle = new State("Idle", Tags.Idle)
-            .OnEnter(s =>
+        var idle = new State(Tags.Idle)
+            .OnEnter(_ =>
             {
                 PlayAnimation("idle");
                 _jumpCount = 0;
-            });
+            })
+            .Any(() => _hasHit, StateTransitionMode.Force)
+            .To(Tags.Run, KeyDownMove)
+            .To(Tags.Fall, () => !IsOnFloor())
+            .To(Tags.Jump, KeyDownJump)
+            .To(Tags.Attack, KeyDownAttack)
+            .To(Tags.WallSlide, KeyDownSliding);
 
         // Jump
-        var jump = new State("Jump", Tags.Jump)
-            .OnEnter(s =>
+        var jump = new State(Tags.Jump)
+            .OnEnter(_ =>
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
                 _jumpCount++;
-            });
+            })
+            .To(Tags.Fall);
 
         // Wall Jump
-        var wall_jump = new State("WallJump", Tags.Jump)
-            .OnEnter(s =>
+        var wall_jump = new State(Tags.Jump)
+            .OnEnter(_ =>
             {
                 PlayAnimation("jump");
                 var wallJumpDirectionX = _graphics.Scale.X;
                 Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
                 _jumpCount = 0;
-            });
-
+            })
+            .To(Tags.Fall);
 
         // Run
-        var run = new State("Run", Tags.Run)
-            .OnEnter(s => PlayAnimation("run"))
-            .OnPhysicsUpdate((s, delta) => Move(delta));
-
+        var run = new State(Tags.Run)
+            .OnEnter(_ => PlayAnimation("run"))
+            .OnPhysicsUpdate((_, delta) => Move(delta))
+            .To(Tags.Idle, () => !KeyDownMove())
+            .To(Tags.Jump, KeyDownJump)
+            .To(Tags.Attack, KeyDownAttack)
+            .To(Tags.WallSlide, KeyDownSliding);
 
         // Fall
-        var fall = new State("Fall", Tags.Fall)
-            .OnEnter(s => PlayAnimation("fall"))
-            .OnPhysicsUpdate((s, delta) => Fall(delta));
-
-        // // Landing
-        // var landing = new PlayerState(this, _data)
-        // {
-        //     Name = "Last",
-        //     Layer = movementTag,
-        //     JobType = typeof(JobSimple),
-        //     IsPreparedFunc = () => isOnFloor.LastIs(false) && isOnFloor.Is(true),
-        //     Duration = 0.25,
-        //     IsFailedFunc = () => false,
-        //     Priority = 15,
-        //     EnterFunc = s => PlayAnimation("landing")
-        // };
-
+        var fall = new State(Tags.Fall)
+            .OnEnter(_ => PlayAnimation("fall"))
+            .OnPhysicsUpdate((_, delta) => Fall(delta))
+            .To(Tags.Idle, IsOnFloor)
+            .To(Tags.WallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove())
+            .To(Tags.DoubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount);
 
         // Double Jump
-        var doubleJump = new State("DoubleJump", Tags.Jump)
-            .OnEnter(s =>
+        var doubleJump = new State(Tags.Jump)
+            .OnEnter(_ =>
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
                 _jumpCount++;
-            });
-
+            })
+            .To(Tags.Fall);
 
         // Wall Slide
-        var wallSlide = new State("WallSlide", Tags.WallSlide)
-            .OnEnter(s => PlayAnimation("wall_sliding"))
-            .OnPhysicsUpdate((s, delta) => WallSlide(delta));
+        var wallSlide = new State(Tags.WallSlide)
+            .OnEnter(_ => PlayAnimation("wall_sliding"))
+            .OnPhysicsUpdate((_, delta) => WallSlide(delta))
+            .To(Tags.Idle, IsOnFloor)
+            .To(Tags.Fall, () => !_footChecker.IsColliding())
+            .To(Tags.WallJump, KeyDownJump);
 
-        var attack1 = new State("Attack1", Tags.Attack1)
-            .OnEnter(s => PlayAnimation("attack1"))
-            .OnExitCondition(s => IsAnimationFinished());
+        // Attack1
+        var attack1 = new State(Tags.Attack1)
+            .OnEnter(_ => PlayAnimation("attack1"))
+            .OnExitCondition(_ => IsAnimationFinished())
+            .To(Tags.Idle)
+            .To(Tags.Attack11, () => _persona.GetStateBy(Tags.Attack1).RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront);
 
-        var attack11 = new State("Attack11", Tags.Attack11)
-            .OnEnter(s => PlayAnimation("attack11"))
-            .OnExitCondition(s => IsAnimationFinished());
 
-        var attack111 = new State("Attack111", Tags.Attack111)
-            .OnEnter(s => PlayAnimation("attack111"))
-            .OnExitCondition(s => IsAnimationFinished());
+        // Attack11
+        var attack11 = new State(Tags.Attack11)
+            .OnEnter(_ => PlayAnimation("attack11"))
+            .OnExitCondition(_ => IsAnimationFinished())
+            .To(Tags.Attack111, () => _persona.GetStateBy(Tags.Attack11).RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront);
 
-        var hit = new State("Hit", Tags.Hit)
-            .OnEnter(s => PlayAnimation("hit"))
-            .OnExit(s => _hasHit = false);
+        // Attack111
+        var attack111 = new State(Tags.Attack111)
+            .OnEnter(_ => PlayAnimation("attack111"))
+            .OnExitCondition(_ => IsAnimationFinished())
+            .To(Tags.Idle);
 
-        var die = new State("Die", Tags.Die)
-            .OnEnter(s =>
+        // Hit
+        var hit = new State(Tags.Hit)
+            .OnEnter(_ => PlayAnimation("hit"))
+            .OnExit(_ => _hasHit = false)
+            .To(Tags.Idle, IsAnimationFinished);
+
+        // Die
+        var die = new State(Tags.Die)
+            .OnEnter(_ =>
             {
                 PlayAnimation("die");
                 Interactions.Clear();
             })
-            .OnPhysicsUpdate((s, delta) =>
+            .OnPhysicsUpdate((_, _) =>
             {
                 if (IsAnimationFinished()) QueueFree();
-            });
-
+            })
+            .Any(() => _hasHit, StateTransitionMode.Force);
 
         // Sliding
-        var sliding = new State("Sliding", Tags.Sliding)
-            .OnEnter(s =>
+        var sliding = new State(Tags.Sliding)
+            .OnEnter(_ =>
             {
                 PlayAnimation("sliding_start");
                 _slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
             })
-            .OnExit(s => _hurtBox.SetDeferred("monitorable", true))
-            .OnPhysicsUpdate((s, delta) =>
+            .OnExit(_ => _hurtBox.SetDeferred("monitorable", true))
+            .OnPhysicsUpdate((_, delta) =>
             {
                 if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
                     PlayAnimation("sliding_loop");
                 else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
                     PlayAnimation("sliding_end");
                 Slide(delta);
-            });
+            })
+            .To(Tags.Idle, IsAnimationFinished);
 
-        // var addHpBuff = new Buff
-        // {
-        // 	Name = "AddHp",
-        // 	Sign = Tags.LayerBuff,
-        // 	JobType = typeof(JobBuff),
-        // 	Modifiers =
-        // 	[
-        // 		// new Modifier
-        // 		// {
-        // 		// 	Property = Data.RunSpeed,
-        // 		// 	Affect = -10,
-        // 		// 	Operator = ModifierOperation.Add
-        // 		// }
-        // 	],
-        // 	DurationPolicy = DurationPolicy.Duration,
-        // 	Duration = 3,
-        // 	Period = 1,
-        // 	StackMaxCount = 3,
-        // 	OnPeriodOverFunc = state => GD.Print("PeriodOver"),
-        // 	EnterFunc = _ => GD.Print("Enter"),
-        // 	ExitFunc = _ => GD.Print("Exit"),
-        // 	OnDurationOverFunc = _ => GD.Print("DurationOver"),
-        // 	OnApplyModifierFunc = _ => GD.Print($"ApplyModifier RunSpeed : {Data.RunSpeed}"),
-        // 	Priority = 0
-        // };
-
-
-        // 转换规则
-        var transitions = new StateTransitionContainer();
-
-        transitions
-            .AddTransitionGroup(Tags.Idle, [
-                new StateTransition(Tags.Run, KeyDownMove),
-                new StateTransition(Tags.Fall, () => !IsOnFloor()),
-                new StateTransition(Tags.Jump, KeyDownJump),
-                new StateTransition(Tags.Attack, KeyDownAttack),
-                new StateTransition(Tags.WallSlide, KeyDownSliding)
-            ])
-            .AddTransitionGroup(Tags.Attack1, [
-                new StateTransition(Tags.Idle),
-                new StateTransition(Tags.Attack11, () => attack1.RunningTime > 0.2f && KeyDownAttack(),
-                    StateTransitionMode.DelayFront)
-            ])
-            .AddTransitionGroup(Tags.Attack11, [
-                new StateTransition(Tags.Idle),
-                new StateTransition(Tags.Attack111, () => attack11.RunningTime > 0.2f && KeyDownAttack(),
-                    StateTransitionMode.DelayFront)
-            ])
-            .AddTransitionGroup(Tags.Attack111, [
-                new StateTransition(Tags.Idle)
-            ])
-            .AddTransitionGroup(Tags.Run, [
-                new StateTransition(Tags.Idle, () => !KeyDownMove()),
-                new StateTransition(Tags.Jump, KeyDownJump),
-                new StateTransition(Tags.Attack, KeyDownAttack),
-                new StateTransition(Tags.WallSlide, KeyDownSliding)
-            ])
-            .AddTransitionGroup(Tags.Jump, [
-                new StateTransition(Tags.Fall)
-            ])
-            .AddTransitionGroup(Tags.Fall, [
-                new StateTransition(Tags.Idle, IsOnFloor),
-                new StateTransition(Tags.WallSlide,
-                    () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove()),
-                new StateTransition(Tags.DoubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount)
-            ])
-            .AddTransitionGroup(Tags.DoubleJump, [
-                new StateTransition(Tags.Fall)
-            ])
-            .AddTransitionGroup(Tags.WallSlide, [
-                new StateTransition(Tags.Idle, IsOnFloor),
-                new StateTransition(Tags.Fall, () => !_footChecker.IsColliding()),
-                new StateTransition(Tags.WallJump, KeyDownJump)
-            ])
-            .AddTransitionGroup(Tags.WallJump, [
-                new StateTransition(Tags.Fall)
-            ])
-            .AddTransitionGroup(Tags.Hit, [
-                new StateTransition(Tags.Idle, IsAnimationFinished)
-            ])
-            .AddTransitionGroup(Tags.Sliding, [
-                new StateTransition(Tags.Idle)
-            ]);
-
-        // Special transitions that don't fit the group pattern
-        transitions.AddAnyTransition(Tags.Hit, () => _hasHit, StateTransitionMode.Force);
-        transitions.AddAnyTransition(Tags.Die, () => _hp <= 0);
-
-
-        var stateMachine = new MultiLayerStateMachine();
-        stateMachine.AddLayer(Tags.LayerMovement, Tags.Idle, transitions);
-        _persona.AddScheduler(stateMachine,
-            [idle, run, jump, doubleJump, fall, wallSlide, wall_jump, attack1, attack11, attack111, hit, die, sliding]);
+        _persona.CreateMultiLayerStateMachine(Tags.LayerMovement,idle,
+        [idle,run,jump,fall,wall_jump,doubleJump,wallSlide,attack1,attack11,attack111,hit,die,sliding]);
 
         // Canvas Layer
         var canvasLayer = new CanvasLayer();
@@ -276,7 +205,7 @@ public partial class Player : Character
         else if (!Mathf.IsZeroApprox(Velocity.X)) _graphics.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
     }
 
-    public void Move(double delta)
+    private void Move(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
@@ -288,7 +217,7 @@ public partial class Player : Character
         MoveAndSlide();
     }
 
-    public void Fall(double delta)
+    private void Fall(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
@@ -307,7 +236,7 @@ public partial class Player : Character
         MoveAndSlide();
     }
 
-    public void WallSlide(double delta)
+    private void WallSlide(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
@@ -318,7 +247,7 @@ public partial class Player : Character
         MoveAndSlide();
     }
 
-    public void WallJumpMove(double delta)
+    private void WallJumpMove(double delta)
     {
         var velocity = Velocity;
         velocity.Y += (float)delta * Data.Gravity;
@@ -328,28 +257,28 @@ public partial class Player : Character
         MoveAndSlide();
     }
 
-    public bool KeyDownMove()
+    private bool KeyDownMove()
     {
         return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
     }
 
-    public bool KeyDownJump()
+    private bool KeyDownJump()
     {
         return Input.IsActionJustPressed("jump");
     }
 
-    public bool KeyDownAttack()
+    private bool KeyDownAttack()
     {
         return Input.IsActionJustPressed("attack");
     }
 
-    public bool KeyDownSliding()
+    private bool KeyDownSliding()
     {
         return Input.IsActionJustPressed("sliding");
     }
 
 
-    public void Slide(double delta)
+    private void Slide(double delta)
     {
         var velocity = Velocity;
         _slidingSpeed = Mathf.MoveToward(_slidingSpeed, 0, SLIDING_DECELERATION * (float)delta);
@@ -362,7 +291,7 @@ public partial class Player : Character
 
     protected override void HandleHit(object sender, HitEventArgs e)
     {
-        _hitBox.SetBuffState(new Buff("TestBuff", Tags.LayerBuff)
+        _hitBox.SetBuffState(new Buff( Tags.LayerBuff)
         {
             JobType = typeof(JobBuff)
         });

@@ -1,3 +1,4 @@
+using BraveStory;
 using Godot;
 
 public partial class Interactable : Area2D

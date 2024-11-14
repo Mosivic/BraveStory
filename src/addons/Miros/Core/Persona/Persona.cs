@@ -1,12 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BraveStory;
+using Godot;
 
 namespace Miros.Core;
 
-internal struct StateJobMap
+
+public enum SchedulerType
 {
-    public Tag Sign;
+    MultiLayerStateMachine,
+    EffectScheduler,
+    AbilityScheduler,
+}
+
+internal struct StateMap
+{
     public State State;
     public JobBase Job;
     public SchedulerBase<JobBase> Scheduler;
@@ -14,24 +23,75 @@ internal struct StateJobMap
 
 public class Persona : AbsPersona, IPersona
 {
-    private readonly IJobProvider _jobProvider = new StaticJobProvider();
-    private readonly Dictionary<Type, SchedulerBase<JobBase>> _schedulers = [];
-    private readonly List<StateJobMap> _stateJobMaps = [];
-    public string Name { get; set; }
-    public int Level { get; protected set; }
-    public bool Enabled { get; set; }
+    private readonly Node2D _host;
+    private readonly IJobProvider _jobProvider;
+
+    private readonly Dictionary<SchedulerType, SchedulerBase<JobBase>> _schedulers = [];
+    private readonly Dictionary<Tag, StateMap> _stateMaps = [];
+
+
 
     public TagAggregator TagAggregator { get; private set; }
-    public AttributeSetContainer AttributeSetContainer { get; private set; }
+    public AttributeSetContainer AttributeSetContainer { get; set; } 
 
-    public void AddState<TState>(TState state)
-        where TState : State
+    public Persona(Node2D host, IJobProvider jobProvider)
     {
-        var type = state.GetType();
-        if (!_schedulers.TryGetValue(type, out var scheduler))
+        _jobProvider = jobProvider;
+        AttributeSetContainer = new AttributeSetContainer(this);
+    }
+
+    public State GetStateBy(Tag sign)
+    {
+        return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
+    }
+
+    public void CreateMultiLayerStateMachine(Tag layer,State defaultState, HashSet<State> states)
+    {
+        var scheduler = new MultiLayerStateMachine();
+        var transitionsCache = new Dictionary<JobBase, HashSet<Transition>>();
+
+        // 生成所有状态的job
+        foreach (var state in states)
+        {
+            var job = _jobProvider.GetJob(state);
+            _stateMaps[state.Sign] = new StateMap { State = state, Job = job, Scheduler = scheduler };
+            transitionsCache[job] = state.Transitions;
+        }
+
+        var transitionRules = new Dictionary<JobBase, HashSet<StateTransition>>();
+        var anyTransitionRules = new HashSet<StateTransition>();
+
+        foreach (var (job, transitions) in transitionsCache)
+        {
+            foreach (var transition in transitions)
+            {
+                var toStateSign = transition.ToStateSign;
+                if(toStateSign == Tags.None){
+                    anyTransitionRules.Add(new StateTransition(
+                        job,
+                        transition.Condition,
+                        transition.Mode
+                    ));
+                }else
+                {
+                    transitionRules[job].Add(new StateTransition(
+                        _stateMaps[toStateSign].Job,
+                        transition.Condition,
+                        transition.Mode
+                    ));
+                }
+            }
+        }
+        scheduler.AddLayer(layer,_stateMaps[defaultState.Sign].Job,transitionRules,anyTransitionRules);
+        _schedulers[SchedulerType.MultiLayerStateMachine] = scheduler;
+    }
+
+    public void AddState(SchedulerType schedulerType, State state)
+    {
+        if (!_schedulers.TryGetValue(schedulerType, out var scheduler))
         {
 #if GODOT4 &&DEBUG
-            throw new Exception($"[Miros.Connect] scheduler of {type} not found");
+            throw new Exception($"[Miros.Connect] scheduler of {schedulerType} not found");
 #else
 			return;
 #endif
@@ -39,30 +99,28 @@ public class Persona : AbsPersona, IPersona
 
         var job = _jobProvider.GetJob(state);
         scheduler.AddJob(job);
-        _stateJobMaps.Add(new StateJobMap { Sign = state.Sign, State = state, Job = job, Scheduler = scheduler });
+        _stateMaps[state.Sign] = new StateMap { State = state, Job = job, Scheduler = scheduler };
     }
 
 
-    public void AddStateTo(State state, IPersona target)
+    public void AddStateTo(SchedulerType schedulerType, State state, Persona target)
     {
-        target.AddState(state);
+        target.AddState(schedulerType, state);
     }
 
 
-    public void RemoveState<TState>(TState state)
-        where TState : State
+    public void RemoveState(SchedulerType schedulerType, State state)
     {
-        var type = state.GetType();
-        if (!_schedulers.TryGetValue(type, out var scheduler))
+        if (!_schedulers.TryGetValue(schedulerType, out var scheduler))
         {
 #if GODOT4 &&DEBUG
-            throw new Exception($"[Miros.Connect] scheduler of {type} not found");
+            throw new Exception($"[Miros.Connect] scheduler of {schedulerType} not found");
 #else
 			return;
 #endif
         }
 
-        var job = _stateJobMaps.FirstOrDefault(map => map.State == state).Job;
+        var job = _stateMaps[state.Sign].Job;
         scheduler.RemoveJob(job);
     }
 
@@ -77,10 +135,6 @@ public class Persona : AbsPersona, IPersona
         foreach (var scheduler in _schedulers.Values) scheduler.PhysicsUpdate(delta);
     }
 
-    public JobBase[] GetAllJobs()
-    {
-        return [.. _stateJobMaps.Select(map => map.Job)];
-    }
 
 
     public void ApplyModFromInstantEffect(Effect effect)
@@ -146,32 +200,21 @@ public class Persona : AbsPersona, IPersona
 
     public Effect[] GetEffects()
     {
-        return _stateJobMaps.Where(map => map.Job is EffectJob).Select(map => map.State as Effect).ToArray();
+        return _schedulers[SchedulerType.EffectScheduler].GetAllJobs().Select(job => _stateMaps[job.Sign].State as Effect).ToArray();
     }
 
-
-    public void AddScheduler(SchedulerBase<JobBase> scheduler, HashSet<State> states)
-    {
-        // _schedulers[typeof(TState)] = scheduler;
-        foreach (var state in states)
-        {
-            var job = _jobProvider.GetJob(state);
-            scheduler.AddJob(job);
-            _stateJobMaps.Add(new StateJobMap { Sign = state.Sign, State = state, Job = job, Scheduler = scheduler });
-        }
-    }
 
     public void RemoveEffectWithAnyTags(TagSet tags)
     {
         if (tags.Empty) return;
-        if (!_schedulers.TryGetValue(typeof(EffectJob), out var scheduler)) return;
+        if (!_schedulers.TryGetValue(SchedulerType.EffectScheduler, out var scheduler)) return;
         var jobs = scheduler.GetAllJobs();
         var removeList = new List<State>();
 
         foreach (var job in jobs)
         {
             var effectJob = job as EffectJob;
-            var effect = _stateJobMaps.FirstOrDefault(map => map.Job == effectJob).State as Effect;
+            var effect = _stateMaps[effectJob.Sign].State as Effect;
 
             var ownedTags = effect.OwnedTags;
             if (!ownedTags.Empty && ownedTags.HasAnyTags(tags))
@@ -182,27 +225,10 @@ public class Persona : AbsPersona, IPersona
                 removeList.Add(effect);
         }
 
-        foreach (var effect in removeList) RemoveState(effect);
+        foreach (var effect in removeList) RemoveState(SchedulerType.EffectScheduler, effect);
     }
 
 
-    public JobBase GetNowJob(Type stateType, Tag layer)
-    {
-        if (!_schedulers.TryGetValue(stateType, out var scheduler)) return null;
-        return scheduler.GetNowJob(layer);
-    }
-
-    public JobBase GetLastJob(Type stateType, Tag layer)
-    {
-        if (!_schedulers.TryGetValue(stateType, out var scheduler)) return null;
-        return scheduler.GetLastJob(layer);
-    }
-
-    public double GetCurrentJobTime(Type stateType, Tag layer)
-    {
-        if (!_schedulers.TryGetValue(stateType, out var scheduler)) return 0;
-        return scheduler.GetCurrentJobTime(layer);
-    }
 
     // public void Enable()
     // {

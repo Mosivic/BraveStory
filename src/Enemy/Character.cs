@@ -11,7 +11,7 @@ public partial class Character : CharacterBody2D
     protected HitBox _hitBox;
     protected HurtBox _hurtBox;
 
-    protected Persona _persona = new();
+    protected Persona _persona;
     protected Sprite2D _sprite;
 
 
@@ -54,8 +54,8 @@ public partial class Character : CharacterBody2D
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        GD.Print($"[Hurt]{Name} Received buff :{e.Buff.Name}");
-        _hasHit = true;
+        // GD.Print($"[Hurt]{Name} Received buff :{e.Buff.Name}");
+        // _hasHit = true;
     }
 
 

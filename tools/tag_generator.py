@@ -3,55 +3,13 @@ import os
 from typing import Dict, Any, List, Set
 from pathlib import Path
 
-class TagProperty:
-    def __init__(self, name: str, type_name: str, default_value: Any = None):
-        self.name = name
-        self.type_name = self._normalize_type(type_name)
-        self.default_value = default_value
-    
-    def _normalize_type(self, type_name: str) -> str:
-        """标准化类型名称"""
-        type_map = {
-            'int': 'int',
-            'float': 'float',
-            'bool': 'bool',
-            'string': 'string',
-            'double': 'double',
-            'vector2': 'Vector2',
-            'vector3': 'Vector3'
-        }
-        return type_map.get(type_name.lower(), type_name)
-    
-    def get_property_declaration(self) -> str:
-        return f"public {self.type_name} {self.name} {{ get; set; }}"
-    
-    def get_default_value_string(self) -> str:
-        """获取默认值的字符串表示"""
-        if self.default_value is None:
-            return "default"
-        if isinstance(self.default_value, str):
-            return f'"{self.default_value}"'
-        if isinstance(self.default_value, bool):
-            return str(self.default_value).lower()
-        if self.type_name == "float":  # 为float类型添加F后缀
-            return f"{self.default_value}f"
-        if self.type_name == "Vector2" and isinstance(self.default_value, list) and len(self.default_value) == 2:
-            return f"new Vector2({self.default_value[0]}f, {self.default_value[1]}f)"
-        if self.type_name == "Vector3" and isinstance(self.default_value, list) and len(self.default_value) == 3:
-            return f"new Vector3({self.default_value[0]}f, {self.default_value[1]}f, {self.default_value[2]}f)"
-        return str(self.default_value)
-
 class TagDefinition:
     def __init__(self, name: str, full_path: str, description: str = ""):
         self.name = name
         self.full_path = full_path
         self.description = description
-        self.properties: Dict[str, TagProperty] = {}
         self.inherits: List[str] = []
         self.children: List[TagDefinition] = []
-    
-    def add_property(self, name: str, type_name: str, default_value: Any = None):
-        self.properties[name] = TagProperty(name, type_name, default_value)
     
     def add_child(self, child: 'TagDefinition'):
         self.children.append(child)
@@ -97,17 +55,6 @@ class TagTreeLoader:
         
         tag = TagDefinition(name, full_path, tag_data.get('description', ''))
         
-        # 处理属性
-        if 'properties' in tag_data:
-            for prop_name, prop_data in tag_data['properties'].items():
-                if isinstance(prop_data, dict):
-                    type_name = prop_data.get('type', 'string')
-                    default_value = prop_data.get('default')
-                else:
-                    type_name = self._infer_type(prop_data)
-                    default_value = prop_data
-                tag.add_property(prop_name, type_name, default_value)
-        
         # 处理继承
         if 'inherits' in tag_data:
             for inherit_path in tag_data['inherits']:
@@ -123,23 +70,6 @@ class TagTreeLoader:
         
         self.tag_trees[full_path] = tag
         return tag
-    
-    def _infer_type(self, value: Any) -> str:
-        """推断属性类型"""
-        if isinstance(value, bool):
-            return 'bool'
-        if isinstance(value, int):
-            return 'int'
-        if isinstance(value, float):
-            return 'float'
-        if isinstance(value, str):
-            return 'string'
-        if isinstance(value, list):
-            if len(value) == 2 and all(isinstance(x, (int, float)) for x in value):
-                return 'Vector2'
-            if len(value) == 3 and all(isinstance(x, (int, float)) for x in value):
-                return 'Vector3'
-        return 'string'  # 默认为string类型
     
     def resolve_inheritance(self):
         """解析所有标签的继承关系"""
@@ -174,64 +104,20 @@ class TagCodeGenerator:
         return "\n".join([
             "// This file is auto-generated. Do not modify.",
             "using Godot;",
-            "using System.Runtime.CompilerServices;",
+            "using Miros.Core;",
             "",
             f"namespace {namespace}",
             "{",
-            self._generate_tag_data_classes(),
             self._generate_tags_class(),
             "}"
         ])
-    
-    def _generate_tag_data_classes(self) -> str:
-        """生成标签数据结构体"""
-        definitions = []
-        
-        # 处理所有包含属性的标签
-        for tag in self.tag_loader.tag_trees.values():
-            if not tag.properties:
-                continue
-                
-            class_name = self._get_data_struct_name(tag)
-            props = {}  # 使用字典来存储属性，确保不重复
-            
-            # 如果有继承，先添加所有继承的属性
-            if tag.inherits:
-                for inherit_path in tag.inherits:
-                    parent_tag = self.tag_loader.tag_trees[inherit_path]
-                    for prop_name, prop in parent_tag.properties.items():
-                        if prop_name not in props:  # 只有在属性不存在时才添加
-                            props[prop_name] = (
-                                f"{self.indent}{self.indent}public {prop.type_name} "
-                                f"{prop.name} = {prop.get_default_value_string()};"
-                            )
-            
-            # 添加自己的属性（如果与继承的属性重复，会覆盖）
-            for prop_name, prop in tag.properties.items():
-                props[prop_name] = (
-                    f"{self.indent}{self.indent}public {prop.type_name} "
-                    f"{prop.name} = {prop.get_default_value_string()};"
-                )
-            
-            # 将属性列表转换为有序的行
-            prop_lines = list(props.values())
-            
-            definitions.extend([
-                f"{self.indent}public class {class_name}",
-                f"{self.indent}{{",
-                *prop_lines,
-                f"{self.indent}}}",
-                ""
-            ])
-        
-        return "\n".join(definitions)
     
     def _generate_tags_class(self) -> str:
         """生成标签类"""
         lines = [
             f"{self.indent}public static class Tags",
             f"{self.indent}{{",
-            f"{self.indent}{self.indent}private static GameplayTagManager TagManager => GameplayTagManager.Instance;",
+            f"{self.indent}{self.indent}private static TagManager TagManager => TagManager.Instance;",
             ""
         ]
         
@@ -239,17 +125,13 @@ class TagCodeGenerator:
         for tag in self.tag_loader.tag_trees.values():
             const_name = self._to_const_name(tag.name)
             lines.append(
-                f"{self.indent}{self.indent}public static GameplayTag {const_name} {{ get; }} = "
-                f"TagManager.RequestGameplayTag(\"{tag.full_path}\");"
+                f"{self.indent}{self.indent}public static Tag {const_name} {{ get; }} = "
+                f"TagManager.RequestTag(\"{tag.full_path}\");"
             )
             lines.append("")
         
         lines.append(f"{self.indent}}}")
         return "\n".join(lines)
-    
-    def _get_data_struct_name(self, tag: TagDefinition) -> str:
-        """获取数据结构名称"""
-        return f"{self._to_const_name(tag.name)}Data"
     
     def _to_const_name(self, name: str) -> str:
         """转换为常量名称"""
@@ -258,16 +140,13 @@ class TagCodeGenerator:
 
 def main():
     # 配置
-    src_dir = "data/"
+    src_dir = "data/tags/"
     output_path = "src/Example/GameplayTags.cs"
     namespace = "BraveStory"
     
     # 加载所有标签文件
     loader = TagTreeLoader()
     loader.load_tag_files(src_dir)
-    
-    # 解析继承关系
-    loader.resolve_inheritance()
     
     # 生成代码
     generator = TagCodeGenerator(loader)

@@ -7,3 +7,4 @@
 .godot/
 *.DS_Store
 .venv/
+.fake

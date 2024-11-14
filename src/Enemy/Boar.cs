@@ -1,13 +1,14 @@
 using BraveStory;
 using Godot;
 using Miros.Core;
+using static BraveStory.TestData;
 
 public partial class Boar : Character
 {
     private readonly EnemyData _data = new();
     private RayCast2D _floorChecker;
     private int _hp = 5;
-
+    private EnemyData Data = new();
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
@@ -20,27 +21,34 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
+        _persona = new Persona(this,new StaticJobProvider());
         // 设置初始朝向为左边
         _graphics.Scale = new Vector2(-1, 1);
 
-        var ownedTags = new TagContainer([Tags.Enemy]);
 
-        // States
-        var idle = new State("Idle", Tags.Idle)
-            .OnEnter(s => PlayAnimation("idle"));
+        // Idle
+        var idle = new State(Tags.Idle)
+            .OnEnter(s => PlayAnimation("idle"))
+            .To(Tags.Walk, () => !_playerChecker.IsColliding())
+            .To(Tags.Run, () => _playerChecker.IsColliding());
 
-
-        var walk = new State("Walk", Tags.Walk)
+        // Walk
+        var walk = new State(Tags.Walk)
             .OnEnter(s => PlayAnimation("walk"))
-            .OnPhysicsUpdate((s, d) => Patrol(d));
+            .OnPhysicsUpdate((s, d) => Patrol(d))
+            .To(Tags.Idle, () =>
+            (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && _persona.GetStateBy(Tags.Walk).RunningTime > 2) ||
+            (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
+            .To(Tags.Run, () => _playerChecker.IsColliding());
 
-
-        var run = new State("Run", Tags.Run)
+        // Run
+        var run = new State(Tags.Run)
             .OnEnter(s => PlayAnimation("run"))
-            .OnPhysicsUpdate((s, d) => Chase(d));
+            .OnPhysicsUpdate((s, d) => Chase(d))
+            .To(Tags.Idle, () => !_playerChecker.IsColliding());
 
-
-        var hit = new State("Hit", Tags.Hit)
+        // Hit
+        var hit = new State(Tags.Hit)
             .OnEnter(s =>
             {
                 PlayAnimation("hit");
@@ -67,9 +75,12 @@ public partial class Boar : Character
             {
                 _hasHit = false;
                 _knockbackVelocity = Vector2.Zero;
-            });
+            })
+            .Any(() => _hasHit, StateTransitionMode.Force)
+            .To(Tags.Idle, IsAnimationFinished);  
 
-        var die = new State("Die", Tags.Die)
+        // Die
+        var die = new State(Tags.Die)
             .OnEnter(s => PlayAnimation("die"))
             .OnPhysicsUpdate((s, d) =>
             {
@@ -77,34 +88,8 @@ public partial class Boar : Character
                 Velocity = Velocity * 0.9f;
                 MoveAndSlide();
             })
-            .OnExit(s => QueueFree());
-
-        // Transitions
-        var transitions = new StateTransitionContainer();
-
-        // Idle
-        transitions.AddTransition(Tags.Idle, Tags.Walk, () => !_playerChecker.IsColliding());
-        transitions.AddTransition(Tags.Idle, Tags.Run, () => _playerChecker.IsColliding());
-
-        // Walk 
-        transitions.AddTransition(Tags.Walk, Tags.Idle, () =>
-            (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
-            (!_floorChecker.IsColliding() && _playerChecker.IsColliding()));
-        transitions.AddTransition(Tags.Walk, Tags.Run, () => _playerChecker.IsColliding());
-
-        // Run 
-        transitions.AddTransition(Tags.Run, Tags.Idle, () => !_playerChecker.IsColliding());
-
-        // Hit 
-        transitions.AddAnyTransition(Tags.Hit, () => _hasHit);
-        transitions.AddTransition(Tags.Hit, Tags.Idle, IsAnimationFinished);
-
-        // Die
-        transitions.AddAnyTransition(Tags.Die, () => _hp <= 0);
-
-        var stateMachine = new MultiLayerStateMachine();
-        stateMachine.AddLayer(Tags.LayerMovement, Tags.Idle, transitions);
-        _persona.AddScheduler(stateMachine, [idle, walk, run, hit, die]);
+            .OnExit(s => QueueFree())
+            .Any(() => _hp <= 0);
 
 
         // State Info Display
