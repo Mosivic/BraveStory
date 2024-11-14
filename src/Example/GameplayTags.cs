@@ -40,8 +40,6 @@ namespace BraveStory
 
         public static Tag Fall { get; } = TagManager.RequestTag("State.Action.Fall");
 
-        public static Tag Attack { get; } = TagManager.RequestTag("State.Action.Attack");
-
         public static Tag DoubleJump { get; } = TagManager.RequestTag("State.Action.DoubleJump");
 
         public static Tag WallJump { get; } = TagManager.RequestTag("State.Action.WallJump");

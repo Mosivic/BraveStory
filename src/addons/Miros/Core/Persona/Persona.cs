@@ -74,6 +74,9 @@ public class Persona : AbsPersona, IPersona
                     ));
                 }else
                 {
+                    if(!transitionRules.ContainsKey(job))
+                        transitionRules[job] = new HashSet<StateTransition>();
+                        
                     transitionRules[job].Add(new StateTransition(
                         _stateMaps[toStateSign].Job,
                         transition.Condition,

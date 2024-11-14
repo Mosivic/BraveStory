@@ -48,7 +48,7 @@ public partial class Player : Character
             .To(Tags.Run, KeyDownMove)
             .To(Tags.Fall, () => !IsOnFloor())
             .To(Tags.Jump, KeyDownJump)
-            .To(Tags.Attack, KeyDownAttack)
+            .To(Tags.Attack1, KeyDownAttack)
             .To(Tags.WallSlide, KeyDownSliding);
 
         // Jump
@@ -78,7 +78,7 @@ public partial class Player : Character
             .OnPhysicsUpdate((_, delta) => Move(delta))
             .To(Tags.Idle, () => !KeyDownMove())
             .To(Tags.Jump, KeyDownJump)
-            .To(Tags.Attack, KeyDownAttack)
+            .To(Tags.Attack1, KeyDownAttack)
             .To(Tags.WallSlide, KeyDownSliding);
 
         // Fall
@@ -90,7 +90,7 @@ public partial class Player : Character
             .To(Tags.DoubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount);
 
         // Double Jump
-        var doubleJump = new State(Tags.Jump)
+        var doubleJump = new State(Tags.DoubleJump)
             .OnEnter(_ =>
             {
                 PlayAnimation("jump");
@@ -105,7 +105,7 @@ public partial class Player : Character
             .OnPhysicsUpdate((_, delta) => WallSlide(delta))
             .To(Tags.Idle, IsOnFloor)
             .To(Tags.Fall, () => !_footChecker.IsColliding())
-            .To(Tags.WallJump, KeyDownJump);
+            .To(Tags.Jump, KeyDownJump);
 
         // Attack1
         var attack1 = new State(Tags.Attack1)
