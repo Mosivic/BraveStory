@@ -45,7 +45,7 @@ public class Persona : AbsPersona, IPersona
         return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
     }
 
-    public void CreateMultiLayerStateMachine(Tag layer,State defaultState, HashSet<State> states)
+    public MultiLayerStateMachine CreateMultiLayerStateMachine(Tag layer,State defaultState, HashSet<State> states)
     {
         var scheduler = new MultiLayerStateMachine();
         var transitionsCache = new Dictionary<JobBase, HashSet<Transition>>();
@@ -76,7 +76,7 @@ public class Persona : AbsPersona, IPersona
                 {
                     if(!transitionRules.ContainsKey(job))
                         transitionRules[job] = new HashSet<StateTransition>();
-                        
+
                     transitionRules[job].Add(new StateTransition(
                         _stateMaps[toStateSign].Job,
                         transition.Condition,
@@ -87,6 +87,8 @@ public class Persona : AbsPersona, IPersona
         }
         scheduler.AddLayer(layer,_stateMaps[defaultState.Sign].Job,transitionRules,anyTransitionRules);
         _schedulers[SchedulerType.MultiLayerStateMachine] = scheduler;
+
+        return scheduler;
     }
 
     public void AddState(SchedulerType schedulerType, State state)

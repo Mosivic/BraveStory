@@ -22,6 +22,11 @@ public partial class Player : Character
     private int _maxJumpCount = 2;
     private float _slidingSpeed;
 
+    private const float MIN_JUMP_VELOCITY = -200f;  // 最小跳跃速度
+    private const float MAX_JUMP_HOLD_TIME = 0.2f;  // 最大跳跃按住时间
+    private float _jumpHoldTime = 0f;  // 跳跃按住时间计数器
+    private bool _isJumpHolding = false;  // 是否正在按住跳跃键
+
     public HashSet<Interactable> Interactions { get; set; } = new();
 
 
@@ -49,7 +54,7 @@ public partial class Player : Character
             .To(Tags.Fall, () => !IsOnFloor())
             .To(Tags.Jump, KeyDownJump)
             .To(Tags.Attack1, KeyDownAttack)
-            .To(Tags.WallSlide, KeyDownSliding);
+            .To(Tags.Sliding, KeyDownSliding);
 
         // Jump
         var jump = new State(Tags.Jump)
@@ -59,7 +64,8 @@ public partial class Player : Character
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
                 _jumpCount++;
             })
-            .To(Tags.Fall);
+            .To(Tags.Fall, () => Velocity.Y >= 0)
+            .To(Tags.DoubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount);
 
         // Wall Jump
         var wall_jump = new State(Tags.Jump)
@@ -79,7 +85,7 @@ public partial class Player : Character
             .To(Tags.Idle, () => !KeyDownMove())
             .To(Tags.Jump, KeyDownJump)
             .To(Tags.Attack1, KeyDownAttack)
-            .To(Tags.WallSlide, KeyDownSliding);
+            .To(Tags.Sliding, KeyDownSliding);
 
         // Fall
         var fall = new State(Tags.Fall)
@@ -119,6 +125,7 @@ public partial class Player : Character
         var attack11 = new State(Tags.Attack11)
             .OnEnter(_ => PlayAnimation("attack11"))
             .OnExitCondition(_ => IsAnimationFinished())
+            .To(Tags.Idle)
             .To(Tags.Attack111, () => _persona.GetStateBy(Tags.Attack11).RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront);
 
         // Attack111
@@ -222,11 +229,11 @@ public partial class Player : Character
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
 
-        // 添加空中移动控制
+        // 确保空中移动控制合理
         velocity.X = Mathf.MoveToward(
             velocity.X,
             direction * Data.RunSpeed,
-            Data.AirAcceleration * (float)delta
+            Data.AirAcceleration * (float)delta  // 使用空中加速度而不是地面加速度
         );
 
         velocity.Y += (float)delta * Data.Gravity;
@@ -287,7 +294,6 @@ public partial class Player : Character
         Velocity = velocity;
         MoveAndSlide();
     }
-
 
     protected override void HandleHit(object sender, HitEventArgs e)
     {

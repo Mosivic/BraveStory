@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BraveStory;
 using Godot;
 using Miros.Core;
@@ -91,7 +92,7 @@ public partial class Boar : Character
             .OnExit(s => QueueFree())
             .Any(() => _hp <= 0);
 
-
+        _persona.CreateMultiLayerStateMachine(Tags.LayerMovement, idle, [idle, walk, run, hit, die]);
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
     }
