@@ -122,7 +122,7 @@ public class EffectPeriodTicker
         {
             // 溢出GE生效
             foreach (var overflowEffect in _effect.Stacking.OverflowEffects)
-                _effect.Owner.AddState(SchedulerType.EffectScheduler,overflowEffect);
+                _effect.Owner.AddState(ExecutorType.EffectExecutor,overflowEffect);
 
             if (_effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
             {

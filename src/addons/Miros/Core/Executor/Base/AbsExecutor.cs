@@ -1,6 +1,6 @@
 ﻿namespace Miros.Core;
 
-public abstract class AbsScheduler<TTask>
+public abstract class AbsExecutor<TTask>
     where TTask : ITask
 {
 }

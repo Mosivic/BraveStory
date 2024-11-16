@@ -5,7 +5,7 @@
 
 // namespace Miros.Core;
 
-// public class GoalOrientedJPlan : AbsScheduler
+// public class GoalOrientedJPlan : AbsExecutor
 // {
 //     private readonly List<AbsState> _goalQueue;
 //     private readonly List<AbsState> _goals;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class SchedulerBase<TTask> : AbsScheduler<TTask>, IScheduler<TTask>
+public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor<TTask>
     where TTask : TaskBase
 {
     protected Dictionary<Tag, TTask> _tasks = [];

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class ConditionMachine : SchedulerBase<TaskBase>
+public class ConditionMachine : ExecutorBase<TaskBase>
 {
     protected readonly Dictionary<Tag, List<TaskBase>> RunningTasks = new();
     protected Dictionary<Tag, List<TaskBase>> WaitingTasks { get; set; } = new();

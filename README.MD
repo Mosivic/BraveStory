@@ -21,7 +21,7 @@ Godot Edition：v4.3-stable_mono_win64
 ##### Buff
 ##### All
 ##### Select
-### Scheduler 调度器 
+### Executor 调度器 
 #### MultiLayerStateMachine 多层状态机器
 #### ConditionStateMachine 条件状态机
 #### GoalOrientedStatePlanner 目标导向状态规划器

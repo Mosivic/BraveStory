@@ -3,7 +3,7 @@ using System;
 namespace Miros.Core;
 
 // _tasks 即为运行的 EffectTask
-public class EffectScheduler : SchedulerBase<EffectTask>
+public class EffectExecutor : ExecutorBase<EffectTask>
 {
     private event Action OnEffectsIsDirty;
 

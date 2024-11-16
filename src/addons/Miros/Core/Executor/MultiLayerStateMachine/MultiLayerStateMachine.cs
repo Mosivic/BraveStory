@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Miros.Core;
 
-public class MultiLayerStateMachine : SchedulerBase<TaskBase>
+public class MultiLayerStateMachine : ExecutorBase<TaskBase>
 {
     private readonly Dictionary<Tag, StateLayer> _layers = [];
 

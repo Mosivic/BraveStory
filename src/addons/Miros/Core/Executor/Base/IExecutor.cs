@@ -1,6 +1,6 @@
 ﻿namespace Miros.Core;
 
-public interface IScheduler<TTask>
+public interface IExecutor<TTask>
     where TTask : TaskBase
 {
     void AddTask(TTask task);
