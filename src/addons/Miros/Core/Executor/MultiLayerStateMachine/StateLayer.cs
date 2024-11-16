@@ -1,31 +1,27 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Godot;
 
 namespace Miros.Core;
 
 public class StateLayer
 {
     private readonly TaskBase _defaultTask;
-    private TaskBase _currentTask;
+
+    private readonly StateTransitionContainer _transitionContainer;
     private double _currentStateTime;
+    private TaskBase _currentTask;
     private TaskBase _delayTask;
     private TaskBase _lastTask;
-    private Dictionary<TaskBase, HashSet<StateTransition>> _transitionRules;
-    private HashSet<StateTransition> _anyTransitionRules;
 
     public StateLayer(Tag layerTag, TaskBase defaultTask,
-        Dictionary<TaskBase, HashSet<StateTransition>> transitionRules,
-        HashSet<StateTransition> anyTransitionRules)
+        StateTransitionContainer transitionContainer)
     {
         Layer = layerTag;
         _defaultTask = defaultTask;
         _currentTask = _defaultTask;
         _lastTask = _defaultTask;
         _delayTask = null;
-        _transitionRules = transitionRules;
-        _anyTransitionRules = anyTransitionRules;
+        _transitionContainer = transitionContainer;
     }
 
     public Tag Layer { get; }
@@ -59,7 +55,7 @@ public class StateLayer
             return;
         }
 
-        var transitions = GetPosibleTransitions(_currentTask);
+        var transitions = _transitionContainer.GetPossibleTransition(_currentTask);
 
         // 使用LINQ获取优先级最高且可进入的状态
         var nextTransition = transitions
@@ -67,7 +63,7 @@ public class StateLayer
             .Where(t => t.Mode switch
             {
                 StateTransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() &&
-                                                t.ToTask.CanEnter(),
+                                              t.ToTask.CanEnter(),
                 StateTransitionMode.Force => t.CanTransition() && t.ToTask.CanEnter(),
                 StateTransitionMode.DelayFront => t.CanTransition() && t.ToTask.CanEnter(),
                 _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
@@ -110,7 +106,6 @@ public class StateLayer
         _lastTask = _currentTask;
         _currentTask = nextTask;
         _currentStateTime = 0.0;
-        
     }
 
     public TaskBase GetNowTask()
@@ -126,10 +121,5 @@ public class StateLayer
     public double GetCurrentTaskTime()
     {
         return _currentStateTime;
-    }
-
-    public StateTransition[] GetPosibleTransitions(TaskBase task)
-    {
-        return _transitionRules[task].Union(_anyTransitionRules).ToArray();
     }
 }

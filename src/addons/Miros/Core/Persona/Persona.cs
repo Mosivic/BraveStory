@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BraveStory;
 using Godot;
 
 namespace Miros.Core;
-
 
 public enum ExecutorType
 {
     MultiLayerStateMachine,
     EffectExecutor,
-    AbilityExecutor,
+    AbilityExecutor
 }
 
 internal struct StateMap
@@ -23,16 +21,10 @@ internal struct StateMap
 
 public class Persona : AbsPersona, IPersona
 {
-    private readonly Node2D _host;
-    private readonly ITaskProvider _taskProvider;
-
     private readonly Dictionary<ExecutorType, ExecutorBase<TaskBase>> _executors = [];
+    private readonly Node2D _host;
     private readonly Dictionary<Tag, StateMap> _stateMaps = [];
-
-
-
-    public TagAggregator TagAggregator { get; private set; }
-    public AttributeSetContainer AttributeSetContainer { get; set; } 
+    private readonly ITaskProvider _taskProvider;
 
     public Persona(Node2D host, ITaskProvider taskProvider)
     {
@@ -40,56 +32,40 @@ public class Persona : AbsPersona, IPersona
         AttributeSetContainer = new AttributeSetContainer(this);
     }
 
+
+    public TagAggregator TagAggregator { get; private set; }
+    public AttributeSetContainer AttributeSetContainer { get; set; }
+
     public State GetStateBy(Tag sign)
     {
         return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
     }
 
-    public MultiLayerStateMachine CreateMultiLayerStateMachine(Tag layer,State defaultState, HashSet<State> states)
+    public void CreateMultiLayerStateMachine(Tag layer, State defaultState, HashSet<State> states,
+        StateTransitionConfig transitions)
     {
         var executor = new MultiLayerStateMachine();
-        var transitionsCache = new Dictionary<TaskBase, HashSet<Transition>>();
+        var container = new StateTransitionContainer();
 
-        // 生成所有状态的task
         foreach (var state in states)
         {
             var task = _taskProvider.GetTask(state);
             _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Executor = executor };
-            transitionsCache[task] = state.Transitions;
         }
 
-        var transitionRules = new Dictionary<TaskBase, HashSet<StateTransition>>();
-        var anyTransitionRules = new HashSet<StateTransition>();
+        foreach (var transition in transitions.AnyTransitions)
+            container.AddAny(new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition,
+                transition.Mode));
 
-        foreach (var (task, transitions) in transitionsCache)
-        {
-            foreach (var transition in transitions)
-            {
-                var toStateSign = transition.ToStateSign;
-                if(toStateSign == Tags.None){
-                    anyTransitionRules.Add(new StateTransition(
-                        task,
-                        transition.Condition,
-                        transition.Mode
-                    ));
-                }else
-                {
-                    if(!transitionRules.ContainsKey(task))
-                        transitionRules[task] = new HashSet<StateTransition>();
+        foreach (var (fromState, stateTransitions) in transitions.Transitions)
+        foreach (var transition in stateTransitions)
+            container.Add(_stateMaps[fromState.Sign].Task,
+                new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition, transition.Mode));
 
-                    transitionRules[task].Add(new StateTransition(
-                        _stateMaps[toStateSign].Task,
-                        transition.Condition,
-                        transition.Mode
-                    ));
-                }
-            }
-        }
-        executor.AddLayer(layer,_stateMaps[defaultState.Sign].Task,transitionRules,anyTransitionRules);
+        executor.AddLayer(layer, _stateMaps[defaultState.Sign].Task, container);
         _executors[ExecutorType.MultiLayerStateMachine] = executor;
-
-        return executor;
     }
+
 
     public void AddState(ExecutorType executorType, State state)
     {
@@ -205,7 +181,8 @@ public class Persona : AbsPersona, IPersona
 
     public Effect[] GetEffects()
     {
-        return _executors[ExecutorType.EffectExecutor].GetAllTasks().Select(task => _stateMaps[task.Sign].State as Effect).ToArray();
+        return _executors[ExecutorType.EffectExecutor].GetAllTasks()
+            .Select(task => _stateMaps[task.Sign].State as Effect).ToArray();
     }
 
 

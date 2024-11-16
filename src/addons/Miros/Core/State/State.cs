@@ -29,8 +29,6 @@ public class State(Tag sign)
 
     public double RunningTime { get; set; } = 0;
 
-    public HashSet<Transition> Transitions { get; set; } = [];
-
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
 

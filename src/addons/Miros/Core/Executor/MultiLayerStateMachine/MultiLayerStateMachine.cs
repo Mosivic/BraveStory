@@ -6,9 +6,9 @@ public class MultiLayerStateMachine : ExecutorBase<TaskBase>
     private readonly Dictionary<Tag, StateLayer> _layers = [];
 
 
-    public void AddLayer(Tag layer, TaskBase defaultTask, Dictionary<TaskBase, HashSet<StateTransition>> transitionRules, HashSet<StateTransition> anyTransitionRules)
+    public void AddLayer(Tag layer, TaskBase defaultTask, StateTransitionContainer container)
     {
-        _layers[layer] = new StateLayer(layer, defaultTask, transitionRules, anyTransitionRules);
+        _layers[layer] = new StateLayer(layer, defaultTask, container);
     }
 
     public override bool HasTaskRunning(TaskBase task)

@@ -5,8 +5,8 @@ namespace Miros.Core;
 public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor<TTask>
     where TTask : TaskBase
 {
-    protected Dictionary<Tag, TTask> _tasks = [];
     protected Persona _owner;
+    protected Dictionary<Tag, TTask> _tasks = [];
 
     public virtual void AddTask(TTask task)
     {
