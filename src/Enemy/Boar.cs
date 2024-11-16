@@ -22,7 +22,7 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
-        _persona = new Persona(this,new StaticJobProvider());
+        _persona = new Persona(this,new StaticTaskProvider());
         // 设置初始朝向为左边
         _graphics.Scale = new Vector2(-1, 1);
 

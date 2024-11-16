@@ -14,7 +14,7 @@
 //     public GoalOrientedJPlan(List<AbsState> states, List<AbsState> goals) : base(states)
 //     {
 //         _goals = goals;
-//         _planner = new Planner(JobWrapper);
+//         _planner = new Planner(TaskWrapper);
 //         _goalQueue = new List<AbsState>();
 //     }
 
@@ -24,12 +24,12 @@
 //         _UpdateValidGoalCfgQueue();
 //         _RemoveInvalidGoalCfgQueue();
 
-//         if (_goalQueue.Count > 0) JobWrapper.Update(_goalQueue[-1], delta);
+//         if (_goalQueue.Count > 0) TaskWrapper.Update(_goalQueue[-1], delta);
 //     }
 
 //     public override void PhysicsUpdate(double delta)
 //     {
-//         if (_goalQueue.Count > 0) JobWrapper.PhysicsUpdate(_goalQueue[-1], delta);
+//         if (_goalQueue.Count > 0) TaskWrapper.PhysicsUpdate(_goalQueue[-1], delta);
 //     }
 
 //     private void _UpdateValidGoalCfgQueue()
@@ -45,7 +45,7 @@
 //         if (_goalQueue.Count == 0)
 //         {
 //             var bestPlan = _planner.GetBestGoalPlan(bestGoalCfg, States);
-//             if (bestPlan == null || bestPlan.JobsCfg.Count == 0)
+//             if (bestPlan == null || bestPlan.TasksCfg.Count == 0)
 //             {
 //                 _planner.AddToBlackList(bestGoalCfg);
 //                 return;
@@ -53,8 +53,8 @@
 
 //             _goalQueue.Add(bestGoalCfg);
 
-//             bestGoalCfg.Subjobs = bestPlan.JobsCfg;
-//             JobWrapper.Enter(bestGoalCfg);
+//             bestGoalCfg.Subtasks = bestPlan.TasksCfg;
+//             TaskWrapper.Enter(bestGoalCfg);
 //         }
 //         // 队列非空 & 最佳目标已存在队列中 -> if 队列顶端已是当前最佳目标 return else 暂停队列顶端目标,将最佳目标设为队列顶端并恢复
 //         else if (_goalQueue.Contains(bestGoalCfg))
@@ -62,28 +62,28 @@
 //             if (_goalQueue[-1] == bestGoalCfg) return;
 
 //             var lastGoalCfg = _goalQueue.Last();
-//             JobWrapper.Pause(lastGoalCfg);
+//             TaskWrapper.Pause(lastGoalCfg);
 //             _goalQueue.Remove(lastGoalCfg);
 
 //             _goalQueue.Add(bestGoalCfg);
-//             JobWrapper.Resume(bestGoalCfg);
+//             TaskWrapper.Resume(bestGoalCfg);
 //         }
 //         // 队列非空 & 最佳目标不存在队列中 -> 暂停队列顶端目标, 规划最佳目标方案加入队列顶端
 //         else
 //         {
 //             var bestPlan = _planner.GetBestGoalPlan(bestGoalCfg, States);
-//             if (bestPlan == null || bestPlan.JobsCfg.Count == 0)
+//             if (bestPlan == null || bestPlan.TasksCfg.Count == 0)
 //             {
 //                 _planner.AddToBlackList(bestGoalCfg);
 //                 return;
 //             }
 
 //             var lastGoalCfg = _goalQueue.Last();
-//             JobWrapper.Pause(lastGoalCfg);
+//             TaskWrapper.Pause(lastGoalCfg);
 //             _goalQueue.Add(lastGoalCfg);
 
-//             bestGoalCfg.Subjobs = bestPlan.JobsCfg;
-//             JobWrapper.Enter(bestGoalCfg);
+//             bestGoalCfg.Subtasks = bestPlan.TasksCfg;
+//             TaskWrapper.Enter(bestGoalCfg);
 //         }
 //     }
 
@@ -97,18 +97,18 @@
 
 //             if (state == Status.Successed || state == Status.Failed)
 //             {
-//                 JobWrapper.Exit(cfg);
+//                 TaskWrapper.Exit(cfg);
 //                 _goalQueue.Remove(cfg);
 //             }
-//             else if (state == Status.Pause && !JobWrapper.CanExecute(cfg))
+//             else if (state == Status.Pause && !TaskWrapper.CanExecute(cfg))
 //             {
-//                 JobWrapper.Resume(cfg);
-//                 JobWrapper.Exit(cfg);
+//                 TaskWrapper.Resume(cfg);
+//                 TaskWrapper.Exit(cfg);
 //                 _goalQueue.Remove(cfg);
 //             }
-//             else if (state == Status.Running && !JobWrapper.CanExecute(cfg))
+//             else if (state == Status.Running && !TaskWrapper.CanExecute(cfg))
 //             {
-//                 JobWrapper.Exit(cfg);
+//                 TaskWrapper.Exit(cfg);
 //                 _goalQueue.Remove(cfg);
 //             }
 //         }
@@ -117,7 +117,7 @@
 
 // internal class Plan
 // {
-//     public List<State> JobsCfg { get; set; }
+//     public List<State> TasksCfg { get; set; }
 //     public int Cost { get; set; }
 // }
 
@@ -131,11 +131,11 @@
 // internal class Planner
 // {
 //     private readonly List<object> _CfgBlackList;
-//     private readonly JobWrapper _jobJobWrapper;
+//     private readonly TaskWrapper _taskTaskWrapper;
 
-//     public Planner(JobWrapper jobWrapper)
+//     public Planner(TaskWrapper taskWrapper)
 //     {
-//         _jobJobWrapper = jobWrapper;
+//         _taskTaskWrapper = taskWrapper;
 //         _CfgBlackList = new List<object>();
 //     }
 
@@ -152,7 +152,7 @@
 //         {
 //             if (_CfgBlackList.Contains(goal)) continue;
 
-//             if (_jobJobWrapper.CanExecute(goal))
+//             if (_taskTaskWrapper.CanExecute(goal))
 //             {
 //                 if (bestCfg == null) bestCfg = goal;
 //                 else if (goal.Priority > bestCfg.Priority) bestCfg = goal;
@@ -163,7 +163,7 @@
 //     }
 
 
-//     public Plan GetBestGoalPlan(State goalCfg, List<State> jobsCfg)
+//     public Plan GetBestGoalPlan(State goalCfg, List<State> tasksCfg)
 //     {
 //         var _DesiredTemp = goalCfg.Desired;
 //         if (_DesiredTemp.Count == 0) return null;
@@ -176,12 +176,12 @@
 //         };
 
 
-//         if (_BuildPlans(root, jobsCfg)) return _GetCheapestPlanInPlans(_TransformTreeIntoArray(root));
+//         if (_BuildPlans(root, tasksCfg)) return _GetCheapestPlanInPlans(_TransformTreeIntoArray(root));
 
 //         return null;
 //     }
 
-//     private bool _BuildPlans(PlanNode node, List<State> jobsCfg) //Need Fix
+//     private bool _BuildPlans(PlanNode node, List<State> tasksCfg) //Need Fix
 //     {
 //         var hasFollup = false;
 //         var desired = new Dictionary<object, object>(node.Desired);
@@ -194,7 +194,7 @@
 
 //         if (desired.Count == 0) return true;
 
-//         foreach (var cfg in jobsCfg)
+//         foreach (var cfg in tasksCfg)
 //         {
 //             var shouldUseAction = false;
 //             var effect = cfg.SuccessedEffects;
@@ -222,7 +222,7 @@
 //         {
 //             var plan = new Plan
 //             {
-//                 JobsCfg = new List<State> { node.Cfg },
+//                 TasksCfg = new List<State> { node.Cfg },
 //                 Cost = node.Cfg.Cost
 //             };
 //             _Plans.Add(plan);
@@ -233,7 +233,7 @@
 //         foreach (var childNode in node.Children)
 //         foreach (var childPlan in _TransformTreeIntoArray(childNode))
 //         {
-//             childPlan.JobsCfg.Add(node.Cfg);
+//             childPlan.TasksCfg.Add(node.Cfg);
 //             childPlan.Cost += node.Cfg.Cost;
 //             _Plans.Add(childPlan);
 //         }

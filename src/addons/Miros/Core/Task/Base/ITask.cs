@@ -1,6 +1,6 @@
 ﻿namespace Miros.Core;
 
-public interface IJob
+public interface ITask
 {
     void Enter();
     void Exit();

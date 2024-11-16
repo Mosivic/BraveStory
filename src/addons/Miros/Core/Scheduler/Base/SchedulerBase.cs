@@ -2,40 +2,40 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
-    where TJob : JobBase
+public class SchedulerBase<TTask> : AbsScheduler<TTask>, IScheduler<TTask>
+    where TTask : TaskBase
 {
-    protected Dictionary<Tag, TJob> _jobs = [];
+    protected Dictionary<Tag, TTask> _tasks = [];
     protected Persona _owner;
 
-    public virtual void AddJob(TJob job)
+    public virtual void AddTask(TTask task)
     {
-        _jobs[job.Sign] = job;
+        _tasks[task.Sign] = task;
     }
 
-    public virtual void RemoveJob(TJob job)
+    public virtual void RemoveTask(TTask task)
     {
-        if (job.IsActive)
-            job.Exit();
-        _jobs.Remove(job.Sign);
+        if (task.IsActive)
+            task.Exit();
+        _tasks.Remove(task.Sign);
     }
 
-    public virtual double GetCurrentJobTime(Tag layer)
+    public virtual double GetCurrentTaskTime(Tag layer)
     {
         return 0;
     }
 
-    public virtual TJob GetLastJob(Tag layer)
+    public virtual TTask GetLastTask(Tag layer)
     {
         return null;
     }
 
-    public virtual TJob GetNowJob(Tag layer)
+    public virtual TTask GetNowTask(Tag layer)
     {
         return null;
     }
 
-    public virtual bool HasJobRunning(TJob job)
+    public virtual bool HasTaskRunning(TTask task)
     {
         return false;
     }
@@ -49,8 +49,8 @@ public class SchedulerBase<TJob> : AbsScheduler<TJob>, IScheduler<TJob>
     {
     }
 
-    public virtual TJob[] GetAllJobs()
+    public virtual TTask[] GetAllTasks()
     {
-        return [.. _jobs.Values];
+        return [.. _tasks.Values];
     }
 }

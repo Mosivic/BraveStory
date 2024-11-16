@@ -2,8 +2,8 @@ using System;
 
 namespace Miros.Core;
 
-// _jobs 即为运行的 EffectJob
-public class EffectScheduler : SchedulerBase<EffectJob>
+// _tasks 即为运行的 EffectTask
+public class EffectScheduler : SchedulerBase<EffectTask>
 {
     private event Action OnEffectsIsDirty;
 
@@ -27,35 +27,35 @@ public class EffectScheduler : SchedulerBase<EffectJob>
     }
 
     // 如果存在StackingComponent组件，则检查是否可以堆叠
-    // 如果可以堆叠,检查是否存在相同StackingGroupTag的Job，如果存在，则调用其Stack方法
-    // 如果当前Jobs不存在传入的Job，则将传入的Job添加到Jobs中，并调用其Activate和Enter方法
-    public override void AddJob(EffectJob job)
+    // 如果可以堆叠,检查是否存在相同StackingGroupTag的Task，如果存在，则调用其Stack方法
+    // 如果当前Tasks不存在传入的Task，则将传入的Task添加到Tasks中，并调用其Activate和Enter方法
+    public override void AddTask(EffectTask task)
     {
-        if (!job.CanEnter()) return;
+        if (!task.CanEnter()) return;
 
-        var stackingComponent = job.GetComponent<StackingComponent>();
+        var stackingComponent = task.GetComponent<StackingComponent>();
         var hasStackingComponent = stackingComponent != null;
-        var hasSameJob = false;
+        var hasSameTask = false;
 
-        foreach (var _job in _jobs.Values)
+        foreach (var _task in _tasks.Values)
         {
-            if (JobEqual(_job, job))
-                hasSameJob = true;
+            if (TaskEqual(_task, task))
+                hasSameTask = true;
 
-            if (hasStackingComponent && _job.CanStack(stackingComponent.StackingGroupTag))
-                _job.Stack();
+            if (hasStackingComponent && _task.CanStack(stackingComponent.StackingGroupTag))
+                _task.Stack();
         }
 
-        if (!hasSameJob)
+        if (!hasSameTask)
         {
-            base.AddJob(job);
-            job.Activate();
-            job.Enter();
+            base.AddTask(task);
+            task.Activate();
+            task.Enter();
         }
     }
 
-    public bool JobEqual(EffectJob job1, EffectJob job2)
+    public bool TaskEqual(EffectTask task1, EffectTask task2)
     {
-        return job1.Sign == job2.Sign;
+        return task1.Sign == task2.Sign;
     }
 }

@@ -17,16 +17,16 @@ public enum SchedulerType
 internal struct StateMap
 {
     public State State;
-    public JobBase Job;
-    public SchedulerBase<JobBase> Scheduler;
+    public TaskBase Task;
+    public SchedulerBase<TaskBase> Scheduler;
 }
 
 public class Persona : AbsPersona, IPersona
 {
     private readonly Node2D _host;
-    private readonly IJobProvider _jobProvider;
+    private readonly ITaskProvider _taskProvider;
 
-    private readonly Dictionary<SchedulerType, SchedulerBase<JobBase>> _schedulers = [];
+    private readonly Dictionary<SchedulerType, SchedulerBase<TaskBase>> _schedulers = [];
     private readonly Dictionary<Tag, StateMap> _stateMaps = [];
 
 
@@ -34,9 +34,9 @@ public class Persona : AbsPersona, IPersona
     public TagAggregator TagAggregator { get; private set; }
     public AttributeSetContainer AttributeSetContainer { get; set; } 
 
-    public Persona(Node2D host, IJobProvider jobProvider)
+    public Persona(Node2D host, ITaskProvider taskProvider)
     {
-        _jobProvider = jobProvider;
+        _taskProvider = taskProvider;
         AttributeSetContainer = new AttributeSetContainer(this);
     }
 
@@ -48,44 +48,44 @@ public class Persona : AbsPersona, IPersona
     public MultiLayerStateMachine CreateMultiLayerStateMachine(Tag layer,State defaultState, HashSet<State> states)
     {
         var scheduler = new MultiLayerStateMachine();
-        var transitionsCache = new Dictionary<JobBase, HashSet<Transition>>();
+        var transitionsCache = new Dictionary<TaskBase, HashSet<Transition>>();
 
-        // 生成所有状态的job
+        // 生成所有状态的task
         foreach (var state in states)
         {
-            var job = _jobProvider.GetJob(state);
-            _stateMaps[state.Sign] = new StateMap { State = state, Job = job, Scheduler = scheduler };
-            transitionsCache[job] = state.Transitions;
+            var task = _taskProvider.GetTask(state);
+            _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Scheduler = scheduler };
+            transitionsCache[task] = state.Transitions;
         }
 
-        var transitionRules = new Dictionary<JobBase, HashSet<StateTransition>>();
+        var transitionRules = new Dictionary<TaskBase, HashSet<StateTransition>>();
         var anyTransitionRules = new HashSet<StateTransition>();
 
-        foreach (var (job, transitions) in transitionsCache)
+        foreach (var (task, transitions) in transitionsCache)
         {
             foreach (var transition in transitions)
             {
                 var toStateSign = transition.ToStateSign;
                 if(toStateSign == Tags.None){
                     anyTransitionRules.Add(new StateTransition(
-                        job,
+                        task,
                         transition.Condition,
                         transition.Mode
                     ));
                 }else
                 {
-                    if(!transitionRules.ContainsKey(job))
-                        transitionRules[job] = new HashSet<StateTransition>();
+                    if(!transitionRules.ContainsKey(task))
+                        transitionRules[task] = new HashSet<StateTransition>();
 
-                    transitionRules[job].Add(new StateTransition(
-                        _stateMaps[toStateSign].Job,
+                    transitionRules[task].Add(new StateTransition(
+                        _stateMaps[toStateSign].Task,
                         transition.Condition,
                         transition.Mode
                     ));
                 }
             }
         }
-        scheduler.AddLayer(layer,_stateMaps[defaultState.Sign].Job,transitionRules,anyTransitionRules);
+        scheduler.AddLayer(layer,_stateMaps[defaultState.Sign].Task,transitionRules,anyTransitionRules);
         _schedulers[SchedulerType.MultiLayerStateMachine] = scheduler;
 
         return scheduler;
@@ -102,9 +102,9 @@ public class Persona : AbsPersona, IPersona
 #endif
         }
 
-        var job = _jobProvider.GetJob(state);
-        scheduler.AddJob(job);
-        _stateMaps[state.Sign] = new StateMap { State = state, Job = job, Scheduler = scheduler };
+        var task = _taskProvider.GetTask(state);
+        scheduler.AddTask(task);
+        _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Scheduler = scheduler };
     }
 
 
@@ -125,8 +125,8 @@ public class Persona : AbsPersona, IPersona
 #endif
         }
 
-        var job = _stateMaps[state.Sign].Job;
-        scheduler.RemoveJob(job);
+        var task = _stateMaps[state.Sign].Task;
+        scheduler.RemoveTask(task);
     }
 
 
@@ -196,7 +196,7 @@ public class Persona : AbsPersona, IPersona
 
     // public EffectScheduler GetEffectScheduler()
     // {
-    //     if(_schedulers.TryGetValue(typeof(EffectJob),out var scheduler))
+    //     if(_schedulers.TryGetValue(typeof(EffectTask),out var scheduler))
     //     {
     //         return scheduler as EffectScheduler;
     //     }
@@ -205,7 +205,7 @@ public class Persona : AbsPersona, IPersona
 
     public Effect[] GetEffects()
     {
-        return _schedulers[SchedulerType.EffectScheduler].GetAllJobs().Select(job => _stateMaps[job.Sign].State as Effect).ToArray();
+        return _schedulers[SchedulerType.EffectScheduler].GetAllTasks().Select(task => _stateMaps[task.Sign].State as Effect).ToArray();
     }
 
 
@@ -213,13 +213,13 @@ public class Persona : AbsPersona, IPersona
     {
         if (tags.Empty) return;
         if (!_schedulers.TryGetValue(SchedulerType.EffectScheduler, out var scheduler)) return;
-        var jobs = scheduler.GetAllJobs();
+        var tasks = scheduler.GetAllTasks();
         var removeList = new List<State>();
 
-        foreach (var job in jobs)
+        foreach (var task in tasks)
         {
-            var effectJob = job as EffectJob;
-            var effect = _stateMaps[effectJob.Sign].State as Effect;
+            var effectTask = task as EffectTask;
+            var effect = _stateMaps[effectTask.Sign].State as Effect;
 
             var ownedTags = effect.OwnedTags;
             if (!ownedTags.Empty && ownedTags.HasAnyTags(tags))

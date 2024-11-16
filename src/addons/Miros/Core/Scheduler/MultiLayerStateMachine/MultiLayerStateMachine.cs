@@ -1,19 +1,19 @@
 using System.Collections.Generic;
 using Miros.Core;
 
-public class MultiLayerStateMachine : SchedulerBase<JobBase>
+public class MultiLayerStateMachine : SchedulerBase<TaskBase>
 {
     private readonly Dictionary<Tag, StateLayer> _layers = [];
 
 
-    public void AddLayer(Tag layer, JobBase defaultJob, Dictionary<JobBase, HashSet<StateTransition>> transitionRules, HashSet<StateTransition> anyTransitionRules)
+    public void AddLayer(Tag layer, TaskBase defaultTask, Dictionary<TaskBase, HashSet<StateTransition>> transitionRules, HashSet<StateTransition> anyTransitionRules)
     {
-        _layers[layer] = new StateLayer(layer, defaultJob, transitionRules, anyTransitionRules);
+        _layers[layer] = new StateLayer(layer, defaultTask, transitionRules, anyTransitionRules);
     }
 
-    public override bool HasJobRunning(JobBase job)
+    public override bool HasTaskRunning(TaskBase task)
     {
-        return job.IsActive;
+        return task.IsActive;
     }
 
     public override void Update(double delta)
@@ -26,21 +26,21 @@ public class MultiLayerStateMachine : SchedulerBase<JobBase>
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public override JobBase GetNowJob(Tag layer)
+    public override TaskBase GetNowTask(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetNowJob();
+        if (_layers.ContainsKey(layer)) return _layers[layer].GetNowTask();
         return null;
     }
 
-    public override JobBase GetLastJob(Tag layer)
+    public override TaskBase GetLastTask(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetLastJob();
+        if (_layers.ContainsKey(layer)) return _layers[layer].GetLastTask();
         return null;
     }
 
-    public override double GetCurrentJobTime(Tag layer)
+    public override double GetCurrentTaskTime(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetCurrentJobTime();
+        if (_layers.ContainsKey(layer)) return _layers[layer].GetCurrentTaskTime();
         return 0;
     }
 }

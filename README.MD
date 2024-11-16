@@ -15,7 +15,7 @@ Godot Edition：v4.3-stable_mono_win64
 ##### Goal
 ##### Compound
 ##### Buff
-### Job 任务
+### Task 任务
 #### Type 
 ##### Simple
 ##### Buff

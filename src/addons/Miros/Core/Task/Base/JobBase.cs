@@ -1,6 +1,6 @@
 ﻿namespace Miros.Core;
 
-public class JobBase(State state) : AbsJob(state), IJob
+public class TaskBase(State state) : AbsTask(state), ITask
 {
     private readonly State state = state;
 
@@ -81,7 +81,7 @@ public class JobBase(State state) : AbsJob(state), IJob
 
     /// <summary>
     ///     是否可以堆叠
-    ///     仅当当前Job处于激活状态时，同时存在组件StackingComponent并且组件的StackingGroupTag与传入destackingGroupTag相等时，返回true
+    ///     仅当当前Task处于激活状态时，同时存在组件StackingComponent并且组件的StackingGroupTag与传入destackingGroupTag相等时，返回true
     /// </summary>
     /// <param name="stackingGroupTag"></param>
     /// <returns></returns>

@@ -3,83 +3,83 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class ConditionMachine : SchedulerBase<JobBase>
+public class ConditionMachine : SchedulerBase<TaskBase>
 {
-    protected readonly Dictionary<Tag, List<JobBase>> RunningJobs = new();
-    protected Dictionary<Tag, List<JobBase>> WaitingJobs { get; set; } = new();
+    protected readonly Dictionary<Tag, List<TaskBase>> RunningTasks = new();
+    protected Dictionary<Tag, List<TaskBase>> WaitingTasks { get; set; } = new();
 
-    public override void AddJob(JobBase job)
+    public override void AddTask(TaskBase task)
     {
-        var layer = job.Sign;
+        var layer = task.Sign;
 
-        if (!WaitingJobs.ContainsKey(layer))
+        if (!WaitingTasks.ContainsKey(layer))
         {
-            WaitingJobs[layer] = [];
-            RunningJobs[layer] = [];
+            WaitingTasks[layer] = [];
+            RunningTasks[layer] = [];
         }
 
-        var index = WaitingJobs[layer].FindIndex(j => job.Priority > j.Priority);
-        WaitingJobs[layer].Insert(index + 1, job);
+        var index = WaitingTasks[layer].FindIndex(j => task.Priority > j.Priority);
+        WaitingTasks[layer].Insert(index + 1, task);
     }
 
 
-    public override void RemoveJob(JobBase job)
+    public override void RemoveTask(TaskBase task)
     {
-        var layer = job.Sign;
-        if (WaitingJobs.ContainsKey(layer) && WaitingJobs[layer].Contains(job))
-            WaitingJobs[layer].Remove(job);
+        var layer = task.Sign;
+        if (WaitingTasks.ContainsKey(layer) && WaitingTasks[layer].Contains(task))
+            WaitingTasks[layer].Remove(task);
     }
 
-    public override bool HasJobRunning(JobBase job)
+    public override bool HasTaskRunning(TaskBase task)
     {
-        return RunningJobs[job.Sign].Contains(job);
+        return RunningTasks[task.Sign].Contains(task);
     }
 
 
     public override void Update(double delta)
     {
-        WaitingJobsToRunningJobs();
+        WaitingTasksToRunningTasks();
 
-        foreach (var layer in RunningJobs.Keys)
-            for (var i = 0; i < RunningJobs[layer].Count; i++)
+        foreach (var layer in RunningTasks.Keys)
+            for (var i = 0; i < RunningTasks[layer].Count; i++)
             {
-                var job = RunningJobs[layer][i];
-                if (job.CanExit())
-                    PopRunningJob(layer, job);
+                var task = RunningTasks[layer][i];
+                if (task.CanExit())
+                    PopRunningTask(layer, task);
                 else
-                    job.Update(delta);
+                    task.Update(delta);
             }
     }
 
 
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var layer in RunningJobs.Keys)
-            for (var i = 0; i < RunningJobs[layer].Count; i++)
-                RunningJobs[layer][i].PhysicsUpdate(delta);
+        foreach (var layer in RunningTasks.Keys)
+            for (var i = 0; i < RunningTasks[layer].Count; i++)
+                RunningTasks[layer][i].PhysicsUpdate(delta);
     }
 
 
-    private void WaitingJobsToRunningJobs()
+    private void WaitingTasksToRunningTasks()
     {
-        foreach (var layer in WaitingJobs.Keys)
-            for (var i = WaitingJobs[layer].Count - 1; i >= 0; i--)
+        foreach (var layer in WaitingTasks.Keys)
+            for (var i = WaitingTasks[layer].Count - 1; i >= 0; i--)
             {
-                var job = WaitingJobs[layer][i];
+                var task = WaitingTasks[layer][i];
 
-                if (!job.CanEnter())
+                if (!task.CanEnter())
                     continue;
 
 
-                var layerRunningJobsCount = RunningJobs[layer].Count;
-                if (layerRunningJobsCount < 3) //限定最大并行数
+                var layerRunningTasksCount = RunningTasks[layer].Count;
+                if (layerRunningTasksCount < 3) //限定最大并行数
                 {
-                    PushRunningJob(layer, job);
+                    PushRunningTask(layer, task);
                 }
-                else if (job.Priority > RunningJobs[layer].Last().Priority)
+                else if (task.Priority > RunningTasks[layer].Last().Priority)
                 {
-                    PopRunningJob(layer, RunningJobs[layer].Last());
-                    PushRunningJob(layer, job);
+                    PopRunningTask(layer, RunningTasks[layer].Last());
+                    PushRunningTask(layer, task);
                 }
                 else
                 {
@@ -89,32 +89,32 @@ public class ConditionMachine : SchedulerBase<JobBase>
     }
 
 
-    private void PushRunningJob(Tag layer, JobBase job)
+    private void PushRunningTask(Tag layer, TaskBase task)
     {
-        WaitingJobs[layer].Remove(job);
-        // if (job.State.IsStack)
+        WaitingTasks[layer].Remove(task);
+        // if (task.State.IsStack)
         // {
-        // 	var index = RunningJobs[layer].FindIndex(j => j.State.Name == job.State.Name);
+        // 	var index = RunningTasks[layer].FindIndex(j => j.State.Name == task.State.Name);
         // 	if (index != -1)
         // 	{
-        // 		RunningJobs[layer][index].Stack(job.State.Source);
+        // 		RunningTasks[layer][index].Stack(task.State.Source);
         // 		return;
         // 	}
         // }
 
-        job.Enter();
+        task.Enter();
 
-        var highPriorityJob = RunningJobs[layer].FindIndex(j => j.Priority > job.Priority);
-        RunningJobs[layer].Insert(highPriorityJob + 1, job);
+        var highPriorityTask = RunningTasks[layer].FindIndex(j => j.Priority > task.Priority);
+        RunningTasks[layer].Insert(highPriorityTask + 1, task);
     }
 
 
-    private void PopRunningJob(Tag layer, JobBase job)
+    private void PopRunningTask(Tag layer, TaskBase task)
     {
-        RunningJobs[layer].Remove(job);
-        var index = WaitingJobs[layer].FindIndex(j => job.Priority > j.Priority);
-        WaitingJobs[layer].Insert(index + 1, job);
+        RunningTasks[layer].Remove(task);
+        var index = WaitingTasks[layer].FindIndex(j => task.Priority > j.Priority);
+        WaitingTasks[layer].Insert(index + 1, task);
 
-        job.Exit();
+        task.Exit();
     }
 }

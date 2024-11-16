@@ -8,45 +8,45 @@ public class StateTransitionContainer
     private readonly Dictionary<Tag, HashSet<StateTransition>> _transitions = [];
     private readonly HashSet<StateTransition> _anyTransitions = [];
     
-    private Action<State,JobBase> _stateToJobFunc;
+    private Action<State,TaskBase> _stateToTaskFunc;
 
-    public void SetStateToJobFunc(Action<State,JobBase> func){
-        _stateToJobFunc = func;
+    public void SetStateToTaskFunc(Action<State,TaskBase> func){
+        _stateToTaskFunc = func;
     }
     
 
-    public void AddTransition(State fromJob,State toJob,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
+    public void AddTransition(State fromTask,State toTask,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
-        var transition = new StateTransition(toJob,condition,mode);
-        if(!_transitions.ContainsKey(fromJobSign))
+        var transition = new StateTransition(toTask,condition,mode);
+        if(!_transitions.ContainsKey(fromTaskSign))
         {
-            _transitions[fromJobSign] = [];
+            _transitions[fromTaskSign] = [];
         }
-        _transitions[fromJobSign].Add(transition);
+        _transitions[fromTaskSign].Add(transition);
     }
 
-    public void AddAnyTransition(Tag toJobSign,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
+    public void AddAnyTransition(Tag toTaskSign,Func<bool> condition = null,StateTransitionMode mode = StateTransitionMode.Normal)
     {
-        var transition = new StateTransition(toJobSign,condition,mode);
+        var transition = new StateTransition(toTaskSign,condition,mode);
         _anyTransitions.Add(transition);
     }
 
     
-    public bool CanTransitionTo(Tag fromJobSign, Tag toJobSign)
+    public bool CanTransitionTo(Tag fromTaskSign, Tag toTaskSign)
     {
-        if (!_transitions.TryGetValue(fromJobSign, out var rules))
+        if (!_transitions.TryGetValue(fromTaskSign, out var rules))
         {
             return false;
         }
         
-        var rule = rules.FirstOrDefault(r => r.ToJobSign == toJobSign);
+        var rule = rules.FirstOrDefault(r => r.ToTaskSign == toTaskSign);
         return rule != null && rule.CanTransition();
     }
     
     // 返回满足转换条件的所有状态
-    public IEnumerable<StateTransition> GetPossibleTransition(Tag fromJobSign)
+    public IEnumerable<StateTransition> GetPossibleTransition(Tag fromTaskSign)
     {
-        if (!_transitions.TryGetValue(fromJobSign, out var rules))
+        if (!_transitions.TryGetValue(fromTaskSign, out var rules))
         {
             return Enumerable.Empty<StateTransition>();
         }
@@ -54,23 +54,23 @@ public class StateTransitionContainer
         return rules.Union(_anyTransitions).Where(r => r.CanTransition());
     }
 
-    public IEnumerable<Tag> GetAllJobSigns()
+    public IEnumerable<Tag> GetAllTaskSigns()
     {
         var fromTransitions = _transitions.Values
-            .SelectMany(transitions => transitions.Select(t => t.ToJobSign));
+            .SelectMany(transitions => transitions.Select(t => t.ToTaskSign));
         
-        var anyTransitions = _anyTransitions.Select(t => t.ToJobSign);
+        var anyTransitions = _anyTransitions.Select(t => t.ToTaskSign);
         
         return fromTransitions.Union(anyTransitions);
     }
 
 
     // 添加链式调用方法
-    public StateTransitionContainer AddTransitionGroup(Tag fromJobSign, IEnumerable<StateTransition> transitions)
+    public StateTransitionContainer AddTransitionGroup(Tag fromTaskSign, IEnumerable<StateTransition> transitions)
     {
         foreach (var transition in transitions)
         {
-            AddTransition(fromJobSign, transition.ToJobSign, transition.Condition, transition.Mode);
+            AddTransition(fromTaskSign, transition.ToTaskSign, transition.Condition, transition.Mode);
         }
         return this;
     }

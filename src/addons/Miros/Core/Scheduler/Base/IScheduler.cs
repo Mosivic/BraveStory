@@ -1,15 +1,15 @@
 ﻿namespace Miros.Core;
 
-public interface IScheduler<TJob>
-    where TJob : JobBase
+public interface IScheduler<TTask>
+    where TTask : TaskBase
 {
-    void AddJob(TJob job);
-    void RemoveJob(TJob job);
-    TJob GetNowJob(Tag layer);
-    TJob GetLastJob(Tag layer);
-    TJob[] GetAllJobs();
-    double GetCurrentJobTime(Tag layer);
-    bool HasJobRunning(TJob job);
+    void AddTask(TTask task);
+    void RemoveTask(TTask task);
+    TTask GetNowTask(Tag layer);
+    TTask GetLastTask(Tag layer);
+    TTask[] GetAllTasks();
+    double GetCurrentTaskTime(Tag layer);
+    bool HasTaskRunning(TTask task);
     void Update(double delta);
     void PhysicsUpdate(double delta);
 }

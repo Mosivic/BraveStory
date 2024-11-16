@@ -38,7 +38,7 @@ public partial class Player : Character
         _footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
         _animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-        _persona = new Persona(this,new StaticJobProvider());
+        _persona = new Persona(this,new StaticTaskProvider());
         _persona.AttributeSetContainer.AddAttributeSet(typeof(PlayerAttributeSet));
         Data = new PlayerData();
 
@@ -299,7 +299,7 @@ public partial class Player : Character
     {
         _hitBox.SetBuffState(new Buff( Tags.LayerBuff)
         {
-            JobType = typeof(JobBuff)
+            TaskType = typeof(TaskBuff)
         });
     }
 }

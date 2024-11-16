@@ -79,7 +79,7 @@ public abstract class Effect(Tag sign) : State(sign)
     public event Action<Persona, Effect> OnImmunity;
     public event Action<int, int> OnStackCountChanged;
 
-    // Necessary for Job
+    // Necessary for Task
     public void RaiseOnStackCountChanged(int oldStackCount, int newStackCount)
     {
         OnStackCountChanged?.Invoke(oldStackCount, newStackCount);

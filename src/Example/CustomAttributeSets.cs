@@ -10,9 +10,9 @@ public class CharacterAttributeSet : AttributeSet
     private readonly AttributeBase _flooracceleration;
     private readonly AttributeBase _airacceleration;
 
-    public override string[] AttributeNames => new[] {
+    public override string[] AttributeNames => [
         "Gravity", "RunSpeed", "JumpVelocity", "FloorAcceleration", "AirAcceleration"
-    };
+    ];
 
     public CharacterAttributeSet() : base()
     {
@@ -77,9 +77,9 @@ public class EnemyAttributeSet : CharacterAttributeSet
 {
     private readonly AttributeBase _walkspeed;
 
-    public override string[] AttributeNames => new[] {
+    public override string[] AttributeNames => [
         "Gravity", "RunSpeed", "JumpVelocity", "FloorAcceleration", "AirAcceleration", "WalkSpeed"
-    };
+    ];
 
     public EnemyAttributeSet() : base()
     {

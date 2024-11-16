@@ -3,7 +3,7 @@
 namespace Miros.Core;
 // 对自定义回调函数的处理
 
-public abstract class AbsJob(State state)
+public abstract class AbsTask(State state)
 {
     public Tag Sign => state.Sign;
     public int Priority => state.Priority;

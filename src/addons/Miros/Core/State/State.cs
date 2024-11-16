@@ -18,7 +18,7 @@ public class State(Tag sign)
 {
     public Tag Sign { get; init; } = sign;
 
-    public Type JobType { get; init; } = typeof(JobBase);
+    public Type TaskType { get; init; } = typeof(TaskBase);
     public int Priority { get; init; } = 0;
 
     public Persona Owner { get; protected set; }
@@ -32,10 +32,10 @@ public class State(Tag sign)
     public HashSet<Transition> Transitions { get; set; } = [];
 
 
-    public Dictionary<Type, StateComponent<JobBase>> Components { get; set; } = [];
+    public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
 
     // 添加便捷的组件添加方法
-    public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<JobBase>, new()
+    public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<TaskBase>, new()
     {
         var component = new T();
         setup?.Invoke(component);

@@ -2,12 +2,12 @@ using System;
 
 namespace Miros.Core;
 
-public class EffectJob(Effect effect) : JobBase(effect)
+public class EffectTask(Effect effect) : TaskBase(effect)
 {
-    public event Action<EffectJob> OnStacked;
-    public event Action<EffectJob> OnStackOverflowed;
-    public event Action<EffectJob> OnDurationOvered;
-    public event Action<EffectJob> OnPeriodOvered;
+    public event Action<EffectTask> OnStacked;
+    public event Action<EffectTask> OnStackOverflowed;
+    public event Action<EffectTask> OnDurationOvered;
+    public event Action<EffectTask> OnPeriodOvered;
 
 
     public override void Enter()
