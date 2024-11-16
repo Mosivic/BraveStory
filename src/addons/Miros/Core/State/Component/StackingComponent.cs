@@ -1,7 +1,7 @@
 namespace Miros.Core;
 
 // GE堆栈数据结构
-public class StackingComponent : StateComponent<EffectJob>
+public class StackingComponent : StateComponent<EffectTask>
 {
     public int StackCount { get; set; } = 1;
 

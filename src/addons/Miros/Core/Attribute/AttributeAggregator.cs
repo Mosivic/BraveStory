@@ -13,7 +13,7 @@ public class AttributeAggregator(AttributeBase attribute, Persona owner)
     // 	// 注册基础值变化事件
     // 	_processedAttribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
     // 	// 注册游戏效果容器变化事件
-    // 	owner.GetEffectScheduler()?.RegisterOnEffectsIsDirty(RefreshModifierCache);
+    // 	owner.GetEffectExecutor()?.RegisterOnEffectsIsDirty(RefreshModifierCache);
     // }
 
     // public void OnDisable()
@@ -21,7 +21,7 @@ public class AttributeAggregator(AttributeBase attribute, Persona owner)
     // 	// 注销基础值变化事件
     // 	_processedAttribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
     // 	// 注销游戏效果容器变化事件
-    // 	owner.GetEffectScheduler()?.UnregisterOnEffectsIsDirty(RefreshModifierCache);
+    // 	owner.GetEffectExecutor()?.UnregisterOnEffectsIsDirty(RefreshModifierCache);
     // }
 
     /// <summary>

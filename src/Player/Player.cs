@@ -1,26 +1,31 @@
 using System.Collections.Generic;
 using System.Linq;
-using BraveStory;
 using Example;
 using Godot;
 using Miros.Core;
 using static BraveStory.TestData;
 
 namespace BraveStory;
+
 public partial class Player : Character
 {
     private const float INITIAL_SLIDING_SPEED = 400f;
     private const float SLIDING_DECELERATION = 600f;
     private const float MIN_SLIDING_SPEED = 20f;
+
+    private const float MIN_JUMP_VELOCITY = -200f; // 最小跳跃速度
+    private const float MAX_JUMP_HOLD_TIME = 0.2f; // 最大跳跃按住时间
     private AnimatedSprite2D _animatedSprite;
     private RayCast2D _footChecker;
     private RayCast2D _handChecker;
     private int _hp = 10;
-
-    private PlayerData Data;
+    private bool _isJumpHolding; // 是否正在按住跳跃键
     private int _jumpCount;
+    private float _jumpHoldTime; // 跳跃按住时间计数器
     private int _maxJumpCount = 2;
     private float _slidingSpeed;
+
+    private PlayerData Data;
 
     public HashSet<Interactable> Interactions { get; set; } = new();
 
@@ -33,108 +38,89 @@ public partial class Player : Character
         _footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
         _animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-        _persona = new Persona(this,new StaticJobProvider());
+        _persona = new Persona(this, new StaticTaskProvider());
         _persona.AttributeSetContainer.AddAttributeSet(typeof(PlayerAttributeSet));
         Data = new PlayerData();
 
         // Idle  
-        var idle = new State(Tags.Idle)
+        var idle = new State(Tags.State_Action_Idle)
             .OnEnter(_ =>
             {
                 PlayAnimation("idle");
                 _jumpCount = 0;
-            })
-            .Any(() => _hasHit, StateTransitionMode.Force)
-            .To(Tags.Run, KeyDownMove)
-            .To(Tags.Fall, () => !IsOnFloor())
-            .To(Tags.Jump, KeyDownJump)
-            .To(Tags.Attack1, KeyDownAttack)
-            .To(Tags.WallSlide, KeyDownSliding);
+            });
+
 
         // Jump
-        var jump = new State(Tags.Jump)
+        var jump = new State(Tags.State_Action_Jump)
             .OnEnter(_ =>
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
                 _jumpCount++;
-            })
-            .To(Tags.Fall);
+            });
 
         // Wall Jump
-        var wall_jump = new State(Tags.Jump)
+        var wall_jump = new State(Tags.State_Action_WallJump)
             .OnEnter(_ =>
             {
                 PlayAnimation("jump");
                 var wallJumpDirectionX = _graphics.Scale.X;
                 Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
                 _jumpCount = 0;
-            })
-            .To(Tags.Fall);
+            });
 
         // Run
-        var run = new State(Tags.Run)
+        var run = new State(Tags.State_Action_Run)
             .OnEnter(_ => PlayAnimation("run"))
-            .OnPhysicsUpdate((_, delta) => Move(delta))
-            .To(Tags.Idle, () => !KeyDownMove())
-            .To(Tags.Jump, KeyDownJump)
-            .To(Tags.Attack1, KeyDownAttack)
-            .To(Tags.WallSlide, KeyDownSliding);
+            .OnPhysicsUpdate((_, delta) => Move(delta));
+
 
         // Fall
-        var fall = new State(Tags.Fall)
+        var fall = new State(Tags.State_Action_Fall)
             .OnEnter(_ => PlayAnimation("fall"))
-            .OnPhysicsUpdate((_, delta) => Fall(delta))
-            .To(Tags.Idle, IsOnFloor)
-            .To(Tags.WallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove())
-            .To(Tags.DoubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount);
+            .OnPhysicsUpdate((_, delta) => Fall(delta));
+
 
         // Double Jump
-        var doubleJump = new State(Tags.DoubleJump)
+        var doubleJump = new State(Tags.State_Action_DoubleJump)
             .OnEnter(_ =>
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
                 _jumpCount++;
-            })
-            .To(Tags.Fall);
+            });
+
 
         // Wall Slide
-        var wallSlide = new State(Tags.WallSlide)
+        var wallSlide = new State(Tags.State_Action_WallSlide)
             .OnEnter(_ => PlayAnimation("wall_sliding"))
-            .OnPhysicsUpdate((_, delta) => WallSlide(delta))
-            .To(Tags.Idle, IsOnFloor)
-            .To(Tags.Fall, () => !_footChecker.IsColliding())
-            .To(Tags.Jump, KeyDownJump);
+            .OnPhysicsUpdate((_, delta) => WallSlide(delta));
+
 
         // Attack1
-        var attack1 = new State(Tags.Attack1)
+        var attack1 = new State(Tags.State_Action_Attack1)
             .OnEnter(_ => PlayAnimation("attack1"))
-            .OnExitCondition(_ => IsAnimationFinished())
-            .To(Tags.Idle)
-            .To(Tags.Attack11, () => _persona.GetStateBy(Tags.Attack1).RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront);
+            .OnExitCondition(_ => IsAnimationFinished());
 
 
         // Attack11
-        var attack11 = new State(Tags.Attack11)
+        var attack11 = new State(Tags.State_Action_Attack11)
             .OnEnter(_ => PlayAnimation("attack11"))
-            .OnExitCondition(_ => IsAnimationFinished())
-            .To(Tags.Attack111, () => _persona.GetStateBy(Tags.Attack11).RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront);
+            .OnExitCondition(_ => IsAnimationFinished());
 
         // Attack111
-        var attack111 = new State(Tags.Attack111)
+        var attack111 = new State(Tags.State_Action_Attack111)
             .OnEnter(_ => PlayAnimation("attack111"))
-            .OnExitCondition(_ => IsAnimationFinished())
-            .To(Tags.Idle);
+            .OnExitCondition(_ => IsAnimationFinished());
 
         // Hit
-        var hit = new State(Tags.Hit)
+        var hit = new State(Tags.State_Action_Hit)
             .OnEnter(_ => PlayAnimation("hit"))
-            .OnExit(_ => _hasHit = false)
-            .To(Tags.Idle, IsAnimationFinished);
+            .OnExit(_ => _hasHit = false);
 
         // Die
-        var die = new State(Tags.Die)
+        var die = new State(Tags.State_Status_Die)
             .OnEnter(_ =>
             {
                 PlayAnimation("die");
@@ -222,11 +208,11 @@ public partial class Player : Character
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
 
-        // 添加空中移动控制
+        // 确保空中移动控制合理
         velocity.X = Mathf.MoveToward(
             velocity.X,
             direction * Data.RunSpeed,
-            Data.AirAcceleration * (float)delta
+            Data.AirAcceleration * (float)delta // 使用空中加速度而不是地面加速度
         );
 
         velocity.Y += (float)delta * Data.Gravity;
@@ -288,12 +274,11 @@ public partial class Player : Character
         MoveAndSlide();
     }
 
-
     protected override void HandleHit(object sender, HitEventArgs e)
     {
-        _hitBox.SetBuffState(new Buff( Tags.LayerBuff)
+        _hitBox.SetBuffState(new Buff(Tags.StateLayer_Buff)
         {
-            JobType = typeof(JobBuff)
+            TaskType = typeof(TaskBuff)
         });
     }
 }

@@ -8,5 +8,5 @@ public class CompoundState(Tag sign) : State(sign)
     public int Cost { get; set; }
 
     public Dictionary<object, object> Desired { get; set; }
-    public List<State> SubJobs { get; set; }
+    public List<State> SubTasks { get; set; }
 }

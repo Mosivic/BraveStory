@@ -2,7 +2,7 @@ using System;
 
 namespace Miros.Core;
 
-public class StandardDelegateComponent : StateComponent<JobBase>
+public class StandardDelegateComponent : StateComponent<TaskBase>
 {
     public Func<State, bool> EnterCondition { get; set; }
     public Func<State, bool> ExitCondition { get; set; }
@@ -19,42 +19,42 @@ public class StandardDelegateComponent : StateComponent<JobBase>
     public Action<State, double> UpdateFunc { get; set; }
     public Action<State, double> PhysicsUpdateFunc { get; set; }
 
-    public override void Activate(JobBase job)
+    public override void Activate(TaskBase task)
     {
-        RegisterEvents(job);
+        RegisterEvents(task);
     }
 
-    public override void Deactivate(JobBase job)
+    public override void Deactivate(TaskBase task)
     {
-        UnregisterEvents(job);
+        UnregisterEvents(task);
     }
 
 
-    public void RegisterEvents(JobBase job)
+    public void RegisterEvents(TaskBase task)
     {
-        job.OnEntered += EnterFunc;
-        job.OnExited += ExitFunc;
-        job.OnSucceeded += OnSucceedFunc;
-        job.OnFailed += OnFailedFunc;
-        job.OnPaused += PauseFunc;
-        job.OnResumed += ResumeFunc;
-        job.OnUpdated += UpdateFunc;
-        job.OnPhysicsUpdated += PhysicsUpdateFunc;
-        job.EnterCondition += EnterCondition;
-        job.ExitCondition += ExitCondition;
+        task.OnEntered += EnterFunc;
+        task.OnExited += ExitFunc;
+        task.OnSucceeded += OnSucceedFunc;
+        task.OnFailed += OnFailedFunc;
+        task.OnPaused += PauseFunc;
+        task.OnResumed += ResumeFunc;
+        task.OnUpdated += UpdateFunc;
+        task.OnPhysicsUpdated += PhysicsUpdateFunc;
+        task.EnterCondition += EnterCondition;
+        task.ExitCondition += ExitCondition;
     }
 
-    public void UnregisterEvents(JobBase job)
+    public void UnregisterEvents(TaskBase task)
     {
-        job.OnEntered -= EnterFunc;
-        job.OnExited -= ExitFunc;
-        job.OnSucceeded -= OnSucceedFunc;
-        job.OnFailed -= OnFailedFunc;
-        job.OnPaused -= PauseFunc;
-        job.OnResumed -= ResumeFunc;
-        job.OnUpdated -= UpdateFunc;
-        job.OnPhysicsUpdated -= PhysicsUpdateFunc;
-        job.EnterCondition -= EnterCondition;
-        job.ExitCondition -= ExitCondition;
+        task.OnEntered -= EnterFunc;
+        task.OnExited -= ExitFunc;
+        task.OnSucceeded -= OnSucceedFunc;
+        task.OnFailed -= OnFailedFunc;
+        task.OnPaused -= PauseFunc;
+        task.OnResumed -= ResumeFunc;
+        task.OnUpdated -= UpdateFunc;
+        task.OnPhysicsUpdated -= PhysicsUpdateFunc;
+        task.EnterCondition -= EnterCondition;
+        task.ExitCondition -= ExitCondition;
     }
 }

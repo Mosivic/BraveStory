@@ -4,15 +4,15 @@ namespace Miros.Core;
 
 public class StateTransition
 {
-    public StateTransition(JobBase toJob, Func<bool> condition = null,
+    public StateTransition(TaskBase toTask, Func<bool> condition = null,
         StateTransitionMode mode = StateTransitionMode.Normal)
     {
-        ToJob = toJob;
+        ToTask = toTask;
         Condition = condition;
         Mode = mode;
     }
 
-    public JobBase ToJob { get; }
+    public TaskBase ToTask { get; }
     public Func<bool> Condition { get; }
     public StateTransitionMode Mode { get; }
 

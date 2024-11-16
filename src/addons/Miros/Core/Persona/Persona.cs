@@ -1,141 +1,119 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BraveStory;
 using Godot;
 
 namespace Miros.Core;
 
-
-public enum SchedulerType
+public enum ExecutorType
 {
     MultiLayerStateMachine,
-    EffectScheduler,
-    AbilityScheduler,
+    EffectExecutor,
+    AbilityExecutor
 }
 
 internal struct StateMap
 {
     public State State;
-    public JobBase Job;
-    public SchedulerBase<JobBase> Scheduler;
+    public TaskBase Task;
+    public ExecutorBase<TaskBase> Executor;
 }
 
 public class Persona : AbsPersona, IPersona
 {
+    private readonly Dictionary<ExecutorType, ExecutorBase<TaskBase>> _executors = [];
     private readonly Node2D _host;
-    private readonly IJobProvider _jobProvider;
-
-    private readonly Dictionary<SchedulerType, SchedulerBase<JobBase>> _schedulers = [];
     private readonly Dictionary<Tag, StateMap> _stateMaps = [];
+    private readonly ITaskProvider _taskProvider;
 
+    public Persona(Node2D host, ITaskProvider taskProvider)
+    {
+        _taskProvider = taskProvider;
+        AttributeSetContainer = new AttributeSetContainer(this);
+    }
 
 
     public TagAggregator TagAggregator { get; private set; }
-    public AttributeSetContainer AttributeSetContainer { get; set; } 
-
-    public Persona(Node2D host, IJobProvider jobProvider)
-    {
-        _jobProvider = jobProvider;
-        AttributeSetContainer = new AttributeSetContainer(this);
-    }
+    public AttributeSetContainer AttributeSetContainer { get; set; }
 
     public State GetStateBy(Tag sign)
     {
         return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
     }
 
-    public void CreateMultiLayerStateMachine(Tag layer,State defaultState, HashSet<State> states)
+    public void CreateMultiLayerStateMachine(Tag layer, State defaultState, HashSet<State> states,
+        StateTransitionConfig transitions)
     {
-        var scheduler = new MultiLayerStateMachine();
-        var transitionsCache = new Dictionary<JobBase, HashSet<Transition>>();
+        var executor = new MultiLayerStateMachine();
+        var container = new StateTransitionContainer();
 
-        // 生成所有状态的job
         foreach (var state in states)
         {
-            var job = _jobProvider.GetJob(state);
-            _stateMaps[state.Sign] = new StateMap { State = state, Job = job, Scheduler = scheduler };
-            transitionsCache[job] = state.Transitions;
+            var task = _taskProvider.GetTask(state);
+            _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Executor = executor };
         }
 
-        var transitionRules = new Dictionary<JobBase, HashSet<StateTransition>>();
-        var anyTransitionRules = new HashSet<StateTransition>();
+        foreach (var transition in transitions.AnyTransitions)
+            container.AddAny(new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition,
+                transition.Mode));
 
-        foreach (var (job, transitions) in transitionsCache)
-        {
-            foreach (var transition in transitions)
-            {
-                var toStateSign = transition.ToStateSign;
-                if(toStateSign == Tags.None){
-                    anyTransitionRules.Add(new StateTransition(
-                        job,
-                        transition.Condition,
-                        transition.Mode
-                    ));
-                }else
-                {
-                    if(!transitionRules.ContainsKey(job))
-                        transitionRules[job] = new HashSet<StateTransition>();
-                        
-                    transitionRules[job].Add(new StateTransition(
-                        _stateMaps[toStateSign].Job,
-                        transition.Condition,
-                        transition.Mode
-                    ));
-                }
-            }
-        }
-        scheduler.AddLayer(layer,_stateMaps[defaultState.Sign].Job,transitionRules,anyTransitionRules);
-        _schedulers[SchedulerType.MultiLayerStateMachine] = scheduler;
+        foreach (var (fromState, stateTransitions) in transitions.Transitions)
+        foreach (var transition in stateTransitions)
+            container.Add(_stateMaps[fromState.Sign].Task,
+                new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition, transition.Mode));
+
+        executor.AddLayer(layer, _stateMaps[defaultState.Sign].Task, container);
+        _executors[ExecutorType.MultiLayerStateMachine] = executor;
     }
 
-    public void AddState(SchedulerType schedulerType, State state)
+
+    public void AddState(ExecutorType executorType, State state)
     {
-        if (!_schedulers.TryGetValue(schedulerType, out var scheduler))
+        if (!_executors.TryGetValue(executorType, out var executor))
         {
 #if GODOT4 &&DEBUG
-            throw new Exception($"[Miros.Connect] scheduler of {schedulerType} not found");
+            throw new Exception($"[Miros.Connect] executor of {executorType} not found");
 #else
 			return;
 #endif
         }
 
-        var job = _jobProvider.GetJob(state);
-        scheduler.AddJob(job);
-        _stateMaps[state.Sign] = new StateMap { State = state, Job = job, Scheduler = scheduler };
+        var task = _taskProvider.GetTask(state);
+        executor.AddTask(task);
+        _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Executor = executor };
     }
 
 
-    public void AddStateTo(SchedulerType schedulerType, State state, Persona target)
+    public void AddStateTo(ExecutorType executorType, State state, Persona target)
     {
-        target.AddState(schedulerType, state);
+        target.AddState(executorType, state);
     }
 
 
-    public void RemoveState(SchedulerType schedulerType, State state)
+    public void RemoveState(ExecutorType executorType, State state)
     {
-        if (!_schedulers.TryGetValue(schedulerType, out var scheduler))
+        if (!_executors.TryGetValue(executorType, out var executor))
         {
 #if GODOT4 &&DEBUG
-            throw new Exception($"[Miros.Connect] scheduler of {schedulerType} not found");
+            throw new Exception($"[Miros.Connect] executor of {executorType} not found");
 #else
 			return;
 #endif
         }
 
-        var job = _stateMaps[state.Sign].Job;
-        scheduler.RemoveJob(job);
+        var task = _stateMaps[state.Sign].Task;
+        executor.RemoveTask(task);
     }
 
 
     public void Update(double delta)
     {
-        foreach (var scheduler in _schedulers.Values) scheduler.Update(delta);
+        foreach (var executor in _executors.Values) executor.Update(delta);
     }
 
     public void PhysicsUpdate(double delta)
     {
-        foreach (var scheduler in _schedulers.Values) scheduler.PhysicsUpdate(delta);
+        foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
     }
 
 
@@ -183,41 +161,42 @@ public class Persona : AbsPersona, IPersona
     }
 
 
-    // public AbilityScheduler AbilityScheduler()
+    // public AbilityExecutor AbilityExecutor()
     // {
-    //     if(_schedulers.TryGetValue(typeof(AbilityScheduler),out var scheduler))
+    //     if(_executors.TryGetValue(typeof(AbilityExecutor),out var executor))
     //     {
-    //         return scheduler as AbilityScheduler;
+    //         return executor as AbilityExecutor;
     //     }
     //     return null;
     // }
 
-    // public EffectScheduler GetEffectScheduler()
+    // public EffectExecutor GetEffectExecutor()
     // {
-    //     if(_schedulers.TryGetValue(typeof(EffectJob),out var scheduler))
+    //     if(_executors.TryGetValue(typeof(EffectTask),out var executor))
     //     {
-    //         return scheduler as EffectScheduler;
+    //         return executor as EffectExecutor;
     //     }
     //     return null;
     // }
 
     public Effect[] GetEffects()
     {
-        return _schedulers[SchedulerType.EffectScheduler].GetAllJobs().Select(job => _stateMaps[job.Sign].State as Effect).ToArray();
+        return _executors[ExecutorType.EffectExecutor].GetAllTasks()
+            .Select(task => _stateMaps[task.Sign].State as Effect).ToArray();
     }
 
 
     public void RemoveEffectWithAnyTags(TagSet tags)
     {
         if (tags.Empty) return;
-        if (!_schedulers.TryGetValue(SchedulerType.EffectScheduler, out var scheduler)) return;
-        var jobs = scheduler.GetAllJobs();
+        if (!_executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
+        var tasks = executor.GetAllTasks();
         var removeList = new List<State>();
 
-        foreach (var job in jobs)
+        foreach (var task in tasks)
         {
-            var effectJob = job as EffectJob;
-            var effect = _stateMaps[effectJob.Sign].State as Effect;
+            var effectTask = task as EffectTask;
+            var effect = _stateMaps[effectTask.Sign].State as Effect;
 
             var ownedTags = effect.OwnedTags;
             if (!ownedTags.Empty && ownedTags.HasAnyTags(tags))
@@ -228,7 +207,7 @@ public class Persona : AbsPersona, IPersona
                 removeList.Add(effect);
         }
 
-        foreach (var effect in removeList) RemoveState(SchedulerType.EffectScheduler, effect);
+        foreach (var effect in removeList) RemoveState(ExecutorType.EffectExecutor, effect);
     }
 
 

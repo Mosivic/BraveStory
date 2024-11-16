@@ -7,14 +7,14 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="addons\Miros\Material\**"/>
-        <Compile Remove="addons\Miros\FSM\Scheduler\OldGOAP\**"/>
-        <Compile Remove="addons\Miros\FSM\Job\JobAll.cs"/>
-        <Compile Remove="addons\Miros\FSM\Scheduler\StateMachine\**"/>
+        <Compile Remove="addons\Miros\FSM\Executor\OldGOAP\**"/>
+        <Compile Remove="addons\Miros\FSM\Task\TaskAll.cs"/>
+        <Compile Remove="addons\Miros\FSM\Executor\StateMachine\**"/>
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Remove="addons\Miros\Material\**"/>
-        <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\OldGOAP\**"/>
-        <EmbeddedResource Remove="addons\Miros\FSM\Scheduler\StateMachine\**"/>
+        <EmbeddedResource Remove="addons\Miros\FSM\Executor\OldGOAP\**"/>
+        <EmbeddedResource Remove="addons\Miros\FSM\Executor\StateMachine\**"/>
     </ItemGroup>
     <ItemGroup>
         <Content Include="addons\Miros\FSM\Utility\StateDebugger\state_debugger.tscn"/>

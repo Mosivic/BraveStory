@@ -6,41 +6,69 @@
 
 Godot Edition：v4.3-stable_mono_win64
 
-# Miros Plugin 
+# Miros Plugin
+
 ## 核心概念
+
 ### GameplayTag 标签
+
 ### State 状态
+
 #### Type
+
 ##### Host
+
 ##### Goal
+
 ##### Compound
+
 ##### Buff
-### Job 任务
-#### Type 
+
+### Task 任务
+
+#### Type
+
 ##### Simple
+
 ##### Buff
+
 ##### All
+
 ##### Select
-### Scheduler 调度器 
+
+### Executor 调度器
+
 #### MultiLayerStateMachine 多层状态机器
+
 #### ConditionStateMachine 条件状态机
+
 #### GoalOrientedStatePlanner 目标导向状态规划器
+
 ### Connect 连接
 
 ## 工具
+
 ### GameInitializer 初始器
+
 ### SceneManager 场景管理
+
 ### SaveManager 存档管理
+
 ### SoundManager （TODO）
+
 ### EffectManager (TODO)
 
 ## 特效
+
 ### Shader
+
 #### SceneTransition 场景切换特效
 
 ## Debug 调试
 
 ## Interact 交互
-####  HitBox & HurtBox
-####  Interactable 
+
+#### HitBox & HurtBox
+
+#### Interactable 
 

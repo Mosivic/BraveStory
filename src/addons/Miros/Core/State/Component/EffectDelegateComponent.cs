@@ -2,36 +2,36 @@ using System;
 
 namespace Miros.Core;
 
-public class EffectDelegateComponent : StateComponent<EffectJob>
+public class EffectDelegateComponent : StateComponent<EffectTask>
 {
-    public Action<EffectJob> OnDurationOveredFunc { get; init; }
-    public Action<EffectJob> OnPeriodOveredFunc { get; init; }
-    public Action<EffectJob> OnStackedFunc { get; init; }
-    public Action<EffectJob> OnStackOverflowedFunc { get; init; }
+    public Action<EffectTask> OnDurationOveredFunc { get; init; }
+    public Action<EffectTask> OnPeriodOveredFunc { get; init; }
+    public Action<EffectTask> OnStackedFunc { get; init; }
+    public Action<EffectTask> OnStackOverflowedFunc { get; init; }
 
-    public override void Activate(EffectJob job)
+    public override void Activate(EffectTask task)
     {
-        RegisterEvents(job);
+        RegisterEvents(task);
     }
 
-    public override void Deactivate(EffectJob job)
+    public override void Deactivate(EffectTask task)
     {
-        UnregisterEvents(job);
+        UnregisterEvents(task);
     }
 
-    public void RegisterEvents(EffectJob job)
+    public void RegisterEvents(EffectTask task)
     {
-        job.OnDurationOvered += OnDurationOveredFunc;
-        job.OnPeriodOvered += OnPeriodOveredFunc;
-        job.OnStacked += OnStackedFunc;
-        job.OnStackOverflowed += OnStackOverflowedFunc;
+        task.OnDurationOvered += OnDurationOveredFunc;
+        task.OnPeriodOvered += OnPeriodOveredFunc;
+        task.OnStacked += OnStackedFunc;
+        task.OnStackOverflowed += OnStackOverflowedFunc;
     }
 
-    public void UnregisterEvents(EffectJob job)
+    public void UnregisterEvents(EffectTask task)
     {
-        job.OnDurationOvered -= OnDurationOveredFunc;
-        job.OnPeriodOvered -= OnPeriodOveredFunc;
-        job.OnStacked -= OnStackedFunc;
-        job.OnStackOverflowed -= OnStackOverflowedFunc;
+        task.OnDurationOvered -= OnDurationOveredFunc;
+        task.OnPeriodOvered -= OnPeriodOveredFunc;
+        task.OnStacked -= OnStackedFunc;
+        task.OnStackOverflowed -= OnStackOverflowedFunc;
     }
 }

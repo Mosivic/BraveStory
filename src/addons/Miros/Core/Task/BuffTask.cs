@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class JobBuff(Buff buff) : JobBase(buff)
+public class TaskBuff(Buff buff) : TaskBase(buff)
 {
     public override void Enter()
     {

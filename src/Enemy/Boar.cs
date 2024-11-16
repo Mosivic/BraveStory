@@ -21,34 +21,26 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
-        _persona = new Persona(this,new StaticJobProvider());
+        _persona = new Persona(this, new StaticTaskProvider());
         // 设置初始朝向为左边
         _graphics.Scale = new Vector2(-1, 1);
 
-
         // Idle
-        var idle = new State(Tags.Idle)
-            .OnEnter(s => PlayAnimation("idle"))
-            .To(Tags.Walk, () => !_playerChecker.IsColliding())
-            .To(Tags.Run, () => _playerChecker.IsColliding());
+        var idle = new State(Tags.State_Action_Idle)
+            .OnEnter(s => PlayAnimation("idle"));
 
         // Walk
-        var walk = new State(Tags.Walk)
+        var walk = new State(Tags.State_Action_Walk)
             .OnEnter(s => PlayAnimation("walk"))
-            .OnPhysicsUpdate((s, d) => Patrol(d))
-            .To(Tags.Idle, () =>
-            (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && _persona.GetStateBy(Tags.Walk).RunningTime > 2) ||
-            (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
-            .To(Tags.Run, () => _playerChecker.IsColliding());
+            .OnPhysicsUpdate((s, d) => Patrol(d));
 
         // Run
-        var run = new State(Tags.Run)
+        var run = new State(Tags.State_Action_Run)
             .OnEnter(s => PlayAnimation("run"))
-            .OnPhysicsUpdate((s, d) => Chase(d))
-            .To(Tags.Idle, () => !_playerChecker.IsColliding());
+            .OnPhysicsUpdate((s, d) => Chase(d));
 
         // Hit
-        var hit = new State(Tags.Hit)
+        var hit = new State(Tags.State_Action_Hit)
             .OnEnter(s =>
             {
                 PlayAnimation("hit");
@@ -88,9 +80,24 @@ public partial class Boar : Character
                 Velocity = Velocity * 0.9f;
                 MoveAndSlide();
             })
-            .OnExit(s => QueueFree())
-            .Any(() => _hp <= 0);
+            .OnExit(s => QueueFree());
 
+
+        // Transitions
+        var transitions = new StateTransitionConfig();
+        transitions
+            .Add(idle, walk, () => !_playerChecker.IsColliding())
+            .Add(idle, run, () => _playerChecker.IsColliding())
+            .Add(walk, idle, () =>
+                (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
+                (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
+            .Add(walk, run, () => _playerChecker.IsColliding())
+            .Add(run, idle, () => !_playerChecker.IsColliding())
+            .AddAny(hit, () => _hasHit)
+            .Add(hit, idle, IsAnimationFinished)
+            .AddAny(die, () => _hp <= 0);
+
+        _persona.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
