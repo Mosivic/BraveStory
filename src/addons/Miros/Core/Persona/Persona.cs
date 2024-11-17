@@ -32,8 +32,8 @@ public class Persona : AbsPersona, IPersona
         AttributeSetContainer = new AttributeSetContainer(this);
     }
 
-
     public TagAggregator TagAggregator { get; private set; }
+    
     public AttributeSetContainer AttributeSetContainer { get; set; }
 
     public State GetStateBy(Tag sign)
@@ -61,6 +61,7 @@ public class Persona : AbsPersona, IPersona
         foreach (var transition in stateTransitions)
             container.Add(_stateMaps[fromState.Sign].Task,
                 new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition, transition.Mode));
+                
 
         executor.AddLayer(layer, _stateMaps[defaultState.Sign].Task, container);
         _executors[ExecutorType.MultiLayerStateMachine] = executor;

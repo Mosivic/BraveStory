@@ -89,7 +89,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public override bool CanExit()
     {
         return effect.Owner.HasAllTags(effect.OngoingRequiredTags) ||
-               effect.Owner.HasAnyTags(effect.ApplicationImmunityTags);
+                effect.Owner.HasAnyTags(effect.ApplicationImmunityTags);
     }
 
 
