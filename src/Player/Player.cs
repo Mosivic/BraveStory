@@ -44,7 +44,7 @@ public partial class Player : Character
 
         // Idle  
         var idle = new State(Tags.State_Action_Idle)
-            .OnEnter(_ =>
+            .OnEntered(_ =>
             {
                 PlayAnimation("idle");
                 _jumpCount = 0;
@@ -53,7 +53,7 @@ public partial class Player : Character
 
         // Jump
         var jump = new State(Tags.State_Action_Jump)
-            .OnEnter(_ =>
+            .OnEntered(_ =>
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
@@ -62,7 +62,7 @@ public partial class Player : Character
 
         // Wall Jump
         var wallJump = new State(Tags.State_Action_WallJump)
-            .OnEnter(_ =>
+            .OnEntered(_ =>
             {
                 PlayAnimation("jump");
                 var wallJumpDirectionX = Graphics.Scale.X;
@@ -72,19 +72,19 @@ public partial class Player : Character
 
         // Run
         var run = new State(Tags.State_Action_Run)
-            .OnEnter(_ => PlayAnimation("run"))
-            .OnPhysicsUpdate((_, delta) => Move(delta));
+            .OnEntered(_ => PlayAnimation("run"))
+            .OnPhysicsUpdated((_, delta) => Move(delta));
 
 
         // Fall
         var fall = new State(Tags.State_Action_Fall)
-            .OnEnter(_ => PlayAnimation("fall"))
-            .OnPhysicsUpdate((_, delta) => Fall(delta));
+            .OnEntered(_ => PlayAnimation("fall"))
+            .OnPhysicsUpdated((_, delta) => Fall(delta));
 
 
         // Double Jump
         var doubleJump = new State(Tags.State_Action_DoubleJump)
-            .OnEnter(_ =>
+            .OnEntered(_ =>
             {
                 PlayAnimation("jump");
                 Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
@@ -94,52 +94,52 @@ public partial class Player : Character
 
         // Wall Slide
         var wallSlide = new State(Tags.State_Action_WallSlide)
-            .OnEnter(_ => PlayAnimation("wall_sliding"))
-            .OnPhysicsUpdate((_, delta) => WallSlide(delta));
+            .OnEntered(_ => PlayAnimation("wall_sliding"))
+            .OnPhysicsUpdated((_, delta) => WallSlide(delta));
 
 
         // Attack1
         var attack1 = new State(Tags.State_Action_Attack1)
-            .OnEnter(_ => PlayAnimation("attack1"))
-            .OnExitCondition(_ => IsAnimationFinished());
+            .OnEntered(_ => PlayAnimation("attack1"))
+            .ExitCondition(_ => IsAnimationFinished());
 
 
         // Attack11
         var attack11 = new State(Tags.State_Action_Attack11)
-            .OnEnter(_ => PlayAnimation("attack11"))
-            .OnExitCondition(_ => IsAnimationFinished());
+            .OnEntered(_ => PlayAnimation("attack11"))
+            .ExitCondition(_ => IsAnimationFinished());
 
         // Attack111
         var attack111 = new State(Tags.State_Action_Attack111)
-            .OnEnter(_ => PlayAnimation("attack111"))
-            .OnExitCondition(_ => IsAnimationFinished());
+            .OnEntered(_ => PlayAnimation("attack111"))
+            .ExitCondition(_ => IsAnimationFinished());
 
         // Hit
         var hit = new State(Tags.State_Action_Hit)
-            .OnEnter(_ => PlayAnimation("hit"))
-            .OnExit(_ => HasHit = false);
+            .OnEntered(_ => PlayAnimation("hit"))
+            .OnExited(_ => HasHit = false);
 
         // Die
         var die = new State(Tags.State_Status_Die)
-            .OnEnter(_ =>
+            .OnEntered(_ =>
             {
                 PlayAnimation("die");
                 Interactions.Clear();
             })
-            .OnPhysicsUpdate((_, _) =>
+            .OnPhysicsUpdated((_, _) =>
             {
                 if (IsAnimationFinished()) QueueFree();
             });
 
         // Sliding
         var sliding = new State(Tags.State_Action_Sliding)
-            .OnEnter(_ =>
+            .OnEntered(_ =>
             {
                 PlayAnimation("sliding_start");
                 _slidingSpeed = InitialSlidingSpeed * Mathf.Sign(Graphics.Scale.X);
             })
-            .OnExit(_ => HurtBox.SetDeferred("monitorable", true))
-            .OnPhysicsUpdate((_, delta) =>
+            .OnExited(_ => HurtBox.SetDeferred("monitorable", true))
+            .OnPhysicsUpdated((_, delta) =>
             {
                 if (AnimationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
                     PlayAnimation("sliding_loop");
