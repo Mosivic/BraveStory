@@ -38,8 +38,8 @@ public partial class Player : Character
         _footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
         _animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-        Persona = new Persona(this, new StaticTaskProvider());
-        Persona.AttributeSetContainer.AddAttributeSet(typeof(PlayerAttributeSet));
+        Agent = new Agent(this, new StaticTaskProvider());
+        Agent.AttributeSetContainer.AddAttributeSet(typeof(PlayerAttributeSet));
         Data = new PlayerData();
 
         // Idle  
@@ -61,7 +61,7 @@ public partial class Player : Character
             });
 
         // Wall Jump
-        var wall_jump = new State(Tags.State_Action_WallJump)
+        var wallJump = new State(Tags.State_Action_WallJump)
             .OnEnter(_ =>
             {
                 PlayAnimation("jump");
@@ -129,29 +129,60 @@ public partial class Player : Character
             .OnPhysicsUpdate((_, _) =>
             {
                 if (IsAnimationFinished()) QueueFree();
-            })
-            .Any(() => _hasHit, StateTransitionMode.Force);
+            });
 
         // Sliding
-        var sliding = new State(Tags.Sliding)
+        var sliding = new State(Tags.State_Action_Sliding)
             .OnEnter(_ =>
             {
                 PlayAnimation("sliding_start");
-                _slidingSpeed = INITIAL_SLIDING_SPEED * Mathf.Sign(_graphics.Scale.X);
+                _slidingSpeed = InitialSlidingSpeed * Mathf.Sign(Graphics.Scale.X);
             })
-            .OnExit(_ => _hurtBox.SetDeferred("monitorable", true))
+            .OnExit(_ => HurtBox.SetDeferred("monitorable", true))
             .OnPhysicsUpdate((_, delta) =>
             {
-                if (_animationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
+                if (AnimationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
                     PlayAnimation("sliding_loop");
-                else if (_animationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
+                else if (AnimationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
                     PlayAnimation("sliding_end");
                 Slide(delta);
-            })
-            .To(Tags.Idle, IsAnimationFinished);
+            });
 
-        _persona.CreateMultiLayerStateMachine(Tags.LayerMovement,idle,
-        [idle,run,jump,fall,wall_jump,doubleJump,wallSlide,attack1,attack11,attack111,hit,die,sliding]);
+        // 转换规则
+        var transitions = new StateTransitionConfig();
+        transitions
+            .Add(idle, run, KeyDownMove)
+            .Add(idle, fall, () => !IsOnFloor())
+            .Add(idle, jump, KeyDownJump)
+            .Add(idle, attack1, KeyDownAttack)
+            .Add(idle, sliding, KeyDownSliding)
+            .Add(attack1, idle)
+            .Add(attack1, attack11, () => attack1.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront)
+            .Add(attack11, idle)
+            .Add(attack11, attack111, () => attack11.RunningTime > 0.2f && KeyDownAttack(),
+                StateTransitionMode.DelayFront)
+            .Add(attack111, idle)
+            .Add(run, idle, () => !KeyDownMove())
+            .Add(run, jump, KeyDownJump)
+            .Add(run, attack1, KeyDownAttack)
+            .Add(run, sliding, KeyDownSliding)
+            .Add(jump, fall)
+            .Add(fall, idle, IsOnFloor)
+            .Add(fall, wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove())
+            .Add(fall, doubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount)
+            .Add(doubleJump, fall)
+            .Add(wallSlide, idle, IsOnFloor)
+            .Add(wallSlide, fall, () => !_footChecker.IsColliding())
+            .Add(wallSlide, wallJump, KeyDownJump)
+            .Add(wallJump, fall)
+            .Add(hit, idle, IsAnimationFinished)
+            .Add(sliding, idle)
+            .AddAny(hit, () => HasHit, StateTransitionMode.Force)
+            .AddAny(die, () => _hp <= 0);
+
+        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle,
+            [idle, run, jump, fall, wallJump, doubleJump, wallSlide, attack1, attack11, attack111, hit, die, sliding],
+            transitions);
 
         // Canvas Layer
         var canvasLayer = new CanvasLayer();

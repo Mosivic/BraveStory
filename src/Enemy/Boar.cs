@@ -21,7 +21,7 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
-        Persona = new Persona(this, new StaticTaskProvider());
+        Agent = new Agent(this, new StaticTaskProvider());
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
@@ -82,7 +82,7 @@ public partial class Boar : Character
             })
             .OnExit(s => QueueFree());
 
-        
+
         // Transitions
         var transitions = new StateTransitionConfig();
         transitions
@@ -97,7 +97,7 @@ public partial class Boar : Character
             .Add(hit, idle, IsAnimationFinished)
             .AddAny(die, () => _hp <= 0);
 
-        Persona.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
+        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
