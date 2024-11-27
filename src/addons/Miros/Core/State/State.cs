@@ -21,8 +21,8 @@ public class State(Tag sign)
     public Type TaskType { get; init; } = typeof(TaskBase);
     public int Priority { get; init; } = 0;
 
-    public Persona Owner { get; protected set; }
-    public Persona Source { get; protected set; }
+    public Agent Owner { get; protected set; }
+    public Agent Source { get; protected set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;

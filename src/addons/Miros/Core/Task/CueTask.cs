@@ -7,7 +7,7 @@ public class CueTask(Cue cue) : TaskBase(cue)
         return Triggerable(cue.Owner);
     }
 
-    public virtual bool Triggerable(Persona owner)
+    public virtual bool Triggerable(Agent owner)
     {
         if (owner == null) return false;
         // 持有【所有】RequiredTags才可触发

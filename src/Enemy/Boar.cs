@@ -21,9 +21,9 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
-        _persona = new Persona(this, new StaticTaskProvider());
+        Agent = new Agent(this, new StaticTaskProvider());
         // 设置初始朝向为左边
-        _graphics.Scale = new Vector2(-1, 1);
+        Graphics.Scale = new Vector2(-1, 1);
 
         // Idle
         var idle = new State(Tags.State_Action_Idle)
@@ -93,11 +93,11 @@ public partial class Boar : Character
                 (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
             .Add(walk, run, () => _playerChecker.IsColliding())
             .Add(run, idle, () => !_playerChecker.IsColliding())
-            .AddAny(hit, () => _hasHit)
+            .AddAny(hit, () => HasHit)
             .Add(hit, idle, IsAnimationFinished)
             .AddAny(die, () => _hp <= 0);
 
-        _persona.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
+        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);

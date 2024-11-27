@@ -76,7 +76,7 @@ public abstract class Effect(Tag sign) : State(sign)
     public Dictionary<string, float> SnapshotTargetAttributes { get; set; }
 
     public StackingComponent Stacking { get; set; }
-    public event Action<Persona, Effect> OnImmunity;
+    public event Action<Agent, Effect> OnImmunity;
     public event Action<int, int> OnStackCountChanged;
 
     // Necessary for Task
