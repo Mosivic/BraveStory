@@ -27,21 +27,21 @@ public partial class Boar : Character
 
         // Idle
         var idle = new State(Tags.State_Action_Idle)
-            .OnEnter(s => PlayAnimation("idle"));
+            .OnEntered(s => PlayAnimation("idle"));
 
         // Walk
         var walk = new State(Tags.State_Action_Walk)
-            .OnEnter(s => PlayAnimation("walk"))
-            .OnPhysicsUpdate((s, d) => Patrol(d));
+            .OnEntered(s => PlayAnimation("walk"))
+            .OnPhysicsUpdated((s, d) => Patrol(d));
 
         // Run
         var run = new State(Tags.State_Action_Run)
-            .OnEnter(s => PlayAnimation("run"))
-            .OnPhysicsUpdate((s, d) => Chase(d));
+            .OnEntered(s => PlayAnimation("run"))
+            .OnPhysicsUpdated((s, d) => Chase(d));
 
         // Hit
         var hit = new State(Tags.State_Action_Hit)
-            .OnEnter(s =>
+            .OnEntered(s =>
             {
                 PlayAnimation("hit");
                 // 方式1：根据玩家位置计算击退方向
@@ -63,24 +63,22 @@ public partial class Boar : Character
                 Velocity = velocity;
                 MoveAndSlide();
             })
-            .OnExit(s =>
+            .OnExited(s =>
             {
-                _hasHit = false;
+                HasHit = false;
                 _knockbackVelocity = Vector2.Zero;
-            })
-            .Any(() => _hasHit, StateTransitionMode.Force)
-            .To(Tags.Idle, IsAnimationFinished);  
+            });
 
         // Die
-        var die = new State(Tags.Die)
-            .OnEnter(s => PlayAnimation("die"))
-            .OnPhysicsUpdate((s, d) =>
+        var die = new State(Tags.State_Status_Die)
+            .OnEntered(s => PlayAnimation("die"))
+            .OnPhysicsUpdated((s, d) =>
             {
                 // 应用击退力
                 Velocity = Velocity * 0.9f;
                 MoveAndSlide();
             })
-            .OnExit(s => QueueFree());
+            .OnExited(s => QueueFree());
 
 
         // Transitions

@@ -1,27 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
-using BraveStory;
 
 namespace Miros.Core;
-
-
-public struct Transition
-{
-    public Tag ToStateSign;
-    public Func<bool> Condition;
-    public StateTransitionMode Mode;
-}
-
 
 public class State(Tag sign)
 {
     public Tag Sign { get; init; } = sign;
-
     public Type TaskType { get; init; } = typeof(TaskBase);
     public int Priority { get; init; } = 0;
-
-    public Agent Owner { get; protected set; }
+    public Agent Owner { get; protected set; } 
     public Agent Source { get; protected set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
@@ -31,8 +18,8 @@ public class State(Tag sign)
 
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
-
-    // 添加便捷的组件添加方法
+    
+    
     public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<TaskBase>, new()
     {
         var component = new T();
