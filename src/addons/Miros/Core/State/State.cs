@@ -27,122 +27,93 @@ public class State(Tag sign)
         Components[typeof(T)] = component;
         return this;
     }
-
-    // 特别为 StandardDelegateComponent 添加快捷方法
-    // 扩展现有的 OnEnter 方法族
-    public State OnEnter(Action<State> action)
+    
+    public State OnEntered(Action<State> action)
     {
         GetStandardDelegateComponent().EnterFunc += action;
         return this;
     }
-
-    public State OnEnterIf(Func<State, bool> condition)
+    
+    public State EnterCondition(Func<State,bool> action)
     {
-        GetStandardDelegateComponent().EnterCondition += condition;
+        GetStandardDelegateComponent().EnterCondition += action;
         return this;
     }
-
-    // 退出相关
-    public State OnExit(Action<State> action)
+    
+    public State OnExited(Action<State> action)
     {
         GetStandardDelegateComponent().ExitFunc += action;
         return this;
     }
 
-    public State OnExitIf(Func<State, bool> condition)
+    public State ExitCondition(Func<State, bool> condition)
     {
         GetStandardDelegateComponent().ExitCondition += condition;
         return this;
     }
-
-    // 状态结果相关
+    
     public State OnSucceed(Action<State> action)
     {
         GetStandardDelegateComponent().OnSucceedFunc += action;
         return this;
     }
 
-    public State OnFail(Action<State> action)
+    public State OnFailed(Action<State> action)
     {
         GetStandardDelegateComponent().OnFailedFunc += action;
         return this;
     }
-
-    // 暂停/恢复相关
-    public State OnPause(Action<State> action)
+    
+    public State OnPaused(Action<State> action)
     {
         GetStandardDelegateComponent().PauseFunc += action;
         return this;
     }
 
-    public State OnResume(Action<State> action)
+    public State OnResumed(Action<State> action)
     {
         GetStandardDelegateComponent().ResumeFunc += action;
         return this;
     }
 
-    // 更新循环相关
-    public State OnUpdate(Action<State, double> action)
+    public State OnUpdated(Action<State, double> action)
     {
         GetStandardDelegateComponent().UpdateFunc += action;
         return this;
     }
 
-    public State OnPhysicsUpdate(Action<State, double> action)
+    public State OnPhysicsUpdated(Action<State, double> action)
     {
         GetStandardDelegateComponent().PhysicsUpdateFunc += action;
         return this;
     }
 
     // 堆栈相关
-    public State OnStack(Action<State> action)
+    public State OnStacked(Action<State> action)
     {
         GetStandardDelegateComponent().OnStackFunc += action;
         return this;
     }
 
-    public State OnStackOverflow(Action<State> action)
+    public State OnStackOverflowed(Action<State> action)
     {
         GetStandardDelegateComponent().OnStackOverflowFunc += action;
         return this;
     }
 
     // 时间相关
-    public State OnDurationOver(Action<State> action)
+    public State OnDurationOvered(Action<State> action)
     {
         GetStandardDelegateComponent().OnDurationOverFunc += action;
         return this;
     }
 
-    public State OnPeriodOver(Action<State> action)
+    public State OnPeriodOvered(Action<State> action)
     {
         GetStandardDelegateComponent().OnPeriodOverFunc += action;
         return this;
     }
-
-    public State OnEnterCondition(Func<State, bool> condition)
-    {
-        GetStandardDelegateComponent().EnterCondition += condition;
-        return this;
-    }
-
-    public State OnExitCondition(Func<State, bool> condition)
-    {
-        GetStandardDelegateComponent().ExitCondition += condition;
-        return this;
-    }
-
-    public State To(Tag sign, Func<bool> condition = null, StateTransitionMode mode = StateTransitionMode.Normal)
-    {
-        Transitions.Add(new Transition { ToStateSign = sign, Condition = condition, Mode = mode });
-        return this;
-    }
-
-    public State Any(Func<bool> condition = null, StateTransitionMode mode = StateTransitionMode.Normal)
-    {
-        Transitions.Add(new Transition { ToStateSign = Tags.None, Condition = condition, Mode = mode });
-        return this;
-    }
+    
 
     // 辅助方法
     private StandardDelegateComponent GetStandardDelegateComponent()
@@ -152,6 +123,7 @@ public class State(Tag sign)
             component = new StandardDelegateComponent();
             Components[typeof(StandardDelegateComponent)] = component;
         }
+
         return (StandardDelegateComponent)component;
     }
 }

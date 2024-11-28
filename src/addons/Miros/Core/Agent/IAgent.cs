@@ -1,10 +1,6 @@
-using System.Collections.Generic;
-
 namespace Miros.Core;
 
-public interface IPersona
+public interface IAgent
 {
-
-
     T AttrSet<T>() where T : AttributeSet;
 }
