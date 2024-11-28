@@ -121,22 +121,17 @@ class TagCodeGenerator:
             ""
         ]
         
-        # 只生成标签定义
+        # 生成标签定义，使用完整路径名作为变量名
         for tag in self.tag_loader.tag_trees.values():
-            const_name = self._to_const_name(tag.name)
+            var_name = tag.full_path.replace('.', '_')
             lines.append(
-                f"{self.indent}{self.indent}public static Tag {const_name} {{ get; }} = "
+                f"{self.indent}{self.indent}public static Tag {var_name} {{ get; }} = "
                 f"TagManager.RequestTag(\"{tag.full_path}\");"
             )
             lines.append("")
         
         lines.append(f"{self.indent}}}")
         return "\n".join(lines)
-    
-    def _to_const_name(self, name: str) -> str:
-        """转换为常量名称"""
-        # return name.upper()
-        return name
 
 def main():
     # 配置

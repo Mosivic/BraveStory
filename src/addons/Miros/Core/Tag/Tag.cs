@@ -4,7 +4,7 @@ namespace Miros.Core;
 
 public struct Tag
 {
-    public readonly string _name;
+    public readonly string Name;
 
     public int HashCode { get; set; }
     public string ShortName { get; set; }
@@ -12,11 +12,11 @@ public struct Tag
     public string[] AncestorNames { get; set; }
 
 
-    public bool IsValid => !string.IsNullOrEmpty(_name);
+    public bool IsValid => !string.IsNullOrEmpty(Name);
 
     public Tag(string name)
     {
-        _name = name;
+        Name = name;
         HashCode = name.GetHashCode();
 
         var tags = name.Split('.');

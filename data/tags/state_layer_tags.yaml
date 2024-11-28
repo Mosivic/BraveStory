@@ -1,5 +1,5 @@
 basePath: "StateLayer"
 tags:
-  - name: LayerMovement
-  - name: LayerBuff
+  - name: Movement
+  - name: Buff
 

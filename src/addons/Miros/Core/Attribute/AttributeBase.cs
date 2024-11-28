@@ -24,7 +24,7 @@ public class AttributeBase
         _value = new AttributeValue(value, calculateMode, supportedOperation, minValue, maxValue);
     }
 
-    public Persona Owner { get; private set; }
+    public Agent Owner { get; private set; }
 
     public AttributeValue Value => _value;
     public float BaseValue => _value.BaseValue;
@@ -39,7 +39,7 @@ public class AttributeBase
     protected event Func<AttributeBase, float, float> OnPreBaseValueChange; // 基础值变化前的事件
     protected event Action<AttributeBase, float, float> OnPostBaseValueChange; // 基础值变化后的事件
 
-    public void SetOwner(Persona owner)
+    public void SetOwner(Agent owner)
     {
         Owner = owner;
     }

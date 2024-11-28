@@ -8,20 +8,20 @@ tags:
       JumpVelocity: -300.0
       FloorAcceleration: 1000.0
       AirAcceleration: 800.0
-      WallJumpVelocity: [1000,-320]
+      WallJumpVelocity: [ 1000,-320 ]
   - name: Warrior
     properties:
       Strength: 10
-      Defense: 8      
+      Defense: 8
   - name: Player
-    inherits: 
+    inherits:
       - Base                    # 相对路径，会自动添加当前的 basePath
       - Character.Warrior       # 完整路径，直接使用
       - Item.Weapon.Sword      # 可以继承任意标签树的属性
     properties:
-      JumpVelocity: -300.0  
+      JumpVelocity: -300.0
   - name: Enemy
-    inherits: 
+    inherits:
       - Base
     properties:
       WalkSpeed: 80.0  

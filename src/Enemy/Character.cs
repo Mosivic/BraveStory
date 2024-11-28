@@ -5,51 +5,51 @@ namespace BraveStory;
 
 public partial class Character : CharacterBody2D
 {
-    protected AnimationPlayer _animationPlayer;
-    protected Node2D _graphics;
-    protected bool _hasHit;
-    protected HitBox _hitBox;
-    protected HurtBox _hurtBox;
+    protected AnimationPlayer AnimationPlayer;
+    protected Node2D Graphics;
+    protected bool HasHit;
+    protected HitBox HitBox;
+    protected HurtBox HurtBox;
 
-    protected Persona _persona;
-    protected Sprite2D _sprite;
+    protected Agent Agent;
+    protected Sprite2D Sprite;
 
 
     public override void _Ready()
     {
-        _graphics = GetNode<Node2D>("Graphics");
-        _sprite = _graphics.GetNode<Sprite2D>("Sprite2D");
-        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        Graphics = GetNode<Node2D>("Graphics");
+        Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
+        AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 
         // 处理击中事件 
-        _hitBox = _graphics.GetNode<HitBox>("HitBox");
-        _hitBox.OnHit += HandleHit;
+        HitBox = Graphics.GetNode<HitBox>("HitBox");
+        HitBox.OnHit += HandleHit;
 
         // 处理受伤事件
-        _hurtBox = _graphics.GetNode<HurtBox>("HurtBox");
-        _hurtBox.OnHurt += HandleHurt;
+        HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
+        HurtBox.OnHurt += HandleHurt;
     }
 
 
     public override void _Process(double delta)
     {
-        _persona.Update(delta);
+        Agent.Update(delta);
     }
 
 
     public override void _PhysicsProcess(double delta)
     {
-        _persona.PhysicsUpdate(delta);
+        Agent.PhysicsUpdate(delta);
     }
 
     protected bool IsAnimationFinished()
     {
-        return !_animationPlayer.IsPlaying() && _animationPlayer.GetQueue().Length == 0;
+        return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
 
     protected void PlayAnimation(string animationName)
     {
-        _animationPlayer.Play(animationName);
+        AnimationPlayer.Play(animationName);
     }
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
@@ -66,10 +66,10 @@ public partial class Character : CharacterBody2D
 
     public override void _ExitTree()
     {
-        if (_hitBox != null)
-            _hitBox.OnHit -= HandleHit;
-        if (_hurtBox != null)
-            _hurtBox.OnHurt -= HandleHurt;
+        if (HitBox != null)
+            HitBox.OnHit -= HandleHit;
+        if (HurtBox != null)
+            HurtBox.OnHurt -= HandleHurt;
         base._ExitTree();
     }
 }
