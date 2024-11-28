@@ -21,7 +21,7 @@ tags:
                 properties:
                   magicDamage: 5
                   elementType: true
-                  
+
   - name: Effect
     description: Character status effects
     children:
@@ -30,5 +30,5 @@ tags:
           duration: 10
       - name: Debuff
         properties:
-          duration: 5 
+          duration: 5
   - name: Character

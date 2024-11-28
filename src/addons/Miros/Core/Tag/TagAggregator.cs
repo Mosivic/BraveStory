@@ -13,12 +13,6 @@ public class TagAggregator
     private readonly Dictionary<Tag, List<object>> _dynamicRemovedTags = new();
 
     private readonly List<Tag> _fixedTags = new();
-    private Persona _owner;
-
-    public TagAggregator(Persona owner)
-    {
-        _owner = owner;
-    }
 
     private event Action OnTagIsDirty;
 
