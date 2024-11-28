@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public class AbsPersona
+public class AbsAgent
 {
     public string[] AttributeSets;
 

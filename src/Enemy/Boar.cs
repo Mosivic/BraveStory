@@ -8,10 +8,10 @@ public partial class Boar : Character
     private readonly EnemyData _data = new();
     private RayCast2D _floorChecker;
     private int _hp = 5;
-    private EnemyData Data = new();
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
+    private EnemyData Data = new();
 
     public override void _Ready()
     {
@@ -52,7 +52,7 @@ public partial class Boar : Character
                     _knockbackVelocity = direction * 300f; // 击退力度
                 }
             })
-            .OnPhysicsUpdate((s, d) =>
+            .OnPhysicsUpdated((s, d) =>
             {
                 // 应用击退力
                 var velocity = Velocity;
@@ -106,7 +106,7 @@ public partial class Boar : Character
     {
         if (!Mathf.IsZeroApprox(direction))
             // 修改朝向逻辑：direction < 0 时朝左（-1），direction > 0 时朝右（1）
-            _graphics.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
+            Graphics.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
     }
 
     private void Patrol(double delta)
@@ -114,11 +114,11 @@ public partial class Boar : Character
         // 检查是否碰到墙壁
         if (_wallChecker.IsColliding())
             // 转向：将 X 缩放在 1 和 -1 之间切换
-            _graphics.Scale = new Vector2(_graphics.Scale.X * -1, 1);
+            Graphics.Scale = new Vector2(Graphics.Scale.X * -1, 1);
 
         // 移动逻辑
         var velocity = Velocity;
-        velocity.X = _data.WalkSpeed * -_graphics.Scale.X; // 注意这里加了负号
+        velocity.X = _data.WalkSpeed * -Graphics.Scale.X; // 注意这里加了负号
         velocity.Y += (float)delta * _data.Gravity;
         Velocity = velocity;
         MoveAndSlide();
@@ -138,7 +138,7 @@ public partial class Boar : Character
                 velocity.Y += (float)delta * _data.Gravity;
                 Velocity = velocity;
                 // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
-                _graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
+                Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
                 MoveAndSlide();
             }
         }
