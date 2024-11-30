@@ -10,14 +10,14 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor<TTask>
 
     public virtual void AddTask(TTask task)
     {
-        _tasks[task.Sign] = task;
+        _tasks[task.Tag] = task;
     }
 
     public virtual void RemoveTask(TTask task)
     {
         if (task.IsActive)
             task.Exit();
-        _tasks.Remove(task.Sign);
+        _tasks.Remove(task.Tag);
     }
 
     public virtual double GetCurrentTaskTime(Tag layer)

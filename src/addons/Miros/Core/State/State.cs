@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class State(Tag sign)
+public class State(Tag tag)
 {
-    public Tag Sign { get; init; } = sign;
+    public Tag Tag { get; init; } = tag;
     public Type TaskType { get; init; } = typeof(TaskBase);
     public int Priority { get; init; } = 0;
     public Agent Owner { get; protected set; } 

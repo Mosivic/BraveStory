@@ -6,8 +6,8 @@ namespace Miros.Core;
 
 public class AttributeBase
 {
-    public readonly Tag Sign;
-    public readonly Tag SetSign;
+    public readonly Tag AttributeTag;
+    public readonly Tag AttributeSetSign;
     private AttributeValue _value;
     protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners; // 基础值变化前的事件监听器
 
@@ -16,8 +16,8 @@ public class AttributeBase
         SupportedOperation supportedOperation = SupportedOperation.All,
         float minValue = float.MinValue, float maxValue = float.MaxValue)
     {
-        SetSign = setSign;
-        Sign = sign;
+        AttributeSetSign = setSign;
+        AttributeTag = sign;
         _value = new AttributeValue(value, calculateMode, supportedOperation, minValue, maxValue);
     }
 

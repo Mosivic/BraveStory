@@ -14,8 +14,8 @@ public class Modifier
 {
     public ModifierMagnitudeCalculation MMC; // 幅度计算
 
-    public Tag AttributeSetSign { get; set; } // 属性集标签
-    public Tag AttributeSign { get; set; } // 属性标签
+    public Tag AttributeSetTag { get; set; } // 属性集标签
+    public Tag AttributeTag { get; set; } // 属性标签
     public float Magnitude { get; set; } // 幅度
 
     public ModifierOperation Operation { get; set; }

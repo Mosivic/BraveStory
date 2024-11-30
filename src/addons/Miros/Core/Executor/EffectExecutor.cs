@@ -56,6 +56,6 @@ public class EffectExecutor : ExecutorBase<EffectTask>
 
     public bool TaskEqual(EffectTask task1, EffectTask task2)
     {
-        return task1.Sign == task2.Sign;
+        return task1.Tag == task2.Tag;
     }
 }

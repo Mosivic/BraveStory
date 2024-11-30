@@ -10,7 +10,7 @@ public class ConditionMachine : ExecutorBase<TaskBase>
 
     public override void AddTask(TaskBase task)
     {
-        var layer = task.Sign;
+        var layer = task.Tag;
 
         if (!WaitingTasks.ContainsKey(layer))
         {
@@ -25,14 +25,14 @@ public class ConditionMachine : ExecutorBase<TaskBase>
 
     public override void RemoveTask(TaskBase task)
     {
-        var layer = task.Sign;
+        var layer = task.Tag;
         if (WaitingTasks.ContainsKey(layer) && WaitingTasks[layer].Contains(task))
             WaitingTasks[layer].Remove(task);
     }
 
     public override bool HasTaskRunning(TaskBase task)
     {
-        return RunningTasks[task.Sign].Contains(task);
+        return RunningTasks[task.Tag].Contains(task);
     }
 
 

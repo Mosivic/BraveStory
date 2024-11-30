@@ -38,7 +38,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 		foreach (var ge in effects)
 			if (ge.IsActive)
 				foreach (var modifier in ge.Modifiers)
-					if (modifier.AttributeSign == _processedAttribute.Sign)
+					if (modifier.AttributeTag == _processedAttribute.AttributeTag)
 					{
 						_modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
 						TryRegisterAttributeChangedListen(ge, modifier);
@@ -239,7 +239,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			var modifier = tuple.Item2;
 			if (modifier.MMC is AttributeBasedModCalculation mmc &&
 				mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track &&
-				attribute.Sign == mmc.attributeSign)
+				attribute.AttributeTag == mmc.attributeSign)
 				if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target &&
 					attribute.Owner == effect.Owner) ||
 					(mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Source &&

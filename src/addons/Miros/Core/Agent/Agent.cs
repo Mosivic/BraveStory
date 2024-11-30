@@ -54,20 +54,20 @@ public class Agent : AbsAgent, IAgent
         foreach (var state in states)
         {
             var task = _taskProvider.GetTask(state);
-            _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Executor = executor };
+            _stateMaps[state.Tag] = new StateMap { State = state, Task = task, Executor = executor };
         }
 
         foreach (var transition in transitions.AnyTransitions)
-            container.AddAny(new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition,
+            container.AddAny(new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition,
                 transition.Mode));
 
         foreach (var (fromState, stateTransitions) in transitions.Transitions)
         foreach (var transition in stateTransitions)
-            container.Add(_stateMaps[fromState.Sign].Task,
-                new StateTransition(_stateMaps[transition.ToState.Sign].Task, transition.Condition, transition.Mode));
+            container.Add(_stateMaps[fromState.Tag].Task,
+                new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition, transition.Mode));
 
 
-        executor.AddLayer(layer, _stateMaps[defaultState.Sign].Task, container);
+        executor.AddLayer(layer, _stateMaps[defaultState.Tag].Task, container);
         _executors[ExecutorType.MultiLayerStateMachine] = executor;
     }
 
@@ -85,7 +85,7 @@ public class Agent : AbsAgent, IAgent
 
         var task = _taskProvider.GetTask(state);
         executor.AddTask(task);
-        _stateMaps[state.Sign] = new StateMap { State = state, Task = task, Executor = executor };
+        _stateMaps[state.Tag] = new StateMap { State = state, Task = task, Executor = executor };
     }
 
 
@@ -106,7 +106,7 @@ public class Agent : AbsAgent, IAgent
 #endif
         }
 
-        var task = _stateMaps[state.Sign].Task;
+        var task = _stateMaps[state.Tag].Task;
         executor.RemoveTask(task);
     }
 
@@ -126,7 +126,7 @@ public class Agent : AbsAgent, IAgent
     {
         foreach (var modifier in effect.Modifiers)
         {
-            var attributeValue = GetAttributeAttributeValue(modifier.AttributeSetSign, modifier.AttributeSign);
+            var attributeValue = GetAttributeAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
             if (attributeValue == null) continue;
             if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
                 throw new InvalidOperationException("Unsupported operation.");
@@ -134,7 +134,7 @@ public class Agent : AbsAgent, IAgent
             if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
                 throw new InvalidOperationException(
                     $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-                    $"But {modifier.AttributeSetSign}.{modifier.AttributeSign} is {attributeValue.Value.CalculateMode}");
+                    $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
 
             var magnitude = modifier.CalculateMagnitude(effect, modifier.Magnitude);
             var baseValue = attributeValue.Value.BaseValue;
@@ -159,8 +159,8 @@ public class Agent : AbsAgent, IAgent
                     throw new ArgumentOutOfRangeException();
             }
 
-            AttributeSetContainer.Sets[modifier.AttributeSetSign]
-                .ChangeAttributeBase(modifier.AttributeSign, baseValue);
+            AttributeSetContainer.Sets[modifier.AttributeSetTag]
+                .ChangeAttributeBase(modifier.AttributeTag, baseValue);
         }
     }
 
@@ -186,7 +186,7 @@ public class Agent : AbsAgent, IAgent
     public Effect[] GetEffects()
     {
         return _executors[ExecutorType.EffectExecutor].GetAllTasks()
-            .Select(task => _stateMaps[task.Sign].State as Effect).ToArray();
+            .Select(task => _stateMaps[task.Tag].State as Effect).ToArray();
     }
 
 
@@ -200,7 +200,7 @@ public class Agent : AbsAgent, IAgent
         foreach (var task in tasks)
         {
             var effectTask = task as EffectTask;
-            var effect = _stateMaps[effectTask.Sign].State as Effect;
+            var effect = _stateMaps[effectTask.Tag].State as Effect;
 
             var ownedTags = effect.OwnedTags;
             if (!ownedTags.Empty && ownedTags.HasAnyTags(tags))
