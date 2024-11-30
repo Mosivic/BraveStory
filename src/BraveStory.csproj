@@ -17,6 +17,8 @@
         <EmbeddedResource Remove="addons\Miros\FSM\Executor\StateMachine\**"/>
     </ItemGroup>
     <ItemGroup>
+        <Content Include="addons\Miros\Experiment\StatsAndModifiers\img.png" />
+        <Content Include="addons\Miros\Experiment\StatsAndModifiers\README.MD" />
         <Content Include="addons\Miros\FSM\Utility\StateDebugger\state_debugger.tscn"/>
         <Content Include="Player\Player.tscn"/>
         <Content Include="Scene\Test.tscn"/>
