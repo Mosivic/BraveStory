@@ -2,6 +2,6 @@
 
 public class BaseStats
 {
-    public int Attack = 10;
-    public int Defense = 10;
+    public readonly int Attack = 10;
+    public readonly int Defense = 10;
 }
