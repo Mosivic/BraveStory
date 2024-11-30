@@ -31,6 +31,6 @@ public class EffectTests
         var agent = new Agent(null, new StaticTaskProvider());
         agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();
 
-        
+        Assert.That(attributeSet[Tags.Attribute_RunSpeed].BaseValue, Is.EqualTo(100));
     }
 }
