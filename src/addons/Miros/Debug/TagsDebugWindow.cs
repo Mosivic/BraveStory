@@ -3,17 +3,11 @@ using System.Linq;
 using Godot;
 using Miros.Core;
 
-public partial class TagDebugWindow : Control
+public partial class TagDebugWindow(HashSet<Tag> tags) : Control
 {
-    private const float UPDATE_INTERVAL = 0.1f; // 更新间隔（秒）
-    private readonly HashSet<Tag> _tags;
+    private const float UpdateInterval = 0.1f; // 更新间隔（秒）
     private Tree _tagTree;
     private float _timeSinceLastUpdate;
-
-    public TagDebugWindow(HashSet<Tag> tags)
-    {
-        _tags = tags;
-    }
 
     public override void _Ready()
     {
@@ -45,7 +39,7 @@ public partial class TagDebugWindow : Control
     public override void _Process(double delta)
     {
         _timeSinceLastUpdate += (float)delta;
-        if (_timeSinceLastUpdate >= UPDATE_INTERVAL)
+        if (_timeSinceLastUpdate >= UpdateInterval)
         {
             UpdateTagDisplay();
             _timeSinceLastUpdate = 0;
@@ -59,17 +53,20 @@ public partial class TagDebugWindow : Control
         root.SetText(0, "Tags");
 
         // 创建标签路径字典
-        var tagPaths = new Dictionary<string, TreeItem>();
-        tagPaths[""] = root;
-
-        foreach (var tag in _tags.OrderBy(t => t.ToString()))
+        var tagPaths = new Dictionary<string, TreeItem>
         {
-            var segments = tag.ToString().Split('.');
+            [""] = root
+        };
+
+        foreach (var tag in tags.OrderBy(t => t.ToString()))
+        {   
+            var segments = tag.ToString()?.Split('.');
+            if(segments == null) return;
+            
             var currentPath = "";
 
-            for (var i = 0; i < segments.Length; i++)
+            foreach (var segment in segments)
             {
-                var segment = segments[i];
                 var newPath = currentPath == "" ? segment : $"{currentPath}.{segment}";
 
                 if (!tagPaths.ContainsKey(newPath))

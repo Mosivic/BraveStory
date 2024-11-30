@@ -26,18 +26,21 @@ public class Agent : AbsAgent, IAgent
     private readonly Dictionary<Tag, StateMap> _stateMaps = [];
     private readonly ITaskProvider _taskProvider;
 
+    private readonly TagContainer _tagContainer;
+
     public Agent(Node2D host, ITaskProvider taskProvider)
     {
         _host = host;
         _taskProvider = taskProvider;
         AttributeSetContainer = new AttributeSetContainer(this);
+        _tagContainer = new([]);
     }
 
     public TagAggregator TagAggregator { get; private set; }
 
     public AttributeSetContainer AttributeSetContainer { get; set; }
 
-    public State GetStateBy(Tag sign)
+    public State GetState(Tag sign)
     {
         return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
     }

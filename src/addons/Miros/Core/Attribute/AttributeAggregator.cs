@@ -241,9 +241,9 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 				mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track &&
 				attribute.Name == mmc.attributeName)
 				if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target &&
-					 attribute.Owner == effect.Owner) ||
+					attribute.Owner == effect.Owner) ||
 					(mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Source &&
-					 attribute.Owner == effect.Source))
+					attribute.Owner == effect.Source))
 				{
 					UpdateCurrentValueWhenModifierIsDirty();
 					break;
