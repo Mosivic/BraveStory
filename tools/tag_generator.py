@@ -115,7 +115,7 @@ class TagCodeGenerator:
     def _generate_tags_class(self) -> str:
         """生成标签类"""
         lines = [
-            f"{self.indent}public static class Tags",
+            f"{self.indent}public static partial class Tags",
             f"{self.indent}{{",
             f"{self.indent}{self.indent}private static TagManager TagManager => TagManager.Instance;",
             ""

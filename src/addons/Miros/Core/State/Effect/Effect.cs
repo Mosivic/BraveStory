@@ -72,8 +72,8 @@ public class Effect(Tag sign) : State(sign)
     public Effect PeriodExecution { get; private set; }
     public Modifier[] Modifiers { get; private set; }
 
-    public Dictionary<string, float> SnapshotSourceAttributes { get; set; }
-    public Dictionary<string, float> SnapshotTargetAttributes { get; set; }
+    public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
+    public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }
 
     public StackingComponent Stacking { get; set; }
     public event Action<Agent, Effect> OnImmunity;

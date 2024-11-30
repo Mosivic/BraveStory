@@ -26,7 +26,7 @@ public class EffectTests
         };
 
         var attributeSet = new PlayerAttributeSet();
-        attributeSet["RunSpeed"].SetBaseValue(100);
+        attributeSet[Tags.Attribute_RunSpeed].SetBaseValue(100);
 
         var agent = new Agent(null, new StaticTaskProvider());
         agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();

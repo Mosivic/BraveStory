@@ -126,7 +126,7 @@ public class Agent : AbsAgent, IAgent
     {
         foreach (var modifier in effect.Modifiers)
         {
-            var attributeValue = GetAttributeAttributeValue(modifier.AttributeSetName, modifier.AttributeShortName);
+            var attributeValue = GetAttributeAttributeValue(modifier.AttributeSetSign, modifier.AttributeSign);
             if (attributeValue == null) continue;
             if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
                 throw new InvalidOperationException("Unsupported operation.");
@@ -134,7 +134,7 @@ public class Agent : AbsAgent, IAgent
             if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
                 throw new InvalidOperationException(
                     $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-                    $"But {modifier.AttributeSetName}.{modifier.AttributeShortName} is {attributeValue.Value.CalculateMode}");
+                    $"But {modifier.AttributeSetSign}.{modifier.AttributeSign} is {attributeValue.Value.CalculateMode}");
 
             var magnitude = modifier.CalculateMagnitude(effect, modifier.Magnitude);
             var baseValue = attributeValue.Value.BaseValue;
@@ -159,8 +159,8 @@ public class Agent : AbsAgent, IAgent
                     throw new ArgumentOutOfRangeException();
             }
 
-            AttributeSetContainer.Sets[modifier.AttributeSetName]
-                .ChangeAttributeBase(modifier.AttributeShortName, baseValue);
+            AttributeSetContainer.Sets[modifier.AttributeSetSign]
+                .ChangeAttributeBase(modifier.AttributeSign, baseValue);
         }
     }
 
@@ -291,31 +291,31 @@ public class Agent : AbsAgent, IAgent
 
     #region Attrubute Setget
 
-    public AttributeValue? GetAttributeAttributeValue(string attrSetName, string attrShortName)
+    public AttributeValue? GetAttributeAttributeValue(Tag attrSetSign, Tag attrSign)
     {
-        var value = AttributeSetContainer.GetAttributeAttributeValue(attrSetName, attrShortName);
+        var value = AttributeSetContainer.GetAttributeAttributeValue(attrSetSign, attrSign);
         return value;
     }
 
-    public CalculateMode? GetAttributeCalculateMode(string attrSetName, string attrShortName)
+    public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
     {
-        var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetName, attrShortName);
+        var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
         return value;
     }
 
-    public float? GetAttributeCurrentValue(string setName, string attributeShortName)
+    public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
     {
-        var value = AttributeSetContainer.GetAttributeCurrentValue(setName, attributeShortName);
+        var value = AttributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
         return value;
     }
 
-    public float? GetAttributeBaseValue(string setName, string attributeShortName)
+    public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
     {
-        var value = AttributeSetContainer.GetAttributeBaseValue(setName, attributeShortName);
+        var value = AttributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
         return value;
     }
 
-    public Dictionary<string, float> DataSnapshot()
+    public Dictionary<Tag, float> DataSnapshot()
     {
         return AttributeSetContainer.Snapshot();
     }

@@ -13,9 +13,9 @@ public struct ModifierMagnitude
 public class Modifier
 {
     public ModifierMagnitudeCalculation MMC; // 幅度计算
-    public string AttributeName { get; set; } // 属性名称
-    public string AttributeSetName { get; set; } // 属性集名称
-    public string AttributeShortName { get; set; } // 属性短名称
+
+    public Tag AttributeSetSign { get; set; } // 属性集标签
+    public Tag AttributeSign { get; set; } // 属性标签
     public float Magnitude { get; set; } // 幅度
 
     public ModifierOperation Operation { get; set; }
@@ -29,9 +29,7 @@ public class Modifier
 
     private void OnAttributeChanged()
     {
-        var split = AttributeName.Split('.');
-        AttributeSetName = split[0];
-        AttributeShortName = split[1];
+
 
         // if (ReflectionHelper.GetAttribute(AttributeName)?.CalculateMode !=
         //     CalculateMode.Stacking)

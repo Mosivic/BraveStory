@@ -38,7 +38,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 		foreach (var ge in effects)
 			if (ge.IsActive)
 				foreach (var modifier in ge.Modifiers)
-					if (modifier.AttributeName == _processedAttribute.Name)
+					if (modifier.AttributeSign == _processedAttribute.Sign)
 					{
 						_modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
 						TryRegisterAttributeChangedListen(ge, modifier);
@@ -187,13 +187,13 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
 			{
 				if (ge.Owner != null)
-					ge.Owner.AttributeSetContainer.Sets[mmc.attributeSetName][mmc.attributeShortName]
+					ge.Owner.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
 						.UnregisterPostCurrentValueChange(OnAttributeChanged);
 			}
 			else
 			{
 				if (ge.Source != null)
-					ge.Source.AttributeSetContainer.Sets[mmc.attributeSetName][mmc.attributeShortName]
+					ge.Source.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
 						.UnregisterPostCurrentValueChange(OnAttributeChanged);
 			}
 		}
@@ -212,13 +212,13 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
 			{
 				if (ge.Owner != null)
-					ge.Owner.AttributeSetContainer.Sets[mmc.attributeSetName][mmc.attributeShortName]
+					ge.Owner.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
 						.RegisterPostCurrentValueChange(OnAttributeChanged);
 			}
 			else
 			{
 				if (ge.Source != null)
-					ge.Source.AttributeSetContainer.Sets[mmc.attributeSetName][mmc.attributeShortName]
+					ge.Source.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
 						.RegisterPostCurrentValueChange(OnAttributeChanged);
 			}
 		}
@@ -239,7 +239,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			var modifier = tuple.Item2;
 			if (modifier.MMC is AttributeBasedModCalculation mmc &&
 				mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track &&
-				attribute.Name == mmc.attributeName)
+				attribute.Sign == mmc.attributeSign)
 				if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target &&
 					attribute.Owner == effect.Owner) ||
 					(mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Source &&

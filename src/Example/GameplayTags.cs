@@ -4,7 +4,7 @@ using Miros.Core;
 
 namespace BraveStory
 {
-    public static class Tags
+    public static partial class Tags
     {
         private static TagManager TagManager => TagManager.Instance;
 

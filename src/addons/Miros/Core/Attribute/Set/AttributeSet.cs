@@ -6,8 +6,8 @@ namespace Miros.Core;
 
 public abstract class AttributeSet
 {
-    public abstract AttributeBase this[string key] { get; }
-    public abstract string[] AttributeNames { get; }
+    public abstract AttributeBase this[Tag sign] { get; }
+    public abstract Tag[] AttributeSigns { get; }
     public Agent Owner { get; private set; }
 
     /// <summary>
@@ -17,17 +17,17 @@ public abstract class AttributeSet
     public void SetOwner(Agent owner)
     {
         Owner = owner;
-        foreach (var attribute in AttributeNames) this[attribute].SetOwner(owner);
+        foreach (var attribute in AttributeSigns) this[attribute].SetOwner(owner);
     }
 
 
     /// <summary>
     ///     修改属性基础值
     /// </summary>
-    /// <param name="attributeShortName">属性名</param>
+    /// <param name="attributeSign">属性标签</param>
     /// <param name="value">新值</param>
-    public void ChangeAttributeBase(string attributeShortName, float value)
+    public void ChangeAttributeBase(Tag attributeSign, float value)
     {
-        if (this[attributeShortName] != null) this[attributeShortName].SetBaseValue(value);
+        if (this[attributeSign] != null) this[attributeSign].SetBaseValue(value);
     }
 }

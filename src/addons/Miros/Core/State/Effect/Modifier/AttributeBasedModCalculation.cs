@@ -19,11 +19,8 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 
     public AttributeFrom attributeFromType; // 属性来源
 
-    public string attributeName; // 属性的名称
-
-    public string attributeSetName; // 属性集名称
-
-    public string attributeShortName;
+    public Tag attributeSetSign; // 属性集的标签
+    public Tag attributeSign; // 属性的标签
 
     public float b = 0; // 常量
 
@@ -38,12 +35,12 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
             if (captureType == EffectAttributeCaptureType.SnapShot)
             {
                 var snapShot = effect.SnapshotSourceAttributes;
-                var attribute = snapShot[attributeName];
+                var attribute = snapShot[attributeSign];
                 return attribute * k + b;
             }
             else
             {
-                var attribute = effect.Source.GetAttributeCurrentValue(attributeSetName, attributeShortName);
+                var attribute = effect.Source.GetAttributeCurrentValue(attributeSetSign, attributeSign);
                 return (attribute ?? 1) * k + b;
             }
         }
@@ -51,28 +48,18 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
         if (captureType == EffectAttributeCaptureType.SnapShot)
         {
             var snapShot = effect.SnapshotTargetAttributes;
-            var attribute = snapShot[attributeName];
+            var attribute = snapShot[attributeSign];
             return attribute * k + b;
         }
         else
         {
-            var attribute = effect.Owner.GetAttributeCurrentValue(attributeSetName, attributeShortName);
+            var attribute = effect.Owner.GetAttributeCurrentValue(attributeSetSign, attributeSign);
             return (attribute ?? 1) * k + b;
         }
     }
 
     private void OnAttributeNameChanged()
     {
-        if (!string.IsNullOrWhiteSpace(attributeName))
-        {
-            var split = attributeName.Split('.');
-            attributeSetName = split[0];
-            attributeShortName = split[1];
-        }
-        else
-        {
-            attributeSetName = null;
-            attributeShortName = null;
-        }
+     
     }
 }

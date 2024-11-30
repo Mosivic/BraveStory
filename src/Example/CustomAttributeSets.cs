@@ -4,71 +4,51 @@ using Miros.Core;
 
 namespace Example;
 
-public static class AttributeTags
+public static partial class Tags
 {
     private static TagManager TagManager => TagManager.Instance;
-    public static Tag Character_Gravity { get; } = TagManager.RequestTag("Character.Gravity");
-    public static Tag Character_RunSpeed { get; } = TagManager.RequestTag("Character.RunSpeed");
-    public static Tag Character_JumpVelocity { get; } = TagManager.RequestTag("Character.JumpVelocity");
-    public static Tag Character_FloorAcceleration { get; } = TagManager.RequestTag("Character.FloorAcceleration");
-    public static Tag Character_AirAcceleration { get; } = TagManager.RequestTag("Character.AirAcceleration");
-    public static Tag Warrior_Gravity { get; } = TagManager.RequestTag("Warrior.Gravity");
-    public static Tag Warrior_RunSpeed { get; } = TagManager.RequestTag("Warrior.RunSpeed");
-    public static Tag Warrior_JumpVelocity { get; } = TagManager.RequestTag("Warrior.JumpVelocity");
-    public static Tag Warrior_FloorAcceleration { get; } = TagManager.RequestTag("Warrior.FloorAcceleration");
-    public static Tag Warrior_AirAcceleration { get; } = TagManager.RequestTag("Warrior.AirAcceleration");
-    public static Tag Warrior_Strength { get; } = TagManager.RequestTag("Warrior.Strength");
-    public static Tag Warrior_Defense { get; } = TagManager.RequestTag("Warrior.Defense");
-    public static Tag Player_Gravity { get; } = TagManager.RequestTag("Player.Gravity");
-    public static Tag Player_RunSpeed { get; } = TagManager.RequestTag("Player.RunSpeed");
-    public static Tag Player_JumpVelocity { get; } = TagManager.RequestTag("Player.JumpVelocity");
-    public static Tag Player_FloorAcceleration { get; } = TagManager.RequestTag("Player.FloorAcceleration");
-    public static Tag Player_AirAcceleration { get; } = TagManager.RequestTag("Player.AirAcceleration");
-    public static Tag Enemy_Gravity { get; } = TagManager.RequestTag("Enemy.Gravity");
-    public static Tag Enemy_RunSpeed { get; } = TagManager.RequestTag("Enemy.RunSpeed");
-    public static Tag Enemy_JumpVelocity { get; } = TagManager.RequestTag("Enemy.JumpVelocity");
-    public static Tag Enemy_FloorAcceleration { get; } = TagManager.RequestTag("Enemy.FloorAcceleration");
-    public static Tag Enemy_AirAcceleration { get; } = TagManager.RequestTag("Enemy.AirAcceleration");
-    public static Tag Enemy_WalkSpeed { get; } = TagManager.RequestTag("Enemy.WalkSpeed");
+    public static Tag AttributeSet_Character { get; } = TagManager.RequestTag("AttributeSet.Character");
+    public static Tag AttributeSet_Warrior { get; } = TagManager.RequestTag("AttributeSet.Warrior");
+    public static Tag AttributeSet_Player { get; } = TagManager.RequestTag("AttributeSet.Player");
+    public static Tag AttributeSet_Enemy { get; } = TagManager.RequestTag("AttributeSet.Enemy");
+    public static Tag Attribute_Gravity { get; } = TagManager.RequestTag("Attribute.Gravity");
+    public static Tag Attribute_RunSpeed { get; } = TagManager.RequestTag("Attribute.RunSpeed");
+    public static Tag Attribute_JumpVelocity { get; } = TagManager.RequestTag("Attribute.JumpVelocity");
+    public static Tag Attribute_FloorAcceleration { get; } = TagManager.RequestTag("Attribute.FloorAcceleration");
+    public static Tag Attribute_AirAcceleration { get; } = TagManager.RequestTag("Attribute.AirAcceleration");
+    public static Tag Attribute_Strength { get; } = TagManager.RequestTag("Attribute.Strength");
+    public static Tag Attribute_Defense { get; } = TagManager.RequestTag("Attribute.Defense");
+    public static Tag Attribute_WalkSpeed { get; } = TagManager.RequestTag("Attribute.WalkSpeed");
 }
 
 public class CharacterAttributeSet : AttributeSet
 {
-    private static TagManager TagManager => TagManager.Instance;
     private readonly AttributeBase _gravity;
     private readonly AttributeBase _runspeed;
     private readonly AttributeBase _jumpvelocity;
     private readonly AttributeBase _flooracceleration;
     private readonly AttributeBase _airacceleration;
-    public static Tag GravityTag => TagManager.RequestTag("Character.Gravity");
-    public static Tag RunSpeedTag => TagManager.RequestTag("Character.RunSpeed");
-    public static Tag JumpVelocityTag => TagManager.RequestTag("Character.JumpVelocity");
-    public static Tag FloorAccelerationTag => TagManager.RequestTag("Character.FloorAcceleration");
-    public static Tag AirAccelerationTag => TagManager.RequestTag("Character.AirAcceleration");
 
-    public override string[] AttributeNames => new[] {
-        "Gravity", "RunSpeed", "JumpVelocity", "FloorAcceleration", "AirAcceleration"
+    public override Tag[] AttributeSigns => new[] {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration
     };
 
     public CharacterAttributeSet() : base()
     {
-        _gravity = new AttributeBase("Character", "Gravity", 980.0f);
-        _runspeed = new AttributeBase("Character", "RunSpeed", 200.0f);
-        _jumpvelocity = new AttributeBase("Character", "JumpVelocity", -300.0f);
-        _flooracceleration = new AttributeBase("Character", "FloorAcceleration", 1000.0f);
-        _airacceleration = new AttributeBase("Character", "AirAcceleration", 800.0f);
+        _gravity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Gravity, 980.0f);
+        _runspeed = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_RunSpeed, 200.0f);
+        _jumpvelocity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_JumpVelocity, -300.0f);
+        _flooracceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_FloorAcceleration, 1000.0f);
+        _airacceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_AirAcceleration, 800.0f);
     }
 
-    public override AttributeBase this[string key] =>
-        key switch
-        {
-            "Gravity" => _gravity,
-            "RunSpeed" => _runspeed,
-            "JumpVelocity" => _jumpvelocity,
-            "FloorAcceleration" => _flooracceleration,
-            "AirAcceleration" => _airacceleration,
-            _ => null
-        };
+    public override AttributeBase this[Tag sign] =>
+        sign.Equals(Tags.Attribute_Gravity) ? _gravity :
+        sign.Equals(Tags.Attribute_RunSpeed) ? _runspeed :
+        sign.Equals(Tags.Attribute_JumpVelocity) ? _jumpvelocity :
+        sign.Equals(Tags.Attribute_FloorAcceleration) ? _flooracceleration :
+        sign.Equals(Tags.Attribute_AirAcceleration) ? _airacceleration :
+        null;
 
     public AttributeBase Gravity => _gravity;
     public AttributeBase RunSpeed => _runspeed;
@@ -79,21 +59,23 @@ public class CharacterAttributeSet : AttributeSet
 
 public class WarriorAttributeSet : CharacterAttributeSet
 {
-    private static TagManager TagManager => TagManager.Instance;
     private readonly AttributeBase _strength;
     private readonly AttributeBase _defense;
-    public static Tag StrengthTag => TagManager.RequestTag("Warrior.Strength");
-    public static Tag DefenseTag => TagManager.RequestTag("Warrior.Defense");
 
-    public override string[] AttributeNames => new[] {
-        "Gravity", "RunSpeed", "JumpVelocity", "FloorAcceleration", "AirAcceleration", "Strength", "Defense"
+    public override Tag[] AttributeSigns => new[] {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration, Tags.Attribute_Strength, Tags.Attribute_Defense
     };
 
     public WarriorAttributeSet() : base()
     {
-        _strength = new AttributeBase("Warrior", "Strength", 10.0f);
-        _defense = new AttributeBase("Warrior", "Defense", 8.0f);
+        _strength = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Strength, 10.0f);
+        _defense = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Defense, 8.0f);
     }
+
+    public override AttributeBase this[Tag sign] =>
+        sign.Equals(Tags.Attribute_Strength) ? _strength :
+        sign.Equals(Tags.Attribute_Defense) ? _defense :
+        base[sign];
 
     public AttributeBase Strength => _strength;
     public AttributeBase Defense => _defense;
@@ -101,32 +83,36 @@ public class WarriorAttributeSet : CharacterAttributeSet
 
 public class PlayerAttributeSet : CharacterAttributeSet
 {
-    private static TagManager TagManager => TagManager.Instance;
 
-    public override string[] AttributeNames => new[] {
-        "Gravity", "RunSpeed", "JumpVelocity", "FloorAcceleration", "AirAcceleration"
+    public override Tag[] AttributeSigns => new[] {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration
     };
 
     public PlayerAttributeSet() : base()
     {
     }
 
+    public override AttributeBase this[Tag sign] =>
+        base[sign];
+
 }
 
 public class EnemyAttributeSet : CharacterAttributeSet
 {
-    private static TagManager TagManager => TagManager.Instance;
     private readonly AttributeBase _walkspeed;
-    public static Tag WalkSpeedTag => TagManager.RequestTag("Enemy.WalkSpeed");
 
-    public override string[] AttributeNames => new[] {
-        "Gravity", "RunSpeed", "JumpVelocity", "FloorAcceleration", "AirAcceleration", "WalkSpeed"
+    public override Tag[] AttributeSigns => new[] {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration, Tags.Attribute_WalkSpeed
     };
 
     public EnemyAttributeSet() : base()
     {
-        _walkspeed = new AttributeBase("Enemy", "WalkSpeed", 80.0f);
+        _walkspeed = new AttributeBase(Tags.AttributeSet_Enemy, Tags.Attribute_WalkSpeed, 80.0f);
     }
+
+    public override AttributeBase this[Tag sign] =>
+        sign.Equals(Tags.Attribute_WalkSpeed) ? _walkspeed :
+        base[sign];
 
     public AttributeBase WalkSpeed => _walkspeed;
 }
