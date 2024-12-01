@@ -5,7 +5,7 @@ namespace Miros.Core;
 
 public abstract class AbsTask(State state)
 {
-    public Tag Sign => state.Sign;
+    public Tag Tag => state.Tag;
     public int Priority => state.Priority;
     public bool IsActive => state.IsActive;
 
@@ -32,12 +32,12 @@ public abstract class AbsTask(State state)
         OnExited?.Invoke(state);
     }
 
-    protected void OnPause()
+    protected void OnDeactivate()
     {
         OnPaused?.Invoke(state);
     }
 
-    protected void OnResume()
+    protected void OnActivate()
     {
         OnResumed?.Invoke(state);
     }

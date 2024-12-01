@@ -5,13 +5,12 @@ namespace BraveStory;
 
 public partial class Character : CharacterBody2D
 {
+    protected Agent Agent;
     protected AnimationPlayer AnimationPlayer;
     protected Node2D Graphics;
     protected bool HasHit;
     protected HitBox HitBox;
     protected HurtBox HurtBox;
-
-    protected Agent Agent;
     protected Sprite2D Sprite;
 
 

@@ -1,5 +1,5 @@
 import yaml
-from typing import Dict, List
+from typing import Dict, List, Any
 
 class AttributeDefinition:
     def __init__(self, name: str, value: float = 0):
@@ -14,6 +14,8 @@ class AttributeSetDefinition:
         self.name = name
         self.inherits: List[str] = []
         self.attributes: Dict[str, AttributeDefinition] = {}
+
+
 
 class AttributeGenerator:
     def __init__(self):
@@ -89,12 +91,40 @@ class AttributeGenerator:
             if set_name not in resolved_sets:
                 self.attribute_sets[set_name].attributes = resolve_set(set_name)
 
+    def generate_tags_class(self) -> str:
+        code_parts = []
+        code_parts.append("public static partial class Tags\n")
+        code_parts.append("{\n")
+
+        generated_tags = set()
+        
+        # 为每个 AttributeSet 生成标签
+        for set_name in self.attribute_sets.keys():
+            tag_identifier = f"AttributeSet.{set_name}"
+            if tag_identifier not in generated_tags:
+                code_parts.append(f"    public static Tag AttributeSet_{set_name} {{ get; }} = TagManager.RequestTag(\"{tag_identifier}\");\n")
+                generated_tags.add(tag_identifier)  # 添加到已生成标签集合
+        
+
+        for attr_set in self.attribute_sets.values():
+            for attr_name in attr_set.attributes.keys():
+                tag_identifier = f"Attribute.{attr_name}"
+                if tag_identifier not in generated_tags:
+                    code_parts.append(f"    public static Tag Attribute_{attr_name} {{ get; }} = TagManager.RequestTag(\"{tag_identifier}\");\n")
+                    generated_tags.add(tag_identifier)
+        
+        code_parts.append("}\n")
+        return "".join(code_parts)
+
     def generate_code(self) -> str:
         code_parts = []
-        code_parts.append("using Miros.Core;\n")
-        code_parts.append("namespace Example;\n")
+        code_parts.append("// This file is auto-generated. Do not modify.\n")
+        code_parts.append("namespace Miros.Core;\n")
         
-        # 首先生成基类
+        # 生成标签类
+        code_parts.append(self.generate_tags_class())
+        
+        # 生成基类
         for set_name, attr_set in self.attribute_sets.items():
             if not attr_set.inherits:  # 没有继承的是基类
                 code_parts.extend(self._generate_attribute_set(set_name, attr_set))
@@ -111,7 +141,10 @@ class AttributeGenerator:
         code_parts = []
         code_parts.append(f"public class {set_name}AttributeSet : {parent_class}")
         code_parts.append("{")
-        
+
+        # 声明属性集标签
+        code_parts.append(f"    public override Tag AttributeSetTag => Tags.AttributeSet_{set_name};\n")
+
         # 只声明新增的属性字段
         inherited_attrs = set()
         if parent_class != "AttributeSet":
@@ -122,10 +155,11 @@ class AttributeGenerator:
         for attr_name in attr_set.attributes.keys():
             if attr_name not in inherited_attrs:
                 code_parts.append(f"    private readonly AttributeBase _{attr_name.lower()};")
+                
         
-        # AttributeNames属性
-        code_parts.append("\n    public override string[] AttributeNames => new[] {")
-        names = [f'"{attr_name}"' for attr_name in attr_set.attributes.keys()]
+        # AttributeSigns 属性
+        code_parts.append("\n    public override Tag[] AttributeSigns => new[] {")
+        names = [f'Tags.Attribute_{attr_name}' for attr_name in attr_set.attributes.keys()]
         code_parts.append(f"        {', '.join(names)}")
         code_parts.append("    };\n")
         
@@ -135,18 +169,22 @@ class AttributeGenerator:
         # 只初始化新增的属性
         for attr_name, attr_def in attr_set.attributes.items():
             if attr_name not in inherited_attrs:
-                code_parts.append(f'        _{attr_name.lower()} = new AttributeBase("{set_name}", "{attr_name}", {attr_def.value}f);')
+                code_parts.append(f'        _{attr_name.lower()} = new AttributeBase(Tags.AttributeSet_{set_name}, Tags.Attribute_{attr_name}, {attr_def.value}f);')
         code_parts.append("    }\n")
         
         # 索引器
         if parent_class == "AttributeSet":
-            code_parts.append("    public override AttributeBase this[string key] =>")
-            code_parts.append("        key switch")
-            code_parts.append("        {")
+            code_parts.append("    public override AttributeBase this[Tag sign] =>")
             for attr_name in attr_set.attributes.keys():
-                code_parts.append(f'            "{attr_name}" => _{attr_name.lower()},')
-            code_parts.append("            _ => null")
-            code_parts.append("        };\n")
+                code_parts.append(f'        sign.Equals(Tags.Attribute_{attr_name}) ? _{attr_name.lower()} :')
+            code_parts.append("        null;\n")
+        else:  # 为继承的类添加索引器
+            code_parts.append("    public override AttributeBase this[Tag sign] =>")
+            # 只处理当前类特有的属性
+            for attr_name in attr_set.attributes.keys():
+                if attr_name not in inherited_attrs:  # 确保不重复父类属性
+                    code_parts.append(f'        sign.Equals(Tags.Attribute_{attr_name}) ? _{attr_name.lower()} :')
+            code_parts.append("        base[sign];\n")  # 调用父类的索引器
         
         # 属性访问器（只为新增的属性生成）
         for attr_name in attr_set.attributes.keys():

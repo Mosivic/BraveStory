@@ -3,13 +3,18 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class State(Tag sign)
+public abstract class StateBase
 {
-    public Tag Sign { get; init; } = sign;
-    public Type TaskType { get; init; } = typeof(TaskBase);
+    public virtual Type TaskType { get; }
+}
+
+public class State(Tag tag,Agent source) : StateBase
+{
+    public Tag Tag { get; init; } = tag;
+    public override Type TaskType => typeof(TaskBase);
     public int Priority { get; init; } = 0;
-    public Agent Owner { get; protected set; } 
-    public Agent Source { get; protected set; }
+    public Agent Owner { get;  set; }
+    public Agent Source { get; init; } = source;
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;
@@ -18,8 +23,8 @@ public class State(Tag sign)
 
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
-    
-    
+
+
     public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<TaskBase>, new()
     {
         var component = new T();
@@ -27,19 +32,19 @@ public class State(Tag sign)
         Components[typeof(T)] = component;
         return this;
     }
-    
+
     public State OnEntered(Action<State> action)
     {
         GetStandardDelegateComponent().EnterFunc += action;
         return this;
     }
-    
-    public State EnterCondition(Func<State,bool> action)
+
+    public State EnterCondition(Func<State, bool> action)
     {
         GetStandardDelegateComponent().EnterCondition += action;
         return this;
     }
-    
+
     public State OnExited(Action<State> action)
     {
         GetStandardDelegateComponent().ExitFunc += action;
@@ -51,7 +56,7 @@ public class State(Tag sign)
         GetStandardDelegateComponent().ExitCondition += condition;
         return this;
     }
-    
+
     public State OnSucceed(Action<State> action)
     {
         GetStandardDelegateComponent().OnSucceedFunc += action;
@@ -63,7 +68,7 @@ public class State(Tag sign)
         GetStandardDelegateComponent().OnFailedFunc += action;
         return this;
     }
-    
+
     public State OnPaused(Action<State> action)
     {
         GetStandardDelegateComponent().PauseFunc += action;
@@ -113,7 +118,7 @@ public class State(Tag sign)
         GetStandardDelegateComponent().OnPeriodOverFunc += action;
         return this;
     }
-    
+
 
     // 辅助方法
     private StandardDelegateComponent GetStandardDelegateComponent()

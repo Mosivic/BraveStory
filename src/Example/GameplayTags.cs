@@ -1,13 +1,9 @@
 // This file is auto-generated. Do not modify.
 
-using Miros.Core;
+namespace Miros.Core;
 
-namespace BraveStory;
-
-public static class Tags
+public static partial class Tags
 {
-    private static TagManager TagManager => TagManager.Instance;
-
     public static Tag StateLayer_Movement { get; } = TagManager.RequestTag("StateLayer.Movement");
 
     public static Tag StateLayer_Buff { get; } = TagManager.RequestTag("StateLayer.Buff");
@@ -63,12 +59,4 @@ public static class Tags
     public static Tag State_Status_Die { get; } = TagManager.RequestTag("State.Status.Die");
 
     public static Tag State_Status { get; } = TagManager.RequestTag("State.Status");
-
-    public static Tag Character_Base { get; } = TagManager.RequestTag("Character.Base");
-
-    public static Tag Character_Warrior { get; } = TagManager.RequestTag("Character.Warrior");
-
-    public static Tag Character_Player { get; } = TagManager.RequestTag("Character.Player");
-
-    public static Tag Character_Enemy { get; } = TagManager.RequestTag("Character.Enemy");
 }

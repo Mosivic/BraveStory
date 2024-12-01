@@ -52,7 +52,7 @@ public struct AttributeValue
 		MaxValue = max;
 	}
 
-	public bool IsSupportOperation(ModifierOperation operation)
+	public readonly bool IsSupportOperation(ModifierOperation operation)
 	{
 		return SupportedOperation.HasFlag((SupportedOperation)(1 << (int)operation));
 	}

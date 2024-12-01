@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -23,7 +22,7 @@ public partial class Brain : Node2D
         UpdateContext();
 
         ActionBase bestAction = null;
-        float bestUtility = float.MinValue;
+        var bestUtility = float.MinValue;
 
         foreach (var action in actions)
         {

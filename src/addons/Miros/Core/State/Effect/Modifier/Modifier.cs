@@ -10,29 +10,23 @@ public struct ModifierMagnitude
     public ModifierMagnitudeType Type { get; set; }
 }
 
-public class Modifier
+public class Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation)
 {
     public ModifierMagnitudeCalculation MMC; // 幅度计算
-    public string AttributeName { get; set; } // 属性名称
-    public string AttributeSetName { get; set; } // 属性集名称
-    public string AttributeShortName { get; set; } // 属性短名称
-    public float Magnitude { get; set; } // 幅度
-
-    public ModifierOperation Operation { get; set; }
+    public Tag AttributeSetTag { get; set; } = attributeSetTag; // 属性集标签
+    public Tag AttributeTag { get; set; } = attributeTag; // 属性标签
+    public float Magnitude { get; set; } = magnitude; // 幅度
+    public ModifierOperation Operation { get; set; } = operation; // 操作
 
 
     public float CalculateMagnitude(Effect state, float modifierMagnitude)
     {
-        return MMC == null ? Magnitude : MMC.CalculateMagnitude(state, modifierMagnitude);
+        return MMC?.CalculateMagnitude(state, modifierMagnitude) ?? Magnitude;
     }
 
 
     private void OnAttributeChanged()
     {
-        var split = AttributeName.Split('.');
-        AttributeSetName = split[0];
-        AttributeShortName = split[1];
-
         // if (ReflectionHelper.GetAttribute(AttributeName)?.CalculateMode !=
         //     CalculateMode.Stacking)
         // {

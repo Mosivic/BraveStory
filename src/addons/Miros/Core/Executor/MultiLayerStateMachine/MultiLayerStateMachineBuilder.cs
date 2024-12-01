@@ -19,7 +19,7 @@ public class MultiLayerStateMachineBuilder
         foreach (var state in states)
         {
             var task = _taskProvider.GetTask(state);
-            _stateMaps[state.Sign] = new StateMap
+            _stateMaps[state.Tag] = new StateMap
             {
                 State = state,
                 Task = task,
@@ -41,7 +41,7 @@ public class MultiLayerStateMachineBuilder
         foreach (var (fromState, stateTransitions) in transitions.Transitions)
         foreach (var transition in stateTransitions)
             container.Add(
-                _stateMaps[fromState.Sign].Task,
+                _stateMaps[fromState.Tag].Task,
                 CreateStateTransition(transition)
             );
 
@@ -51,7 +51,7 @@ public class MultiLayerStateMachineBuilder
     private StateTransition CreateStateTransition(StateTransitionConfig.Transition transition)
     {
         return new StateTransition(
-            _stateMaps[transition.ToState.Sign].Task,
+            _stateMaps[transition.ToState.Tag].Task,
             transition.Condition,
             transition.Mode
         );
@@ -61,7 +61,7 @@ public class MultiLayerStateMachineBuilder
     {
         _stateMachine.AddLayer(
             layer,
-            _stateMaps[defaultState.Sign].Task,
+            _stateMaps[defaultState.Tag].Task,
             container
         );
         return _stateMachine;

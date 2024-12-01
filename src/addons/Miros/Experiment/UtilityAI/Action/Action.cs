@@ -1,12 +1,13 @@
-
 namespace Miros.Experiment.UtilityAI;
 
 public abstract class ActionBase
 {
-    public string targetTag;
     public Consideration consideration;
+    public string targetTag;
 
-    public virtual void Init(Context context){}
+    public virtual void Init(Context context)
+    {
+    }
 
     public float CalculateUtility(Context context)
     {

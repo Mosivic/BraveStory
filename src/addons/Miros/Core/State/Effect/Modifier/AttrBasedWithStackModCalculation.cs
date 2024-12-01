@@ -29,8 +29,8 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
         {
             var formulae = stackMagnitudeOperation switch
             {
-                StackMagnitudeOperation.Add => $"({attributeName} * {k} + {b}) + (StackCount * {sK} + {sB})",
-                StackMagnitudeOperation.Multiply => $"({attributeName} * {k} + {b}) * (StackCount * {sK} + {sB})",
+                StackMagnitudeOperation.Add => $"({attributeSign} * {k} + {b}) + (StackCount * {sK} + {sB})",
+                StackMagnitudeOperation.Multiply => $"({attributeSign} * {k} + {b}) * (StackCount * {sK} + {sB})",
                 _ => ""
             };
 

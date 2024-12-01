@@ -7,7 +7,7 @@ public interface IStatModifierFactory
     StatModifier Create(IOperationStrategy operateType, StatType statType, int value, float duration);
 }
 
-public  class StatModifierFactory : IStatModifierFactory
+public class StatModifierFactory : IStatModifierFactory
 {
     public StatModifier Create(IOperationStrategy operateType, StatType statType, int value, float duration)
     {
@@ -17,7 +17,7 @@ public  class StatModifierFactory : IStatModifierFactory
             MultiplyOperationStrategy _ => new MultiplyOperationStrategy(value),
             _ => throw new ArgumentOutOfRangeException(nameof(operateType), operateType, null)
         };
-        
+
         return new StatModifier(statType, strategy, duration);
     }
 }

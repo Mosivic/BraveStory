@@ -1,15 +1,14 @@
 ﻿namespace Miros.Core;
 
-public interface IExecutor<TTask>
-    where TTask : TaskBase
+public interface IExecutor
 {
-    void AddTask(TTask task);
-    void RemoveTask(TTask task);
-    TTask GetNowTask(Tag layer);
-    TTask GetLastTask(Tag layer);
-    TTask[] GetAllTasks();
+    void AddTask(ITask task);
+    void RemoveTask(ITask task);
+    ITask GetNowTask(Tag layer);
+    ITask GetLastTask(Tag layer);
+    ITask[] GetAllTasks();
     double GetCurrentTaskTime(Tag layer);
-    bool HasTaskRunning(TTask task);
+    bool HasTaskRunning(ITask task);
     void Update(double delta);
     void PhysicsUpdate(double delta);
 }

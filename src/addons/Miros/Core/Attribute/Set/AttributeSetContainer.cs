@@ -6,10 +6,10 @@ namespace Miros.Core;
 public class AttributeSetContainer(Agent owner)
 {
     private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
+    
+    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
 
-    private readonly Agent _owner = owner;
-    public Dictionary<string, AttributeSet> Sets { get; } = [];
-
+    private static readonly Dictionary<Type, Tag> _attributeSetTypeMap = [];
 
     /// <summary>
     ///     向容器中添加一个新的属性集。如果同类型的属性集已存在，则不会重复添加。
@@ -27,19 +27,21 @@ public class AttributeSetContainer(Agent owner)
     public void AddAttributeSet(Type attrSetType)
     {
         if (TryGetAttributeSet(attrSetType, out _)) return;
-        var setName = AttributeSetUtil.AttributeSetName(attrSetType);
-        Sets.Add(setName, Activator.CreateInstance(attrSetType) as AttributeSet);
 
-        var attrSet = Sets[setName];
-        foreach (var attr in attrSet.AttributeNames)
+        var attrSet = Activator.CreateInstance(attrSetType) as AttributeSet;
+        var attrSetTag = attrSet.AttributeSetTag;
+        Sets.Add(attrSetTag, attrSet);
+        _attributeSetTypeMap.Add(attrSetType, attrSetTag);
+
+        foreach (var attr in attrSet.AttributeTags)
             if (!_attributeAggregators.ContainsKey(attrSet[attr]))
             {
-                var attrAggt = new AttributeAggregator(attrSet[attr], _owner);
+                var attrAggt = new AttributeAggregator(attrSet[attr], owner);
                 // if (_owner.Enabled) attrAggt.OnEnable();
                 _attributeAggregators.Add(attrSet[attr], attrAggt);
             }
 
-        attrSet.SetOwner(_owner);
+        attrSet.SetOwner(owner);
     }
 
 
@@ -49,11 +51,11 @@ public class AttributeSetContainer(Agent owner)
     /// <typeparam name="T">要移除的属性集类型，必须继承自AttributeSet</typeparam>
     public void RemoveAttributeSet<T>() where T : AttributeSet
     {
-        var setName = AttributeSetUtil.AttributeSetName(typeof(T));
-        var attrSet = Sets[setName];
-        foreach (var attr in attrSet.AttributeNames) _attributeAggregators.Remove(attrSet[attr]);
+        var setTag = _attributeSetTypeMap[typeof(T)];
+        var attrSet = Sets[setTag];
+        foreach (var attr in attrSet.AttributeTags) _attributeAggregators.Remove(attrSet[attr]);
 
-        Sets.Remove(setName);
+        Sets.Remove(setTag);
     }
 
     /// <summary>
@@ -64,7 +66,7 @@ public class AttributeSetContainer(Agent owner)
     /// <returns>是否成功获取到属性集</returns>
     public bool TryGetAttributeSet<T>(out T attributeSet) where T : AttributeSet
     {
-        if (Sets.TryGetValue(AttributeSetUtil.AttributeSetName(typeof(T)), out var set))
+        if (Sets.TryGetValue(_attributeSetTypeMap[typeof(T)], out var set))
         {
             attributeSet = (T)set;
             return true;
@@ -75,18 +77,21 @@ public class AttributeSetContainer(Agent owner)
     }
 
     /// <summary>
-    ///     尝试获取一个属性集。
+    ///  尝试获取一个属性集。
     /// </summary>
     /// <param name="attrSetType">要获取的属性集类型，必须继承自AttributeSet</param>
     /// <param name="attributeSet">获取到的属性集</param>
     public bool TryGetAttributeSet(Type attrSetType, out AttributeSet attributeSet)
     {
-        if (Sets.TryGetValue(AttributeSetUtil.AttributeSetName(attrSetType), out var set))
-        {
-            attributeSet = set;
-            return true;
-        }
 
+        if (_attributeSetTypeMap.TryGetValue(attrSetType, out var tag))
+        {
+            if (Sets.TryGetValue(tag, out var set))
+            {
+                attributeSet = set;
+                return true;
+            }
+        }
         attributeSet = null;
         return false;
     }
@@ -94,50 +99,50 @@ public class AttributeSetContainer(Agent owner)
     /// <summary>
     ///     获取一个属性集的属性值。
     /// </summary>
-    /// <param name="attrSetName">属性集名称</param>
-    /// <param name="attrShortName">属性名</param>
+    /// <param name="attrSetSign">属性集标签</param>
+    /// <param name="attrSign">属性标签</param>
     /// <returns>属性值</returns>
-    public AttributeValue? GetAttributeAttributeValue(string attrSetName, string attrShortName)
+    public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
     {
-        return Sets.TryGetValue(attrSetName, out var set)
-            ? set[attrShortName].Value
+        return Sets.TryGetValue(attrSetSign, out var set)
+            ? set[attrSign].Value
             : null;
     }
 
     /// <summary>
     ///     获取一个属性集的计算模式。
     /// </summary>
-    /// <param name="attrSetName">属性集名称</param>
-    /// <param name="attrShortName">属性名</param>
+    /// <param name="attrSetSign">属性集标签</param>
+    /// <param name="attrSign">属性标签</param>
     /// <returns>计算模式</returns>
-    public CalculateMode? GetAttributeCalculateMode(string attrSetName, string attrShortName)
+    public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
     {
-        return Sets.TryGetValue(attrSetName, out var set)
-            ? set[attrShortName].CalculateMode
+        return Sets.TryGetValue(attrSetSign, out var set)
+            ? set[attrSign].CalculateMode
             : null;
     }
 
     /// <summary>
     ///     获取一个属性集的基础值。
     /// </summary>
-    /// <param name="attrSetName">属性集名称</param>
-    /// <param name="attrShortName">属性名</param>
+    /// <param name="attrSetSign">属性集标签</param>
+    /// <param name="attrSign">属性标签</param>
     /// <returns>基础值</returns>
-    public float? GetAttributeBaseValue(string attrSetName, string attrShortName)
+    public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
     {
-        return Sets.TryGetValue(attrSetName, out var set) ? set[attrShortName].BaseValue : null;
+        return Sets.TryGetValue(attrSetSign, out var set) ? set[attrSign].BaseValue : null;
     }
 
     /// <summary>
     ///     获取一个属性集的当前值。
     /// </summary>
-    /// <param name="attrSetName">属性集名称</param>
-    /// <param name="attrShortName">属性名</param>
+    /// <param name="attrSetSign">属性集标签</param>
+    /// <param name="attrSign">属性标签</param>
     /// <returns>当前值</returns>
-    public float? GetAttributeCurrentValue(string attrSetName, string attrShortName)
+    public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
     {
-        return Sets.TryGetValue(attrSetName, out var set)
-            ? set[attrShortName].CurrentValue
+        return Sets.TryGetValue(attrSetSign, out var set)
+            ? set[attrSign].CurrentValue
             : null;
     }
 
@@ -145,14 +150,14 @@ public class AttributeSetContainer(Agent owner)
     ///     获取一个属性集的快照。
     /// </summary>
     /// <returns>快照</returns>
-    public Dictionary<string, float> Snapshot()
+    public Dictionary<Tag, float> Snapshot()
     {
-        Dictionary<string, float> snapshot = [];
+        Dictionary<Tag, float> snapshot = [];
         foreach (var attributeSet in Sets)
-        foreach (var name in attributeSet.Value.AttributeNames)
+        foreach (var sign in attributeSet.Value.AttributeTags)
         {
-            var attr = attributeSet.Value[name];
-            snapshot.Add(attr.Name, attr.CurrentValue);
+            var attr = attributeSet.Value[sign];
+            snapshot.Add(sign, attr.CurrentValue);
         }
 
         return snapshot;

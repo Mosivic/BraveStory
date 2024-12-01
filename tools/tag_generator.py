@@ -104,7 +104,6 @@ class TagCodeGenerator:
         return "\n".join([
             "// This file is auto-generated. Do not modify.",
             "using Godot;",
-            "using Miros.Core;",
             "",
             f"namespace {namespace}",
             "{",
@@ -115,9 +114,8 @@ class TagCodeGenerator:
     def _generate_tags_class(self) -> str:
         """生成标签类"""
         lines = [
-            f"{self.indent}public static class Tags",
+            f"{self.indent}public static partial class Tags",
             f"{self.indent}{{",
-            f"{self.indent}{self.indent}private static TagManager TagManager => TagManager.Instance;",
             ""
         ]
         
@@ -137,7 +135,7 @@ def main():
     # 配置
     src_dir = "data/tags/"
     output_path = "src/Example/GameplayTags.cs"
-    namespace = "BraveStory"
+    namespace = "Miros.Core"
     
     # 加载所有标签文件
     loader = TagTreeLoader()

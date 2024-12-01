@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 
 /// <summary>
 /// 自定义属性集
@@ -6,24 +5,24 @@ using System.Collections.Generic;
 /// </summary>
 namespace Miros.Core;
 
-public class CustomAttrSet : AttributeSet
-{
-    private readonly Dictionary<string, AttributeBase> _attributes = [];
+// public class CustomAttrSet : AttributeSet
+// {
+//     private readonly Dictionary<string, AttributeBase> _attributes = [];
 
-    public override AttributeBase this[string key] =>
-        _attributes.TryGetValue(key, out var attribute) ? attribute : null;
+//     public override AttributeBase this[Tag sign] =>
+//         _attributes.TryGetValue(sign.Name, out var attribute) ? attribute : null;
 
-    public override string[] AttributeNames { get; }
+//     public override Tag[] AttributeSigns => _attributes.Keys.Select(key => Tags.Attribute_ + key).ToArray();
 
-    public void AddAttribute(AttributeBase attribute)
-    {
-        if (_attributes.ContainsKey(attribute.Name))
-            return;
-        _attributes.Add(attribute.Name, attribute);
-    }
+//     public void AddAttribute(AttributeBase attribute)
+//     {
+//         if (_attributes.ContainsKey(attribute.Sign.Name))
+//             return;
+//         _attributes.Add(attribute.Sign.Name, attribute);
+//     }
 
-    public void RemoveAttribute(AttributeBase attribute)
-    {
-        _attributes.Remove(attribute.Name);
-    }
-}
+//     public void RemoveAttribute(AttributeBase attribute)
+//     {
+//         _attributes.Remove(attribute.Sign.Name);
+//     }
+// }

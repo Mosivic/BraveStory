@@ -8,9 +8,10 @@ public class ConditionMachine : ExecutorBase<TaskBase>
     protected readonly Dictionary<Tag, List<TaskBase>> RunningTasks = new();
     protected Dictionary<Tag, List<TaskBase>> WaitingTasks { get; set; } = new();
 
-    public override void AddTask(TaskBase task)
+    public override void AddTask(ITask task)
     {
-        var layer = task.Sign;
+        var conditionTask = task as TaskBase;
+        var layer = conditionTask.Tag;
 
         if (!WaitingTasks.ContainsKey(layer))
         {
@@ -18,21 +19,23 @@ public class ConditionMachine : ExecutorBase<TaskBase>
             RunningTasks[layer] = [];
         }
 
-        var index = WaitingTasks[layer].FindIndex(j => task.Priority > j.Priority);
-        WaitingTasks[layer].Insert(index + 1, task);
+        var index = WaitingTasks[layer].FindIndex(j => conditionTask.Priority > j.Priority);
+        WaitingTasks[layer].Insert(index + 1, conditionTask);
     }
 
 
-    public override void RemoveTask(TaskBase task)
+    public override void RemoveTask(ITask task)
     {
-        var layer = task.Sign;
-        if (WaitingTasks.ContainsKey(layer) && WaitingTasks[layer].Contains(task))
-            WaitingTasks[layer].Remove(task);
+        var conditionTask = task as TaskBase;
+        var layer = conditionTask.Tag;
+        if (WaitingTasks.ContainsKey(layer) && WaitingTasks[layer].Contains(conditionTask))
+            WaitingTasks[layer].Remove(conditionTask);
     }
 
-    public override bool HasTaskRunning(TaskBase task)
+    public override bool HasTaskRunning(ITask task)
     {
-        return RunningTasks[task.Sign].Contains(task);
+        var conditionTask = task as TaskBase;
+        return RunningTasks[conditionTask.Tag].Contains(conditionTask);
     }
 
 

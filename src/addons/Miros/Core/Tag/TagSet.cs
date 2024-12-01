@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Miros.Core;
 
@@ -6,7 +7,7 @@ public readonly struct TagSet
 {
     public readonly Tag[] Tags;
 
-    public bool Empty => Tags.Length == 0;
+    public bool Empty => Tags == null || Tags.Length == 0;
 
     public TagSet(string[] tagNames)
     {
@@ -16,57 +17,44 @@ public readonly struct TagSet
 
     public TagSet(params Tag[] tags)
     {
-        Tags = tags ?? Array.Empty<Tag>();
+        Tags = tags ?? [];
     }
 
-    public bool HasTag(Tag tag)
+    public bool Has(Tag tag)
     {
-        foreach (var t in Tags)
-            if (t.HasTag(tag))
-                return true;
-
-        return false;
+        return Tags.Any(t => t.HasTag(tag));
     }
 
-    public bool HasAllTags(TagSet other)
+    public bool HasAll(TagSet other)
     {
-        return HasAllTags(other.Tags);
+        return HasAll(other.Tags);
     }
 
-    public bool HasAllTags(params Tag[] tags)
+    public bool HasAll(params Tag[] tags)
     {
-        foreach (var tag in tags)
-            if (!HasTag(tag))
-                return false;
-
-        return true;
+        var set = this;
+        return tags.All(tag => set.Has(tag));
     }
 
-    public bool HasAnyTags(TagSet other)
+    public bool HasAny(TagSet other)
     {
-        return HasAnyTags(other.Tags);
+        return HasAny(other.Tags);
     }
 
-    public bool HasAnyTags(params Tag[] tags)
+    public bool HasAny(params Tag[] tags)
     {
-        foreach (var tag in tags)
-            if (HasTag(tag))
-                return true;
-
-        return false;
+        var set = this;
+        return tags.Any(tag => set.Has(tag));
     }
 
-    public bool HasNoneTags(TagSet other)
+    public bool HasNone(TagSet other)
     {
-        return HasNoneTags(other.Tags);
+        return HasNone(other.Tags);
     }
 
-    public bool HasNoneTags(params Tag[] tags)
+    public bool HasNone(params Tag[] tags)
     {
-        foreach (var tag in tags)
-            if (HasTag(tag))
-                return false;
-
-        return true;
+        var set = this;
+        return tags.All(tag => !set.Has(tag));
     }
 }

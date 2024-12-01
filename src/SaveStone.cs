@@ -4,7 +4,6 @@ public partial class SaveStone : Interactable
 {
     private AnimationPlayer _animationPlayer;
 
-
     public override void _Ready()
     {
         base._Ready();

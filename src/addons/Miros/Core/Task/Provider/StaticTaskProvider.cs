@@ -6,9 +6,9 @@ namespace Miros.Core;
 
 public class StaticTaskProvider : ITaskProvider
 {
-    private readonly Dictionary<State, TaskBase> _statesTask = [];
+    private readonly Dictionary<StateBase, TaskBase> _statesTask = [];
 
-    public TaskBase GetTask(State state)
+    public TaskBase GetTask(StateBase state)
     {
         if (_statesTask.TryGetValue(state, out var task))
             return task;
@@ -20,7 +20,7 @@ public class StaticTaskProvider : ITaskProvider
         return _statesTask.Values.ToArray();
     }
 
-    private TaskBase CreateTask(State state)
+    private TaskBase CreateTask(StateBase state)
     {
         var type = state.TaskType;
         var task = (TaskBase)Activator.CreateInstance(type, state);
