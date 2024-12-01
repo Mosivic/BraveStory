@@ -4,7 +4,7 @@ public class SetByCallerFromTagModCalculation : ModifierMagnitudeCalculation
 {
 	private Tag tag;
 
-	public override float CalculateMagnitude(Effect state, float input)
+	public override float CalculateMagnitude(Effect effect, float magnitude)
 	{
 // 		var value = state.GetMapValue(tag);
 // #if GODOT

@@ -28,7 +28,7 @@ public class EffectPeriodTicker
 		UpdateDuration(delta);
 		UpdatePeriod(delta);
 
-
+		// 当 Effect 的 DurationPolicy 为 Duration 时，且 Duration 持续时间结束时
 		if (DurationPolicy == DurationPolicy.Duration && _durationRemaining <= 0)
 		{
 			// 处理STACKING

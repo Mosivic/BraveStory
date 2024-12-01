@@ -4,7 +4,7 @@ public class SetByCallerFromNameModCalculation : ModifierMagnitudeCalculation
 {
     private string valueName;
 
-    public override float CalculateMagnitude(Effect state, float input)
+    public override float CalculateMagnitude(Effect effect, float magnitude)
     {
 //         var value = state.GetMapValue(valueName);
 // #if GODOT

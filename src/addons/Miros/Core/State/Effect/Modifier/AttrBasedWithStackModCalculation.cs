@@ -38,13 +38,13 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
         }
     }
 
-    public override float CalculateMagnitude(Effect spec, float modifierMagnitude)
+    public override float CalculateMagnitude(Effect effect, float magnitude)
     {
-        var attrMagnitude = base.CalculateMagnitude(spec, modifierMagnitude);
+        var attrMagnitude = base.CalculateMagnitude(effect, magnitude);
 
-        if (spec.Stacking.StackingType == StackingType.None) return attrMagnitude;
+        if (effect.Stacking.StackingType == StackingType.None) return attrMagnitude;
 
-        var stackMagnitude = spec.Stacking.StackCount * sK + sB;
+        var stackMagnitude = effect.Stacking.StackCount * sK + sB;
 
         return stackMagnitudeOperation switch
         {
@@ -53,4 +53,4 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
             _ => attrMagnitude + stackMagnitude
         };
     }
-}
+}   
