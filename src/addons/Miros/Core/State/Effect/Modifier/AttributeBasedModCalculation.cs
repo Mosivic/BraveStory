@@ -60,6 +60,5 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 
     private void OnAttributeNameChanged()
     {
-     
     }
 }

@@ -37,14 +37,14 @@ public class TaskBase(State state) : AbsTask(state), ITask
     public virtual void Deactivate()
     {
         state.Status = RunningStatus.NoRun;
-        OnPause();
+        OnDeactivate();
     }
 
 
     public virtual void Activate()
     {
         state.Status = RunningStatus.Running;
-        OnResume();
+        OnActivate();
     }
 
 

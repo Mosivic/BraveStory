@@ -7,5 +7,8 @@ public class CurveConsideration(Curve curve) : Consideration
 {
     public Curve curve = curve;
 
-    public override float Evaluate(Context context) => curve.Sample(context.Get<float>("value"));
+    public override float Evaluate(Context context)
+    {
+        return curve.Sample(context.Get<float>("value"));
+    }
 }

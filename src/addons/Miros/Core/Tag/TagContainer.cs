@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class TagContainer(HashSet<Tag> tags )
+public class TagContainer(HashSet<Tag> tags)
 {
     private readonly HashSet<Tag> _tags = tags ?? [];
 

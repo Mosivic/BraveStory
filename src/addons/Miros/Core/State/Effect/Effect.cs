@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class Effect(Tag sign) : State(sign)
+public class Effect(Tag tag) : State(tag)
 {
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;
@@ -62,7 +62,7 @@ public class Effect(Tag sign) : State(sign)
     /// </summary>
     public TagSet RemoveEffectsWithTags;
 
-    public DurationPolicy DurationPolicy { get; private set; }
+    public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }
     public double Period { get; set; }
     public float Level { get; set; } = 1;
@@ -70,7 +70,7 @@ public class Effect(Tag sign) : State(sign)
     public ExecutionCalculation[] Executions { get; set; }
     public EffectPeriodTicker PeriodTicker { get; }
     public Effect PeriodExecution { get; private set; }
-    public Modifier[] Modifiers { get; private set; }
+    public Modifier[] Modifiers { get; set; }
 
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
     public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }

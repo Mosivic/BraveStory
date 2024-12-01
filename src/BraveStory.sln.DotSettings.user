@@ -10,14 +10,21 @@
     <s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003APlayer_005FScriptMethods_002Egenerated_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F5db0ae8e37649b1affa64b70cc7f5bd9cc017fa_003FPlayer_005FScriptMethods_002Egenerated_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
     <s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AThrowHelper_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Ffdb8f472d41f4ddcbc712654d037dc3ed82a00_003F2b_003Fdfeb0b84_003FThrowHelper_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
     <s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">INFO</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a4718e6a_002Dad6b_002D43cf_002Dabfc_002D0bbc7db67e0a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestEffectApply" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	
+    <s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a4718e6a_002Dad6b_002D43cf_002Dabfc_002D0bbc7db67e0a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestEffectApply" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::E74B3295-08A9-491B-B391-8861C145E615::net8.0::Miros.Tests.EffectTests.TestEffectApply&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f4fb6a30_002Df727_002D4aa8_002Db8b1_002D0fb306500027/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestEffectApply #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+    <s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e0cd49e5_002De935_002D4db0_002D8a6b_002Dac2f57ea7845/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestEffectInit" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;NUnit3x::E74B3295-08A9-491B-B391-8861C145E615::net8.0::Miros.Tests.EffectTests.TestEffectInit&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+    <s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f4fb6a30_002Df727_002D4aa8_002Db8b1_002D0fb306500027/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TestEffectApply #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::E74B3295-08A9-491B-B391-8861C145E615::net8.0::Miros.Tests.EffectTests.TestEffectApply&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::E74B3295-08A9-491B-B391-8861C145E615::net8.0::Miros.Tests.EffectTests.TestEffectInit&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	

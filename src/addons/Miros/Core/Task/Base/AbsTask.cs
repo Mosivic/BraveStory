@@ -32,12 +32,12 @@ public abstract class AbsTask(State state)
         OnExited?.Invoke(state);
     }
 
-    protected void OnPause()
+    protected void OnDeactivate()
     {
         OnPaused?.Invoke(state);
     }
 
-    protected void OnResume()
+    protected void OnActivate()
     {
         OnResumed?.Invoke(state);
     }

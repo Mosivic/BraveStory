@@ -15,7 +15,7 @@ public class CompositeConsideration : Consideration
         Max,
         Min,
         Average,
-        Sum,
+        Sum
     }
 
     public List<Consideration> considerations = [];
@@ -28,7 +28,7 @@ public class CompositeConsideration : Consideration
         if (considerations == null || considerations.Count == 0)
             return 0f;
 
-        float result = 0f;
+        var result = 0f;
         foreach (var consideration in considerations)
             result = operationType switch
             {

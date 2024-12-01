@@ -8,7 +8,7 @@ public class State(Tag tag)
     public Tag Tag { get; init; } = tag;
     public Type TaskType { get; init; } = typeof(TaskBase);
     public int Priority { get; init; } = 0;
-    public Agent Owner { get; protected set; } 
+    public Agent Owner { get; protected set; }
     public Agent Source { get; protected set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
@@ -18,8 +18,8 @@ public class State(Tag tag)
 
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
-    
-    
+
+
     public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<TaskBase>, new()
     {
         var component = new T();
@@ -27,19 +27,19 @@ public class State(Tag tag)
         Components[typeof(T)] = component;
         return this;
     }
-    
+
     public State OnEntered(Action<State> action)
     {
         GetStandardDelegateComponent().EnterFunc += action;
         return this;
     }
-    
-    public State EnterCondition(Func<State,bool> action)
+
+    public State EnterCondition(Func<State, bool> action)
     {
         GetStandardDelegateComponent().EnterCondition += action;
         return this;
     }
-    
+
     public State OnExited(Action<State> action)
     {
         GetStandardDelegateComponent().ExitFunc += action;
@@ -51,7 +51,7 @@ public class State(Tag tag)
         GetStandardDelegateComponent().ExitCondition += condition;
         return this;
     }
-    
+
     public State OnSucceed(Action<State> action)
     {
         GetStandardDelegateComponent().OnSucceedFunc += action;
@@ -63,7 +63,7 @@ public class State(Tag tag)
         GetStandardDelegateComponent().OnFailedFunc += action;
         return this;
     }
-    
+
     public State OnPaused(Action<State> action)
     {
         GetStandardDelegateComponent().PauseFunc += action;
@@ -113,7 +113,7 @@ public class State(Tag tag)
         GetStandardDelegateComponent().OnPeriodOverFunc += action;
         return this;
     }
-    
+
 
     // 辅助方法
     private StandardDelegateComponent GetStandardDelegateComponent()

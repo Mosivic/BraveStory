@@ -15,14 +15,10 @@ public class NormalStatModifierOrder : IStatModifierApplicationOrder
         var allModifier = statModifiers.ToList();
 
         foreach (var modifier in allModifier.Where(m => m.Strategy is AddOperationStrategy))
-        {
             baseValue = modifier.Strategy.Calculate(baseValue);
-        }
 
         foreach (var modifier in allModifier.Where(m => m.Strategy is MultiplyOperationStrategy))
-        {
-            baseValue =  modifier.Strategy.Calculate(baseValue);
-        }
+            baseValue = modifier.Strategy.Calculate(baseValue);
 
         return baseValue;
     }

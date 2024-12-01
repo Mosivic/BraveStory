@@ -6,8 +6,8 @@ namespace Miros.Core;
 
 public class AttributeBase
 {
-    public readonly Tag AttributeTag;
     public readonly Tag AttributeSetSign;
+    public readonly Tag AttributeTag;
     private AttributeValue _value;
     protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners; // 基础值变化前的事件监听器
 

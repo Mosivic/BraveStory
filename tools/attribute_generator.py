@@ -60,7 +60,7 @@ class AttributeGenerator:
         resolved_sets = {}
         
         def resolve_set(set_name: str) -> Dict[str, AttributeDefinition]:
-            # ���果已经解析过，直接返回
+            # 如果已经解析过，直接返回
             if set_name in resolved_sets:
                 return resolved_sets[set_name].copy()
             
@@ -95,7 +95,6 @@ class AttributeGenerator:
         code_parts = []
         code_parts.append("public static partial class Tags\n")
         code_parts.append("{\n")
-        code_parts.append("    private static TagManager TagManager => TagManager.Instance;\n")
 
         generated_tags = set()
         
@@ -120,8 +119,7 @@ class AttributeGenerator:
     def generate_code(self) -> str:
         code_parts = []
         code_parts.append("// This file is auto-generated. Do not modify.\n")
-        code_parts.append("using Miros.Core;\n")
-        code_parts.append("namespace Example;\n")
+        code_parts.append("namespace Miros.Core;\n")
         
         # 生成标签类
         code_parts.append(self.generate_tags_class())

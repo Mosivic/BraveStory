@@ -59,10 +59,10 @@ public partial class TagDebugWindow(HashSet<Tag> tags) : Control
         };
 
         foreach (var tag in tags.OrderBy(t => t.ToString()))
-        {   
+        {
             var segments = tag.ToString()?.Split('.');
-            if(segments == null) return;
-            
+            if (segments == null) return;
+
             var currentPath = "";
 
             foreach (var segment in segments)

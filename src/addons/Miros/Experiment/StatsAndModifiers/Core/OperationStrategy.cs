@@ -7,10 +7,16 @@ public interface IOperationStrategy
 
 public class AddOperationStrategy(int value) : IOperationStrategy
 {
-    public int Calculate(int value1) => value1 + value;
+    public int Calculate(int value1)
+    {
+        return value1 + value;
+    }
 }
 
 public class MultiplyOperationStrategy(int value) : IOperationStrategy
 {
-    public int Calculate(int value1) => value1 * value;
+    public int Calculate(int value1)
+    {
+        return value1 * value;
+    }
 }

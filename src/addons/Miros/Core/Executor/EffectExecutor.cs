@@ -1,30 +1,47 @@
 using System;
+using System.Collections.Generic;
 
 namespace Miros.Core;
 
 // _tasks 即为运行的 EffectTask
 public class EffectExecutor : ExecutorBase<EffectTask>
 {
-    private event Action OnEffectsIsDirty;
+    private List<EffectTask> _runningTasks = [];
 
     public override void Update(double delta)
     {
+        UpdateRunningEffects();
+
+        foreach (var task in _runningTasks)
+        {
+            task.Update(delta);
+        }   
     }
 
-    public void RegisterOnEffectsIsDirty(Action action)
+    private void UpdateRunningEffects()
     {
-        OnEffectsIsDirty += action;
+        foreach (var task in _tasks.Values)
+        {
+            if (task.CanEnter())
+            {
+                task.Activate();
+                task.Enter();
+                _runningTasks.Add(task);
+            }
+        }
+
+        foreach (var task in _runningTasks)
+        {
+            if (task.CanExit())
+            {
+                task.Deactivate();
+                task.Exit();
+                _runningTasks.Remove(task);
+                _tasks.Remove(task.Tag);
+            }
+        }
     }
 
-    public void UnregisterOnEffectsIsDirty(Action action)
-    {
-        OnEffectsIsDirty -= action;
-    }
-
-
-    private void UpdateEffect()
-    {
-    }
 
     // 如果存在StackingComponent组件，则检查是否可以堆叠
     // 如果可以堆叠,检查是否存在相同StackingGroupTag的Task，如果存在，则调用其Stack方法

@@ -41,7 +41,7 @@ public struct Tag
     {
         return other.AncestorHashCodes.Contains(HashCode);
     }
-    
+
     public readonly bool Equals(Tag other)
     {
         return this == other;

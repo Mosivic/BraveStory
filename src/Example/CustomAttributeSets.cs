@@ -1,12 +1,9 @@
 // This file is auto-generated. Do not modify.
 
-using Miros.Core;
-
-namespace Example;
+namespace Miros.Core;
 
 public static partial class Tags
 {
-    private static TagManager TagManager => TagManager.Instance;
     public static Tag AttributeSet_Character { get; } = TagManager.RequestTag("AttributeSet.Character");
     public static Tag AttributeSet_Warrior { get; } = TagManager.RequestTag("AttributeSet.Warrior");
     public static Tag AttributeSet_Player { get; } = TagManager.RequestTag("AttributeSet.Player");

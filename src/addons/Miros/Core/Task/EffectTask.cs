@@ -20,7 +20,11 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
         // TryActivateGrantedAbilities();
 
-        if (effect.DurationPolicy == DurationPolicy.Instant) effect.Owner.ApplyModFromInstantEffect(effect);
+        if (effect.DurationPolicy == DurationPolicy.Instant)
+        {
+            effect.Owner.ApplyModFromInstantEffect(effect);
+            effect.Status = RunningStatus.Succeed;
+        }
     }
 
 
@@ -89,7 +93,8 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public override bool CanExit()
     {
         return effect.Owner.HasAllTags(effect.OngoingRequiredTags) ||
-               effect.Owner.HasAnyTags(effect.ApplicationImmunityTags);
+               effect.Owner.HasAnyTags(effect.ApplicationImmunityTags) ||
+               effect.Status != RunningStatus.Running;
     }
 
 
@@ -100,17 +105,6 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         effect.SnapshotTargetAttributes = effect.Source == effect.Owner
             ? effect.SnapshotSourceAttributes
             : effect.Owner.DataSnapshot();
-    }
-
-
-    public void RegisterOnStackCountChanged(Action<int, int> callback)
-    {
-        effect.OnStackCountChanged += callback;
-    }
-
-    public void UnregisterOnStackCountChanged(Action<int, int> callback)
-    {
-        effect.OnStackCountChanged -= callback;
     }
 
 

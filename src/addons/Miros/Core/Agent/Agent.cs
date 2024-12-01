@@ -24,16 +24,16 @@ public class Agent : AbsAgent, IAgent
     private readonly Dictionary<ExecutorType, ExecutorBase<TaskBase>> _executors = [];
     private readonly Node2D _host;
     private readonly Dictionary<Tag, StateMap> _stateMaps = [];
-    private readonly ITaskProvider _taskProvider;
 
     private readonly TagContainer _tagContainer;
+    private readonly ITaskProvider _taskProvider;
 
     public Agent(Node2D host, ITaskProvider taskProvider)
     {
         _host = host;
         _taskProvider = taskProvider;
         AttributeSetContainer = new AttributeSetContainer(this);
-        _tagContainer = new([]);
+        _tagContainer = new TagContainer([]);
     }
 
     public TagAggregator TagAggregator { get; private set; }

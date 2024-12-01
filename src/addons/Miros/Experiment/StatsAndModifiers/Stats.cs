@@ -1,11 +1,15 @@
 namespace Miros.Experiment.StatsAndModifiers;
 
-public enum StatType {Attack,Defence}
+public enum StatType
+{
+    Attack,
+    Defence
+}
 
 public class Stats(StatsMediator mediator, BaseStats baseStats)
 {
     public StatsMediator Mediator => mediator;
-    
+
     public int Attack
     {
         get
@@ -15,7 +19,7 @@ public class Stats(StatsMediator mediator, BaseStats baseStats)
             return q.Value;
         }
     }
-    
+
     public int Defence
     {
         get
@@ -25,6 +29,9 @@ public class Stats(StatsMediator mediator, BaseStats baseStats)
             return q.Value;
         }
     }
-    
-    public override string ToString()=> $"Attack: {Attack} Defence: {Defence}";
+
+    public override string ToString()
+    {
+        return $"Attack: {Attack} Defence: {Defence}";
+    }
 }

@@ -1,12 +1,10 @@
 // This file is auto-generated. Do not modify.
 using Godot;
-using Miros.Core;
 
-namespace BraveStory
+namespace Miros.Core
 {
     public static partial class Tags
     {
-        private static TagManager TagManager => TagManager.Instance;
 
         public static Tag StateLayer_Movement { get; } = TagManager.RequestTag("StateLayer.Movement");
 

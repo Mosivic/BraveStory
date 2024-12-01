@@ -149,11 +149,11 @@ public class AttributeSetContainer(Agent owner)
     {
         Dictionary<Tag, float> snapshot = [];
         foreach (var attributeSet in Sets)
-            foreach (var sign in attributeSet.Value.AttributeSigns)
-            {
-                var attr = attributeSet.Value[sign];
-                snapshot.Add(sign, attr.CurrentValue);
-            }
+        foreach (var sign in attributeSet.Value.AttributeSigns)
+        {
+            var attr = attributeSet.Value[sign];
+            snapshot.Add(sign, attr.CurrentValue);
+        }
 
         return snapshot;
     }

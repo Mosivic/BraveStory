@@ -1,11 +1,21 @@
-using Example;
 using Miros.Core;
 using NUnit.Framework;
 
 namespace Miros.Tests;
 
+[TestFixture]
 public class EffectTests
 {
+    private Agent _agent;
+    private int _frameCounter;
+
+    [SetUp]
+    public void Setup()
+    {
+        _agent = new Agent(null, new StaticTaskProvider());
+        _frameCounter = 0;
+    }
+
     [Test]
     public void TestEffectInit()
     {
@@ -23,6 +33,11 @@ public class EffectTests
         {
             Duration = 10,
             Period = 1,
+
+            Modifiers =
+            [
+                new Modifier(Tags.Attribute_RunSpeed, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+            ]
         };
 
         var attributeSet = new PlayerAttributeSet();
@@ -30,6 +45,7 @@ public class EffectTests
 
         var agent = new Agent(null, new StaticTaskProvider());
         agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();
+
 
         Assert.That(attributeSet[Tags.Attribute_RunSpeed].BaseValue, Is.EqualTo(100));
     }
