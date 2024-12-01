@@ -27,6 +27,8 @@ public class Agent : AbsAgent, IAgent
 
 	private readonly TagContainer  OwnedTags;
 	private readonly ITaskProvider _taskProvider;
+
+    public bool Enabled { get; set; } = true;
 	
 	public AttributeSetContainer AttributeSetContainer { get; set; }
 
@@ -76,6 +78,11 @@ public class Agent : AbsAgent, IAgent
 		var executor = new EffectExecutor();
 		_executors[ExecutorType.EffectExecutor] = executor;
 	}
+
+    public EffectExecutor GetEffectExecutor()
+    {
+        return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
+    }
 
 	public void AddState(ExecutorType executorType, State state)
 	{
@@ -142,7 +149,7 @@ public class Agent : AbsAgent, IAgent
 					$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
 					$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
 
-			var magnitude = modifier.CalculateMagnitude(effect, modifier.Magnitude);
+			var magnitude = modifier.CalculateMagnitude(effect);
 			var baseValue = attributeValue.Value.BaseValue;
 			switch (modifier.Operation)
 			{
@@ -169,7 +176,7 @@ public class Agent : AbsAgent, IAgent
 				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
 		}
 	}
-
+	
 
 	// public AbilityExecutor AbilityExecutor()
 	// {

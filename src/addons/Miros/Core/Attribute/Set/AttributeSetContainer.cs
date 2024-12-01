@@ -9,7 +9,7 @@ public class AttributeSetContainer(Agent owner)
     
     public Dictionary<Tag, AttributeSet> Sets { get; } = [];
 
-    private static readonly Dictionary<Type, Tag> _attributeSetTypeMap = [];
+    private static readonly Dictionary<Type, Tag> AttributeSetTypeMap = [];
 
     /// <summary>
     ///     向容器中添加一个新的属性集。如果同类型的属性集已存在，则不会重复添加。
@@ -31,13 +31,13 @@ public class AttributeSetContainer(Agent owner)
         var attrSet = Activator.CreateInstance(attrSetType) as AttributeSet;
         var attrSetTag = attrSet.AttributeSetTag;
         Sets.Add(attrSetTag, attrSet);
-        _attributeSetTypeMap.Add(attrSetType, attrSetTag);
+        AttributeSetTypeMap.Add(attrSetType, attrSetTag);
 
         foreach (var attr in attrSet.AttributeTags)
             if (!_attributeAggregators.ContainsKey(attrSet[attr]))
             {
                 var attrAggt = new AttributeAggregator(attrSet[attr], owner);
-                // if (_owner.Enabled) attrAggt.OnEnable();
+                if (owner.Enabled) attrAggt.OnEnable();
                 _attributeAggregators.Add(attrSet[attr], attrAggt);
             }
 
@@ -51,7 +51,7 @@ public class AttributeSetContainer(Agent owner)
     /// <typeparam name="T">要移除的属性集类型，必须继承自AttributeSet</typeparam>
     public void RemoveAttributeSet<T>() where T : AttributeSet
     {
-        var setTag = _attributeSetTypeMap[typeof(T)];
+        var setTag = AttributeSetTypeMap[typeof(T)];
         var attrSet = Sets[setTag];
         foreach (var attr in attrSet.AttributeTags) _attributeAggregators.Remove(attrSet[attr]);
 
@@ -66,7 +66,7 @@ public class AttributeSetContainer(Agent owner)
     /// <returns>是否成功获取到属性集</returns>
     public bool TryGetAttributeSet<T>(out T attributeSet) where T : AttributeSet
     {
-        if (Sets.TryGetValue(_attributeSetTypeMap[typeof(T)], out var set))
+        if (Sets.TryGetValue(AttributeSetTypeMap[typeof(T)], out var set))
         {
             attributeSet = (T)set;
             return true;
@@ -84,7 +84,7 @@ public class AttributeSetContainer(Agent owner)
     public bool TryGetAttributeSet(Type attrSetType, out AttributeSet attributeSet)
     {
 
-        if (_attributeSetTypeMap.TryGetValue(attrSetType, out var tag))
+        if (AttributeSetTypeMap.TryGetValue(attrSetType, out var tag))
         {
             if (Sets.TryGetValue(tag, out var set))
             {

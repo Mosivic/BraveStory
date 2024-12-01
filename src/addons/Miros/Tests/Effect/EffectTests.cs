@@ -36,25 +36,21 @@ public partial class EffectTests : Node2D
         {
             Duration = 10,
             Period = 1,
-
             Modifiers =
             [
                 new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
         };
-
-
-        _agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();
-
+        
         _agent.CreateEffectExecutor();
         _agent.AddState(ExecutorType.EffectExecutor, effect);
+        
+        _agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();
 
-        //Assert.That(attributeSet[Tags.Attribute_RunSpeed].BaseValue, Is.EqualTo(110));
+        //Assert.That(_agent.AttributeSetContainer.GetAttributeBaseValue(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed), Is.EqualTo(210));
     }
 
 
-    [Test]
-    [TestCase(0D)]
     public override void _Process(double delta)
     {
         _frameCounter++;

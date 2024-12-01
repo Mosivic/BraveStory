@@ -6,39 +6,40 @@ namespace Miros.Core;
 public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
 	private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
-	private readonly AttributeBase _processedAttribute = attribute;
+	private readonly AttributeBase _attribute = attribute;
 
-	// public void OnEnable()
-	// {
-	// 	// 注册基础值变化事件
-	// 	_processedAttribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
-	// 	// 注册游戏效果容器变化事件
-	// 	owner.GetEffectExecutor()?.RegisterOnEffectsIsDirty(RefreshModifierCache);
-	// }
+	public void OnEnable()
+	{
+		// 注册基础值变化事件
+		_attribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueChanged);
+		// 注册游戏效果容器变化事件
+		owner.GetEffectExecutor()?.RegisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
+	}
 
-	// public void OnDisable()
-	// {
-	// 	// 注销基础值变化事件
-	// 	_processedAttribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueIsDirty);
-	// 	// 注销游戏效果容器变化事件
-	// 	owner.GetEffectExecutor()?.UnregisterOnEffectsIsDirty(RefreshModifierCache);
-	// }
+	public void OnDisable()
+	{
+		// 注销基础值变化事件
+		_attribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueChanged);
+		// 注销游戏效果容器变化事件
+		owner.GetEffectExecutor()?.UnregisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
+	}
 
 	/// <summary>
 	///     刷新修改器缓存
 	///     当游戏效果被添加或移除时触发
 	/// </summary>
-	private void RefreshModifierCache()
+	private void RefreshModifierCache(object sender, EffectTask task)
 	{
 		// 注销属性变化事件
-		UnregisterAttributeChangedListen();
+		foreach (var tuple in _modifierCache)
+			TryUnregisterAttributeChangedListen(tuple.Item1, tuple.Item2);
 		_modifierCache.Clear();
 
 		var effects = owner.GetEffects();
 		foreach (var ge in effects)
 			if (ge.IsActive)
 				foreach (var modifier in ge.Modifiers)
-					if (modifier.AttributeTag == _processedAttribute.AttributeTag)
+					if (modifier.AttributeTag == _attribute.AttributeTag)
 					{
 						_modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
 						TryRegisterAttributeChangedListen(ge, modifier);
@@ -53,18 +54,18 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	/// <returns></returns>
 	private float CalculateNewValue()
 	{
-		switch (_processedAttribute.CalculateMode)
+		switch (_attribute.CalculateMode)
 		{
 			case CalculateMode.Stacking:
 			{
-				var newValue = _processedAttribute.BaseValue;
+				var newValue = _attribute.BaseValue;
 				foreach (var tuple in _modifierCache)
 				{
 					var spec = tuple.Item1;
 					var modifier = tuple.Item2;
-					var magnitude = modifier.CalculateMagnitude(spec, modifier.Magnitude);
+					var magnitude = modifier.CalculateMagnitude(spec);
 
-					if (!_processedAttribute.IsSupportOperation(modifier.Operation))
+					if (!_attribute.IsSupportOperation(modifier.Operation))
 						throw new InvalidOperationException("Unsupported operation.");
 
 					switch (modifier.Operation)
@@ -100,18 +101,18 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 					var spec = tuple.Item1;
 					var modifier = tuple.Item2;
 
-					if (!_processedAttribute.IsSupportOperation(modifier.Operation))
+					if (!_attribute.IsSupportOperation(modifier.Operation))
 						throw new InvalidOperationException("Unsupported operation.");
 
 					if (modifier.Operation != ModifierOperation.Override)
 						throw new InvalidOperationException("MinValueOnly mode only supports override operation.");
 
-					var magnitude = modifier.CalculateMagnitude(spec, modifier.Magnitude);
+					var magnitude = modifier.CalculateMagnitude(spec);
 					min = Math.Min(min, magnitude);
 					hasOverride = true;
 				}
 
-				return hasOverride ? min : _processedAttribute.BaseValue;
+				return hasOverride ? min : _attribute.BaseValue;
 			}
 			case CalculateMode.MaxValueOnly:
 			{
@@ -122,18 +123,18 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 					var spec = tuple.Item1;
 					var modifier = tuple.Item2;
 
-					if (!_processedAttribute.IsSupportOperation(modifier.Operation))
+					if (!_attribute.IsSupportOperation(modifier.Operation))
 						throw new InvalidOperationException("Unsupported operation.");
 
 					if (modifier.Operation != ModifierOperation.Override)
 						throw new InvalidOperationException("MaxValueOnly mode only supports override operation.");
 
-					var magnitude = modifier.CalculateMagnitude(spec, modifier.Magnitude);
+					var magnitude = modifier.CalculateMagnitude(spec);
 					max = Math.Max(max, magnitude);
 					hasOverride = true;
 				}
 
-				return hasOverride ? max : _processedAttribute.BaseValue;
+				return hasOverride ? max : _attribute.BaseValue;
 			}
 			default:
 				throw new ArgumentOutOfRangeException();
@@ -146,12 +147,12 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	/// <param name="attribute"></param>
 	/// <param name="oldBaseValue"></param>
 	/// <param name="newBaseValue"></param>
-	private void UpdateCurrentValueWhenBaseValueIsDirty(AttributeBase attribute, float oldBaseValue, float newBaseValue)
+	private void UpdateCurrentValueWhenBaseValueChanged(AttributeBase attribute, float oldBaseValue, float newBaseValue)
 	{
 		if (Math.Abs(oldBaseValue - newBaseValue) < float.Epsilon) return;
 
 		var newValue = CalculateNewValue();
-		_processedAttribute.SetCurrentValue(newValue);
+		_attribute.SetCurrentValue(newValue);
 	}
 
 	/// <summary>
@@ -160,18 +161,9 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	private void UpdateCurrentValueWhenModifierIsDirty()
 	{
 		var newValue = CalculateNewValue();
-		_processedAttribute.SetCurrentValue(newValue);
+		_attribute.SetCurrentValue(newValue);
 	}
 
-
-	/// <summary>
-	///     注销属性变化事件
-	/// </summary>
-	private void UnregisterAttributeChangedListen()
-	{
-		foreach (var tuple in _modifierCache)
-			TryUnregisterAttributeChangedListen(tuple.Item1, tuple.Item2);
-	}
 
 
 	/// <summary>
@@ -200,7 +192,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	}
 
 	/// <summary>
-	///     注册属性变化事件
+	/// 注册属性变化事件
 	/// </summary>
 	/// <param name="ge">游戏效果</param>
 	/// <param name="modifier">修改器</param>
@@ -225,7 +217,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	}
 
 	/// <summary>
-	///     属性变化事件
+	/// 属性变化事件
 	/// </summary>
 	/// <param name="attribute">属性</param>
 	/// <param name="oldValue">旧值</param>
@@ -241,9 +233,9 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 				mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track &&
 				attribute.AttributeTag == mmc.attributeSign)
 				if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target &&
-					 attribute.Owner == effect.Owner) ||
+					attribute.Owner == effect.Owner) ||
 					(mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Source &&
-					 attribute.Owner == effect.Source))
+					attribute.Owner == effect.Source))
 				{
 					UpdateCurrentValueWhenModifierIsDirty();
 					break;

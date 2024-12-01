@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,6 +9,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
 {
     private readonly List<EffectTask> _runningTasks = [];
     private readonly List<EffectTask> _tasksToRemove = [];
+
 
     public override void Update(double delta)
     {
@@ -23,6 +25,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
             task.Activate();
             task.Enter();
             _runningTasks.Add(task);
+            _onRunningEffectTasksIsDirty?.Invoke(this, task);
         }
 
         foreach (var task in _runningTasks.Where(task => task.CanExit()))
@@ -31,6 +34,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
             task.Exit();
             _tasksToRemove.Add(task);
             _tasks.Remove(task);
+            _onRunningEffectTasksIsDirty?.Invoke(this, task);
         }
 
         // 在遍历完成后再进行删除
@@ -69,4 +73,21 @@ public class EffectExecutor : ExecutorBase<EffectTask>
     {
         return task1.Tag == task2.Tag;
     }
+
+
+#region Event
+
+    private EventHandler<EffectTask> _onRunningEffectTasksIsDirty;
+
+    public void RegisterOnRunningEffectTasksIsDirty(EventHandler<EffectTask> handler)
+    {
+        _onRunningEffectTasksIsDirty += handler;
+    }
+
+    public void UnregisterOnRunningEffectTasksIsDirty(EventHandler<EffectTask> handler)
+    {
+        _onRunningEffectTasksIsDirty -= handler;
+    }
+
+#endregion
 }
