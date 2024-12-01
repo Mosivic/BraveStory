@@ -1,4 +1,5 @@
 using System;
+using Godot;
 
 namespace Miros.Core;
 
@@ -21,6 +22,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         // TryActivateGrantedAbilities();
 
         if (effect.DurationPolicy != DurationPolicy.Instant) return;
+        GD.Print("Wwwwwwww");
         effect.Owner.ApplyModFromInstantEffect(effect);
         effect.Status = RunningStatus.Succeed;
     }
@@ -84,14 +86,14 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
     public override bool CanEnter()
     {
-        return effect.Owner.HasAllTags(effect.ApplicationRequiredTags);
+        return effect.Owner.HasAll(effect.ApplicationRequiredTags);
     }
 
 
     public override bool CanExit()
     {
-        return effect.Owner.HasAllTags(effect.OngoingRequiredTags) ||
-               effect.Owner.HasAnyTags(effect.ApplicationImmunityTags) ||
+        return effect.Owner.HasAll(effect.OngoingRequiredTags) ||
+               effect.Owner.HasAny(effect.ApplicationImmunityTags) ||
                effect.Status != RunningStatus.Running;
     }
 

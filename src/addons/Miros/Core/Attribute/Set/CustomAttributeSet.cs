@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+
 /// <summary>
 /// 自定义属性集
 /// 用于存储自定义的属性集

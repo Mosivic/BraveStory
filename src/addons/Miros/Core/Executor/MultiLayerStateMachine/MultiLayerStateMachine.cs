@@ -5,12 +5,6 @@ public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
 {
     private readonly Dictionary<Tag, StateLayer> _layers = [];
 
-
-    public void AddLayer(Tag layer, TaskBase defaultTask, StateTransitionContainer container)
-    {
-        _layers[layer] = new StateLayer(layer, defaultTask, container);
-    }
-
     public override bool HasTaskRunning(ITask task)
     {
         var stateTask = task as TaskBase;
@@ -27,6 +21,18 @@ public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
+    public override double GetCurrentTaskTime(Tag layer)
+    {
+        if (_layers.ContainsKey(layer)) return _layers[layer].GetCurrentTaskTime();
+        return 0;
+    }
+
+
+    public void AddLayer(Tag layer, TaskBase defaultTask, StateTransitionContainer container)
+    {
+        _layers[layer] = new StateLayer(layer, defaultTask, container);
+    }
+
     public override TaskBase GetNowTask(Tag layer)
     {
         if (_layers.ContainsKey(layer)) return _layers[layer].GetNowTask();
@@ -37,11 +43,5 @@ public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
     {
         if (_layers.ContainsKey(layer)) return _layers[layer].GetLastTask();
         return null;
-    }
-
-    public override double GetCurrentTaskTime(Tag layer)
-    {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetCurrentTaskTime();
-        return 0;
     }
 }

@@ -24,7 +24,6 @@ public class State(Tag tag) : StateBase
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
 
-    
 
     public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<TaskBase>, new()
     {

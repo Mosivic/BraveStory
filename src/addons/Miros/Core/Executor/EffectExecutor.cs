@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,17 +6,14 @@ namespace Miros.Core;
 // _tasks 即为运行的 EffectTask
 public class EffectExecutor : ExecutorBase<EffectTask>
 {
-    private readonly List<EffectTask> _tasksToRemove = [];
     private readonly List<EffectTask> _runningTasks = [];
+    private readonly List<EffectTask> _tasksToRemove = [];
 
     public override void Update(double delta)
     {
         UpdateRunningEffects();
 
-        foreach (var task in _runningTasks)
-        {
-            task.Update(delta);
-        }   
+        foreach (var task in _runningTasks) task.Update(delta);
     }
 
     private void UpdateRunningEffects()
@@ -38,10 +34,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         }
 
         // 在遍历完成后再进行删除
-        foreach (var task in _tasksToRemove)
-        {
-            _runningTasks.Remove(task); 
-        }
+        foreach (var task in _tasksToRemove) _runningTasks.Remove(task);
 
         _tasksToRemove.Clear();
     }
@@ -52,7 +45,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
     // 如果当前Tasks不存在传入的Task，则将传入的Task添加到Tasks中，并调用其Activate和Enter方法
     public override void AddTask(ITask task)
     {
-        var effectTask = task as EffectTask;
+        var effectTask = (EffectTask)task;
         if (!effectTask.CanEnter()) return;
 
         var stackingComponent = effectTask.GetComponent<StackingComponent>();

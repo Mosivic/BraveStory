@@ -1,6 +1,6 @@
 ﻿namespace Miros.Core;
 
-public  class TaskBase(State state) : AbsTask(state), ITask
+public class TaskBase(State state) : AbsTask(state), ITask
 {
     private readonly State state = state;
 

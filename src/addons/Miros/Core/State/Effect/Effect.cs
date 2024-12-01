@@ -5,7 +5,6 @@ namespace Miros.Core;
 
 public class Effect(Tag tag) : State(tag)
 {
-    public override Type TaskType => typeof(EffectTask);
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;
     public readonly Effect[] RoutineExpirationEffectClasses;
@@ -62,6 +61,8 @@ public class Effect(Tag tag) : State(tag)
     ///     3. Period Execution GE(非Instant GE中的PeriodExecution)的每个周期到期时。
     /// </summary>
     public TagSet RemoveEffectsWithTags;
+
+    public override Type TaskType => typeof(EffectTask);
 
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }

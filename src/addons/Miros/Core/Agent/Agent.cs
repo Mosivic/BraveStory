@@ -25,20 +25,22 @@ public class Agent : AbsAgent, IAgent
 	private readonly Node2D _host;
 	private readonly Dictionary<Tag, StateMap> _stateMaps = [];
 
-	private readonly TagContainer _tagContainer;
+	private readonly TagContainer  OwnedTags;
 	private readonly ITaskProvider _taskProvider;
+	
+	public AttributeSetContainer AttributeSetContainer { get; set; }
 
 	public Agent(Node2D host, ITaskProvider taskProvider)
 	{
 		_host = host;
 		_taskProvider = taskProvider;
 		AttributeSetContainer = new AttributeSetContainer(this);
-		_tagContainer = new TagContainer([]);
+		OwnedTags = new TagContainer([]);
 	}
 
-	public TagAggregator TagAggregator { get; private set; }
 
-	public AttributeSetContainer AttributeSetContainer { get; set; }
+
+	
 
 	public StateBase GetState(Tag sign)
 	{
@@ -191,7 +193,7 @@ public class Agent : AbsAgent, IAgent
 	public Effect[] GetEffects()
 	{
 		return _executors[ExecutorType.EffectExecutor].GetAllTasks()
-			.Select(task => _stateMaps[(task as EffectTask).Tag].State as Effect).ToArray();
+			.Select(task => _stateMaps[((EffectTask)task).Tag].State as Effect).ToArray();
 	}
 
 
@@ -208,11 +210,11 @@ public class Agent : AbsAgent, IAgent
 			var effect = _stateMaps[effectTask.Tag].State as Effect;
 
 			var ownedTags = effect.OwnedTags;
-			if (!ownedTags.Empty && ownedTags.HasAnyTags(tags))
+			if (!ownedTags.Empty && ownedTags.HasAny(tags))
 				removeList.Add(effect);
 
 			var grantedTags = effect.GrantedTags;
-			if (!grantedTags.Empty && grantedTags.HasAnyTags(tags))
+			if (!grantedTags.Empty && grantedTags.HasAny(tags))
 				removeList.Add(effect);
 		}
 
@@ -258,37 +260,17 @@ public class Agent : AbsAgent, IAgent
 
 	public bool HasTag(Tag gameplayTag)
 	{
-		return TagAggregator.HasTag(gameplayTag);
+		return OwnedTags.HasTag(gameplayTag);
 	}
 
-	public bool HasAllTags(TagSet tags)
+	public bool HasAll(TagSet tags)
 	{
-		return TagAggregator.HasAllTags(tags);
+		return OwnedTags.HasAll(tags);
 	}
 
-	public bool HasAnyTags(TagSet tags)
+	public bool HasAny(TagSet tags)
 	{
-		return TagAggregator.HasAnyTags(tags);
-	}
-
-	public void AddFixedTags(TagSet tags)
-	{
-		TagAggregator.AddFixedTag(tags);
-	}
-
-	public void RemoveFixedTags(TagSet tags)
-	{
-		TagAggregator.RemoveFixedTag(tags);
-	}
-
-	public void AddFixedTag(Tag gameplayTag)
-	{
-		TagAggregator.AddFixedTag(gameplayTag);
-	}
-
-	public void RemoveFixedTag(Tag gameplayTag)
-	{
-		TagAggregator.RemoveFixedTag(gameplayTag);
+		return OwnedTags.HasAny(tags);
 	}
 
 	#endregion

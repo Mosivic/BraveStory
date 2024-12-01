@@ -18,70 +18,70 @@ public class TagContainer(HashSet<Tag> tags)
     {
         return _tags.Contains(tag);
     }
-
+    
+    public bool HasAny(TagSet other)
+    {
+        return other.Empty || _tags.Overlaps(other.Tags);
+    }
+    
     public bool HasAny(TagContainer other)
     {
-        if (other == null) return false;
-        return _tags.Overlaps(other._tags);
+        return other != null && _tags.Overlaps(other._tags);
     }
 
     public bool HasAny(HashSet<Tag> other)
     {
-        if (other == null) return false;
-        return _tags.Overlaps(other);
+        return other != null && _tags.Overlaps(other);
     }
 
+    public bool HasAll(TagSet other)
+    {
+        return other.Empty || _tags.IsSupersetOf(other.Tags);
+    }
+    
     public bool HasAll(TagContainer other)
     {
-        if (other == null) return true;
-        return _tags.IsSupersetOf(other._tags);
+        return other == null || _tags.IsSupersetOf(other._tags);
     }
 
     public bool HasAll(HashSet<Tag> other)
     {
-        if (other == null) return true;
-        return _tags.IsSupersetOf(other);
+        return other == null || _tags.IsSupersetOf(other);
     }
 
 
     public void AddTag(Tag tag)
     {
-        if (tag.IsValid && _tags.Add(tag))
-        {
-            OnTagAdded(tag);
-            OnTagsChanged(new[] { tag });
-        }
+        if (!tag.IsValid || !_tags.Add(tag)) return;
+        OnTagAdded(tag);
+        OnTagsChanged([tag]);
     }
 
     public void RemoveTag(Tag tag)
     {
-        if (_tags.Remove(tag))
-        {
-            OnTagRemoved(tag);
-            OnTagsChanged(new[] { tag });
-        }
+        if (!_tags.Remove(tag)) return;
+        OnTagRemoved(tag);
+        OnTagsChanged([tag]);
     }
 
     public void AppendTags(TagContainer other)
     {
         var addedTags = other._tags.Except(_tags).ToList();
-        if (addedTags.Any())
-        {
-            _tags.UnionWith(addedTags);
-            foreach (var tag in addedTags) OnTagAdded(tag);
-            OnTagsChanged(addedTags);
-        }
+        
+        if (addedTags.Count == 0) return;
+        _tags.UnionWith(addedTags);
+        foreach (var tag in addedTags) OnTagAdded(tag);
+        OnTagsChanged(addedTags);
     }
 
     public void RemoveTags(TagContainer other)
     {
         var removedTags = _tags.Intersect(other._tags).ToList();
-        if (removedTags.Any())
-        {
-            _tags.ExceptWith(removedTags);
-            foreach (var tag in removedTags) OnTagRemoved(tag);
-            OnTagsChanged(removedTags);
-        }
+        
+        if (removedTags.Count == 0) return;
+        _tags.ExceptWith(removedTags);
+        foreach (var tag in removedTags) OnTagRemoved(tag);
+        OnTagsChanged(removedTags);
     }
 
     public bool HasTagExact(Tag tag)
@@ -132,17 +132,17 @@ public class TagContainer(HashSet<Tag> tags)
         return _tags.Count;
     }
 
-    protected virtual void OnTagAdded(Tag tag)
+    private void OnTagAdded(Tag tag)
     {
         TagAdded?.Invoke(this, new TagEventArgs(tag, this));
     }
 
-    protected virtual void OnTagRemoved(Tag tag)
+    private void OnTagRemoved(Tag tag)
     {
         TagRemoved?.Invoke(this, new TagEventArgs(tag, this));
     }
 
-    protected virtual void OnTagsChanged(IEnumerable<Tag> tags)
+    private void OnTagsChanged(IEnumerable<Tag> tags)
     {
         TagsChanged?.Invoke(this, new TagContainerEventArgs(this, tags));
     }

@@ -20,96 +20,91 @@ public static partial class Tags
 
 public class CharacterAttributeSet : AttributeSet
 {
-    private readonly AttributeBase _gravity;
-    private readonly AttributeBase _runspeed;
-    private readonly AttributeBase _jumpvelocity;
-    private readonly AttributeBase _flooracceleration;
-    private readonly AttributeBase _airacceleration;
-
-    public override Tag[] AttributeSigns => new[] {
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration
-    };
-
-    public CharacterAttributeSet() : base()
+    public CharacterAttributeSet()
     {
-        _gravity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Gravity, 980.0f);
-        _runspeed = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_RunSpeed, 200.0f);
-        _jumpvelocity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_JumpVelocity, -300.0f);
-        _flooracceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_FloorAcceleration, 1000.0f);
-        _airacceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_AirAcceleration, 800.0f);
+        Gravity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Gravity, 980.0f);
+        RunSpeed = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_RunSpeed, 200.0f);
+        JumpVelocity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_JumpVelocity, -300.0f);
+        FloorAcceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_FloorAcceleration, 1000.0f);
+        AirAcceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_AirAcceleration, 800.0f);
     }
 
+    public override Tag[] AttributeSigns => new[]
+    {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration
+    };
+
     public override AttributeBase this[Tag sign] =>
-        sign.Equals(Tags.Attribute_Gravity) ? _gravity :
-        sign.Equals(Tags.Attribute_RunSpeed) ? _runspeed :
-        sign.Equals(Tags.Attribute_JumpVelocity) ? _jumpvelocity :
-        sign.Equals(Tags.Attribute_FloorAcceleration) ? _flooracceleration :
-        sign.Equals(Tags.Attribute_AirAcceleration) ? _airacceleration :
+        sign.Equals(Tags.Attribute_Gravity) ? Gravity :
+        sign.Equals(Tags.Attribute_RunSpeed) ? RunSpeed :
+        sign.Equals(Tags.Attribute_JumpVelocity) ? JumpVelocity :
+        sign.Equals(Tags.Attribute_FloorAcceleration) ? FloorAcceleration :
+        sign.Equals(Tags.Attribute_AirAcceleration) ? AirAcceleration :
         null;
 
-    public AttributeBase Gravity => _gravity;
-    public AttributeBase RunSpeed => _runspeed;
-    public AttributeBase JumpVelocity => _jumpvelocity;
-    public AttributeBase FloorAcceleration => _flooracceleration;
-    public AttributeBase AirAcceleration => _airacceleration;
+    public AttributeBase Gravity { get; }
+
+    public AttributeBase RunSpeed { get; }
+
+    public AttributeBase JumpVelocity { get; }
+
+    public AttributeBase FloorAcceleration { get; }
+
+    public AttributeBase AirAcceleration { get; }
 }
 
 public class WarriorAttributeSet : CharacterAttributeSet
 {
-    private readonly AttributeBase _strength;
-    private readonly AttributeBase _defense;
-
-    public override Tag[] AttributeSigns => new[] {
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration, Tags.Attribute_Strength, Tags.Attribute_Defense
-    };
-
-    public WarriorAttributeSet() : base()
+    public WarriorAttributeSet()
     {
-        _strength = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Strength, 10.0f);
-        _defense = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Defense, 8.0f);
+        Strength = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Strength, 10.0f);
+        Defense = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Defense, 8.0f);
     }
 
+    public override Tag[] AttributeSigns => new[]
+    {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration, Tags.Attribute_Strength, Tags.Attribute_Defense
+    };
+
     public override AttributeBase this[Tag sign] =>
-        sign.Equals(Tags.Attribute_Strength) ? _strength :
-        sign.Equals(Tags.Attribute_Defense) ? _defense :
+        sign.Equals(Tags.Attribute_Strength) ? Strength :
+        sign.Equals(Tags.Attribute_Defense) ? Defense :
         base[sign];
 
-    public AttributeBase Strength => _strength;
-    public AttributeBase Defense => _defense;
+    public AttributeBase Strength { get; }
+
+    public AttributeBase Defense { get; }
 }
 
 public class PlayerAttributeSet : CharacterAttributeSet
 {
-
-    public override Tag[] AttributeSigns => new[] {
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration
-    };
-
-    public PlayerAttributeSet() : base()
+    public override Tag[] AttributeSigns => new[]
     {
-    }
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration
+    };
 
     public override AttributeBase this[Tag sign] =>
         base[sign];
-
 }
 
 public class EnemyAttributeSet : CharacterAttributeSet
 {
-    private readonly AttributeBase _walkspeed;
-
-    public override Tag[] AttributeSigns => new[] {
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration, Tags.Attribute_WalkSpeed
-    };
-
-    public EnemyAttributeSet() : base()
+    public EnemyAttributeSet()
     {
-        _walkspeed = new AttributeBase(Tags.AttributeSet_Enemy, Tags.Attribute_WalkSpeed, 80.0f);
+        WalkSpeed = new AttributeBase(Tags.AttributeSet_Enemy, Tags.Attribute_WalkSpeed, 80.0f);
     }
 
-    public override AttributeBase this[Tag sign] =>
-        sign.Equals(Tags.Attribute_WalkSpeed) ? _walkspeed :
-        base[sign];
+    public override Tag[] AttributeSigns => new[]
+    {
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration, Tags.Attribute_WalkSpeed
+    };
 
-    public AttributeBase WalkSpeed => _walkspeed;
+    public override AttributeBase this[Tag sign] =>
+        sign.Equals(Tags.Attribute_WalkSpeed) ? WalkSpeed : base[sign];
+
+    public AttributeBase WalkSpeed { get; }
 }
