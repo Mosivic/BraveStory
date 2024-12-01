@@ -2,6 +2,6 @@
 
 public interface ITaskProvider
 {
-    TaskBase GetTask(State state);
+    TaskBase GetTask(StateBase state);
     TaskBase[] GetAllTasks();
 }

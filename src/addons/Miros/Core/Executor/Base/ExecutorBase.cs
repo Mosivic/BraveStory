@@ -1,23 +1,20 @@
+using System;
 using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor<TTask>
+public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
     where TTask : TaskBase
 {
-    protected Agent _owner;
-    protected Dictionary<Tag, TTask> _tasks = [];
 
-    public virtual void AddTask(TTask task)
+    public virtual void AddTask(ITask task)
     {
-        _tasks[task.Tag] = task;
+        _tasks.Add(task as TTask);
     }
 
-    public virtual void RemoveTask(TTask task)
+    public virtual void RemoveTask(ITask task)
     {
-        if (task.IsActive)
-            task.Exit();
-        _tasks.Remove(task.Tag);
+        _tasks.Remove(task as TTask);
     }
 
     public virtual double GetCurrentTaskTime(Tag layer)
@@ -25,17 +22,17 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor<TTask>
         return 0;
     }
 
-    public virtual TTask GetLastTask(Tag layer)
+    public virtual ITask GetLastTask(Tag layer)
     {
         return null;
     }
 
-    public virtual TTask GetNowTask(Tag layer)
+    public virtual ITask GetNowTask(Tag layer)
     {
         return null;
     }
 
-    public virtual bool HasTaskRunning(TTask task)
+    public virtual bool HasTaskRunning(ITask task)
     {
         return false;
     }
@@ -49,8 +46,8 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor<TTask>
     {
     }
 
-    public virtual TTask[] GetAllTasks()
+    public virtual ITask[] GetAllTasks()
     {
-        return [.. _tasks.Values];
+        return [.. _tasks];
     }
 }

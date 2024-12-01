@@ -5,6 +5,7 @@ namespace Miros.Core;
 
 public class Effect(Tag tag) : State(tag)
 {
+    public override Type TaskType => typeof(EffectTask);
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;
     public readonly Effect[] RoutineExpirationEffectClasses;

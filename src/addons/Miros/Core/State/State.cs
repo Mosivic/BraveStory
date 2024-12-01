@@ -3,10 +3,15 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class State(Tag tag)
+public abstract class StateBase
+{
+    public virtual Type TaskType { get; }
+}
+
+public class State(Tag tag) : StateBase
 {
     public Tag Tag { get; init; } = tag;
-    public Type TaskType { get; init; } = typeof(TaskBase);
+    public override Type TaskType => typeof(TaskBase);
     public int Priority { get; init; } = 0;
     public Agent Owner { get; protected set; }
     public Agent Source { get; protected set; }
@@ -19,6 +24,7 @@ public class State(Tag tag)
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
 
+    
 
     public State AddComponent<T>(Action<T> setup = null) where T : StateComponent<TaskBase>, new()
     {

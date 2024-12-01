@@ -20,11 +20,9 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
         // TryActivateGrantedAbilities();
 
-        if (effect.DurationPolicy == DurationPolicy.Instant)
-        {
-            effect.Owner.ApplyModFromInstantEffect(effect);
-            effect.Status = RunningStatus.Succeed;
-        }
+        if (effect.DurationPolicy != DurationPolicy.Instant) return;
+        effect.Owner.ApplyModFromInstantEffect(effect);
+        effect.Status = RunningStatus.Succeed;
     }
 
 

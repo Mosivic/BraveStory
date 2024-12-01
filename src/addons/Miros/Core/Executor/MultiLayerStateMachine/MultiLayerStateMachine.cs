@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Miros.Core;
 
-public class MultiLayerStateMachine : ExecutorBase<TaskBase>
+public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
 {
     private readonly Dictionary<Tag, StateLayer> _layers = [];
 
@@ -11,9 +11,10 @@ public class MultiLayerStateMachine : ExecutorBase<TaskBase>
         _layers[layer] = new StateLayer(layer, defaultTask, container);
     }
 
-    public override bool HasTaskRunning(TaskBase task)
+    public override bool HasTaskRunning(ITask task)
     {
-        return task.IsActive;
+        var stateTask = task as TaskBase;
+        return stateTask.IsActive;
     }
 
     public override void Update(double delta)
