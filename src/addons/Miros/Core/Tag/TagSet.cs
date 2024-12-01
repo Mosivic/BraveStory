@@ -7,7 +7,7 @@ public readonly struct TagSet
 {
     public readonly Tag[] Tags;
 
-    public bool Empty => Tags.Length == 0;
+    public bool Empty => Tags == null || Tags.Length == 0;
 
     public TagSet(string[] tagNames)
     {

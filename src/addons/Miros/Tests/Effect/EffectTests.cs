@@ -24,7 +24,7 @@ public partial class EffectTests : Node2D
     public void TestEffectInit()
     {
         var tag = new Tag("TestTag");
-        var effect = new Effect(tag);
+        var effect = new Effect(tag, _agent);
 
         Assert.That(effect.Tag, Is.EqualTo(tag));
     }
@@ -32,14 +32,14 @@ public partial class EffectTests : Node2D
     [Test]
     public void TestEffectApply()
     {
-        var effect = new Effect(Tags.Effect_Buff)
+        var effect = new Effect(Tags.Effect_Buff,_agent)
         {
             Duration = 10,
             Period = 1,
 
             Modifiers =
             [
-                new Modifier(Tags.Attribute_RunSpeed, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
         };
 

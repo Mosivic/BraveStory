@@ -8,13 +8,13 @@ public abstract class StateBase
     public virtual Type TaskType { get; }
 }
 
-public class State(Tag tag) : StateBase
+public class State(Tag tag,Agent source) : StateBase
 {
     public Tag Tag { get; init; } = tag;
     public override Type TaskType => typeof(TaskBase);
     public int Priority { get; init; } = 0;
-    public Agent Owner { get; protected set; }
-    public Agent Source { get; protected set; }
+    public Agent Owner { get;  set; }
+    public Agent Source { get; init; } = source;
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;

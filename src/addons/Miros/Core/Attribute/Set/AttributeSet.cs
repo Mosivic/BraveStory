@@ -7,7 +7,8 @@ namespace Miros.Core;
 public abstract class AttributeSet
 {
     public abstract AttributeBase this[Tag sign] { get; }
-    public abstract Tag[] AttributeSigns { get; }
+    public abstract Tag[] AttributeTags { get; }
+    public abstract Tag AttributeSetTag { get; }
     public Agent Owner { get; private set; }
 
     /// <summary>
@@ -17,7 +18,7 @@ public abstract class AttributeSet
     public void SetOwner(Agent owner)
     {
         Owner = owner;
-        foreach (var attribute in AttributeSigns) this[attribute].SetOwner(owner);
+        foreach (var attribute in AttributeTags) this[attribute].SetOwner(owner);
     }
 
 

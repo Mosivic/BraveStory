@@ -141,7 +141,10 @@ class AttributeGenerator:
         code_parts = []
         code_parts.append(f"public class {set_name}AttributeSet : {parent_class}")
         code_parts.append("{")
-        
+
+        # 声明属性集标签
+        code_parts.append(f"    public override Tag AttributeSetTag => Tags.AttributeSet_{set_name};\n")
+
         # 只声明新增的属性字段
         inherited_attrs = set()
         if parent_class != "AttributeSet":

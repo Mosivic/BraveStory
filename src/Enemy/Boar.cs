@@ -26,21 +26,21 @@ public partial class Boar : Character
         Graphics.Scale = new Vector2(-1, 1);
 
         // Idle
-        var idle = new State(Tags.State_Action_Idle)
+        var idle = new State(Tags.State_Action_Idle,Agent)
             .OnEntered(s => PlayAnimation("idle"));
 
         // Walk
-        var walk = new State(Tags.State_Action_Walk)
+        var walk = new State(Tags.State_Action_Walk, Agent)
             .OnEntered(s => PlayAnimation("walk"))
             .OnPhysicsUpdated((s, d) => Patrol(d));
 
         // Run
-        var run = new State(Tags.State_Action_Run)
+        var run = new State(Tags.State_Action_Run, Agent)
             .OnEntered(s => PlayAnimation("run"))
             .OnPhysicsUpdated((s, d) => Chase(d));
 
         // Hit
-        var hit = new State(Tags.State_Action_Hit)
+        var hit = new State(Tags.State_Action_Hit, Agent)
             .OnEntered(s =>
             {
                 PlayAnimation("hit");
@@ -70,7 +70,7 @@ public partial class Boar : Character
             });
 
         // Die
-        var die = new State(Tags.State_Status_Die)
+        var die = new State(Tags.State_Status_Die, Agent)
             .OnEntered(s => PlayAnimation("die"))
             .OnPhysicsUpdated((s, d) =>
             {

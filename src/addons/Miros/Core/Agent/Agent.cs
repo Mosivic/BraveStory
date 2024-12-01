@@ -12,7 +12,7 @@ public enum ExecutorType
 	AbilityExecutor
 }
 
-internal struct StateMap
+internal struct StateMap   
 {
 	public StateBase State;
 	public TaskBase Task;
@@ -38,10 +38,7 @@ public class Agent : AbsAgent, IAgent
 		OwnedTags = new TagContainer([]);
 	}
 
-
-
 	
-
 	public StateBase GetState(Tag sign)
 	{
 		return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
@@ -56,6 +53,7 @@ public class Agent : AbsAgent, IAgent
 		foreach (var state in states)
 		{
 			var task = _taskProvider.GetTask(state);
+			state.Owner = this;
 			_stateMaps[state.Tag] = new StateMap { State = state, Task = task, Executor = executor };
 		}
 
@@ -90,6 +88,7 @@ public class Agent : AbsAgent, IAgent
 #endif
 		}
 
+		state.Owner = this;
 		var task = _taskProvider.GetTask(state);
 		executor.AddTask(task);
 		_stateMaps[state.Tag] = new StateMap { State = state, Task = task, Executor = executor };
@@ -133,7 +132,7 @@ public class Agent : AbsAgent, IAgent
 	{
 		foreach (var modifier in effect.Modifiers)
 		{
-			var attributeValue = GetAttributeAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
+			var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
 			if (attributeValue == null) continue;
 			if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
 				throw new InvalidOperationException("Unsupported operation.");
@@ -278,9 +277,9 @@ public class Agent : AbsAgent, IAgent
 
 	#region Attrubute Setget
 
-	public AttributeValue? GetAttributeAttributeValue(Tag attrSetSign, Tag attrSign)
+	public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeAttributeValue(attrSetSign, attrSign);
+		var value = AttributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
 		return value;
 	}
 

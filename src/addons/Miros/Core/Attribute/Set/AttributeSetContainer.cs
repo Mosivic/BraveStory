@@ -6,10 +6,10 @@ namespace Miros.Core;
 public class AttributeSetContainer(Agent owner)
 {
     private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
-
-    private readonly Agent _owner = owner;
+    
     public Dictionary<Tag, AttributeSet> Sets { get; } = [];
 
+    private static readonly Dictionary<Type, Tag> _attributeSetTypeMap = [];
 
     /// <summary>
     ///     向容器中添加一个新的属性集。如果同类型的属性集已存在，则不会重复添加。
@@ -27,19 +27,21 @@ public class AttributeSetContainer(Agent owner)
     public void AddAttributeSet(Type attrSetType)
     {
         if (TryGetAttributeSet(attrSetType, out _)) return;
-        var setTag = AttributeSetUtil.AttributeSetTag(attrSetType);
-        Sets.Add(setTag, Activator.CreateInstance(attrSetType) as AttributeSet);
 
-        var attrSet = Sets[setTag];
-        foreach (var attr in attrSet.AttributeSigns)
+        var attrSet = Activator.CreateInstance(attrSetType) as AttributeSet;
+        var attrSetTag = attrSet.AttributeSetTag;
+        Sets.Add(attrSetTag, attrSet);
+        _attributeSetTypeMap.Add(attrSetType, attrSetTag);
+
+        foreach (var attr in attrSet.AttributeTags)
             if (!_attributeAggregators.ContainsKey(attrSet[attr]))
             {
-                var attrAggt = new AttributeAggregator(attrSet[attr], _owner);
+                var attrAggt = new AttributeAggregator(attrSet[attr], owner);
                 // if (_owner.Enabled) attrAggt.OnEnable();
                 _attributeAggregators.Add(attrSet[attr], attrAggt);
             }
 
-        attrSet.SetOwner(_owner);
+        attrSet.SetOwner(owner);
     }
 
 
@@ -49,9 +51,9 @@ public class AttributeSetContainer(Agent owner)
     /// <typeparam name="T">要移除的属性集类型，必须继承自AttributeSet</typeparam>
     public void RemoveAttributeSet<T>() where T : AttributeSet
     {
-        var setTag = AttributeSetUtil.AttributeSetTag(typeof(T));
+        var setTag = _attributeSetTypeMap[typeof(T)];
         var attrSet = Sets[setTag];
-        foreach (var attr in attrSet.AttributeSigns) _attributeAggregators.Remove(attrSet[attr]);
+        foreach (var attr in attrSet.AttributeTags) _attributeAggregators.Remove(attrSet[attr]);
 
         Sets.Remove(setTag);
     }
@@ -64,7 +66,7 @@ public class AttributeSetContainer(Agent owner)
     /// <returns>是否成功获取到属性集</returns>
     public bool TryGetAttributeSet<T>(out T attributeSet) where T : AttributeSet
     {
-        if (Sets.TryGetValue(AttributeSetUtil.AttributeSetTag(typeof(T)), out var set))
+        if (Sets.TryGetValue(_attributeSetTypeMap[typeof(T)], out var set))
         {
             attributeSet = (T)set;
             return true;
@@ -75,18 +77,21 @@ public class AttributeSetContainer(Agent owner)
     }
 
     /// <summary>
-    ///     尝试获取一个属性集。
+    ///  尝试获取一个属性集。
     /// </summary>
     /// <param name="attrSetType">要获取的属性集类型，必须继承自AttributeSet</param>
     /// <param name="attributeSet">获取到的属性集</param>
     public bool TryGetAttributeSet(Type attrSetType, out AttributeSet attributeSet)
     {
-        if (Sets.TryGetValue(AttributeSetUtil.AttributeSetTag(attrSetType), out var set))
-        {
-            attributeSet = set;
-            return true;
-        }
 
+        if (_attributeSetTypeMap.TryGetValue(attrSetType, out var tag))
+        {
+            if (Sets.TryGetValue(tag, out var set))
+            {
+                attributeSet = set;
+                return true;
+            }
+        }
         attributeSet = null;
         return false;
     }
@@ -97,7 +102,7 @@ public class AttributeSetContainer(Agent owner)
     /// <param name="attrSetSign">属性集标签</param>
     /// <param name="attrSign">属性标签</param>
     /// <returns>属性值</returns>
-    public AttributeValue? GetAttributeAttributeValue(Tag attrSetSign, Tag attrSign)
+    public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
     {
         return Sets.TryGetValue(attrSetSign, out var set)
             ? set[attrSign].Value
@@ -149,7 +154,7 @@ public class AttributeSetContainer(Agent owner)
     {
         Dictionary<Tag, float> snapshot = [];
         foreach (var attributeSet in Sets)
-        foreach (var sign in attributeSet.Value.AttributeSigns)
+        foreach (var sign in attributeSet.Value.AttributeTags)
         {
             var attr = attributeSet.Value[sign];
             snapshot.Add(sign, attr.CurrentValue);

@@ -61,12 +61,8 @@ public class EffectExecutor : ExecutorBase<EffectTask>
                 _task.Stack();
         }
 
-        if (!hasSameTask)
-        {
-            base.AddTask(task);
-            effectTask.Activate();
-            effectTask.Enter();
-        }
+        if (hasSameTask) return;
+        base.AddTask(task);
     }
 
     private bool TaskEqual(EffectTask task1, EffectTask task2)

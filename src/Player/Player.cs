@@ -42,7 +42,7 @@ public partial class Player : Character
 		Data = new PlayerData();
 
 		// Idle  
-		var idle = new State(Tags.State_Action_Idle)
+		var idle = new State(Tags.State_Action_Idle, Agent)
 			.OnEntered(_ =>
 			{
 				PlayAnimation("idle");
@@ -51,7 +51,7 @@ public partial class Player : Character
 
 
 		// Jump
-		var jump = new State(Tags.State_Action_Jump)
+		var jump = new State(Tags.State_Action_Jump, Agent)
 			.OnEntered(_ =>
 			{
 				PlayAnimation("jump");
@@ -60,7 +60,7 @@ public partial class Player : Character
 			});
 
 		// Wall Jump
-		var wallJump = new State(Tags.State_Action_WallJump)
+		var wallJump = new State(Tags.State_Action_WallJump, Agent)
 			.OnEntered(_ =>
 			{
 				PlayAnimation("jump");
@@ -70,19 +70,19 @@ public partial class Player : Character
 			});
 
 		// Run
-		var run = new State(Tags.State_Action_Run)
+		var run = new State(Tags.State_Action_Run, Agent)
 			.OnEntered(_ => PlayAnimation("run"))
 			.OnPhysicsUpdated((_, delta) => Move(delta));
 
 
 		// Fall
-		var fall = new State(Tags.State_Action_Fall)
+		var fall = new State(Tags.State_Action_Fall, Agent)
 			.OnEntered(_ => PlayAnimation("fall"))
 			.OnPhysicsUpdated((_, delta) => Fall(delta));
 
 
 		// Double Jump
-		var doubleJump = new State(Tags.State_Action_DoubleJump)
+		var doubleJump = new State(Tags.State_Action_DoubleJump, Agent)
 			.OnEntered(_ =>
 			{
 				PlayAnimation("jump");
@@ -92,34 +92,34 @@ public partial class Player : Character
 
 
 		// Wall Slide
-		var wallSlide = new State(Tags.State_Action_WallSlide)
+		var wallSlide = new State(Tags.State_Action_WallSlide, Agent)
 			.OnEntered(_ => PlayAnimation("wall_sliding"))
 			.OnPhysicsUpdated((_, delta) => WallSlide(delta));
 
 
 		// Attack1
-		var attack1 = new State(Tags.State_Action_Attack1)
+		var attack1 = new State(Tags.State_Action_Attack1, Agent)
 			.OnEntered(_ => PlayAnimation("attack1"))
 			.ExitCondition(_ => IsAnimationFinished());
 
 
 		// Attack11
-		var attack11 = new State(Tags.State_Action_Attack11)
+		var attack11 = new State(Tags.State_Action_Attack11, Agent)
 			.OnEntered(_ => PlayAnimation("attack11"))
 			.ExitCondition(_ => IsAnimationFinished());
 
 		// Attack111
-		var attack111 = new State(Tags.State_Action_Attack111)
+		var attack111 = new State(Tags.State_Action_Attack111, Agent)
 			.OnEntered(_ => PlayAnimation("attack111"))
 			.ExitCondition(_ => IsAnimationFinished());
 
 		// Hit
-		var hit = new State(Tags.State_Action_Hit)
+		var hit = new State(Tags.State_Action_Hit, Agent)
 			.OnEntered(_ => PlayAnimation("hit"))
 			.OnExited(_ => HasHit = false);
 
 		// Die
-		var die = new State(Tags.State_Status_Die)
+		var die = new State(Tags.State_Status_Die, Agent)
 			.OnEntered(_ =>
 			{
 				PlayAnimation("die");
@@ -131,7 +131,7 @@ public partial class Player : Character
 			});
 
 		// Sliding
-		var sliding = new State(Tags.State_Action_Sliding)
+		var sliding = new State(Tags.State_Action_Sliding, Agent)
 			.OnEntered(_ =>
 			{
 				PlayAnimation("sliding_start");
@@ -306,9 +306,9 @@ public partial class Player : Character
 
 	protected override void HandleHit(object sender, HitEventArgs e)
 	{
-		HitBox.SetBuffState(new Buff(Tags.StateLayer_Buff)
-		{
-			// TaskType = typeof(TaskBuff)
-		});
+		// HitBox.SetBuffState(new Buff(Tags.StateLayer_Buff)
+		// {
+		// 	 TaskType = typeof(TaskBuff)
+		// });
 	}
 }
