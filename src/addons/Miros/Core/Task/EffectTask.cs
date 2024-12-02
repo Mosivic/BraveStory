@@ -10,6 +10,8 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnDurationOvered;
     public event Action<EffectTask> OnPeriodOvered;
 
+    public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
+    private EffectPeriodTicker _periodTicker;
 
     public override void Enter()
     {
@@ -21,17 +23,22 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
         // TryActivateGrantedAbilities();
 
-        if (effect.DurationPolicy != DurationPolicy.Instant) return;
-        GD.Print("Wwwwwwww");
-        effect.Owner.ApplyModFromInstantEffect(effect);
-        effect.Status = RunningStatus.Succeed;
+        if (effect.DurationPolicy == DurationPolicy.Instant)
+        {
+            effect.Owner.ApplyModFromInstantEffect(effect);
+            effect.Status = RunningStatus.Succeed;
+        }
+        else
+        {
+            _periodTicker = new EffectPeriodTicker(effect);
+        }
     }
 
 
     public override void Update(double delta)
     {
         base.Update(delta);
-        effect.PeriodTicker.Tick(delta);
+        _periodTicker.Tick(delta);
     }
 
 
@@ -92,9 +99,9 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
     public override bool CanExit()
     {
-        return effect.Owner.HasAll(effect.OngoingRequiredTags) ||
-               effect.Owner.HasAny(effect.ApplicationImmunityTags) ||
-               effect.Status != RunningStatus.Running;
+        if(!effect.Owner.HasAll(effect.OngoingRequiredTags)) return true;
+        if(effect.Owner.HasAny(effect.ApplicationImmunityTags)) return true;
+        return effect.Status != RunningStatus.Running;
     }
 
 

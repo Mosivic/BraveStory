@@ -12,7 +12,7 @@ public enum ExecutorType
 	AbilityExecutor
 }
 
-internal struct StateMap   
+internal struct StateMap
 {
 	public StateBase State;
 	public TaskBase Task;
@@ -25,20 +25,22 @@ public class Agent : AbsAgent, IAgent
 	private readonly Node2D _host;
 	private readonly Dictionary<Tag, StateMap> _stateMaps = [];
 
-	private readonly TagContainer  OwnedTags;
+	private readonly TagContainer OwnedTags;
 	private readonly ITaskProvider _taskProvider;
-	
-	public AttributeSetContainer AttributeSetContainer { get; set; }
+
+	public bool Enabled { get; set; } = true;
+
+	private AttributeSetContainer _attributeSetContainer { get; set; }
 
 	public Agent(Node2D host, ITaskProvider taskProvider)
 	{
 		_host = host;
 		_taskProvider = taskProvider;
-		AttributeSetContainer = new AttributeSetContainer(this);
+		_attributeSetContainer = new AttributeSetContainer(this);
 		OwnedTags = new TagContainer([]);
 	}
 
-	
+
 	public StateBase GetState(Tag sign)
 	{
 		return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
@@ -62,9 +64,9 @@ public class Agent : AbsAgent, IAgent
 				transition.Mode));
 
 		foreach (var (fromState, stateTransitions) in transitions.Transitions)
-		foreach (var transition in stateTransitions)
-			container.Add(_stateMaps[fromState.Tag].Task,
-				new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition, transition.Mode));
+			foreach (var transition in stateTransitions)
+				container.Add(_stateMaps[fromState.Tag].Task,
+					new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition, transition.Mode));
 
 
 		executor.AddLayer(layer, _stateMaps[defaultState.Tag].Task, container);
@@ -77,11 +79,16 @@ public class Agent : AbsAgent, IAgent
 		_executors[ExecutorType.EffectExecutor] = executor;
 	}
 
+	public EffectExecutor GetEffectExecutor()
+	{
+		return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
+	}
+
 	public void AddState(ExecutorType executorType, State state)
 	{
 		if (!_executors.TryGetValue(executorType, out var executor))
 		{
-#if GODOT4 &&DEBUG
+#if GODOT4 && DEBUG
 			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
 #else
 			return;
@@ -105,7 +112,7 @@ public class Agent : AbsAgent, IAgent
 	{
 		if (!_executors.TryGetValue(executorType, out var executor))
 		{
-#if GODOT4 &&DEBUG
+#if GODOT4 && DEBUG
 			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
 #else
 			return;
@@ -134,6 +141,7 @@ public class Agent : AbsAgent, IAgent
 		{
 			var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
 			if (attributeValue == null) continue;
+			
 			if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
 				throw new InvalidOperationException("Unsupported operation.");
 
@@ -142,7 +150,7 @@ public class Agent : AbsAgent, IAgent
 					$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
 					$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
 
-			var magnitude = modifier.CalculateMagnitude(effect, modifier.Magnitude);
+			var magnitude = modifier.CalculateMagnitude(effect);
 			var baseValue = attributeValue.Value.BaseValue;
 			switch (modifier.Operation)
 			{
@@ -165,7 +173,7 @@ public class Agent : AbsAgent, IAgent
 					throw new ArgumentOutOfRangeException();
 			}
 
-			AttributeSetContainer.Sets[modifier.AttributeSetTag]
+			_attributeSetContainer.Sets[modifier.AttributeSetTag]
 				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
 		}
 	}
@@ -275,40 +283,51 @@ public class Agent : AbsAgent, IAgent
 	#endregion
 
 
-	#region Attrubute Setget
+	#region AttributeSet
+
+	public void AddAttributeSet(Type attrSetType)
+	{
+		_attributeSetContainer.AddAttributeSet(attrSetType);
+	}
 
 	public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
+		return value;
+	}
+
+	public AttributeBase GetAttributeBase(Tag attrSetSign, Tag attrSign)
+	{
+		var value = _attributeSetContainer.Sets[attrSetSign][attrSign];
 		return value;
 	}
 
 	public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
 		return value;
 	}
 
 	public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public Dictionary<Tag, float> DataSnapshot()
 	{
-		return AttributeSetContainer.Snapshot();
+		return _attributeSetContainer.Snapshot();
 	}
 
 	public T AttrSet<T>() where T : AttributeSet
 	{
-		AttributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
+		_attributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
 		return attrSet;
 	}
 

@@ -12,7 +12,6 @@ public partial class EffectTests : Node2D
     {
         base._Ready();
         _agent = new Agent(null, new StaticTaskProvider());
-        _frameCounter = 0;
 
         TestEffectApply();
     }
@@ -34,30 +33,25 @@ public partial class EffectTests : Node2D
     {
         var effect = new Effect(Tags.Effect_Buff,_agent)
         {
+            DurationPolicy = DurationPolicy.Duration,
             Duration = 10,
             Period = 1,
-
             Modifiers =
             [
                 new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
-        };
-
-
-        _agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();
-
+        }.OnEntered(effect => GD.Print("Effect Entered"));
+        
         _agent.CreateEffectExecutor();
         _agent.AddState(ExecutorType.EffectExecutor, effect);
-
-        //Assert.That(attributeSet[Tags.Attribute_RunSpeed].BaseValue, Is.EqualTo(110));
+        
+        _agent.AddAttributeSet(typeof(PlayerAttributeSet));
     }
 
 
-    [Test]
-    [TestCase(0D)]
     public override void _Process(double delta)
     {
-        _frameCounter++;
         _agent.Update(delta);
+        GD.Print(_agent.GetAttributeBaseValue(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed));
     }
 }

@@ -6,8 +6,8 @@ public class ScalableFloatModCalculation : ModifierMagnitudeCalculation
 
     private readonly float k = 1f;
 
-    public override float CalculateMagnitude(Effect state, float input)
+    public override float CalculateMagnitude(Effect effect, float magnitude)
     {
-        return input * k + b;
+        return magnitude * k + b;
     }
 }

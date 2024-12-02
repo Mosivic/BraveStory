@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,37 +7,47 @@ namespace Miros.Core;
 // _tasks 即为运行的 EffectTask
 public class EffectExecutor : ExecutorBase<EffectTask>
 {
-    private readonly List<EffectTask> _runningTasks = [];
-    private readonly List<EffectTask> _tasksToRemove = [];
+
+    private readonly List<EffectTask> _runningPermanentTasks = [];
 
     public override void Update(double delta)
     {
         UpdateRunningEffects();
 
-        foreach (var task in _runningTasks) task.Update(delta);
+        foreach (var task in _runningPermanentTasks) task.Update(delta);
     }
 
     private void UpdateRunningEffects()
     {
-        foreach (var task in _tasks.Where(task => task.CanEnter()))
+        var couldEnterTasks = _tasks.Where(task => task.CanEnter()).ToList();
+        foreach (var task in couldEnterTasks) 
         {
-            task.Activate();
-            task.Enter();
-            _runningTasks.Add(task);
+            if(task.IsInstant)
+            {
+                task.Activate();
+                task.Enter();
+                task.Exit();
+                task.Deactivate();
+                _tasks.Remove(task);
+            }
+            else
+            {
+                task.Activate();
+                task.Enter();
+                _tasks.Remove(task);
+                _runningPermanentTasks.Add(task);
+                _onRunningEffectTasksIsDirty?.Invoke(this, task);
+            }
         }
 
-        foreach (var task in _runningTasks.Where(task => task.CanExit()))
+        var couldExitTasks = _runningPermanentTasks.Where(task => task.CanExit()).ToList();
+        foreach (var task in couldExitTasks)
         {
             task.Deactivate();
             task.Exit();
-            _tasksToRemove.Add(task);
-            _tasks.Remove(task);
+            _runningPermanentTasks.Remove(task);
+            _onRunningEffectTasksIsDirty?.Invoke(this, task);
         }
-
-        // 在遍历完成后再进行删除
-        foreach (var task in _tasksToRemove) _runningTasks.Remove(task);
-
-        _tasksToRemove.Clear();
     }
 
 
@@ -52,21 +63,31 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         var hasStackingComponent = stackingComponent != null;
         var hasSameTask = false;
 
-        foreach (var _task in _tasks)
+        foreach (var otherTask in _tasks)
         {
-            if (TaskEqual(_task, effectTask))
+            if (effectTask.Tag == otherTask.Tag)
                 hasSameTask = true;
 
-            if (hasStackingComponent && _task.CanStack(stackingComponent.StackingGroupTag))
-                _task.Stack();
+            if (hasStackingComponent && otherTask.CanStack(stackingComponent.StackingGroupTag))
+                otherTask.Stack();
         }
 
         if (hasSameTask) return;
         base.AddTask(task);
     }
+#region Event
 
-    private bool TaskEqual(EffectTask task1, EffectTask task2)
+    private EventHandler<EffectTask> _onRunningEffectTasksIsDirty;
+
+    public void RegisterOnRunningEffectTasksIsDirty(EventHandler<EffectTask> handler)
     {
-        return task1.Tag == task2.Tag;
+        _onRunningEffectTasksIsDirty += handler;
     }
+
+    public void UnregisterOnRunningEffectTasksIsDirty(EventHandler<EffectTask> handler)
+    {
+        _onRunningEffectTasksIsDirty -= handler;
+    }
+
+#endregion
 }

@@ -28,7 +28,7 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
 
     public float k = 1; // 系数
 
-    public override float CalculateMagnitude(Effect effect, float modifierMagnitude)
+    public override float CalculateMagnitude(Effect effect, float magnitude)
     {
         if (attributeFromType == AttributeFrom.Source)
         {
