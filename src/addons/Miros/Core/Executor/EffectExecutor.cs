@@ -19,7 +19,6 @@ public class EffectExecutor : ExecutorBase<EffectTask>
 
     private void UpdateRunningEffects()
     {
-
         var couldEnterTasks = _tasks.Where(task => task.CanEnter()).ToList();
         foreach (var task in couldEnterTasks) 
         {
@@ -64,25 +63,18 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         var hasStackingComponent = stackingComponent != null;
         var hasSameTask = false;
 
-        foreach (var _task in _tasks)
+        foreach (var otherTask in _tasks)
         {
-            if (TaskEqual(_task, effectTask))
+            if (effectTask.Tag == otherTask.Tag)
                 hasSameTask = true;
 
-            if (hasStackingComponent && _task.CanStack(stackingComponent.StackingGroupTag))
-                _task.Stack();
+            if (hasStackingComponent && otherTask.CanStack(stackingComponent.StackingGroupTag))
+                otherTask.Stack();
         }
 
         if (hasSameTask) return;
         base.AddTask(task);
     }
-
-    private bool TaskEqual(EffectTask task1, EffectTask task2)
-    {
-        return task1.Tag == task2.Tag;
-    }
-
-
 #region Event
 
     private EventHandler<EffectTask> _onRunningEffectTasksIsDirty;

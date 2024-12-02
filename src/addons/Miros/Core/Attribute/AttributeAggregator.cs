@@ -179,13 +179,13 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
 			{
 				if (ge.Owner != null)
-					ge.Owner.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
+					ge.Owner.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
 						.UnregisterPostCurrentValueChange(OnAttributeChanged);
 			}
 			else
 			{
 				if (ge.Source != null)
-					ge.Source.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
+					ge.Source.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
 						.UnregisterPostCurrentValueChange(OnAttributeChanged);
 			}
 		}
@@ -204,13 +204,13 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
 			{
 				if (ge.Owner != null)
-					ge.Owner.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
+					ge.Owner.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
 						.RegisterPostCurrentValueChange(OnAttributeChanged);
 			}
 			else
 			{
 				if (ge.Source != null)
-					ge.Source.AttributeSetContainer.Sets[mmc.attributeSetSign][mmc.attributeSign]
+					ge.Source.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
 						.RegisterPostCurrentValueChange(OnAttributeChanged);
 			}
 		}

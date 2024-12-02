@@ -45,12 +45,13 @@ public partial class EffectTests : Node2D
         _agent.CreateEffectExecutor();
         _agent.AddState(ExecutorType.EffectExecutor, effect);
         
-        _agent.AttributeSetContainer.AddAttributeSet<PlayerAttributeSet>();
+        _agent.AddAttributeSet(typeof(PlayerAttributeSet));
     }
 
 
     public override void _Process(double delta)
     {
         _agent.Update(delta);
+        GD.Print(_agent.GetAttributeBaseValue(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed));
     }
 }

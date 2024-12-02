@@ -38,7 +38,7 @@ public partial class Player : Character
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
 		Agent = new Agent(this, new StaticTaskProvider());
-		Agent.AttributeSetContainer.AddAttributeSet(typeof(PlayerAttributeSet));
+		Agent.AddAttributeSet(typeof(PlayerAttributeSet));
 		Data = new PlayerData();
 
 		// Idle  

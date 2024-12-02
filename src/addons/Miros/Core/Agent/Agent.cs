@@ -30,13 +30,13 @@ public class Agent : AbsAgent, IAgent
 
 	public bool Enabled { get; set; } = true;
 
-	public AttributeSetContainer AttributeSetContainer { get; set; }
+	private AttributeSetContainer _attributeSetContainer { get; set; }
 
 	public Agent(Node2D host, ITaskProvider taskProvider)
 	{
 		_host = host;
 		_taskProvider = taskProvider;
-		AttributeSetContainer = new AttributeSetContainer(this);
+		_attributeSetContainer = new AttributeSetContainer(this);
 		OwnedTags = new TagContainer([]);
 	}
 
@@ -173,7 +173,7 @@ public class Agent : AbsAgent, IAgent
 					throw new ArgumentOutOfRangeException();
 			}
 
-			AttributeSetContainer.Sets[modifier.AttributeSetTag]
+			_attributeSetContainer.Sets[modifier.AttributeSetTag]
 				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
 		}
 	}
@@ -283,40 +283,51 @@ public class Agent : AbsAgent, IAgent
 	#endregion
 
 
-	#region Attrubute Setget
+	#region AttributeSet
+
+	public void AddAttributeSet(Type attrSetType)
+	{
+		_attributeSetContainer.AddAttributeSet(attrSetType);
+	}
 
 	public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
+		return value;
+	}
+
+	public AttributeBase GetAttributeBase(Tag attrSetSign, Tag attrSign)
+	{
+		var value = _attributeSetContainer.Sets[attrSetSign][attrSign];
 		return value;
 	}
 
 	public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
 		return value;
 	}
 
 	public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = AttributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
+		var value = _attributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public Dictionary<Tag, float> DataSnapshot()
 	{
-		return AttributeSetContainer.Snapshot();
+		return _attributeSetContainer.Snapshot();
 	}
 
 	public T AttrSet<T>() where T : AttributeSet
 	{
-		AttributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
+		_attributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
 		return attrSet;
 	}
 
