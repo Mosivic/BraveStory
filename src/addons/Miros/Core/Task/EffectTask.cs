@@ -10,6 +10,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnDurationOvered;
     public event Action<EffectTask> OnPeriodOvered;
 
+    public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
 
     public override void Enter()
     {

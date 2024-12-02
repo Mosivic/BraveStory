@@ -7,7 +7,8 @@ namespace Miros.Core;
 // _tasks 即为运行的 EffectTask
 public class EffectExecutor : ExecutorBase<EffectTask>
 {
-    private readonly List<EffectTask> _runningTasks = [];
+
+    private readonly List<EffectTask> _runningPermanentTasks = [];
     private readonly List<EffectTask> _tasksToRemove = [];
 
 
@@ -15,20 +16,33 @@ public class EffectExecutor : ExecutorBase<EffectTask>
     {
         UpdateRunningEffects();
 
-        foreach (var task in _runningTasks) task.Update(delta);
+        foreach (var task in _runningPermanentTasks) task.Update(delta);
     }
 
     private void UpdateRunningEffects()
     {
         foreach (var task in _tasks.Where(task => task.CanEnter()))
         {
-            task.Activate();
-            task.Enter();
-            _runningTasks.Add(task);
-            _onRunningEffectTasksIsDirty?.Invoke(this, task);
+            // 如果任务是瞬时的，则立即执行并结束
+            if (task.IsInstant)
+            {
+                task.Activate();
+                task.Enter();
+                task.Update(0);
+                task.Exit();
+                task.Deactivate();
+                _tasksToRemove.Add(task);
+            }
+            else
+            {
+                task.Activate();
+                task.Enter();
+                _runningPermanentTasks.Add(task);
+                _onRunningEffectTasksIsDirty?.Invoke(this, task);
+            }
         }
 
-        foreach (var task in _runningTasks.Where(task => task.CanExit()))
+        foreach (var task in _runningPermanentTasks.Where(task => task.CanExit()))
         {
             task.Deactivate();
             task.Exit();
@@ -38,7 +52,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         }
 
         // 在遍历完成后再进行删除
-        foreach (var task in _tasksToRemove) _runningTasks.Remove(task);
+        foreach (var task in _tasksToRemove) _runningPermanentTasks.Remove(task);
 
         _tasksToRemove.Clear();
     }

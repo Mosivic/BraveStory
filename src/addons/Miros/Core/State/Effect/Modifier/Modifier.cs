@@ -19,9 +19,9 @@ public class Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, Mo
     public ModifierOperation Operation { get; set; } = operation; // 操作
 
 
-    public float CalculateMagnitude(Effect state)
+    public float CalculateMagnitude(Effect effect)
     {
-        return MMC?.CalculateMagnitude(state, Magnitude) ?? Magnitude;
+        return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;
     }
 
 
