@@ -12,7 +12,7 @@ public enum ExecutorType
 	AbilityExecutor
 }
 
-internal struct StateMap   
+internal struct StateMap
 {
 	public StateBase State;
 	public TaskBase Task;
@@ -25,11 +25,11 @@ public class Agent : AbsAgent, IAgent
 	private readonly Node2D _host;
 	private readonly Dictionary<Tag, StateMap> _stateMaps = [];
 
-	private readonly TagContainer  OwnedTags;
+	private readonly TagContainer OwnedTags;
 	private readonly ITaskProvider _taskProvider;
 
-    public bool Enabled { get; set; } = true;
-	
+	public bool Enabled { get; set; } = true;
+
 	public AttributeSetContainer AttributeSetContainer { get; set; }
 
 	public Agent(Node2D host, ITaskProvider taskProvider)
@@ -40,7 +40,7 @@ public class Agent : AbsAgent, IAgent
 		OwnedTags = new TagContainer([]);
 	}
 
-	
+
 	public StateBase GetState(Tag sign)
 	{
 		return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
@@ -64,9 +64,9 @@ public class Agent : AbsAgent, IAgent
 				transition.Mode));
 
 		foreach (var (fromState, stateTransitions) in transitions.Transitions)
-		foreach (var transition in stateTransitions)
-			container.Add(_stateMaps[fromState.Tag].Task,
-				new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition, transition.Mode));
+			foreach (var transition in stateTransitions)
+				container.Add(_stateMaps[fromState.Tag].Task,
+					new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition, transition.Mode));
 
 
 		executor.AddLayer(layer, _stateMaps[defaultState.Tag].Task, container);
@@ -79,16 +79,16 @@ public class Agent : AbsAgent, IAgent
 		_executors[ExecutorType.EffectExecutor] = executor;
 	}
 
-    public EffectExecutor GetEffectExecutor()
-    {
-        return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
-    }
+	public EffectExecutor GetEffectExecutor()
+	{
+		return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
+	}
 
 	public void AddState(ExecutorType executorType, State state)
 	{
 		if (!_executors.TryGetValue(executorType, out var executor))
 		{
-#if GODOT4 &&DEBUG
+#if GODOT4 && DEBUG
 			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
 #else
 			return;
@@ -112,7 +112,7 @@ public class Agent : AbsAgent, IAgent
 	{
 		if (!_executors.TryGetValue(executorType, out var executor))
 		{
-#if GODOT4 &&DEBUG
+#if GODOT4 && DEBUG
 			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
 #else
 			return;
@@ -141,6 +141,7 @@ public class Agent : AbsAgent, IAgent
 		{
 			var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
 			if (attributeValue == null) continue;
+			
 			if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
 				throw new InvalidOperationException("Unsupported operation.");
 
@@ -176,7 +177,7 @@ public class Agent : AbsAgent, IAgent
 				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
 		}
 	}
-	
+
 
 	// public AbilityExecutor AbilityExecutor()
 	// {

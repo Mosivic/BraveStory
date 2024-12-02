@@ -61,9 +61,9 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 				var newValue = _attribute.BaseValue;
 				foreach (var tuple in _modifierCache)
 				{
-					var spec = tuple.Item1;
+					var effect = tuple.Item1;
 					var modifier = tuple.Item2;
-					var magnitude = modifier.CalculateMagnitude(spec);
+					var magnitude = modifier.CalculateMagnitude(effect);
 
 					if (!_attribute.IsSupportOperation(modifier.Operation))
 						throw new InvalidOperationException("Unsupported operation.");
@@ -98,7 +98,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 				var min = float.MaxValue;
 				foreach (var tuple in _modifierCache)
 				{
-					var spec = tuple.Item1;
+					var effect = tuple.Item1;
 					var modifier = tuple.Item2;
 
 					if (!_attribute.IsSupportOperation(modifier.Operation))
@@ -107,7 +107,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 					if (modifier.Operation != ModifierOperation.Override)
 						throw new InvalidOperationException("MinValueOnly mode only supports override operation.");
 
-					var magnitude = modifier.CalculateMagnitude(spec);
+					var magnitude = modifier.CalculateMagnitude(effect);
 					min = Math.Min(min, magnitude);
 					hasOverride = true;
 				}
@@ -120,7 +120,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 				var max = float.MinValue;
 				foreach (var tuple in _modifierCache)
 				{
-					var spec = tuple.Item1;
+					var effect = tuple.Item1;
 					var modifier = tuple.Item2;
 
 					if (!_attribute.IsSupportOperation(modifier.Operation))
@@ -129,7 +129,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 					if (modifier.Operation != ModifierOperation.Override)
 						throw new InvalidOperationException("MaxValueOnly mode only supports override operation.");
 
-					var magnitude = modifier.CalculateMagnitude(spec);
+					var magnitude = modifier.CalculateMagnitude(effect);
 					max = Math.Max(max, magnitude);
 					hasOverride = true;
 				}

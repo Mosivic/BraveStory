@@ -21,32 +21,38 @@ public class TagContainer(HashSet<Tag> tags)
     
     public bool HasAny(TagSet other)
     {
-        return other.Empty || _tags.Overlaps(other.Tags);
+        if(other.Empty) return false;
+        return _tags.Overlaps(other.Tags);
     }
     
     public bool HasAny(TagContainer other)
     {
-        return other != null && _tags.Overlaps(other._tags);
+        if(other == null) return false;
+        return _tags.Overlaps(other._tags);
     }
 
     public bool HasAny(HashSet<Tag> other)
     {
-        return other != null && _tags.Overlaps(other);
+        if(other == null) return false;
+        return _tags.Overlaps(other);
     }
 
     public bool HasAll(TagSet other)
     {
-        return other.Empty || _tags.IsSupersetOf(other.Tags);
+        if(other.Empty) return true;
+        return _tags.IsSupersetOf(other.Tags);
     }
     
     public bool HasAll(TagContainer other)
     {
-        return other == null || _tags.IsSupersetOf(other._tags);
+        if(other == null) return true;
+        return _tags.IsSupersetOf(other._tags);
     }
 
     public bool HasAll(HashSet<Tag> other)
     {
-        return other == null || _tags.IsSupersetOf(other);
+        if(other == null) return true;
+        return _tags.IsSupersetOf(other);
     }
 
 

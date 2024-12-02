@@ -70,7 +70,7 @@ public class Effect(Tag tag, Agent source) : State(tag,source)
     public float Level { get; set; } = 1;
 
     public ExecutionCalculation[] Executions { get; set; }
-    public EffectPeriodTicker PeriodTicker { get; }
+
     public Effect PeriodExecution { get; private set; }
     public Modifier[] Modifiers { get; set; }
 
@@ -79,11 +79,4 @@ public class Effect(Tag tag, Agent source) : State(tag,source)
 
     public StackingComponent Stacking { get; set; }
     public event Action<Agent, Effect> OnImmunity;
-    public event Action<int, int> OnStackCountChanged;
-
-    // Necessary for Task
-    public void RaiseOnStackCountChanged(int oldStackCount, int newStackCount)
-    {
-        OnStackCountChanged?.Invoke(oldStackCount, newStackCount);
-    }
 }

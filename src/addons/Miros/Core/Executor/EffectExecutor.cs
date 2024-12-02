@@ -9,8 +9,6 @@ public class EffectExecutor : ExecutorBase<EffectTask>
 {
 
     private readonly List<EffectTask> _runningPermanentTasks = [];
-    private readonly List<EffectTask> _tasksToRemove = [];
-
 
     public override void Update(double delta)
     {
@@ -21,40 +19,36 @@ public class EffectExecutor : ExecutorBase<EffectTask>
 
     private void UpdateRunningEffects()
     {
-        foreach (var task in _tasks.Where(task => task.CanEnter()))
+
+        var couldEnterTasks = _tasks.Where(task => task.CanEnter()).ToList();
+        foreach (var task in couldEnterTasks) 
         {
-            // 如果任务是瞬时的，则立即执行并结束
-            if (task.IsInstant)
+            if(task.IsInstant)
             {
                 task.Activate();
                 task.Enter();
-                task.Update(0);
                 task.Exit();
                 task.Deactivate();
-                _tasksToRemove.Add(task);
+                _tasks.Remove(task);
             }
             else
             {
                 task.Activate();
                 task.Enter();
+                _tasks.Remove(task);
                 _runningPermanentTasks.Add(task);
                 _onRunningEffectTasksIsDirty?.Invoke(this, task);
             }
         }
 
-        foreach (var task in _runningPermanentTasks.Where(task => task.CanExit()))
+        var couldExitTasks = _runningPermanentTasks.Where(task => task.CanExit()).ToList();
+        foreach (var task in couldExitTasks)
         {
             task.Deactivate();
             task.Exit();
-            _tasksToRemove.Add(task);
-            _tasks.Remove(task);
+            _runningPermanentTasks.Remove(task);
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
         }
-
-        // 在遍历完成后再进行删除
-        foreach (var task in _tasksToRemove) _runningPermanentTasks.Remove(task);
-
-        _tasksToRemove.Clear();
     }
 
 
