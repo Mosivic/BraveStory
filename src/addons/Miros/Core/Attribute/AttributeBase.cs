@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#if GODOT
+using Godot;
+#endif
+
 namespace Miros.Core;
 
 public class AttributeBase
@@ -70,6 +74,10 @@ public class AttributeBase
         var oldValue = CurrentValue;
         _value.SetCurrentValue(value);
 
+#if GODOT
+        GD.Print($"[AttributeBase] CurrentValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
+#endif
+
         if (Math.Abs(oldValue - value) > float.Epsilon)
             OnPostCurrentValueChange?.Invoke(this, oldValue, value);
     }
@@ -80,6 +88,10 @@ public class AttributeBase
 
         var oldValue = _value.BaseValue;
         _value.SetBaseValue(value);
+
+#if GODOT
+        GD.Print($"[AttributeBase] BaseValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
+#endif
 
         if (Math.Abs(oldValue - value) > float.Epsilon)
             OnPostBaseValueChange?.Invoke(this, oldValue, value);

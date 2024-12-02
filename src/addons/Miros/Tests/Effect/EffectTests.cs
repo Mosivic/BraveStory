@@ -35,7 +35,7 @@ public partial class EffectTests : Node2D
         {
             DurationPolicy = DurationPolicy.Duration,
             Duration = 10,
-            Period = 1,
+            Period = 2,
             Modifiers =
             [
                 new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
@@ -52,6 +52,5 @@ public partial class EffectTests : Node2D
     public override void _Process(double delta)
     {
         _agent.Update(delta);
-        GD.Print(_agent.GetAttributeBaseValue(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed));
     }
 }

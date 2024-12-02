@@ -1,5 +1,5 @@
 using System;
-using Miros.Experiment.Utilities;
+using Miros.Utils;
 
 namespace Miros.Experiment.StatsAndModifiers;
 
