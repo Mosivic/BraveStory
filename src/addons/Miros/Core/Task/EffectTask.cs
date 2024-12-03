@@ -52,7 +52,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
 
-    public override void Stack()
+    public  void Stack()
     {
         var stackingComponent = GetComponent<StackingComponent>();
         if (effect.DurationPolicy == DurationPolicy.Instant)

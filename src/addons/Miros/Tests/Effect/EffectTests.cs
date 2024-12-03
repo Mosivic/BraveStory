@@ -35,7 +35,7 @@ public partial class EffectTests : Node2D
         {
             DurationPolicy = DurationPolicy.Duration,
             Duration = 10,
-            Period = 2,
+            Period = 1,
             Modifiers =
             [
                 new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
