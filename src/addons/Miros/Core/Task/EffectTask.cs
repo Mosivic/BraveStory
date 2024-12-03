@@ -19,10 +19,8 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         base.Enter();
         CaptureAttributesSnapshot();
 
-        // effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
         effect.Owner.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
-        // TryActivateGrantedAbilities();
 
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
@@ -46,17 +44,27 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public override void Exit()
     {
         base.Exit();
-
-        // TryRemoveGrantedAbilities();
-        // effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
-        // TryDeactivateGrantedAbilities();
     }
 
 
-    public void Stack(bool isFromSameSource = false)
+    public void Stack(bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
     {
         var stacking = GetComponent<StackingComponent>();
-        stacking.StackCount++;
+
+        switch (stacking.StackingType)
+        {
+            case StackingType.None:
+                break;
+            case StackingType.AggregateBySource:
+                if (isFromSameSource)
+                    stacking.StackCount++;
+                break;
+            case StackingType.AggregateByTarget:
+                stacking.StackCount = 1;
+                break;
+            default:
+                throw new ArgumentException($"Invalid StackingType: {stacking.StackingType}");
+        }
     }
 
 
