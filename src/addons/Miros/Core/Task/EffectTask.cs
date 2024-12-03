@@ -11,6 +11,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnPeriodOvered;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
+
     private EffectUpdateHandler _periodTicker;
 
     public override void Enter()
@@ -52,39 +53,10 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
 
-    public void Stack()
+    public void Stack(bool isFromSameSource = false)
     {
-        var stackingComponent = GetComponent<StackingComponent>();
-
-        // Check GE Stacking
-        if (stackingComponent.StackingType == StackingType.None)
-        {
-            return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        }
-
-        // 处理GE堆叠
-        // 基于Target类型GE堆叠
-        if (stackingComponent.StackingType == StackingType.AggregateByTarget)
-        {
-            GetStackingEffectByData(effect, out var ge);
-            // 新添加GE
-            if (ge == null)
-                return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-            bool stackCountChange = ge.RefreshStack();
-            if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-            return ge;
-        }
-
-        // 基于Source类型GE堆叠
-        if (stackingComponent.StackingType == StackingType.AggregateBySource)
-        {
-            GetStackingEffectByDataFrom(effect, source, out var ge);
-            if (ge == null)
-                return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-            bool stackCountChange = ge.RefreshStack();
-            if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-            return ge;
-        }
+        var stacking = GetComponent<StackingComponent>();
+        stacking.StackCount++;
     }
 
 
@@ -100,7 +72,6 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         if(effect.Owner.HasAny(effect.ApplicationImmunityTags)) return true;
         return effect.Status != RunningStatus.Running;
     }
-
 
     // 捕获属性快照
     private void CaptureAttributesSnapshot()

@@ -12,18 +12,13 @@ public enum ExecutorType
 	AbilityExecutor
 }
 
-internal struct StateMap
-{
-	public StateBase State;
-	public TaskBase Task;
-	public IExecutor Executor;
-}
+
 
 public class Agent : AbsAgent, IAgent
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
 	private readonly Node2D _host;
-	private readonly Dictionary<Tag, StateMap> _stateMaps = [];
+	private readonly StateTaskExecutorContainer _stateTaskExecutorContainer = new();
 
 	private readonly TagContainer OwnedTags;
 	private readonly ITaskProvider _taskProvider;
@@ -41,11 +36,6 @@ public class Agent : AbsAgent, IAgent
 	}
 
 
-	public StateBase GetState(Tag sign)
-	{
-		return _stateMaps.TryGetValue(sign, out var stateMap) ? stateMap.State : null;
-	}
-
 	public void CreateMultiLayerStateMachine(Tag layer, State defaultState, HashSet<State> states,
 		StateTransitionConfig transitions)
 	{
@@ -56,20 +46,20 @@ public class Agent : AbsAgent, IAgent
 		{
 			var task = _taskProvider.GetTask(state);
 			state.Owner = this;
-			_stateMaps[state.Tag] = new StateMap { State = state, Task = task, Executor = executor };
+			_stateTaskExecutorContainer.AddStateMap(state.Tag, new StateTaskExecutor(state, task, executor));
 		}
 
 		foreach (var transition in transitions.AnyTransitions)
-			container.AddAny(new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition,
+			container.AddAny(new StateTransition(_stateTaskExecutorContainer.GetTask(transition.ToState), transition.Condition,
 				transition.Mode));
 
 		foreach (var (fromState, stateTransitions) in transitions.Transitions)
 			foreach (var transition in stateTransitions)
-				container.Add(_stateMaps[fromState.Tag].Task,
-					new StateTransition(_stateMaps[transition.ToState.Tag].Task, transition.Condition, transition.Mode));
+				container.Add(_stateTaskExecutorContainer.GetTask(fromState),
+					new StateTransition(_stateTaskExecutorContainer.GetTask(transition.ToState), transition.Condition, transition.Mode));
 
 
-		executor.AddLayer(layer, _stateMaps[defaultState.Tag].Task, container);
+		executor.AddLayer(layer, _stateTaskExecutorContainer.GetTask(defaultState), container);
 		_executors[ExecutorType.MultiLayerStateMachine] = executor;
 	}
 
@@ -98,7 +88,7 @@ public class Agent : AbsAgent, IAgent
 		state.Owner = this;
 		var task = _taskProvider.GetTask(state);
 		executor.AddTask(task);
-		_stateMaps[state.Tag] = new StateMap { State = state, Task = task, Executor = executor };
+		_stateTaskExecutorContainer.AddStateMap(state.Tag, new StateTaskExecutor(state, task, executor));
 	}
 
 
@@ -119,7 +109,7 @@ public class Agent : AbsAgent, IAgent
 #endif
 		}
 
-		var task = _stateMaps[state.Tag].Task;
+		var task = _stateTaskExecutorContainer.GetTask(state);
 		executor.RemoveTask(task);
 	}
 
@@ -178,6 +168,12 @@ public class Agent : AbsAgent, IAgent
 		}
 	}
 
+	public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
+	{
+		var state1 = _stateTaskExecutorContainer.GetState(task1);
+		var state2 = _stateTaskExecutorContainer.GetState(task2);
+		return state1.Source == state2.Source;
+	}
 
 	// public AbilityExecutor AbilityExecutor()
 	// {
@@ -201,7 +197,7 @@ public class Agent : AbsAgent, IAgent
 	{
 		return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
 			.GetRunningTasks()
-			.Select(task => _stateMaps[((EffectTask)task).Tag].State as Effect).ToArray();
+			.Select(task => _stateTaskExecutorContainer.GetState(task) as Effect).ToArray();
 	}
 
 
@@ -215,7 +211,7 @@ public class Agent : AbsAgent, IAgent
 		foreach (var task in tasks)
 		{
 			var effectTask = task as EffectTask;
-			var effect = _stateMaps[effectTask.Tag].State as Effect;
+			var effect = _stateTaskExecutorContainer.GetState(effectTask) as Effect;
 
 			var ownedTags = effect.OwnedTags;
 			if (!ownedTags.Empty && ownedTags.HasAny(tags))

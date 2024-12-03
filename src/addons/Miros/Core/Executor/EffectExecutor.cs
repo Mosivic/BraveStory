@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace Miros.Core;
 
@@ -11,7 +12,7 @@ public class EffectExecutor : ExecutorBase<EffectTask>
     private readonly List<EffectTask> _runningPermanentTasks = [];
 
     public List<EffectTask> GetRunningTasks() => _runningPermanentTasks;
-    
+
     public override void Update(double delta)
     {
         UpdateRunningEffects();
@@ -22,9 +23,9 @@ public class EffectExecutor : ExecutorBase<EffectTask>
     private void UpdateRunningEffects()
     {
         var couldEnterTasks = _tasks.Where(task => task.CanEnter()).ToList();
-        foreach (var task in couldEnterTasks) 
+        foreach (var task in couldEnterTasks)
         {
-            if(task.IsInstant)
+            if (task.IsInstant)
             {
                 task.Activate();
                 task.Enter();
@@ -52,32 +53,37 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         }
     }
 
+    private static bool AreTaskCouldStackByAnotherTask(EffectTask task, EffectTask otherTask)
+    {
+        return task.GetComponent<StackingComponent>() != null && otherTask.GetComponent<StackingComponent>() != null &&
+        task.GetComponent<StackingComponent>().StackingGroupTag == otherTask.GetComponent<StackingComponent>().StackingGroupTag;
+    }
 
-    // 如果存在StackingComponent组件，则检查是否可以堆叠
-    // 如果可以堆叠,检查是否存在相同StackingGroupTag的Task，如果存在，则调用其Stack方法
-    // 如果当前Tasks不存在传入的Task，则将传入的Task添加到Tasks中，并调用其Activate和Enter方法
     public override void AddTask(ITask task)
     {
         var effectTask = (EffectTask)task;
+
         if (!effectTask.CanEnter()) return;
 
-        var stackingComponent = effectTask.GetComponent<StackingComponent>();
-        var hasStackingComponent = stackingComponent != null;
-        var hasSameTask = false;
-
-        foreach (var otherTask in _tasks)
+        foreach (var existingTask in _tasks)
         {
-            if (effectTask.Tag == otherTask.Tag)
-                hasSameTask = true;
 
-            if (hasStackingComponent && otherTask.CanStack(stackingComponent.StackingGroupTag))
-                otherTask.Stack();
+            if (_agent.AreTasksFromSameSource(effectTask, existingTask)) // 如果传入的Task与已存在Task来自同一个Agent,
+            {
+                if (AreTaskCouldStackByAnotherTask(effectTask, existingTask)) existingTask.Stack(true);
+                if (existingTask.Tag != effectTask.Tag) base.AddTask(task);
+            }
+            else // 如果传入的Task与已存在Task来自不同Agent
+            {
+                if (AreTaskCouldStackByAnotherTask(effectTask, existingTask)) existingTask.Stack(false);
+                base.AddTask(task);
+            }
         }
 
-        if (hasSameTask) return;
+
         base.AddTask(task);
     }
-#region Event
+    #region Event
 
     private EventHandler<EffectTask> _onRunningEffectTasksIsDirty;
 
@@ -91,5 +97,5 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         _onRunningEffectTasksIsDirty -= handler;
     }
 
-#endregion
+    #endregion
 }
