@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Miros.Experiment.Utilities;
+namespace Miros.Utils;
 
-public abstract class Timer(float time)
+public abstract class Timer(double time)
 {
     protected double initialTime = time;
 
@@ -28,6 +28,7 @@ public abstract class Timer(float time)
         IsRunning = false;
         OnTimerStop?.Invoke();
     }
+    
 
     public void Resume()
     {
@@ -42,15 +43,19 @@ public abstract class Timer(float time)
     public abstract void Tick(double deltaTime);
 }
 
-public class CounterTimer(float time) : Timer(time)
+public class CounterTimer(double time) : Timer(time)
 {
     public bool IsFinished => Time <= 0;
 
     public override void Tick(double deltaTime)
     {
+        // 防止误差
+        if (IsRunning && Time < double.Epsilon) Stop();
+        
         if (IsRunning && Time > 0) Time -= deltaTime;
 
-        if (IsRunning && Time <= 0) Stop();
+        if (IsRunning && Time < 0) Stop();
+        
     }
 
     public void Reset()
@@ -66,7 +71,7 @@ public class CounterTimer(float time) : Timer(time)
 
 public class StopwatchTimer : Timer
 {
-    public StopwatchTimer(float time) : base(0)
+    public StopwatchTimer(double time) : base(time)
     {
     }
 

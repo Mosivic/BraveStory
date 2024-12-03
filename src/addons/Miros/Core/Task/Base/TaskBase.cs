@@ -29,11 +29,6 @@ public class TaskBase(State state) : AbsTask(state), ITask
     }
 
 
-    public virtual void Stack()
-    {
-    }
-
-
     public virtual void Deactivate()
     {
         state.Status = RunningStatus.NoRun;

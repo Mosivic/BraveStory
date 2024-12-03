@@ -35,7 +35,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			TryUnregisterAttributeChangedListen(tuple.Item1, tuple.Item2);
 		_modifierCache.Clear();
 
-		var effects = owner.GetEffects();
+		var effects = owner.GetRunningEffects(); // 获取所有正在运行的 Effect
 		foreach (var ge in effects)
 			if (ge.IsActive)
 				foreach (var modifier in ge.Modifiers)

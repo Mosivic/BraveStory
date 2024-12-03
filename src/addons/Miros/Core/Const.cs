@@ -171,7 +171,8 @@ public enum DurationPolicy //持续策略
 {
     Instant, //立即生效
     Infinite, //永久生效
-    Duration //规定时长
+    Duration, //规定时长
+    Period //周期
 }
 
 public enum RunningCompletePolicy

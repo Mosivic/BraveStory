@@ -197,9 +197,10 @@ public class Agent : AbsAgent, IAgent
 	//     return null;
 	// }
 
-	public Effect[] GetEffects()
+	public Effect[] GetRunningEffects()
 	{
-		return _executors[ExecutorType.EffectExecutor].GetAllTasks()
+		return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
+			.GetRunningTasks()
 			.Select(task => _stateMaps[((EffectTask)task).Tag].State as Effect).ToArray();
 	}
 

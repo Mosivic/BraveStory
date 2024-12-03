@@ -11,7 +11,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnPeriodOvered;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
-    private EffectPeriodTicker _periodTicker;
+    private EffectUpdateHandler _periodTicker;
 
     public override void Enter()
     {
@@ -30,7 +30,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         }
         else
         {
-            _periodTicker = new EffectPeriodTicker(effect);
+            _periodTicker = new EffectUpdateHandler(effect);
         }
     }
 
@@ -52,7 +52,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
 
-    public override void Stack()
+    public  void Stack()
     {
         var stackingComponent = GetComponent<StackingComponent>();
         if (effect.DurationPolicy == DurationPolicy.Instant)
