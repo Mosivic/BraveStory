@@ -52,42 +52,39 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
 
-    public  void Stack()
+    public void Stack()
     {
         var stackingComponent = GetComponent<StackingComponent>();
-        if (effect.DurationPolicy == DurationPolicy.Instant)
+
+        // Check GE Stacking
+        if (stackingComponent.StackingType == StackingType.None)
         {
+            return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
         }
 
-        // // Check GE Stacking
-        // if (stackingComponent.StackingType == StackingType.None)
-        // {
-        //     return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        // }
+        // 处理GE堆叠
+        // 基于Target类型GE堆叠
+        if (stackingComponent.StackingType == StackingType.AggregateByTarget)
+        {
+            GetStackingEffectByData(effect, out var ge);
+            // 新添加GE
+            if (ge == null)
+                return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
+            bool stackCountChange = ge.RefreshStack();
+            if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
+            return ge;
+        }
 
-        // // 处理GE堆叠
-        // // 基于Target类型GE堆叠
-        // if (stackingComponent.StackingType == StackingType.AggregateByTarget)
-        // {
-        //     GetStackingEffectByData(effect, out var ge);
-        //     // 新添加GE
-        //     if (ge == null)
-        //         return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        //     bool stackCountChange = ge.RefreshStack();
-        //     if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-        //     return ge;
-        // }
-
-        // // 基于Source类型GE堆叠
-        // if (stackingComponent.StackingType == StackingType.AggregateBySource)
-        // {
-        //     GetStackingEffectByDataFrom(effect, source, out var ge);
-        //     if (ge == null)
-        //         return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        //     bool stackCountChange = ge.RefreshStack();
-        //     if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-        //     return ge;
-        // }
+        // 基于Source类型GE堆叠
+        if (stackingComponent.StackingType == StackingType.AggregateBySource)
+        {
+            GetStackingEffectByDataFrom(effect, source, out var ge);
+            if (ge == null)
+                return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
+            bool stackCountChange = ge.RefreshStack();
+            if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
+            return ge;
+        }
     }
 
 
