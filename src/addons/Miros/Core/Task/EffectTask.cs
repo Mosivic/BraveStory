@@ -1,5 +1,8 @@
 using System;
+
+# if GODOT
 using Godot;
+# endif
 
 namespace Miros.Core;
 
@@ -11,6 +14,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnPeriodOvered;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
+    public EffectStacking Stacking => effect.Stacking;
 
     private EffectUpdateHandler _periodTicker;
 
@@ -49,7 +53,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
     public void Stack(bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
     {
-        var stacking = GetComponent<StackingComponent>();
+        var stacking = effect.Stacking;
 
         switch (stacking.StackingType)
         {
@@ -57,10 +61,17 @@ public class EffectTask(Effect effect) : TaskBase(effect)
                 break;
             case StackingType.AggregateBySource:
                 if (isFromSameSource)
-                    stacking.StackCount++;
+# if GODOT && DEBUG
+                GD.Print($"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
+# endif
+                    stacking.ChangeStackCount(stacking.StackCount + 1);
                 break;
             case StackingType.AggregateByTarget:
-                stacking.StackCount = 1;
+                
+# if GODOT && DEBUG
+                GD.Print($"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
+# endif
+                stacking.ChangeStackCount(stacking.StackCount + 1);
                 break;
             default:
                 throw new ArgumentException($"Invalid StackingType: {stacking.StackingType}");

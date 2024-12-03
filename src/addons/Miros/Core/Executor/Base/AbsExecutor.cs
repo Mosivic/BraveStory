@@ -6,5 +6,4 @@ public abstract class AbsExecutor<TTask>
     where TTask : TaskBase
 {
     protected readonly List<TTask> _tasks = [];
-    protected Agent _agent;
 }

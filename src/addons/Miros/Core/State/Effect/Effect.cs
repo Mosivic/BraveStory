@@ -77,6 +77,7 @@ public class Effect(Tag tag, Agent source) : State(tag,source)
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
     public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }
 
-    public StackingComponent Stacking { get; set; }
+    public EffectStacking Stacking { get; set; }
+
     public event Action<Agent, Effect> OnImmunity;
 }

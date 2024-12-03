@@ -1,7 +1,9 @@
+using System;
+
 namespace Miros.Core;
 
 // GE堆栈数据结构
-public class StackingComponent : StateComponent<EffectTask>
+public class EffectStacking
 {
     public int StackCount { get; set; } = 1;
 
@@ -16,4 +18,12 @@ public class StackingComponent : StateComponent<EffectTask>
     public bool DenyOverflowApplication { get; set; } //对应于StackDurationRefreshPolicy，如果为True则多余的Apply不会刷新Duration
     public bool ClearStackOnOverflow { get; set; } //当DenyOverflowApplication为True是才有效，当Overflow时是否直接删除所有层数
     public Effect[] OverflowEffects { get; set; } // 超过StackLimitCount数量的Effect被Apply时将会调用该OverflowEffects
+
+    public Action<int> OnStackCountChanged { get; set; }
+
+    public void ChangeStackCount(int count)
+    {
+        StackCount = count;
+        OnStackCountChanged?.Invoke(count);
+    }
 }

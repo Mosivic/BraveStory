@@ -13,7 +13,6 @@ public enum ExecutorType
 }
 
 
-
 public class Agent : AbsAgent, IAgent
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
@@ -65,7 +64,7 @@ public class Agent : AbsAgent, IAgent
 
 	public void CreateEffectExecutor()
 	{
-		var executor = new EffectExecutor();
+		var executor = new EffectExecutor(this);
 		_executors[ExecutorType.EffectExecutor] = executor;
 	}
 
