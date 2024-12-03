@@ -10,6 +10,8 @@ public class EffectExecutor : ExecutorBase<EffectTask>
 
     private readonly List<EffectTask> _runningPermanentTasks = [];
 
+    public List<EffectTask> GetRunningTasks() => _runningPermanentTasks;
+    
     public override void Update(double delta)
     {
         UpdateRunningEffects();

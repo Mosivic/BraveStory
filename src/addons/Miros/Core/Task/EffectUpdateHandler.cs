@@ -3,7 +3,7 @@ using Miros.Utils;
 
 namespace Miros.Core;
 
-public class EffectPeriodTicker
+public class EffectUpdateHandler
 {
 	private readonly Effect _effect;
 
@@ -11,7 +11,7 @@ public class EffectPeriodTicker
 	private readonly CounterTimer _periodTimer;
 	private readonly CounterTimer _durationTimer;
 
-	public EffectPeriodTicker(Effect effect)
+	public EffectUpdateHandler(Effect effect)
 	{
 		_effect = effect;
 
@@ -27,8 +27,11 @@ public class EffectPeriodTicker
 
 	public void Tick(double delta)
 	{
-		_durationTimer.Tick(delta);
-		_periodTimer.Tick(delta);
+		if (_effect.DurationPolicy == DurationPolicy.Duration)
+			_durationTimer.Tick(delta);
+
+		if (_effect.DurationPolicy == DurationPolicy.Period)
+			_periodTimer.Tick(delta);
 	}
 
 	private void OnPeriodOver()
@@ -39,8 +42,6 @@ public class EffectPeriodTicker
 
 	private void OnDurationOver()
 	{
-		if (_effect.DurationPolicy == DurationPolicy.Infinite) return;
-
 		if (_effect.Stacking == null)
 		{
 			_effect.Status = RunningStatus.Succeed;

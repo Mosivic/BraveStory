@@ -31,19 +31,29 @@ public partial class EffectTests : Node2D
     [Test]
     public void TestEffectApply()
     {
-        var effect = new Effect(Tags.Effect_Buff,_agent)
+        var durationEffect = new Effect(Tags.Effect_Buff,_agent)
         {
             DurationPolicy = DurationPolicy.Duration,
+            Duration = 10,
+            Modifiers =
+            [
+                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+            ]
+        };
+        
+
+        var periodEffect = new Effect(Tags.Effect_Buff,_agent)
+        {
+            DurationPolicy = DurationPolicy.Period,
             Duration = 10,
             Period = 1,
             Modifiers =
             [
                 new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
-        }.OnEntered(effect => GD.Print("Effect Entered"));
-        
+        };
         _agent.CreateEffectExecutor();
-        _agent.AddState(ExecutorType.EffectExecutor, effect);
+        _agent.AddState(ExecutorType.EffectExecutor, durationEffect);
         
         _agent.AddAttributeSet(typeof(PlayerAttributeSet));
     }
