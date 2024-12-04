@@ -174,18 +174,18 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	private void TryUnregisterAttributeChangedListen(Effect ge, Modifier modifier)
 	{
 		if (modifier.MMC is AttributeBasedModCalculation mmc &&
-			mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track)
+			mmc.captureType == AttributeBasedModCalculation.AttributeCaptureType.Track)
 		{
-			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
+			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Target)
 			{
 				if (ge.Owner != null)
-					ge.Owner.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
+					ge.Owner.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
 						.UnregisterPostCurrentValueChange(OnAttributeChanged);
 			}
 			else
 			{
 				if (ge.Source != null)
-					ge.Source.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
+					ge.Source.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
 						.UnregisterPostCurrentValueChange(OnAttributeChanged);
 			}
 		}
@@ -199,18 +199,18 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 	private void TryRegisterAttributeChangedListen(Effect ge, Modifier modifier)
 	{
 		if (modifier.MMC is AttributeBasedModCalculation mmc &&
-			mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track)
+			mmc.captureType == AttributeBasedModCalculation.AttributeCaptureType.Track)
 		{
-			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target)
+			if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Target)
 			{
 				if (ge.Owner != null)
-					ge.Owner.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
+					ge.Owner.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
 						.RegisterPostCurrentValueChange(OnAttributeChanged);
 			}
 			else
 			{
 				if (ge.Source != null)
-					ge.Source.GetAttributeBase(mmc.attributeSetSign, mmc.attributeSign)
+					ge.Source.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
 						.RegisterPostCurrentValueChange(OnAttributeChanged);
 			}
 		}
@@ -230,11 +230,11 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 			var effect = tuple.Item1;
 			var modifier = tuple.Item2;
 			if (modifier.MMC is AttributeBasedModCalculation mmc &&
-				mmc.captureType == AttributeBasedModCalculation.EffectAttributeCaptureType.Track &&
-				attribute.AttributeTag == mmc.attributeSign)
-				if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Target &&
+				mmc.captureType == AttributeBasedModCalculation.AttributeCaptureType.Track &&
+				attribute.AttributeTag == mmc.attributeBasedTag)
+				if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Target &&
 					attribute.Owner == effect.Owner) ||
-					(mmc.attributeFromType == AttributeBasedModCalculation.AttributeFrom.Source &&
+					(mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Source &&
 					attribute.Owner == effect.Source))
 				{
 					UpdateCurrentValueWhenModifierIsDirty();

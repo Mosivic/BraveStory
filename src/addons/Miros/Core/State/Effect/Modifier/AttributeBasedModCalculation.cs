@@ -5,60 +5,50 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
     /// <summary>
     ///     属性来源
     /// </summary>
-    public enum AttributeFrom
+    public enum AttributeFromType
     {
         Source, // 来源
         Target // 目标
     }
 
-    public enum EffectAttributeCaptureType
+    public enum AttributeCaptureType
     {
         SnapShot, // 快照
         Track // 实时
     }
 
-    public AttributeFrom attributeFromType; // 属性来源
+    public AttributeFromType attributeFromType; // 属性来源
 
-    public Tag attributeSetSign; // 属性集的标签
-    public Tag attributeSign; // 属性的标签
+    public Tag attributeBasedSetTag; // 属性集的标签
+    public Tag attributeBasedTag; // 属性的标签
 
     public float b = 0; // 常量
 
-    public EffectAttributeCaptureType captureType; // 捕获方式
+    public AttributeCaptureType captureType; // 捕获方式
 
     public float k = 1; // 系数
 
     public override float CalculateMagnitude(Effect effect, float magnitude)
     {
-        if (attributeFromType == AttributeFrom.Source)
-        {
-            if (captureType == EffectAttributeCaptureType.SnapShot)
-            {
-                var snapShot = effect.SnapshotSourceAttributes;
-                var attribute = snapShot[attributeSign];
-                return attribute * k + b;
-            }
-            else
-            {
-                var attribute = effect.Source.GetAttributeCurrentValue(attributeSetSign, attributeSign);
-                return (attribute ?? 1) * k + b;
-            }
-        }
 
-        if (captureType == EffectAttributeCaptureType.SnapShot)
+        if (captureType == AttributeCaptureType.SnapShot)
         {
-            var snapShot = effect.SnapshotTargetAttributes;
-            var attribute = snapShot[attributeSign];
+            var snapShot = attributeFromType == AttributeFromType.Source
+                ? effect.SnapshotSourceAttributes
+                : effect.SnapshotTargetAttributes;
+
+            var attribute = snapShot[attributeBasedTag];
             return attribute * k + b;
         }
         else
         {
-            var attribute = effect.Owner.GetAttributeCurrentValue(attributeSetSign, attributeSign);
+            var agent = attributeFromType == AttributeFromType.Source
+                ? effect.Source
+                : effect.Owner;
+
+            var attribute = agent.GetAttributeCurrentValue(attributeBasedSetTag, attributeBasedTag);
             return (attribute ?? 1) * k + b;
         }
     }
 
-    private void OnAttributeNameChanged()
-    {
-    }
 }
