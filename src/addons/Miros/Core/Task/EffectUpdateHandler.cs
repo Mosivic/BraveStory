@@ -28,10 +28,10 @@ public class EffectUpdateHandler
 	public void Tick(double delta)
 	{
 		if (_effect.DurationPolicy == DurationPolicy.Duration)
+		{
 			_durationTimer.Tick(delta);
-
-		if (_effect.DurationPolicy == DurationPolicy.Period)
 			_periodTimer.Tick(delta);
+		}
 	}
 
 	private void OnPeriodOver()

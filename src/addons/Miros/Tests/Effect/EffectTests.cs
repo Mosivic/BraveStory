@@ -67,7 +67,7 @@ public partial class EffectTests : Node2D
 
         var periodEffect = new Effect(Tags.Effect_Buff,_agent)
         {
-            DurationPolicy = DurationPolicy.Period,
+            DurationPolicy = DurationPolicy.Duration,
             Duration = 10,
             Period = 1,
             Modifiers =
