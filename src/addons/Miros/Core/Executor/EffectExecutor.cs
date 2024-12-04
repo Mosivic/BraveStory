@@ -12,60 +12,80 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
     private readonly Agent _agent = agent;
     private readonly List<EffectTask> _runningTasks = [];
 
+    private readonly List<EffectTask> _tasksRemoveCache = [];
+
     public List<EffectTask> GetRunningTasks() => _runningTasks;
 
     public override void Update(double delta)
     {
-        UpdateRunningEffects();
+        UpdateTasks();
 
         foreach (var task in _runningTasks) task.Update(delta);
     }
 
-    private void UpdateRunningEffects()
-    {
-        var couldEnterTasks = _tasks.Where(task => task.CanEnter()).ToList();
-        foreach (var task in couldEnterTasks)
+    private void UpdateTasks()
+    {   
+        // Enter
+        foreach (var task in _tasks)
         {
+            if(!task.CanEnter())
+            {
+                if(task.RemoveSelfOnEnterFailed)
+                    _tasksRemoveCache.Add(task);
+
+                continue;
+            }
+
             if (task.IsInstant)
             {
                 task.Activate();
                 task.Enter();
                 task.Exit();
                 task.Deactivate();
-                _tasks.Remove(task);
+
+                if(!task.KeepSelfOnExitSucceeded)
+                    _tasksRemoveCache.Add(task);
             }
             else
             {
                 task.Activate();
                 task.Enter();
-                _tasks.Remove(task);
                 _runningTasks.Add(task);
+                _tasksRemoveCache.Add(task);
                 _onRunningEffectTasksIsDirty?.Invoke(this, task);
             }
         }
 
-        var couldExitTasks = _runningTasks.Where(task => task.CanExit()).ToList();
-        foreach (var task in couldExitTasks)
+        // Exit
+        foreach (var task in _runningTasks)
         {
+            if(!task.CanExit())
+                continue;
+
             task.Deactivate();
             task.Exit();
             _runningTasks.Remove(task);
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
+
+            if(task.KeepSelfOnExitSucceeded)
+                _tasks.Add(task);
         }
+
+        // Clear
+        foreach (var task in _tasksRemoveCache)
+            _tasks.Remove(task);
+        _tasksRemoveCache.Clear();
     }
 
     private static bool AreTaskCouldStackByAnotherTask(EffectTask task, EffectTask otherTask)
     {
-        return task.Stacking != null && otherTask.Stacking != null &&
-        task.Stacking.StackingGroupTag == otherTask.Stacking.StackingGroupTag;
+        return task.Stacking is not null && otherTask.Stacking is not null &&
+               task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
     public override void AddTask(ITask task)
     {
         var effectTask = (EffectTask)task;
-
-        if (!effectTask.CanEnter()) return;
-
         bool isAddTask = true;
 
         foreach (var existingTask in _runningTasks)

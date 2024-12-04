@@ -14,8 +14,11 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnPeriodOvered;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
-    public EffectStacking Stacking => effect.Stacking;
+    public EffectStacking? Stacking => effect.Stacking;
+    public bool RemoveSelfOnEnterFailed => effect.RemoveSelfOnEnterFailed;
+    public bool KeepSelfOnExitSucceeded => effect.KeepSelfOnExitSucceeded;
 
+    
     private EffectUpdateHandler _periodTicker;
 
     public override void Enter()

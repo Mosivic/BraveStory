@@ -40,7 +40,7 @@ public partial class EffectTests : Node2D
             Duration = 100,
             Stacking = new EffectStacking
             {
-                StackingGroupTag = Tags.Effect_Buff,
+                GroupTag = Tags.Effect_Buff,
                 StackingType = StackingType.AggregateByTarget,
             },
             Modifiers =
@@ -56,7 +56,7 @@ public partial class EffectTests : Node2D
             Duration = 100,
             Stacking = new EffectStacking
             {
-                StackingGroupTag = Tags.Effect_Buff,
+                GroupTag = Tags.Effect_Buff,
                 StackingType = StackingType.AggregateByTarget,
             },
             Modifiers =

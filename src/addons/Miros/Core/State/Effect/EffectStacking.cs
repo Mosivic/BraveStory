@@ -6,7 +6,7 @@ namespace Miros.Core;
 public struct EffectStacking
 {
     public int StackCount { get; set; }
-    public required Tag StackingGroupTag { get; set; } // 堆叠组标签, 用于区分不同的堆栈组,同一组的 Effect 可以共同触发堆叠
+    public required Tag GroupTag { get; set; } // 堆叠组标签, 用于区分不同的堆栈组,同一组的 Effect 可以共同触发堆叠
     public StackingType StackingType { get; set; } // 堆叠类型
     public int LimitCount { get; set; }
     public DurationRefreshPolicy DurationRefreshPolicy { get; set; } // 堆叠时长刷新策略
@@ -24,7 +24,7 @@ public struct EffectStacking
     {
         StackCount = 1;
         LimitCount = int.MaxValue;
-        StackingGroupTag = default!;
+        GroupTag = default!;
         OverflowEffects = [];
     }
 
