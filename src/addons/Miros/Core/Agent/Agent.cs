@@ -45,7 +45,7 @@ public class Agent : AbsAgent, IAgent
 		{
 			var task = _taskProvider.GetTask(state);
 			state.Owner = this;
-			_stateExecutionRegistry.AddStateMap(state.Tag, new StateExecutionContext(state, task, executor));
+			_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
 		}
 
 		foreach (var transition in transitions.AnyTransitions)
@@ -87,7 +87,7 @@ public class Agent : AbsAgent, IAgent
 		state.Owner = this;
 		var task = _taskProvider.GetTask(state);
 		executor.AddTask(task);
-		_stateExecutionRegistry.AddStateMap(state.Tag, new StateExecutionContext(state, task, executor));
+		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
 	}
 
 
@@ -171,7 +171,11 @@ public class Agent : AbsAgent, IAgent
 	{
 		var state1 = _stateExecutionRegistry.GetState(task1);
 		var state2 = _stateExecutionRegistry.GetState(task2);
-		return state1.Source == state2.Source;
+		
+		if (state1 == null || state2 == null) 
+			return false;
+		else
+			return state1.Source == state2.Source;
 	}
 
 	// public AbilityExecutor AbilityExecutor()

@@ -20,7 +20,7 @@ public class MultiLayerStateMachineBuilder
         foreach (var state in states)
         {
             var task = _taskProvider.GetTask(state);
-            _stateExecutionRegistry.AddStateMap(state.Tag, new StateExecutionContext(state, task, _stateMachine));
+            _stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, _stateMachine));
         }
         return this;
     }

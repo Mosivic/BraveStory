@@ -15,32 +15,32 @@ public class StateExecutionRegistry
 {
 	private readonly Dictionary<Tag, StateExecutionContext> _STEMap = [];
 
-	public void AddStateMap(Tag tag, StateExecutionContext stateMap)
+	public void AddStateExecutionContext(Tag tag, StateExecutionContext context)
 	{
-		_STEMap[tag] = stateMap;
+		_STEMap[tag] = context;
 	}
 
-	public StateExecutionContext GetStateMap(Tag tag)
+	public StateExecutionContext GetStateExecutionContext(Tag tag)
 	{
 		return _STEMap[tag];
 	}
 
-	public bool TryGetStateMap(Tag tag, out StateExecutionContext stateMap)
+	public bool TryGetStateExecutionContext(Tag tag, out StateExecutionContext context)
 	{
-		return _STEMap.TryGetValue(tag, out stateMap);
+		return _STEMap.TryGetValue(tag, out context);
 	}
 
-	public void RemoveStateMap(Tag tag)
+	public void RemoveStateExecutionContext(Tag tag)
 	{
 		_STEMap.Remove(tag);
 	}
 
-	public bool HasStateMap(Tag tag)
+	public bool HasStateExecutionContext(Tag tag)
 	{
 		return _STEMap.ContainsKey(tag);
 	}
 
-	public IEnumerable<StateExecutionContext> GetAllStateMaps() => _STEMap.Values;
+	public IEnumerable<StateExecutionContext> GetAllStateExecutionContexts() => _STEMap.Values;
 
 
 	public void Clear()
@@ -48,17 +48,17 @@ public class StateExecutionRegistry
 		_STEMap.Clear();
 	}
 
-	public State GetState(Tag tag) => _STEMap[tag].State;
+	public State GetState(Tag tag) => _STEMap.TryGetValue(tag, out var context) ? context.State : null;
 
-	public State GetState(TaskBase task) => _STEMap[task.Tag].State;
+	public State GetState(TaskBase task) => _STEMap.TryGetValue(task.Tag, out var context) ? context.State : null;
 
-	public TaskBase GetTask(Tag tag) => _STEMap[tag].Task;
+	public TaskBase GetTask(Tag tag) => _STEMap.TryGetValue(tag, out var context) ? context.Task : null;
 
-	public TaskBase GetTask(State state) => _STEMap[state.Tag].Task;
+	public TaskBase GetTask(State state) => _STEMap.TryGetValue(state.Tag, out var context) ? context.Task : null;
 
-	public IExecutor GetExecutor(Tag tag) => _STEMap[tag].Executor;
+	public IExecutor GetExecutor(Tag tag) => _STEMap.TryGetValue(tag, out var context) ? context.Executor : null;
 
-	public IExecutor GetExecutor(TaskBase task) => _STEMap[task.Tag].Executor;
+	public IExecutor GetExecutor(TaskBase task) => _STEMap.TryGetValue(task.Tag, out var context) ? context.Executor : null;
 
-	public IExecutor GetExecutor(State state) => _STEMap[state.Tag].Executor;
+	public IExecutor GetExecutor(State state) => _STEMap.TryGetValue(state.Tag, out var context) ? context.Executor : null;
 }
