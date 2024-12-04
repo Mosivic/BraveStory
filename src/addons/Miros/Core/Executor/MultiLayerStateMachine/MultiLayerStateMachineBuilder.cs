@@ -5,13 +5,13 @@ namespace Miros.Core;
 public class MultiLayerStateMachineBuilder
 {
     private readonly MultiLayerStateMachine _stateMachine;
-    private readonly StateTaskExecutorContainer _stateTaskExecutorContainer;
+    private readonly StateExecutionRegistry _stateExecutionRegistry;
     private readonly ITaskProvider _taskProvider;
 
     public MultiLayerStateMachineBuilder(ITaskProvider taskProvider)
     {
         _taskProvider = taskProvider;
-        _stateTaskExecutorContainer = new StateTaskExecutorContainer();
+        _stateExecutionRegistry = new StateExecutionRegistry();
         _stateMachine = new MultiLayerStateMachine();
     }
 
@@ -20,7 +20,7 @@ public class MultiLayerStateMachineBuilder
         foreach (var state in states)
         {
             var task = _taskProvider.GetTask(state);
-            _stateTaskExecutorContainer.AddStateMap(state.Tag, new StateTaskExecutor(state, task, _stateMachine));
+            _stateExecutionRegistry.AddStateMap(state.Tag, new StateExecutionContext(state, task, _stateMachine));
         }
         return this;
     }
@@ -36,7 +36,7 @@ public class MultiLayerStateMachineBuilder
         foreach (var (fromState, stateTransitions) in transitions.Transitions)
         foreach (var transition in stateTransitions)
             container.Add(
-                _stateTaskExecutorContainer.GetTask(fromState),
+                _stateExecutionRegistry.GetTask(fromState),
                 CreateStateTransition(transition)
             );
 
@@ -46,7 +46,7 @@ public class MultiLayerStateMachineBuilder
     private StateTransition CreateStateTransition(StateTransitionConfig.Transition transition)
     {
         return new StateTransition(
-            _stateTaskExecutorContainer.GetTask(transition.ToState),
+            _stateExecutionRegistry.GetTask(transition.ToState),
             transition.Condition,
             transition.Mode
         );
@@ -56,7 +56,7 @@ public class MultiLayerStateMachineBuilder
     {
         _stateMachine.AddLayer(
             layer,
-            _stateTaskExecutorContainer.GetTask(defaultState),
+            _stateExecutionRegistry.GetTask(defaultState),
             container
         );
         return _stateMachine;

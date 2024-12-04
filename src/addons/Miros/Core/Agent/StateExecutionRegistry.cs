@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace Miros.Core;
 
-public struct StateTaskExecutor(State state, TaskBase task, IExecutor executor)
+public struct StateExecutionContext(State state, TaskBase task, IExecutor executor)
 {
     public State State { get; } = state;
     public TaskBase Task { get; } = task;
@@ -11,21 +11,21 @@ public struct StateTaskExecutor(State state, TaskBase task, IExecutor executor)
 }
 
 
-public class StateTaskExecutorContainer
+public class StateExecutionRegistry
 {
-	private readonly Dictionary<Tag, StateTaskExecutor> _STEMap = [];
+	private readonly Dictionary<Tag, StateExecutionContext> _STEMap = [];
 
-	public void AddStateMap(Tag tag, StateTaskExecutor stateMap)
+	public void AddStateMap(Tag tag, StateExecutionContext stateMap)
 	{
 		_STEMap[tag] = stateMap;
 	}
 
-	public StateTaskExecutor GetStateMap(Tag tag)
+	public StateExecutionContext GetStateMap(Tag tag)
 	{
 		return _STEMap[tag];
 	}
 
-	public bool TryGetStateMap(Tag tag, out StateTaskExecutor stateMap)
+	public bool TryGetStateMap(Tag tag, out StateExecutionContext stateMap)
 	{
 		return _STEMap.TryGetValue(tag, out stateMap);
 	}
@@ -40,7 +40,7 @@ public class StateTaskExecutorContainer
 		return _STEMap.ContainsKey(tag);
 	}
 
-	public IEnumerable<StateTaskExecutor> GetAllStateMaps() => _STEMap.Values;
+	public IEnumerable<StateExecutionContext> GetAllStateMaps() => _STEMap.Values;
 
 
 	public void Clear()
