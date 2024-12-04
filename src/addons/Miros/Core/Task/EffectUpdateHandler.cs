@@ -42,7 +42,7 @@ public class EffectUpdateHandler
 
 	private void OnDurationOver()
 	{
-		if (_effect.Stacking == null)
+		if (_effect.Stacking is null)
 		{
 			_effect.Status = RunningStatus.Succeed;
 			return;

@@ -15,24 +15,11 @@ public enum ExecutorType
 
 public class Agent : AbsAgent, IAgent
 {
-	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-	private readonly Node2D _host;
-	private readonly StateExecutionRegistry _stateExecutionRegistry = new();
-
-	private readonly TagContainer OwnedTags;
-	private readonly ITaskProvider _taskProvider;
-
-	public bool Enabled { get; set; } = true;
-
-	private AttributeSetContainer _attributeSetContainer { get; set; }
-
-	public Agent(Node2D host, ITaskProvider taskProvider)
+	public Agent(Node2D host, ITaskProvider taskProvider) : base(host, taskProvider)
 	{
-		_host = host;
-		_taskProvider = taskProvider;
-		_attributeSetContainer = new AttributeSetContainer(this);
-		OwnedTags = new TagContainer([]);
+		AttributeSetContainer = new AttributeSetContainer(this);
 	}
+
 
 
 	public void CreateMultiLayerStateMachine(Tag layer, State defaultState, HashSet<State> states,
@@ -43,39 +30,39 @@ public class Agent : AbsAgent, IAgent
 
 		foreach (var state in states)
 		{
-			var task = _taskProvider.GetTask(state);
+			var task = TaskProvider.GetTask(state);
 			state.Owner = this;
-			_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
+			StateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
 		}
 
 		foreach (var transition in transitions.AnyTransitions)
-			container.AddAny(new StateTransition(_stateExecutionRegistry.GetTask(transition.ToState), transition.Condition,
+			container.AddAny(new StateTransition(StateExecutionRegistry.GetTask(transition.ToState), transition.Condition,
 				transition.Mode));
 
 		foreach (var (fromState, stateTransitions) in transitions.Transitions)
 			foreach (var transition in stateTransitions)
-				container.Add(_stateExecutionRegistry.GetTask(fromState),
-					new StateTransition(_stateExecutionRegistry.GetTask(transition.ToState), transition.Condition, transition.Mode));
+				container.Add(StateExecutionRegistry.GetTask(fromState),
+					new StateTransition(StateExecutionRegistry.GetTask(transition.ToState), transition.Condition, transition.Mode));
 
 
-		executor.AddLayer(layer, _stateExecutionRegistry.GetTask(defaultState), container);
-		_executors[ExecutorType.MultiLayerStateMachine] = executor;
+		executor.AddLayer(layer, StateExecutionRegistry.GetTask(defaultState), container);
+		Executors[ExecutorType.MultiLayerStateMachine] = executor;
 	}
 
 	public void CreateEffectExecutor()
 	{
 		var executor = new EffectExecutor(this);
-		_executors[ExecutorType.EffectExecutor] = executor;
+		Executors[ExecutorType.EffectExecutor] = executor;
 	}
 
 	public EffectExecutor GetEffectExecutor()
 	{
-		return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
+		return Executors[ExecutorType.EffectExecutor] as EffectExecutor;
 	}
 
 	public void AddState(ExecutorType executorType, State state)
 	{
-		if (!_executors.TryGetValue(executorType, out var executor))
+		if (!Executors.TryGetValue(executorType, out var executor))
 		{
 #if GODOT4 && DEBUG
 			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
@@ -85,9 +72,9 @@ public class Agent : AbsAgent, IAgent
 		}
 
 		state.Owner = this;
-		var task = _taskProvider.GetTask(state);
+		var task = TaskProvider.GetTask(state);
 		executor.AddTask(task);
-		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
+		StateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
 	}
 
 
@@ -99,7 +86,7 @@ public class Agent : AbsAgent, IAgent
 
 	public void RemoveState(ExecutorType executorType, State state)
 	{
-		if (!_executors.TryGetValue(executorType, out var executor))
+		if (!Executors.TryGetValue(executorType, out var executor))
 		{
 #if GODOT4 && DEBUG
 			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
@@ -108,19 +95,19 @@ public class Agent : AbsAgent, IAgent
 #endif
 		}
 
-		var task = _stateExecutionRegistry.GetTask(state);
+		var task = StateExecutionRegistry.GetTask(state);
 		executor.RemoveTask(task);
 	}
 
 
 	public void Update(double delta)
 	{
-		foreach (var executor in _executors.Values) executor.Update(delta);
+		foreach (var executor in Executors.Values) executor.Update(delta);
 	}
 
 	public void PhysicsUpdate(double delta)
 	{
-		foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
+		foreach (var executor in Executors.Values) executor.PhysicsUpdate(delta);
 	}
 
 
@@ -162,16 +149,16 @@ public class Agent : AbsAgent, IAgent
 					throw new ArgumentOutOfRangeException();
 			}
 
-			_attributeSetContainer.Sets[modifier.AttributeSetTag]
+			AttributeSetContainer.Sets[modifier.AttributeSetTag]
 				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
 		}
 	}
 
 	public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
 	{
-		var state1 = _stateExecutionRegistry.GetState(task1);
-		var state2 = _stateExecutionRegistry.GetState(task2);
-		
+		var state1 = StateExecutionRegistry.GetState(task1);
+		var state2 = StateExecutionRegistry.GetState(task2);
+
 		if (state1 == null || state2 == null) 
 			return false;
 		else
@@ -180,7 +167,7 @@ public class Agent : AbsAgent, IAgent
 
 	// public AbilityExecutor AbilityExecutor()
 	// {
-	//     if(_executors.TryGetValue(typeof(AbilityExecutor),out var executor))
+	//     if(Executors.TryGetValue(typeof(AbilityExecutor),out var executor))
 	//     {
 	//         return executor as AbilityExecutor;
 	//     }
@@ -198,9 +185,9 @@ public class Agent : AbsAgent, IAgent
 
 	public Effect[] GetRunningEffects()
 	{
-		return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
+		return (Executors[ExecutorType.EffectExecutor] as EffectExecutor)
 			.GetRunningTasks()
-			.Select(task => _stateExecutionRegistry.GetState(task) as Effect).ToArray();
+			.Select(task => StateExecutionRegistry.GetState(task) as Effect).ToArray();
 	}
 
 
@@ -210,14 +197,14 @@ public class Agent : AbsAgent, IAgent
 	public void RemoveEffectWithAnyTags(TagSet tags)
 	{
 		if (tags.Empty) return;
-		if (!_executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
+		if (!Executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
 		var tasks = executor.GetAllTasks();
 		var removeList = new List<State>();
 
 		foreach (var task in tasks)
 		{
 			var effectTask = task as EffectTask;
-			var effect = _stateExecutionRegistry.GetState(effectTask) as Effect;
+			var effect = StateExecutionRegistry.GetState(effectTask) as Effect;
 
 			var ownedTags = effect.OwnedTags;
 			if (!ownedTags.Empty && ownedTags.HasAny(tags))
@@ -290,47 +277,47 @@ public class Agent : AbsAgent, IAgent
 
 	public void AddAttributeSet(Type attrSetType)
 	{
-		_attributeSetContainer.AddAttributeSet(attrSetType);
+		AttributeSetContainer.AddAttributeSet(attrSetType);
 	}
 
 	public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = _attributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
+		var value = AttributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public AttributeBase GetAttributeBase(Tag attrSetSign, Tag attrSign)
 	{
-		var value = _attributeSetContainer.Sets[attrSetSign][attrSign];
+		var value = AttributeSetContainer.Sets[attrSetSign][attrSign];
 		return value;
 	}
 
 	public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
 	{
-		var value = _attributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
+		var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
 		return value;
 	}
 
 	public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = _attributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
+		var value = AttributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
 	{
-		var value = _attributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
+		var value = AttributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
 		return value;
 	}
 
 	public Dictionary<Tag, float> DataSnapshot()
 	{
-		return _attributeSetContainer.Snapshot();
+		return AttributeSetContainer.Snapshot();
 	}
 
 	public T AttrSet<T>() where T : AttributeSet
 	{
-		_attributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
+		AttributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
 		return attrSet;
 	}
 
