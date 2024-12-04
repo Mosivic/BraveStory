@@ -3,12 +3,12 @@ using System;
 namespace Miros.Core;
 
 // GE堆栈数据结构
-public class EffectStacking
+public struct EffectStacking
 {
-    public int StackCount { get; set; } = 1;
+    public int StackCount { get; set; }
     public required Tag StackingGroupTag { get; set; } // 堆叠组标签, 用于区分不同的堆栈组,同一组的 Effect 可以共同触发堆叠
     public StackingType StackingType { get; set; } // 堆叠类型
-    public int LimitCount { get; set; } = int.MaxValue; // 堆叠上限
+    public int LimitCount { get; set; }
     public DurationRefreshPolicy DurationRefreshPolicy { get; set; } // 堆叠时长刷新策略
     public PeriodResetPolicy PeriodResetPolicy { get; set; } // 堆叠周期重置策略
     public ExpirationPolicy ExpirationPolicy { get; set; } // 堆叠过期策略
@@ -20,9 +20,19 @@ public class EffectStacking
 
     public Action<int> OnStackCountChanged { get; set; }
 
+    public EffectStacking()
+    {
+        StackCount = 1;
+        LimitCount = int.MaxValue;
+        StackingGroupTag = default!;
+        OverflowEffects = [];
+    }
+
     public void ChangeStackCount(int count)
     {
         StackCount = count;
         OnStackCountChanged?.Invoke(count);
     }
+
+
 }
