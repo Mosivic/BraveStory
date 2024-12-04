@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public class ExecutionCalculation
+public class Execution
 {
     // TODO
 }

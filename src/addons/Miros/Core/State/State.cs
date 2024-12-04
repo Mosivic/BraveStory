@@ -17,6 +17,7 @@ public class State(Tag tag,Agent source)
 
     public double RunningTime { get; set; } = 0;
 
+    public Dictionary<string, object> CustomData { get; set; } = [];
 
     public Dictionary<Type, StateComponent<TaskBase>> Components { get; set; } = [];
 

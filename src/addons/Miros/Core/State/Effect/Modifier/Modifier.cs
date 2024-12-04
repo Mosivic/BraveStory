@@ -2,7 +2,11 @@
 
 public enum ModifierMagnitudeType
 {
-    ScalableFloat
+    ScalableFloat,
+    AttributeBased,
+    AttributeBasedWithStack,
+    SetByCallerFromName,
+    SetByCallerFromTag,
 }
 
 public struct ModifierMagnitude
