@@ -21,8 +21,10 @@ public class EffectUpdateHandler
 		_periodTimer.Start();
 		_durationTimer.Start();
 
-		_periodTimer.OnTimerStop += OnPeriodOver;
-		_durationTimer.OnTimerStop += OnDurationOver;
+		if (_effect.Period > 0)
+			_periodTimer.OnTimerStop += OnPeriodOver;
+		if (_effect.Duration > 0)
+			_durationTimer.OnTimerStop += OnDurationOver;
 	}
 
 	public void Tick(double delta)
