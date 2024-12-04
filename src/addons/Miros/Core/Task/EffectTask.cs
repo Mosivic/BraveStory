@@ -1,5 +1,8 @@
 using System;
+
+# if GODOT
 using Godot;
+# endif
 
 namespace Miros.Core;
 
@@ -11,6 +14,11 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnPeriodOvered;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
+    public EffectStacking? Stacking => effect.Stacking;
+    public bool RemoveSelfOnEnterFailed => effect.RemoveSelfOnEnterFailed;
+    public bool KeepSelfOnExitSucceeded => effect.KeepSelfOnExitSucceeded;
+
+    
     private EffectUpdateHandler _periodTicker;
 
     public override void Enter()
@@ -18,10 +26,8 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         base.Enter();
         CaptureAttributesSnapshot();
 
-        // effect.Owner.TagAggregator.ApplyEffectDynamicTag(effect);
         effect.Owner.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
-        // TryActivateGrantedAbilities();
 
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
@@ -45,49 +51,34 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public override void Exit()
     {
         base.Exit();
-
-        // TryRemoveGrantedAbilities();
-        // effect.Owner.TagAggregator.RestoreEffectDynamicTags(effect);
-        // TryDeactivateGrantedAbilities();
     }
 
 
-    public  void Stack()
+    public void Stack(bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
     {
-        var stackingComponent = GetComponent<StackingComponent>();
-        if (effect.DurationPolicy == DurationPolicy.Instant)
+        var stacking = effect.Stacking;
+
+        switch (stacking.StackingType)
         {
+            case StackingType.None:
+                break;
+            case StackingType.AggregateBySource:
+                if (isFromSameSource)
+# if GODOT && DEBUG
+                GD.Print($"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
+# endif
+                    stacking.ChangeStackCount(stacking.StackCount + 1);
+                break;
+            case StackingType.AggregateByTarget:
+                
+# if GODOT && DEBUG
+                GD.Print($"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
+# endif
+                stacking.ChangeStackCount(stacking.StackCount + 1);
+                break;
+            default:
+                throw new ArgumentException($"Invalid StackingType: {stacking.StackingType}");
         }
-
-        // // Check GE Stacking
-        // if (stackingComponent.StackingType == StackingType.None)
-        // {
-        //     return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        // }
-
-        // // 处理GE堆叠
-        // // 基于Target类型GE堆叠
-        // if (stackingComponent.StackingType == StackingType.AggregateByTarget)
-        // {
-        //     GetStackingEffectByData(effect, out var ge);
-        //     // 新添加GE
-        //     if (ge == null)
-        //         return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        //     bool stackCountChange = ge.RefreshStack();
-        //     if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-        //     return ge;
-        // }
-
-        // // 基于Source类型GE堆叠
-        // if (stackingComponent.StackingType == StackingType.AggregateBySource)
-        // {
-        //     GetStackingEffectByDataFrom(effect, source, out var ge);
-        //     if (ge == null)
-        //         return Operation_AddNewGameplayEffectSpec(source, effect, overwriteEffectLevel, effectLevel);
-        //     bool stackCountChange = ge.RefreshStack();
-        //     if (stackCountChange) OnRefreshStackCountMakeContainerDirty();
-        //     return ge;
-        // }
     }
 
 
@@ -103,7 +94,6 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         if(effect.Owner.HasAny(effect.ApplicationImmunityTags)) return true;
         return effect.Status != RunningStatus.Running;
     }
-
 
     // 捕获属性快照
     private void CaptureAttributesSnapshot()

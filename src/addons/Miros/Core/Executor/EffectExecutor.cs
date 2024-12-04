@@ -1,83 +1,117 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
+using NUnit.Framework;
 
 namespace Miros.Core;
 
 // _tasks 即为运行的 EffectTask
-public class EffectExecutor : ExecutorBase<EffectTask>
+public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
 {
+    private readonly Agent _agent = agent;
+    private readonly List<EffectTask> _runningTasks = [];
 
-    private readonly List<EffectTask> _runningPermanentTasks = [];
+    private readonly List<EffectTask> _tasksRemoveCache = [];
 
-    public List<EffectTask> GetRunningTasks() => _runningPermanentTasks;
-    
+    public List<EffectTask> GetRunningTasks() => _runningTasks;
+
     public override void Update(double delta)
     {
-        UpdateRunningEffects();
+        UpdateTasks();
 
-        foreach (var task in _runningPermanentTasks) task.Update(delta);
+        foreach (var task in _runningTasks) task.Update(delta);
     }
 
-    private void UpdateRunningEffects()
-    {
-        var couldEnterTasks = _tasks.Where(task => task.CanEnter()).ToList();
-        foreach (var task in couldEnterTasks) 
+    private void UpdateTasks()
+    {   
+        // Enter
+        foreach (var task in _tasks)
         {
-            if(task.IsInstant)
+            if(!task.CanEnter())
+            {
+                if(task.RemoveSelfOnEnterFailed)
+                    _tasksRemoveCache.Add(task);
+
+                continue;
+            }
+
+            if (task.IsInstant)
             {
                 task.Activate();
                 task.Enter();
                 task.Exit();
                 task.Deactivate();
-                _tasks.Remove(task);
+
+                if(!task.KeepSelfOnExitSucceeded)
+                    _tasksRemoveCache.Add(task);
             }
             else
             {
                 task.Activate();
                 task.Enter();
-                _tasks.Remove(task);
-                _runningPermanentTasks.Add(task);
+                _runningTasks.Add(task);
+                _tasksRemoveCache.Add(task);
                 _onRunningEffectTasksIsDirty?.Invoke(this, task);
             }
         }
 
-        var couldExitTasks = _runningPermanentTasks.Where(task => task.CanExit()).ToList();
-        foreach (var task in couldExitTasks)
+        // Exit
+        foreach (var task in _runningTasks)
         {
+            if(!task.CanExit())
+                continue;
+
             task.Deactivate();
             task.Exit();
-            _runningPermanentTasks.Remove(task);
+            _runningTasks.Remove(task);
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
+
+            if(task.KeepSelfOnExitSucceeded)
+                _tasks.Add(task);
         }
+
+        // Clear
+        foreach (var task in _tasksRemoveCache)
+            _tasks.Remove(task);
+        _tasksRemoveCache.Clear();
     }
 
+    private static bool AreTaskCouldStackByAnotherTask(EffectTask task, EffectTask otherTask)
+    {
+        return task.Stacking is not null && otherTask.Stacking is not null &&
+               task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
+    }
 
-    // 如果存在StackingComponent组件，则检查是否可以堆叠
-    // 如果可以堆叠,检查是否存在相同StackingGroupTag的Task，如果存在，则调用其Stack方法
-    // 如果当前Tasks不存在传入的Task，则将传入的Task添加到Tasks中，并调用其Activate和Enter方法
     public override void AddTask(ITask task)
     {
         var effectTask = (EffectTask)task;
-        if (!effectTask.CanEnter()) return;
+        bool isAddTask = true;
 
-        var stackingComponent = effectTask.GetComponent<StackingComponent>();
-        var hasStackingComponent = stackingComponent != null;
-        var hasSameTask = false;
-
-        foreach (var otherTask in _tasks)
+        foreach (var existingTask in _runningTasks)
         {
-            if (effectTask.Tag == otherTask.Tag)
-                hasSameTask = true;
+            if (AreTaskCouldStackByAnotherTask(effectTask, existingTask)) 
+            {
+                // 如果Tag相同且来自同一个Agent, 则不添加, 并跳过当前循环
+                if(effectTask.Tag == existingTask.Tag && _agent.AreTasksFromSameSource(effectTask, existingTask))
+                {
+                    existingTask.Stack(true);
+                    isAddTask = false;
+                    continue;
+                }
 
-            if (hasStackingComponent && otherTask.CanStack(stackingComponent.StackingGroupTag))
-                otherTask.Stack();
+                // 如果来自不同Agent, 则根据是否可以叠加来决定是否添加
+                if(_agent.AreTasksFromSameSource(effectTask, existingTask))
+                    existingTask.Stack(true);
+                else
+                    existingTask.Stack(false);
+            }
         }
 
-        if (hasSameTask) return;
-        base.AddTask(task);
+        if(isAddTask) base.AddTask(task);
     }
-#region Event
+
+    #region Event
 
     private EventHandler<EffectTask> _onRunningEffectTasksIsDirty;
 
@@ -91,5 +125,5 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         _onRunningEffectTasksIsDirty -= handler;
     }
 
-#endregion
+    #endregion
 }

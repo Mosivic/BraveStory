@@ -23,14 +23,4 @@ public class Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, Mo
     {
         return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;
     }
-
-
-    private void OnAttributeChanged()
-    {
-        // if (ReflectionHelper.GetAttribute(AttributeName)?.CalculateMode !=
-        //     CalculateMode.Stacking)
-        // {
-        //     Operation = ModifierOperation.Override;
-        // }
-    }
 }

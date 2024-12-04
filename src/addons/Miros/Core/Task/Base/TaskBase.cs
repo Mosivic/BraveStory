@@ -74,25 +74,6 @@ public class TaskBase(State state) : AbsTask(state), ITask
     }
 
 
-    /// <summary>
-    ///     是否可以堆叠
-    ///     仅当当前Task处于激活状态时，同时存在组件StackingComponent并且组件的StackingGroupTag与传入destackingGroupTag相等时，返回true
-    /// </summary>
-    /// <param name="stackingGroupTag"></param>
-    /// <returns></returns>
-    public virtual bool CanStack(Tag stackingGroupTag)
-    {
-        var canStack = false;
-        if (state.IsActive)
-        {
-            var stackingComponent = GetComponent<StackingComponent>();
-            if (stackingComponent != null) canStack = stackingComponent.StackingGroupTag == stackingGroupTag;
-        }
-
-        return canStack;
-    }
-
-
     protected virtual void Succeed()
     {
         state.Status = RunningStatus.Succeed;
@@ -105,4 +86,6 @@ public class TaskBase(State state) : AbsTask(state), ITask
         state.Status = RunningStatus.Failed;
         OnFail();
     }
+
+
 }

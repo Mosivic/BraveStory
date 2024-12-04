@@ -62,7 +62,7 @@ public class Effect(Tag tag, Agent source) : State(tag,source)
     /// </summary>
     public TagSet RemoveEffectsWithTags;
 
-    public override Type TaskType => typeof(EffectTask);
+    public override Type Type => typeof(EffectTask);
 
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }
@@ -77,6 +77,17 @@ public class Effect(Tag tag, Agent source) : State(tag,source)
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
     public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }
 
-    public StackingComponent Stacking { get; set; }
+    /// <summary>
+    ///     进入失败时是否移除自身
+    /// </summary>
+    public bool RemoveSelfOnEnterFailed { get; set; } = false;
+
+    /// <summary>
+    ///     退出成功时是否保留自身
+    /// </summary>
+    public bool KeepSelfOnExitSucceeded { get; set; } = false;
+
+    public EffectStacking Stacking { get; set; }
+
     public event Action<Agent, Effect> OnImmunity;
 }
