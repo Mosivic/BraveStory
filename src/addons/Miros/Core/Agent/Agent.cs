@@ -17,6 +17,7 @@ public class Agent : AbsAgent, IAgent
     public Agent(Node2D host, ITaskProvider taskProvider) : base(host, taskProvider)
     {
         AttributeSetContainer = new AttributeSetContainer(this);
+        CreateEffectExecutor();
     }
 
 

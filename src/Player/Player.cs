@@ -208,6 +208,14 @@ public partial class Player : Character
         if (@event.IsActionPressed("jump"))
         {
             GD.Print("gravity: " + Agent.Attr("Gravity"));
+            GD.Print("run speed: " + Agent.Attr("RunSpeed"));
+            GD.Print("sliding deceleration: " + Agent.Attr("SlidingDeceleration"));
+            GD.Print("floor acceleration: " + Agent.Attr("FloorAcceleration"));
+            GD.Print("air acceleration: " + Agent.Attr("AirAcceleration"));
+            GD.Print("jump velocity: " + Agent.Attr("JumpVelocity"));
+            GD.Print("jump count: " + _jumpCount);
+            GD.Print("max jump count: " + _maxJumpCount);
+
         }
     }
 

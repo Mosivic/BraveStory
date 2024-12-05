@@ -25,9 +25,9 @@ public class DamageExecution : Execution
 
         public DamageData(Effect effect)
         {
-            SourceAttack = effect.Source.GetAttributeCurrentValue("Character", "Attack") ?? 0;
-            TargetDefense = effect.Owner.GetAttributeCurrentValue("Character", "Defense") ?? 0;
-            TargetHP = effect.Owner.GetAttributeCurrentValue("Character", "HP") ?? 0;
+            SourceAttack = effect.Source.Attr("Attack");
+            TargetDefense = effect.Owner.Attr("Defense");
+            TargetHP = effect.Owner.Attr("HP");
         }
     }
 }
