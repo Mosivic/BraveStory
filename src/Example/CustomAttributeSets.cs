@@ -22,11 +22,11 @@ public class CharacterAttributeSet : AttributeSet
 {
     public override Tag AttributeSetTag => Tags.AttributeSet_Character;
 
-    protected readonly AttributeBase _gravity;
-    protected readonly AttributeBase _runspeed;
-    protected readonly AttributeBase _jumpvelocity;
-    protected readonly AttributeBase _flooracceleration;
-    protected readonly AttributeBase _airacceleration;
+    protected AttributeBase _gravity;
+    protected AttributeBase _runspeed;
+    protected AttributeBase _jumpvelocity;
+    protected AttributeBase _flooracceleration;
+    protected AttributeBase _airacceleration;
 
     public override AttributeBase[] Attributes => [
         _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration
@@ -56,8 +56,8 @@ public class WarriorAttributeSet : CharacterAttributeSet
 {
     public override Tag AttributeSetTag => Tags.AttributeSet_Character_Warrior;
 
-    protected readonly AttributeBase _strength;
-    protected readonly AttributeBase _defense;
+    protected AttributeBase _strength;
+    protected AttributeBase _defense;
 
     public override AttributeBase[] Attributes => [
         _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration, _strength, _defense
@@ -92,6 +92,7 @@ public class PlayerAttributeSet : CharacterAttributeSet
 
     public PlayerAttributeSet() : base()
     {
+        _jumpvelocity.SetValueWithoutEvent(-500.0f);
     }
 
 }
@@ -100,7 +101,7 @@ public class EnemyAttributeSet : CharacterAttributeSet
 {
     public override Tag AttributeSetTag => Tags.AttributeSet_Character_Enemy;
 
-    protected readonly AttributeBase _walkspeed;
+    protected AttributeBase _walkspeed;
 
     public override AttributeBase[] Attributes => [
         _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration, _walkspeed
