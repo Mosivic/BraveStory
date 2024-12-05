@@ -21,22 +21,21 @@ public class EffectUpdateHandler
 		_periodTimer.Start();
 		_durationTimer.Start();
 
-		_periodTimer.OnTimerStop += OnPeriodOver;
-		_durationTimer.OnTimerStop += OnDurationOver;
+		if (_effect.Period > 0)
+			_periodTimer.OnTimerStop += OnPeriodOver;
+		if (_effect.Duration > 0)
+			_durationTimer.OnTimerStop += OnDurationOver;
 	}
 
 	public void Tick(double delta)
 	{
-		if (_effect.DurationPolicy == DurationPolicy.Duration)
-			_durationTimer.Tick(delta);
-
-		if (_effect.DurationPolicy == DurationPolicy.Period)
-			_periodTimer.Tick(delta);
+		_durationTimer.Tick(delta);
+		_periodTimer.Tick(delta);
 	}
 
 	private void OnPeriodOver()
 	{
-		_effect.Owner.ApplyModFromInstantEffect(_effect);
+		_effect.Owner.ApplyModWithInstant(_effect);
 		_periodTimer.Start();
 	}
 

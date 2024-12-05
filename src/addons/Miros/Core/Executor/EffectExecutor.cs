@@ -79,7 +79,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
 
     private static bool AreTaskCouldStackByAnotherTask(EffectTask task, EffectTask otherTask)
     {
-        return task.Stacking is not null && otherTask.Stacking is not null &&
+        return task.Stacking != null && otherTask.Stacking != null &&
                task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 

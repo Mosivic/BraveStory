@@ -110,48 +110,65 @@ public class Agent : AbsAgent, IAgent
 		foreach (var executor in Executors.Values) executor.PhysicsUpdate(delta);
 	}
 
-
-	public void ApplyModFromInstantEffect(Effect effect)
+	public void ApplyExecWithInstant(Effect effect)
 	{
-		foreach (var modifier in effect.Modifiers)
+		if (effect.Executions == null) return;
+
+		foreach (var execution in effect.Executions)
 		{
-			var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
-			if (attributeValue == null) continue;
-			
-			if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
-				throw new InvalidOperationException("Unsupported operation.");
+			execution.Execute(effect, out var modifiers);
 
-			if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
-				throw new InvalidOperationException(
-					$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-					$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
-
-			var magnitude = modifier.CalculateMagnitude(effect);
-			var baseValue = attributeValue.Value.BaseValue;
-			switch (modifier.Operation)
-			{
-				case ModifierOperation.Add:
-					baseValue += magnitude;
-					break;
-				case ModifierOperation.Minus:
-					baseValue -= magnitude;
-					break;
-				case ModifierOperation.Multiply:
-					baseValue *= magnitude;
-					break;
-				case ModifierOperation.Divide:
-					baseValue /= magnitude;
-					break;
-				case ModifierOperation.Override:
-					baseValue = magnitude;
-					break;
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
-
-			AttributeSetContainer.Sets[modifier.AttributeSetTag]
-				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
+			foreach (var modifier in modifiers)
+				ApplyModifier(effect, modifier);
 		}
+	}
+
+	public void ApplyModWithInstant(Effect effect)
+	{
+		if (effect.Modifiers == null) return;
+
+		foreach (var modifier in effect.Modifiers)
+			ApplyModifier(effect, modifier);
+	}
+
+	private void ApplyModifier(Effect effect, Modifier modifier)
+	{
+		var attributeValue = GetAttributeValue(modifier.AttributeIdentifier.SetTag, modifier.AttributeIdentifier.Tag);
+		if (attributeValue == null) return;
+
+		if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
+			throw new InvalidOperationException("Unsupported operation.");
+
+		if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
+			throw new InvalidOperationException(
+				$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
+				$"But {modifier.AttributeIdentifier.SetTag}.{modifier.AttributeIdentifier.Tag} is {attributeValue.Value.CalculateMode}");
+
+		var magnitude = modifier.CalculateMagnitude(effect);
+		var baseValue = attributeValue.Value.BaseValue;
+		switch (modifier.Operation)
+		{
+			case ModifierOperation.Add:
+				baseValue += magnitude;
+				break;
+			case ModifierOperation.Minus:
+				baseValue -= magnitude;
+				break;
+			case ModifierOperation.Multiply:
+				baseValue *= magnitude;
+				break;
+			case ModifierOperation.Divide:
+				baseValue /= magnitude;
+				break;
+			case ModifierOperation.Override:
+				baseValue = magnitude;
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
+		}
+
+		AttributeSetContainer.Sets[modifier.AttributeIdentifier.SetTag]
+			.ChangeAttributeBase(modifier.AttributeIdentifier.Tag, baseValue);
 	}
 
 	public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
@@ -159,7 +176,7 @@ public class Agent : AbsAgent, IAgent
 		var state1 = StateExecutionRegistry.GetState(task1);
 		var state2 = StateExecutionRegistry.GetState(task2);
 
-		if (state1 == null || state2 == null) 
+		if (state1 == null || state2 == null)
 			return false;
 		else
 			return state1.Source == state2.Source;
@@ -275,39 +292,61 @@ public class Agent : AbsAgent, IAgent
 
 	#region AttributeSet
 
+
+	public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
+	{
+		return AttributeSetContainer.GetAttributeIdentifier(attrSetName, attrName);
+	}
+
 	public void AddAttributeSet(Type attrSetType)
 	{
 		AttributeSetContainer.AddAttributeSet(attrSetType);
 	}
 
-	public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
+	public AttributeValue? GetAttributeValue(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeValue(attrSetTag, attrTag);
 	}
 
-	public AttributeBase GetAttributeBase(Tag attrSetSign, Tag attrSign)
+	public AttributeValue? GetAttributeValue(string tagSetShortName, string tagShortName)
 	{
-		var value = AttributeSetContainer.Sets[attrSetSign][attrSign];
-		return value;
+		return AttributeSetContainer.GetAttributeValue(tagSetShortName, tagShortName);
 	}
 
-	public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
+
+	public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeBase(attrSetTag, attrTag);
 	}
 
-	public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
+	public AttributeBase GetAttributeBase(string attrSetName, string attrName)
 	{
-		var value = AttributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeBase(attrSetName, attrName);
 	}
 
-	public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
+	public CalculateMode? GetAttributeCalculateMode(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeCalculateMode(attrSetTag, attrTag);
+	}
+
+	public float? GetAttributeCurrentValue(Tag attrSetTag, Tag attrTag)
+	{
+		return AttributeSetContainer.GetAttributeCurrentValue(attrSetTag, attrTag);
+	}
+
+	public float? GetAttributeCurrentValue(string attrSetName, string attrName)
+	{
+		return AttributeSetContainer.GetAttributeCurrentValue(attrSetName, attrName);
+	}
+
+	public float? GetAttributeBaseValue(Tag attrSetTag, Tag attrTag)
+	{
+		return AttributeSetContainer.GetAttributeBaseValue(attrSetTag, attrTag);
+	}
+
+	public float? GetAttributeBaseValue(string attrSetName, string attrName)
+	{
+		return AttributeSetContainer.GetAttributeBaseValue(attrSetName, attrName);
 	}
 
 	public Dictionary<Tag, float> DataSnapshot()

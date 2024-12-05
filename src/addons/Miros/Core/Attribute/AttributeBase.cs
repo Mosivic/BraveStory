@@ -45,6 +45,12 @@ public class AttributeBase
         Owner = owner;
     }
 
+    public void SetValueWithoutEvent(float value)
+    {
+        _value.SetBaseValue(value);
+        _value.SetCurrentValue(value);
+    }
+
     public void SetMinValue(float min)
     {
         _value.SetMinValue(min);

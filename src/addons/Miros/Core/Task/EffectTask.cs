@@ -14,12 +14,12 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     public event Action<EffectTask> OnPeriodOvered;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
-    public EffectStacking? Stacking => effect.Stacking;
+    public EffectStacking Stacking => effect.Stacking;
     public bool RemoveSelfOnEnterFailed => effect.RemoveSelfOnEnterFailed;
     public bool KeepSelfOnExitSucceeded => effect.KeepSelfOnExitSucceeded;
 
     
-    private EffectUpdateHandler _periodTicker;
+    private EffectUpdateHandler _updateHandler;
 
     public override void Enter()
     {
@@ -31,20 +31,25 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
-            effect.Owner.ApplyModFromInstantEffect(effect);
+            effect.Owner.ApplyModWithInstant(effect);
             effect.Status = RunningStatus.Succeed;
         }
-        else
+        else if(effect.DurationPolicy == DurationPolicy.Infinite)
         {
-            _periodTicker = new EffectUpdateHandler(effect);
+            
         }
+        else if(effect.DurationPolicy == DurationPolicy.Duration || effect.DurationPolicy == DurationPolicy.Periodic)
+        {
+            _updateHandler = new EffectUpdateHandler(effect);
+        }
+
     }
 
 
     public override void Update(double delta)
     {
         base.Update(delta);
-        _periodTicker.Tick(delta);
+        _updateHandler?.Tick(delta);
     }
 
 

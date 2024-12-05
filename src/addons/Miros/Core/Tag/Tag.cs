@@ -4,7 +4,7 @@ namespace Miros.Core;
 
 public struct Tag
 {
-    public readonly string Name;
+    public readonly string FuallName;
 
     public int HashCode { get; set; }
     public string ShortName { get; set; }
@@ -12,11 +12,11 @@ public struct Tag
     public string[] AncestorNames { get; set; }
 
 
-    public bool IsValid => !string.IsNullOrEmpty(Name);
+    public bool IsValid => !string.IsNullOrEmpty(FuallName);
 
     public Tag(string name)
     {
-        Name = name;
+        FuallName = name;
         HashCode = name.GetHashCode();
 
         var tags = name.Split('.');
@@ -37,10 +37,29 @@ public struct Tag
         ShortName = tags.Last();
     }
 
-    public bool IsDescendantOf(Tag other)
+
+    /// <summary>
+    /// 是否是其他标签的后代
+    /// </summary>
+    public readonly bool IsDescendantOf(Tag other)
+    {
+        return AncestorHashCodes.Contains(HashCode);
+    }
+
+    public readonly bool IsDescendantOf(string other)
+    {
+        return AncestorNames.Contains(other);
+    }
+
+    /// <summary>
+    /// 是否是其他标签的祖先
+    /// </summary>
+    public readonly bool IsAncestorOf(Tag other)
     {
         return other.AncestorHashCodes.Contains(HashCode);
     }
+
+
 
     public readonly bool Equals(Tag other)
     {

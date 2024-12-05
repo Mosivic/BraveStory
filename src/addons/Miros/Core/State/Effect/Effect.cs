@@ -67,11 +67,8 @@ public class Effect(Tag tag, Agent source) : State(tag,source)
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }
     public double Period { get; set; }
-    public float Level { get; set; } = 1;
 
-    public ExecutionCalculation[] Executions { get; set; }
-
-    public Effect PeriodExecution { get; private set; }
+    public Execution[] Executions { get; set; }
     public Modifier[] Modifiers { get; set; }
 
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }

@@ -6,5 +6,6 @@
 .idea/
 .godot/
 *.DS_Store
+.VSCodeCounter/
 .venv/
 .fake

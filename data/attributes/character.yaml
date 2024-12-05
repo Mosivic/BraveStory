@@ -15,7 +15,7 @@ Warrior:
 Player:
   - inherits: Character
   - properties:
-      JumpVelocity: -300.0  # 覆盖属性
+      JumpVelocity: -500.0  # 覆盖属性
 Enemy:
   - inherits: Character
   - properties:

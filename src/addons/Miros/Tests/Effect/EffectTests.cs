@@ -45,7 +45,7 @@ public partial class EffectTests : Node2D
             },
             Modifiers =
             [
-                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10, ModifierOperation.Add)
             ]
         };
         
@@ -61,18 +61,18 @@ public partial class EffectTests : Node2D
             },
             Modifiers =
             [
-                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10, ModifierOperation.Add)
             ]
         };
 
         var periodEffect = new Effect(Tags.Effect_Buff,_agent)
         {
-            DurationPolicy = DurationPolicy.Period,
+            DurationPolicy = DurationPolicy.Duration,
             Duration = 10,
             Period = 1,
             Modifiers =
             [
-                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10, ModifierOperation.Add)
             ]
         };
         _agent.CreateEffectExecutor();

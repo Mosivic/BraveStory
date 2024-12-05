@@ -39,7 +39,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 		foreach (var ge in effects)
 			if (ge.IsActive)
 				foreach (var modifier in ge.Modifiers)
-					if (modifier.AttributeTag == _attribute.AttributeTag)
+					if (modifier.AttributeIdentifier.Tag == _attribute.AttributeTag)
 					{
 						_modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
 						TryRegisterAttributeChangedListen(ge, modifier);
