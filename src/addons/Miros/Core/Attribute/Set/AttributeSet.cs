@@ -35,6 +35,17 @@ public abstract class AttributeSet
         if (GetAttributeBase(attributeSign) != null) GetAttributeBase(attributeSign).SetBaseValue(value);
     }
 
+    public bool TryGetAttribute(string attrName, out AttributeBase attribute)
+    {
+        foreach (var attr in Attributes)
+            if (attr.AttributeTag.ShortName == attrName)
+            {
+                attribute = attr;
+                return true;
+            }
+        attribute = null;
+        return false;
+    }
 
     public AttributeBase GetAttributeBase(string tagName)
     {

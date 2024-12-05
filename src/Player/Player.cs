@@ -8,23 +8,17 @@ namespace BraveStory;
 
 public partial class Player : Character
 {
-    private const float InitialSlidingSpeed = 400f;
-    private const float SlidingDeceleration = 600f;
-    private const float MinSlidingSpeed = 20f;
-
-    private const float MinJumpVelocity = -200f; // 最小跳跃速度
-    private const float MaxJumpHoldTime = 0.2f; // 最大跳跃按住时间
     private AnimatedSprite2D _animatedSprite;
     private RayCast2D _footChecker;
     private RayCast2D _handChecker;
-    private int _hp = 10;
+
+
+
     private bool _isJumpHolding; // 是否正在按住跳跃键
     private int _jumpCount;
     private float _jumpHoldTime; // 跳跃按住时间计数器
     private int _maxJumpCount = 2;
-    private float _slidingSpeed;
 
-    private PlayerData Data;
 
     public HashSet<Interactable> Interactions { get; set; } = new();
 
@@ -39,7 +33,6 @@ public partial class Player : Character
 
         Agent = new Agent(this, new StaticTaskProvider());
         Agent.AddAttributeSet(typeof(PlayerAttributeSet));
-        Data = new PlayerData();
 
         // Idle  
         var idle = new State(Tags.State_Action_Idle, Agent)
@@ -55,7 +48,7 @@ public partial class Player : Character
             .OnEntered(_ =>
             {
                 PlayAnimation("jump");
-                Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+                Velocity = new Vector2(Velocity.X, Agent.Attr("JumpVelocity"));
                 _jumpCount++;
             });
 
@@ -86,7 +79,7 @@ public partial class Player : Character
             .OnEntered(_ =>
             {
                 PlayAnimation("jump");
-                Velocity = new Vector2(Velocity.X, Data.JumpVelocity);
+                Velocity = new Vector2(Velocity.X, Agent.Attr("JumpVelocity"));
                 _jumpCount++;
             });
 
@@ -135,7 +128,6 @@ public partial class Player : Character
             .OnEntered(_ =>
             {
                 PlayAnimation("sliding_start");
-                _slidingSpeed = InitialSlidingSpeed * Mathf.Sign(Graphics.Scale.X);
             })
             .OnExited(_ => HurtBox.SetDeferred("monitorable", true))
             .OnPhysicsUpdated((_, delta) =>
@@ -177,7 +169,7 @@ public partial class Player : Character
             .Add(hit, idle, IsAnimationFinished)
             .Add(sliding, idle)
             .AddAny(hit, () => HasHit, StateTransitionMode.Force)
-            .AddAny(die, () => _hp <= 0);
+            .AddAny(die, () => Agent.Attr("HP") <= 0);
 
         Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle,
             [idle, run, jump, fall, wallJump, doubleJump, wallSlide, attack1, attack11, attack111, hit, die, sliding],
@@ -210,6 +202,14 @@ public partial class Player : Character
         }
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        if (@event.IsActionPressed("jump"))
+        {
+            GD.Print("gravity: " + Agent.Attr("Gravity"));
+        }
+    }
 
     // 添加一个统一处理朝向的方法
     private void UpdateFacing(float direction)
@@ -225,8 +225,8 @@ public partial class Player : Character
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * Data.RunSpeed, Data.FloorAcceleration);
-        velocity.Y += (float)delta * Data.Gravity;
+        velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Attr("RunSpeed"), Agent.Attr("FloorAcceleration"));
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
         Velocity = velocity;
 
         UpdateFacing(direction); // 使用新方法处理朝向
@@ -241,11 +241,11 @@ public partial class Player : Character
         // 确保空中移动控制合理
         velocity.X = Mathf.MoveToward(
             velocity.X,
-            direction * Data.RunSpeed,
-            Data.AirAcceleration * (float)delta // 使用空中加速度而不是地面加速度
+            direction * Agent.Attr("RunSpeed"),
+            Agent.Attr("AirAcceleration")
         );
 
-        velocity.Y += (float)delta * Data.Gravity;
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
         Velocity = velocity;
 
         UpdateFacing(direction);
@@ -256,7 +256,7 @@ public partial class Player : Character
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Velocity;
-        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Data.Gravity, 600);
+        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Attr("Gravity"), 600);
         Velocity = velocity;
 
         UpdateFacing(direction); // 使用新方法处理朝向
@@ -266,7 +266,7 @@ public partial class Player : Character
     private void WallJumpMove(double delta)
     {
         var velocity = Velocity;
-        velocity.Y += (float)delta * Data.Gravity;
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
         Velocity = velocity;
 
         UpdateFacing(0); // 在空中时只根据速度方向转向
@@ -297,9 +297,8 @@ public partial class Player : Character
     private void Slide(double delta)
     {
         var velocity = Velocity;
-        _slidingSpeed = Mathf.MoveToward(_slidingSpeed, 0, SlidingDeceleration * (float)delta);
-        velocity.X = _slidingSpeed;
-        velocity.Y += (float)delta * Data.Gravity;
+        velocity.X = Mathf.MoveToward(velocity.X, 0, Agent.Attr("SlidingDeceleration") * (float)delta);
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
         Velocity = velocity;
         MoveAndSlide();
     }

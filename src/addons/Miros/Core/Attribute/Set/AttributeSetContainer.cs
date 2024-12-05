@@ -154,6 +154,19 @@ public class AttributeSetContainer(Agent owner)
             : null;
     }
 
+    public bool TryGetAttributeCurrentValue(string attrName, out float value)
+    {
+        foreach (var attrSet in Sets)
+            if (attrSet.Value.TryGetAttribute(attrName, out var attr))
+            {
+                value = attr.CurrentValue;
+                return true;
+            }
+
+        value = 0;
+        return false;
+    }
+
 
     public float? GetAttributeCurrentValue(string attrSetName, string attrName)
     {

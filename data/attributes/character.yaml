@@ -1,22 +1,22 @@
 Character: # 定义一个角色属性
   - properties:
       Name: Base
+      HP: 100
+      Defense: 5
+      Attack: 10
       Gravity: 980.0
       RunSpeed: 200.0
+      WalkSpeed: 80.0
       JumpVelocity: -300.0
       FloorAcceleration: 1000.0
       AirAcceleration: 800.0
+      SlidingDeceleration: 600.0
       WallJumpVelocity: [ 1000,-320 ]
-Warrior:
-  - inherits: Character  # 继承角色属性
-  - properties:
-      Strength: 10  # 在继承的基础上添加属性
-      Defense: 8
 Player:
   - inherits: Character
   - properties:
-      JumpVelocity: -500.0  # 覆盖属性
-Enemy:
+      Attack: 15  # 覆盖属性
+Boar :
   - inherits: Character
   - properties:
-      WalkSpeed: 80.0  
+      HP: 30
