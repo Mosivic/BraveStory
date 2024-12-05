@@ -110,48 +110,65 @@ public class Agent : AbsAgent, IAgent
 		foreach (var executor in Executors.Values) executor.PhysicsUpdate(delta);
 	}
 
-
-	public void ApplyModFromInstantEffect(Effect effect)
+	public void ApplyExecWithInstant(Effect effect)
 	{
-		foreach (var modifier in effect.Modifiers)
+		if (effect.Executions == null) return;
+
+		foreach (var execution in effect.Executions)
 		{
-			var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
-			if (attributeValue == null) continue;
-			
-			if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
-				throw new InvalidOperationException("Unsupported operation.");
+			execution.Execute(effect, out var modifiers);
 
-			if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
-				throw new InvalidOperationException(
-					$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-					$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
-
-			var magnitude = modifier.CalculateMagnitude(effect);
-			var baseValue = attributeValue.Value.BaseValue;
-			switch (modifier.Operation)
-			{
-				case ModifierOperation.Add:
-					baseValue += magnitude;
-					break;
-				case ModifierOperation.Minus:
-					baseValue -= magnitude;
-					break;
-				case ModifierOperation.Multiply:
-					baseValue *= magnitude;
-					break;
-				case ModifierOperation.Divide:
-					baseValue /= magnitude;
-					break;
-				case ModifierOperation.Override:
-					baseValue = magnitude;
-					break;
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
-
-			AttributeSetContainer.Sets[modifier.AttributeSetTag]
-				.ChangeAttributeBase(modifier.AttributeTag, baseValue);
+			foreach (var modifier in modifiers)
+				ApplyModifier(effect, modifier);
 		}
+	}
+
+	public void ApplyModWithInstant(Effect effect)
+	{
+		if (effect.Modifiers == null) return;
+
+		foreach (var modifier in effect.Modifiers)
+			ApplyModifier(effect, modifier);
+	}
+
+	private void ApplyModifier(Effect effect, Modifier modifier)
+	{
+		var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
+		if (attributeValue == null) return;
+
+		if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
+			throw new InvalidOperationException("Unsupported operation.");
+
+		if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
+			throw new InvalidOperationException(
+				$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
+				$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
+
+		var magnitude = modifier.CalculateMagnitude(effect);
+		var baseValue = attributeValue.Value.BaseValue;
+		switch (modifier.Operation)
+		{
+			case ModifierOperation.Add:
+				baseValue += magnitude;
+				break;
+			case ModifierOperation.Minus:
+				baseValue -= magnitude;
+				break;
+			case ModifierOperation.Multiply:
+				baseValue *= magnitude;
+				break;
+			case ModifierOperation.Divide:
+				baseValue /= magnitude;
+				break;
+			case ModifierOperation.Override:
+				baseValue = magnitude;
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
+		}
+
+		AttributeSetContainer.Sets[modifier.AttributeSetTag]
+			.ChangeAttributeBase(modifier.AttributeTag, baseValue);
 	}
 
 	public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
@@ -159,7 +176,7 @@ public class Agent : AbsAgent, IAgent
 		var state1 = StateExecutionRegistry.GetState(task1);
 		var state2 = StateExecutionRegistry.GetState(task2);
 
-		if (state1 == null || state2 == null) 
+		if (state1 == null || state2 == null)
 			return false;
 		else
 			return state1.Source == state2.Source;
@@ -284,7 +301,7 @@ public class Agent : AbsAgent, IAgent
 	{
 		return AttributeSetContainer.GetAttributeValue(attrSetTag, attrTag);
 	}
-	
+
 	public AttributeValue? GetAttributeValue(string tagSetShortName, string tagShortName)
 	{
 		return AttributeSetContainer.GetAttributeValue(tagSetShortName, tagShortName);

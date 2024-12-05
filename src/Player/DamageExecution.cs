@@ -10,6 +10,7 @@ public class DamageExecution : Execution
         public float TargetDefense;
         public float TargetHP;
 
+
         public DamageData(Effect effect)
         {
             SourceAttack = effect.Source.GetAttributeCurrentValue("Character", "Attack") ?? 0;
@@ -18,10 +19,14 @@ public class DamageExecution : Execution
         }
     }
 
-    public override void Execute(Effect effect)
-    {
+    public override void Execute(Effect effect, out Modifier[] modifiers)
+    {  
         var data = new DamageData(effect);
         var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
         
+        // TODO : Fix attribute set tag & attribute tag problem
+        var hpModifier = new Modifier(new Tag("Character"), new Tag("HP"), newHp, ModifierOperation.Override);
+
+        modifiers = [hpModifier];
     }
 }

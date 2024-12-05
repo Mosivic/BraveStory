@@ -35,7 +35,7 @@ public class EffectUpdateHandler
 
 	private void OnPeriodOver()
 	{
-		_effect.Owner.ApplyModFromInstantEffect(_effect);
+		_effect.Owner.ApplyModWithInstant(_effect);
 		_periodTimer.Start();
 	}
 

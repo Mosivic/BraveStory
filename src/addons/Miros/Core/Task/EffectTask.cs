@@ -31,7 +31,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
-            effect.Owner.ApplyModFromInstantEffect(effect);
+            effect.Owner.ApplyModWithInstant(effect);
             effect.Status = RunningStatus.Succeed;
         }
         else if(effect.DurationPolicy == DurationPolicy.Infinite)
