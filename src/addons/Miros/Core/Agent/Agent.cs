@@ -280,34 +280,50 @@ public class Agent : AbsAgent, IAgent
 		AttributeSetContainer.AddAttributeSet(attrSetType);
 	}
 
-	public AttributeValue? GetAttributeValue(Tag attrSetSign, Tag attrSign)
+	public AttributeValue? GetAttributeValue(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.GetAttributeValue(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeValue(attrSetTag, attrTag);
+	}
+	
+	public AttributeValue? GetAttributeValue(string tagSetShortName, string tagShortName)
+	{
+		return AttributeSetContainer.GetAttributeValue(tagSetShortName, tagShortName);
 	}
 
-	public AttributeBase GetAttributeBase(Tag attrSetSign, Tag attrSign)
+
+	public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.Sets[attrSetSign][attrSign];
-		return value;
+		return AttributeSetContainer.GetAttributeBase(attrSetTag, attrTag);
 	}
 
-	public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
+	public AttributeBase GetAttributeBase(string attrSetName, string attrName)
 	{
-		var value = AttributeSetContainer.GetAttributeCalculateMode(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeBase(attrSetName, attrName);
 	}
 
-	public float? GetAttributeCurrentValue(Tag attrSetSign, Tag attrSign)
+	public CalculateMode? GetAttributeCalculateMode(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.GetAttributeCurrentValue(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeCalculateMode(attrSetTag, attrTag);
 	}
 
-	public float? GetAttributeBaseValue(Tag attrSetSign, Tag attrSign)
+	public float? GetAttributeCurrentValue(Tag attrSetTag, Tag attrTag)
 	{
-		var value = AttributeSetContainer.GetAttributeBaseValue(attrSetSign, attrSign);
-		return value;
+		return AttributeSetContainer.GetAttributeCurrentValue(attrSetTag, attrTag);
+	}
+
+	public float? GetAttributeCurrentValue(string attrSetName, string attrName)
+	{
+		return AttributeSetContainer.GetAttributeCurrentValue(attrSetName, attrName);
+	}
+
+	public float? GetAttributeBaseValue(Tag attrSetTag, Tag attrTag)
+	{
+		return AttributeSetContainer.GetAttributeBaseValue(attrSetTag, attrTag);
+	}
+
+	public float? GetAttributeBaseValue(string attrSetName, string attrName)
+	{
+		return AttributeSetContainer.GetAttributeBaseValue(attrSetName, attrName);
 	}
 
 	public Dictionary<Tag, float> DataSnapshot()

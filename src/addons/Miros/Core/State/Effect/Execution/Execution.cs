@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public class Execution
+public abstract class Execution
 {
-    // TODO
+    public abstract void CalculateMagnitude(Effect effect);
 }

@@ -148,21 +148,26 @@ class AttributeGenerator:
         # 只声明新增的属性字段
         inherited_attrs = set()
         if parent_class != "AttributeSet":
-            parent_set = self.attribute_sets[parent_class[:-12]]  # 移除"AttributeSet"后缀
+            parent_set = self.attribute_sets[parent_class[:-12]]
             inherited_attrs = set(parent_set.attributes.keys())
         
         # 声明本类特有的属性字段
         for attr_name in attr_set.attributes.keys():
             if attr_name not in inherited_attrs:
-                code_parts.append(f"    private readonly AttributeBase _{attr_name.lower()};")
-                
+                code_parts.append(f"    protected readonly AttributeBase _{attr_name.lower()};")
         
-        # AttributeSigns 属性
-        code_parts.append("\n    public override Tag[] AttributeSigns => new[] {")
+        # 添加 Attributes 属性
+        code_parts.append("\n    public override AttributeBase[] Attributes => [")
+        names = [f'_{attr_name.lower()}' for attr_name in attr_set.attributes.keys()]
+        code_parts.append(f"        {', '.join(names)}")
+        code_parts.append("    ];\n")
+        
+        # AttributeTags 属性
+        code_parts.append("    public override Tag[] AttributeTags => [")
         names = [f'Tags.Attribute_{attr_name}' for attr_name in attr_set.attributes.keys()]
         code_parts.append(f"        {', '.join(names)}")
-        code_parts.append("    };\n")
-        
+        code_parts.append("    ];\n")
+
         # 构造函数
         code_parts.append(f"    public {set_name}AttributeSet() : base()")
         code_parts.append("    {")
@@ -171,20 +176,6 @@ class AttributeGenerator:
             if attr_name not in inherited_attrs:
                 code_parts.append(f'        _{attr_name.lower()} = new AttributeBase(Tags.AttributeSet_{set_name}, Tags.Attribute_{attr_name}, {attr_def.value}f);')
         code_parts.append("    }\n")
-        
-        # 索引器
-        if parent_class == "AttributeSet":
-            code_parts.append("    public override AttributeBase this[Tag sign] =>")
-            for attr_name in attr_set.attributes.keys():
-                code_parts.append(f'        sign.Equals(Tags.Attribute_{attr_name}) ? _{attr_name.lower()} :')
-            code_parts.append("        null;\n")
-        else:  # 为继承的类添加索引器
-            code_parts.append("    public override AttributeBase this[Tag sign] =>")
-            # 只处理当前类特有的属性
-            for attr_name in attr_set.attributes.keys():
-                if attr_name not in inherited_attrs:  # 确保不重复父类属性
-                    code_parts.append(f'        sign.Equals(Tags.Attribute_{attr_name}) ? _{attr_name.lower()} :')
-            code_parts.append("        base[sign];\n")  # 调用父类的索引器
         
         # 属性访问器（只为新增的属性生成）
         for attr_name in attr_set.attributes.keys():
