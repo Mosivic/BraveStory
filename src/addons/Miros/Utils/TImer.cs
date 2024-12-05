@@ -28,7 +28,7 @@ public abstract class Timer(double time)
         IsRunning = false;
         OnTimerStop?.Invoke();
     }
-    
+
 
     public void Resume()
     {
@@ -51,11 +51,10 @@ public class CounterTimer(double time) : Timer(time)
     {
         // 防止误差
         if (IsRunning && Time < double.Epsilon) Stop();
-        
+
         if (IsRunning && Time > 0) Time -= deltaTime;
 
         if (IsRunning && Time < 0) Stop();
-        
     }
 
     public void Reset()

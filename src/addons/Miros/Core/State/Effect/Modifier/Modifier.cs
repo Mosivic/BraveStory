@@ -6,7 +6,7 @@ public enum ModifierMagnitudeType
     AttributeBased,
     AttributeBasedWithStack,
     SetByCallerFromName,
-    SetByCallerFromTag,
+    SetByCallerFromTag
 }
 
 public struct ModifierMagnitude

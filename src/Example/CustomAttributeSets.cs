@@ -20,23 +20,14 @@ public static partial class Tags
 
 public class CharacterAttributeSet : AttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Character;
+    protected AttributeBase _airacceleration;
+    protected AttributeBase _flooracceleration;
 
     protected AttributeBase _gravity;
-    protected AttributeBase _runspeed;
     protected AttributeBase _jumpvelocity;
-    protected AttributeBase _flooracceleration;
-    protected AttributeBase _airacceleration;
+    protected AttributeBase _runspeed;
 
-    public override AttributeBase[] Attributes => [
-        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration
-    ];
-
-    public override Tag[] AttributeTags => [
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration
-    ];
-
-    public CharacterAttributeSet() : base()
+    public CharacterAttributeSet()
     {
         _gravity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Gravity, 980.0f);
         _runspeed = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_RunSpeed, 200.0f);
@@ -44,6 +35,19 @@ public class CharacterAttributeSet : AttributeSet
         _flooracceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_FloorAcceleration, 1000.0f);
         _airacceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_AirAcceleration, 800.0f);
     }
+
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character;
+
+    public override AttributeBase[] Attributes =>
+    [
+        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration
+    ];
+
+    public override Tag[] AttributeTags =>
+    [
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration
+    ];
 
     public AttributeBase Gravity => _gravity;
     public AttributeBase RunSpeed => _runspeed;
@@ -54,24 +58,28 @@ public class CharacterAttributeSet : AttributeSet
 
 public class WarriorAttributeSet : CharacterAttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Warrior;
-
-    protected AttributeBase _strength;
     protected AttributeBase _defense;
 
-    public override AttributeBase[] Attributes => [
-        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration, _strength, _defense
-    ];
+    protected AttributeBase _strength;
 
-    public override Tag[] AttributeTags => [
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration, Tags.Attribute_Strength, Tags.Attribute_Defense
-    ];
-
-    public WarriorAttributeSet() : base()
+    public WarriorAttributeSet()
     {
         _strength = new AttributeBase(Tags.AttributeSet_Character_Warrior, Tags.Attribute_Strength, 10.0f);
         _defense = new AttributeBase(Tags.AttributeSet_Character_Warrior, Tags.Attribute_Defense, 8.0f);
     }
+
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Warrior;
+
+    public override AttributeBase[] Attributes =>
+    [
+        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration, _strength, _defense
+    ];
+
+    public override Tag[] AttributeTags =>
+    [
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration, Tags.Attribute_Strength, Tags.Attribute_Defense
+    ];
 
     public AttributeBase Strength => _strength;
     public AttributeBase Defense => _defense;
@@ -79,42 +87,47 @@ public class WarriorAttributeSet : CharacterAttributeSet
 
 public class PlayerAttributeSet : CharacterAttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Player;
-
-
-    public override AttributeBase[] Attributes => [
-        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration
-    ];
-
-    public override Tag[] AttributeTags => [
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration
-    ];
-
-    public PlayerAttributeSet() : base()
+    public PlayerAttributeSet()
     {
         _jumpvelocity.SetValueWithoutEvent(-500.0f);
     }
 
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Player;
+
+
+    public override AttributeBase[] Attributes =>
+    [
+        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration
+    ];
+
+    public override Tag[] AttributeTags =>
+    [
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration
+    ];
 }
 
 public class EnemyAttributeSet : CharacterAttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Enemy;
-
     protected AttributeBase _walkspeed;
 
-    public override AttributeBase[] Attributes => [
-        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration, _walkspeed
-    ];
-
-    public override Tag[] AttributeTags => [
-        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration, Tags.Attribute_AirAcceleration, Tags.Attribute_WalkSpeed
-    ];
-
-    public EnemyAttributeSet() : base()
+    public EnemyAttributeSet()
     {
         _walkspeed = new AttributeBase(Tags.AttributeSet_Character_Enemy, Tags.Attribute_WalkSpeed, 80.0f);
     }
+
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Enemy;
+
+    public override AttributeBase[] Attributes =>
+    [
+        _gravity, _runspeed, _jumpvelocity, _flooracceleration, _airacceleration, _walkspeed
+    ];
+
+    public override Tag[] AttributeTags =>
+    [
+        Tags.Attribute_Gravity, Tags.Attribute_RunSpeed, Tags.Attribute_JumpVelocity, Tags.Attribute_FloorAcceleration,
+        Tags.Attribute_AirAcceleration, Tags.Attribute_WalkSpeed
+    ];
 
     public AttributeBase WalkSpeed => _walkspeed;
 }

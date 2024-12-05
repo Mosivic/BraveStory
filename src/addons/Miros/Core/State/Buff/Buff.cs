@@ -23,7 +23,7 @@ public enum StackExpirationPolicy
     RefreshDuration
 }
 
-public class Buff(Tag sign, Agent source) : State(sign,source)
+public class Buff(Tag sign, Agent source) : State(sign, source)
 {
     // Core
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;

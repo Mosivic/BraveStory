@@ -39,7 +39,7 @@ public struct Tag
 
 
     /// <summary>
-    /// 是否是其他标签的后代
+    ///     是否是其他标签的后代
     /// </summary>
     public readonly bool IsDescendantOf(Tag other)
     {
@@ -52,13 +52,12 @@ public struct Tag
     }
 
     /// <summary>
-    /// 是否是其他标签的祖先
+    ///     是否是其他标签的祖先
     /// </summary>
     public readonly bool IsAncestorOf(Tag other)
     {
         return other.AncestorHashCodes.Contains(HashCode);
     }
-
 
 
     public readonly bool Equals(Tag other)

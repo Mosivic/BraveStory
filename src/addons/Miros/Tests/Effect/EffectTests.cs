@@ -7,9 +7,6 @@ namespace Miros.Tests;
 [TestFixture]
 public partial class EffectTests : Node2D
 {
-
-    private Effect durationEffect;
-    private Effect effect2;
     [SetUp]
     public override void _Ready()
     {
@@ -18,6 +15,9 @@ public partial class EffectTests : Node2D
 
         TestEffectApply();
     }
+
+    private Effect durationEffect;
+    private Effect effect2;
 
     private Agent _agent;
     private int _frameCounter;
@@ -34,50 +34,53 @@ public partial class EffectTests : Node2D
     [Test]
     public void TestEffectApply()
     {
-        durationEffect = new Effect(Tags.Effect_Buff,_agent)
+        durationEffect = new Effect(Tags.Effect_Buff, _agent)
         {
             DurationPolicy = DurationPolicy.Duration,
             Duration = 100,
             Stacking = new EffectStacking
             {
                 GroupTag = Tags.Effect_Buff,
-                StackingType = StackingType.AggregateByTarget,
+                StackingType = StackingType.AggregateByTarget
             },
             Modifiers =
             [
-                new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10, ModifierOperation.Add)
+                new Modifier(new AttributeIdentifier(Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10,
+                    ModifierOperation.Add)
             ]
         };
-        
 
-        effect2 = new Effect(Tags.Effect_Debuff,_agent)
+
+        effect2 = new Effect(Tags.Effect_Debuff, _agent)
         {
             DurationPolicy = DurationPolicy.Duration,
             Duration = 100,
             Stacking = new EffectStacking
             {
                 GroupTag = Tags.Effect_Buff,
-                StackingType = StackingType.AggregateByTarget,
+                StackingType = StackingType.AggregateByTarget
             },
             Modifiers =
             [
-                new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10, ModifierOperation.Add)
+                new Modifier(new AttributeIdentifier(Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10,
+                    ModifierOperation.Add)
             ]
         };
 
-        var periodEffect = new Effect(Tags.Effect_Buff,_agent)
+        var periodEffect = new Effect(Tags.Effect_Buff, _agent)
         {
             DurationPolicy = DurationPolicy.Duration,
             Duration = 10,
             Period = 1,
             Modifiers =
             [
-                new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10, ModifierOperation.Add)
+                new Modifier(new AttributeIdentifier(Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed), 10,
+                    ModifierOperation.Add)
             ]
         };
         _agent.CreateEffectExecutor();
         _agent.AddState(ExecutorType.EffectExecutor, durationEffect);
-        
+
         _agent.AddAttributeSet(typeof(PlayerAttributeSet));
     }
 

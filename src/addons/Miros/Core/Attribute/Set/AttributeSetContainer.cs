@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 
 namespace Miros.Core;
 
 public class AttributeSetContainer(Agent owner)
 {
-    private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
-    
-    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
-
     private static readonly Dictionary<Type, Tag> AttributeSetTypeMap = [];
+    private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
+
+    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
 
 
     public void AddAttributeSet<T>() where T : AttributeSet
@@ -63,15 +61,13 @@ public class AttributeSetContainer(Agent owner)
 
     public bool TryGetAttributeSet(Type attrSetType, out AttributeSet attributeSet)
     {
-
         if (AttributeSetTypeMap.TryGetValue(attrSetType, out var tag))
-        {
             if (Sets.TryGetValue(tag, out var set))
             {
                 attributeSet = set;
                 return true;
             }
-        }
+
         attributeSet = null;
         return false;
     }
@@ -90,6 +86,7 @@ public class AttributeSetContainer(Agent owner)
                 attributeSet = Sets[tag];
                 return true;
             }
+
         attributeSet = null;
         return false;
     }
@@ -99,7 +96,7 @@ public class AttributeSetContainer(Agent owner)
         if (TryGetAttributeSet(attrSetName, out var set))
             foreach (var attrTag in set.AttributeTags)
                 if (attrTag.ShortName == attrName)
-                    return new (set.AttributeSetTag, attrTag);
+                    return new AttributeIdentifier(set.AttributeSetTag, attrTag);
 
         throw new Exception($"Attribute {attrName} not found in attribute set {attrSetName}");
     }

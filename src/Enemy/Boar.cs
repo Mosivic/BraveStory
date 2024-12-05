@@ -26,7 +26,7 @@ public partial class Boar : Character
         Graphics.Scale = new Vector2(-1, 1);
 
         // Idle
-        var idle = new State(Tags.State_Action_Idle,Agent)
+        var idle = new State(Tags.State_Action_Idle, Agent)
             .OnEntered(s => PlayAnimation("idle"));
 
         // Walk

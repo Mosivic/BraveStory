@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using NUnit.Framework;
 
 namespace Miros.Core;
 
@@ -14,7 +11,10 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
 
     private readonly List<EffectTask> _tasksRemoveCache = [];
 
-    public List<EffectTask> GetRunningTasks() => _runningTasks;
+    public List<EffectTask> GetRunningTasks()
+    {
+        return _runningTasks;
+    }
 
     public override void Update(double delta)
     {
@@ -24,13 +24,13 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
     }
 
     private void UpdateTasks()
-    {   
+    {
         // Enter
         foreach (var task in _tasks)
         {
-            if(!task.CanEnter())
+            if (!task.CanEnter())
             {
-                if(task.RemoveSelfOnEnterFailed)
+                if (task.RemoveSelfOnEnterFailed)
                     _tasksRemoveCache.Add(task);
 
                 continue;
@@ -43,7 +43,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                 task.Exit();
                 task.Deactivate();
 
-                if(!task.KeepSelfOnExitSucceeded)
+                if (!task.KeepSelfOnExitSucceeded)
                     _tasksRemoveCache.Add(task);
             }
             else
@@ -59,7 +59,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
         // Exit
         foreach (var task in _runningTasks)
         {
-            if(!task.CanExit())
+            if (!task.CanExit())
                 continue;
 
             task.Deactivate();
@@ -67,7 +67,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
             _runningTasks.Remove(task);
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
 
-            if(task.KeepSelfOnExitSucceeded)
+            if (task.KeepSelfOnExitSucceeded)
                 _tasks.Add(task);
         }
 
@@ -86,14 +86,13 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
     public override void AddTask(ITask task)
     {
         var effectTask = (EffectTask)task;
-        bool isAddTask = true;
+        var isAddTask = true;
 
         foreach (var existingTask in _runningTasks)
-        {
-            if (AreTaskCouldStackByAnotherTask(effectTask, existingTask)) 
+            if (AreTaskCouldStackByAnotherTask(effectTask, existingTask))
             {
                 // 如果Tag相同且来自同一个Agent, 则不添加, 并跳过当前循环
-                if(effectTask.Tag == existingTask.Tag && _agent.AreTasksFromSameSource(effectTask, existingTask))
+                if (effectTask.Tag == existingTask.Tag && _agent.AreTasksFromSameSource(effectTask, existingTask))
                 {
                     existingTask.Stack(true);
                     isAddTask = false;
@@ -101,14 +100,13 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                 }
 
                 // 如果来自不同Agent, 则根据是否可以叠加来决定是否添加
-                if(_agent.AreTasksFromSameSource(effectTask, existingTask))
+                if (_agent.AreTasksFromSameSource(effectTask, existingTask))
                     existingTask.Stack(true);
                 else
-                    existingTask.Stack(false);
+                    existingTask.Stack();
             }
-        }
 
-        if(isAddTask) base.AddTask(task);
+        if (isAddTask) base.AddTask(task);
     }
 
     #region Event

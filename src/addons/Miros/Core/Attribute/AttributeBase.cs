@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 #if GODOT
 using Godot;
 #endif
@@ -81,7 +80,8 @@ public class AttributeBase
         _value.SetCurrentValue(value);
 
 #if GODOT
-        GD.Print($"[AttributeBase] CurrentValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
+        GD.Print(
+            $"[AttributeBase] CurrentValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
 #endif
 
         if (Math.Abs(oldValue - value) > float.Epsilon)
@@ -96,7 +96,8 @@ public class AttributeBase
         _value.SetBaseValue(value);
 
 #if GODOT
-        GD.Print($"[AttributeBase] BaseValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
+        GD.Print(
+            $"[AttributeBase] BaseValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
 #endif
 
         if (Math.Abs(oldValue - value) > float.Epsilon)

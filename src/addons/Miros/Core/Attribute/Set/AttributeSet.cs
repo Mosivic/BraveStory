@@ -1,4 +1,3 @@
-
 using System;
 
 
@@ -40,18 +39,16 @@ public abstract class AttributeSet
     public AttributeBase GetAttributeBase(string tagName)
     {
         foreach (var attribute in Attributes)
-        {
-            if (attribute.AttributeTag.ShortName == tagName) return attribute;
-        }
+            if (attribute.AttributeTag.ShortName == tagName)
+                return attribute;
         throw new Exception($"AttributeSet {AttributeSetTag} does not contain attribute {tagName}");
     }
 
     public AttributeBase GetAttributeBase(Tag tag)
     {
         foreach (var attribute in Attributes)
-        {
-            if (attribute.AttributeTag == tag) return attribute;
-        }
+            if (attribute.AttributeTag == tag)
+                return attribute;
         throw new Exception($"AttributeSet {AttributeSetTag} does not contain attribute {tag.ShortName}");
     }
 }

@@ -1,8 +1,8 @@
-
 /// <summary>
 /// 自定义属性集
 /// 用于存储自定义的属性集
 /// </summary>
+
 namespace Miros.Core;
 
 // public class CustomAttrSet : AttributeSet
