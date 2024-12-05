@@ -133,7 +133,7 @@ public class Agent : AbsAgent, IAgent
 
 	private void ApplyModifier(Effect effect, Modifier modifier)
 	{
-		var attributeValue = GetAttributeValue(modifier.AttributeSetTag, modifier.AttributeTag);
+		var attributeValue = GetAttributeValue(modifier.AttributeIdentifier.SetTag, modifier.AttributeIdentifier.Tag);
 		if (attributeValue == null) return;
 
 		if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
@@ -142,7 +142,7 @@ public class Agent : AbsAgent, IAgent
 		if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
 			throw new InvalidOperationException(
 				$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-				$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeValue.Value.CalculateMode}");
+				$"But {modifier.AttributeIdentifier.SetTag}.{modifier.AttributeIdentifier.Tag} is {attributeValue.Value.CalculateMode}");
 
 		var magnitude = modifier.CalculateMagnitude(effect);
 		var baseValue = attributeValue.Value.BaseValue;
@@ -167,8 +167,8 @@ public class Agent : AbsAgent, IAgent
 				throw new ArgumentOutOfRangeException();
 		}
 
-		AttributeSetContainer.Sets[modifier.AttributeSetTag]
-			.ChangeAttributeBase(modifier.AttributeTag, baseValue);
+		AttributeSetContainer.Sets[modifier.AttributeIdentifier.SetTag]
+			.ChangeAttributeBase(modifier.AttributeIdentifier.Tag, baseValue);
 	}
 
 	public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
@@ -291,6 +291,12 @@ public class Agent : AbsAgent, IAgent
 
 
 	#region AttributeSet
+
+
+	public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
+	{
+		return AttributeSetContainer.GetAttributeIdentifier(attrSetName, attrName);
+	}
 
 	public void AddAttributeSet(Type attrSetType)
 	{

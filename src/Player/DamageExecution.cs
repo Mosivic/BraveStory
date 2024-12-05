@@ -25,8 +25,9 @@ public class DamageExecution : Execution
         var data = new DamageData(effect);
         var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
         
-        // TODO : Fix attribute set tag & attribute tag problem
-        var hpModifier = new Modifier(new Tag("Character"), new Tag("HP"), newHp, ModifierOperation.Override);
+
+    
+        var hpModifier = new Modifier(effect.Owner.GetAttributeIdentifier("Character", "HP"), newHp, ModifierOperation.Override);
 
         modifiers = [hpModifier];
     }

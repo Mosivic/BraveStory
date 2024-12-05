@@ -76,6 +76,7 @@ public class AttributeSetContainer(Agent owner)
         return false;
     }
 
+
     public bool TryGetAttributeSet(string attrSetName, out AttributeSet attributeSet)
     {
         foreach (var tag in Sets.Keys)
@@ -93,6 +94,15 @@ public class AttributeSetContainer(Agent owner)
         return false;
     }
 
+    public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
+    {
+        if (TryGetAttributeSet(attrSetName, out var set))
+            foreach (var attrTag in set.AttributeTags)
+                if (attrTag.ShortName == attrName)
+                    return new (set.AttributeSetTag, attrTag);
+
+        throw new Exception($"Attribute {attrName} not found in attribute set {attrSetName}");
+    }
 
     public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
     {
