@@ -45,7 +45,7 @@ public partial class EffectTests : Node2D
             },
             Modifiers =
             [
-                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
         };
         
@@ -61,7 +61,7 @@ public partial class EffectTests : Node2D
             },
             Modifiers =
             [
-                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
         };
 
@@ -72,7 +72,7 @@ public partial class EffectTests : Node2D
             Period = 1,
             Modifiers =
             [
-                new Modifier(Tags.AttributeSet_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
+                new Modifier(Tags.AttributeSet_Character_Player, Tags.Attribute_RunSpeed, 10, ModifierOperation.Add)
             ]
         };
         _agent.CreateEffectExecutor();

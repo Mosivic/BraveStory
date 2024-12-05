@@ -16,6 +16,7 @@ public class DamageExecution : Execution
             SourceAttack = effect.Source.GetAttributeCurrentValue("Character", "Attack") ?? 0;
             TargetDefense = effect.Owner.GetAttributeCurrentValue("Character", "Defense") ?? 0;
             TargetHP = effect.Owner.GetAttributeCurrentValue("Character", "HP") ?? 0;
+
         }
     }
 
