@@ -5,9 +5,9 @@ namespace Miros.Core;
 public static partial class Tags
 {
     public static Tag AttributeSet_Character { get; } = TagManager.RequestTag("AttributeSet.Character");
-    public static Tag AttributeSet_Warrior { get; } = TagManager.RequestTag("AttributeSet.Warrior");
-    public static Tag AttributeSet_Player { get; } = TagManager.RequestTag("AttributeSet.Player");
-    public static Tag AttributeSet_Enemy { get; } = TagManager.RequestTag("AttributeSet.Enemy");
+    public static Tag AttributeSet_Character_Warrior { get; } = TagManager.RequestTag("AttributeSet.Character.Warrior");
+    public static Tag AttributeSet_Character_Player { get; } = TagManager.RequestTag("AttributeSet.Character.Player");
+    public static Tag AttributeSet_Character_Enemy { get; } = TagManager.RequestTag("AttributeSet.Character.Enemy");
     public static Tag Attribute_Gravity { get; } = TagManager.RequestTag("Attribute.Gravity");
     public static Tag Attribute_RunSpeed { get; } = TagManager.RequestTag("Attribute.RunSpeed");
     public static Tag Attribute_JumpVelocity { get; } = TagManager.RequestTag("Attribute.JumpVelocity");
@@ -54,7 +54,7 @@ public class CharacterAttributeSet : AttributeSet
 
 public class WarriorAttributeSet : CharacterAttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Warrior;
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Warrior;
 
     protected readonly AttributeBase _strength;
     protected readonly AttributeBase _defense;
@@ -69,8 +69,8 @@ public class WarriorAttributeSet : CharacterAttributeSet
 
     public WarriorAttributeSet() : base()
     {
-        _strength = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Strength, 10.0f);
-        _defense = new AttributeBase(Tags.AttributeSet_Warrior, Tags.Attribute_Defense, 8.0f);
+        _strength = new AttributeBase(Tags.AttributeSet_Character_Warrior, Tags.Attribute_Strength, 10.0f);
+        _defense = new AttributeBase(Tags.AttributeSet_Character_Warrior, Tags.Attribute_Defense, 8.0f);
     }
 
     public AttributeBase Strength => _strength;
@@ -79,7 +79,7 @@ public class WarriorAttributeSet : CharacterAttributeSet
 
 public class PlayerAttributeSet : CharacterAttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Player;
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Player;
 
 
     public override AttributeBase[] Attributes => [
@@ -98,7 +98,7 @@ public class PlayerAttributeSet : CharacterAttributeSet
 
 public class EnemyAttributeSet : CharacterAttributeSet
 {
-    public override Tag AttributeSetTag => Tags.AttributeSet_Enemy;
+    public override Tag AttributeSetTag => Tags.AttributeSet_Character_Enemy;
 
     protected readonly AttributeBase _walkspeed;
 
@@ -112,7 +112,7 @@ public class EnemyAttributeSet : CharacterAttributeSet
 
     public EnemyAttributeSet() : base()
     {
-        _walkspeed = new AttributeBase(Tags.AttributeSet_Enemy, Tags.Attribute_WalkSpeed, 80.0f);
+        _walkspeed = new AttributeBase(Tags.AttributeSet_Character_Enemy, Tags.Attribute_WalkSpeed, 80.0f);
     }
 
     public AttributeBase WalkSpeed => _walkspeed;

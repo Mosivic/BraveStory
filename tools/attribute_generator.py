@@ -102,7 +102,10 @@ class AttributeGenerator:
         for set_name in self.attribute_sets.keys():
             tag_identifier = f"AttributeSet.{set_name}"
             if tag_identifier not in generated_tags:
-                code_parts.append(f"    public static Tag AttributeSet_{set_name} {{ get; }} = TagManager.RequestTag(\"{tag_identifier}\");\n")
+                # 修改标签名称为递归父类名称 + "_" + 自身名称
+                parent_name_underscore = "_".join(self.attribute_sets[set_name].inherits + [set_name])
+                parent_name_dot = ".".join(self.attribute_sets[set_name].inherits + [set_name])
+                code_parts.append(f"    public static Tag AttributeSet_{parent_name_underscore} {{ get; }} = TagManager.RequestTag(\"AttributeSet.{parent_name_dot}\");\n")
                 generated_tags.add(tag_identifier)  # 添加到已生成标签集合
         
 
@@ -141,9 +144,9 @@ class AttributeGenerator:
         code_parts = []
         code_parts.append(f"public class {set_name}AttributeSet : {parent_class}")
         code_parts.append("{")
-
+        parent_name_underscore = "_".join(attr_set.inherits + [set_name])
         # 声明属性集标签
-        code_parts.append(f"    public override Tag AttributeSetTag => Tags.AttributeSet_{set_name};\n")
+        code_parts.append(f"    public override Tag AttributeSetTag => Tags.AttributeSet_{parent_name_underscore};\n")
 
         # 只声明新增的属性字段
         inherited_attrs = set()
@@ -174,7 +177,9 @@ class AttributeGenerator:
         # 只初始化新增的属性
         for attr_name, attr_def in attr_set.attributes.items():
             if attr_name not in inherited_attrs:
-                code_parts.append(f'        _{attr_name.lower()} = new AttributeBase(Tags.AttributeSet_{set_name}, Tags.Attribute_{attr_name}, {attr_def.value}f);')
+                # 在构造函数开始时定义 parent_name_underscore
+                parent_name_underscore = "_".join(attr_set.inherits + [set_name])
+                code_parts.append(f'        _{attr_name.lower()} = new AttributeBase(Tags.AttributeSet_{parent_name_underscore}, Tags.Attribute_{attr_name}, {attr_def.value}f);')
         code_parts.append("    }\n")
         
         # 属性访问器（只为新增的属性生成）

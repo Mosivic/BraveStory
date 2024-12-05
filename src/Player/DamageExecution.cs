@@ -1,5 +1,6 @@
-
 using Miros.Core;
+
+namespace BraveStory;
 
 public class DamageExecution : Execution
 {
@@ -17,7 +18,7 @@ public class DamageExecution : Execution
         }
     }
 
-    public override void CalculateMagnitude(Effect effect)
+    public override void Execute(Effect effect)
     {
         var data = new DamageData(effect);
         var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
