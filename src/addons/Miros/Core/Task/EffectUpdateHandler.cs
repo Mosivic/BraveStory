@@ -29,11 +29,8 @@ public class EffectUpdateHandler
 
 	public void Tick(double delta)
 	{
-		if (_effect.DurationPolicy == DurationPolicy.Duration)
-		{
-			_durationTimer.Tick(delta);
-			_periodTimer.Tick(delta);
-		}
+		_durationTimer.Tick(delta);
+		_periodTimer.Tick(delta);
 	}
 
 	private void OnPeriodOver()

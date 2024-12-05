@@ -83,7 +83,7 @@ public class AttributeSetContainer(Agent owner)
             // 1. 完全匹配，例如 传入字符串为"Character.Attack" 可以匹配标签为"Character.Attack"的属性集
             // 2. 短名称匹配，例如 传入字符串为"Attack" 可以匹配标签为"Character.Attack"的属性集
             // 3. 后代匹配，例如 传入字符串为"Character" 可以匹配标签为"Character.Attack"的属性集
-            // 第二点和第三点会导致歧义，所以使用时请注意，尽量使用完全匹配来获取属性集
+            // 第二点和第三点会导致歧义，尽量使用完全匹配来获取属性集
             if (tag.FuallName == attrSetName || tag.ShortName == attrSetName || tag.IsDescendantOf(attrSetName))
             {
                 attributeSet = Sets[tag];
