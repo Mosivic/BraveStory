@@ -29,7 +29,6 @@ public partial class HitBox : Area2D
     {
         if (area2D is HurtBox hurtBox)
         {
-            GD.Print($"[Hit] {Owner.Name} -> {hurtBox.Owner.Name}");
             OnHit?.Invoke(this, new HitEventArgs(hurtBox));
             hurtBox.Emit(this); //Emit HurtBox OnHurt
         }

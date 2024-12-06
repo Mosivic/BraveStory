@@ -53,7 +53,7 @@ public partial class Character : CharacterBody2D
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        GD.Print($"[Hurt] {Name} Received hurt from {e.Hitbox.Owner.Name} and now HP is {Agent.Attr("HP")}");
+        GD.Print($"[Damage] {e.Hitbox.Owner.Name} -> {Name} | HP : {Agent.Attr("HP")}");
     }   
 
 

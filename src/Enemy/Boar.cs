@@ -123,7 +123,6 @@ public partial class Boar : Character
 
     private void Chase(double delta)
     {
-        // Implement chase logic when player is detected
         if (_playerChecker.IsColliding())
         {
             var playerPosition = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;

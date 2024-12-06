@@ -309,12 +309,4 @@ public partial class Player : Character
         Velocity = velocity;
         MoveAndSlide();
     }
-
-    protected override void HandleHit(object sender, HitEventArgs e)
-    {
-        // HitBox.SetBuffState(new Buff(Tags.StateLayer_Buff)
-        // {
-        // 	 TaskType = typeof(TaskBuff)
-        // });
-    }
 }
