@@ -31,8 +31,7 @@ public partial class Player : Character
         _footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
         _animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-        Agent = new Agent(this, new StaticTaskProvider());
-        Agent.AddAttributeSet(typeof(PlayerAttributeSet));
+        Agent = new Agent(this, new StaticTaskProvider(), [typeof(PlayerAttributeSet)]);
 
         // Idle  
         var idle = new State(Tags.State_Action_Idle, Agent)
@@ -202,22 +201,6 @@ public partial class Player : Character
         }
     }
 
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
-        if (@event.IsActionPressed("jump"))
-        {
-            GD.Print("gravity: " + Agent.Attr("Gravity"));
-            GD.Print("run speed: " + Agent.Attr("RunSpeed"));
-            GD.Print("sliding deceleration: " + Agent.Attr("SlidingDeceleration"));
-            GD.Print("floor acceleration: " + Agent.Attr("FloorAcceleration"));
-            GD.Print("air acceleration: " + Agent.Attr("AirAcceleration"));
-            GD.Print("jump velocity: " + Agent.Attr("JumpVelocity"));
-            GD.Print("jump count: " + _jumpCount);
-            GD.Print("max jump count: " + _maxJumpCount);
-
-        }
-    }
 
     // 添加一个统一处理朝向的方法
     private void UpdateFacing(float direction)

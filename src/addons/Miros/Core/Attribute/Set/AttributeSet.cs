@@ -9,9 +9,9 @@ namespace Miros.Core;
 public abstract class AttributeSet
 {
     public abstract AttributeBase[] Attributes { get; }
-
     public abstract Tag[] AttributeTags { get; }
     public abstract Tag AttributeSetTag { get; }
+    
     public Agent Owner { get; private set; }
 
     /// <summary>
@@ -32,7 +32,7 @@ public abstract class AttributeSet
     /// <param name="value">新值</param>
     public void ChangeAttributeBase(Tag attributeSign, float value)
     {
-        if (GetAttributeBase(attributeSign) != null) GetAttributeBase(attributeSign).SetBaseValue(value);
+        GetAttributeBase(attributeSign)?.SetBaseValue(value);
     }
 
     public bool TryGetAttribute(string attrName, out AttributeBase attribute)

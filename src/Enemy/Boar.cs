@@ -21,7 +21,7 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
-        Agent = new Agent(this, new StaticTaskProvider());
+        Agent = new Agent(this, new StaticTaskProvider(), [typeof(BoarAttributeSet)]);
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 

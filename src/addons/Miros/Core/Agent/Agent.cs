@@ -14,10 +14,13 @@ public enum ExecutorType
 
 public class Agent : AbsAgent, IAgent
 {
-    public Agent(Node2D host, ITaskProvider taskProvider) : base(host, taskProvider)
+    public Agent(Node2D host, ITaskProvider taskProvider, Type[] attrSetTypes) : base(host, taskProvider)
     {
         AttributeSetContainer = new AttributeSetContainer(this);
-        CreateEffectExecutor();
+        Executors[ExecutorType.EffectExecutor] = new EffectExecutor(this);;
+
+        foreach (var attrSetType in attrSetTypes)
+            AddAttributeSet(attrSetType);
     }
 
 
@@ -51,16 +54,12 @@ public class Agent : AbsAgent, IAgent
         Executors[ExecutorType.MultiLayerStateMachine] = executor;
     }
 
-    public void CreateEffectExecutor()
-    {
-        var executor = new EffectExecutor(this);
-        Executors[ExecutorType.EffectExecutor] = executor;
-    }
 
     public EffectExecutor GetEffectExecutor()
     {
         return Executors[ExecutorType.EffectExecutor] as EffectExecutor;
     }
+
 
     public void AddState(ExecutorType executorType, State state)
     {
@@ -135,7 +134,7 @@ public class Agent : AbsAgent, IAgent
 
     private void ApplyModifier(Effect effect, Modifier modifier)
     {
-        var attributeValue = GetAttributeValue(modifier.AttributeIdentifier.SetTag, modifier.AttributeIdentifier.Tag);
+        var attributeValue = GetAttributeBase(modifier.AttributeIdentifier.SetTag, modifier.AttributeIdentifier.Tag);
         if (attributeValue == null) return;
 
         if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
@@ -271,94 +270,7 @@ public class Agent : AbsAgent, IAgent
     // }
 
 
-    #region Tag Check
-
-    public bool HasTag(Tag gameplayTag)
-    {
-        return OwnedTags.HasTag(gameplayTag);
-    }
-
-    public bool HasAll(TagSet tags)
-    {
-        return OwnedTags.HasAll(tags);
-    }
-
-    public bool HasAny(TagSet tags)
-    {
-        return OwnedTags.HasAny(tags);
-    }
-
-    #endregion
 
 
-    #region AttributeSet
 
-    public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
-    {
-        return AttributeSetContainer.GetAttributeIdentifier(attrSetName, attrName);
-    }
-
-    public void AddAttributeSet(Type attrSetType)
-    {
-        AttributeSetContainer.AddAttributeSet(attrSetType);
-    }
-
-    public AttributeValue? GetAttributeValue(Tag attrSetTag, Tag attrTag)
-    {
-        return AttributeSetContainer.GetAttributeValue(attrSetTag, attrTag);
-    }
-
-    public AttributeValue? GetAttributeValue(string tagSetShortName, string tagShortName)
-    {
-        return AttributeSetContainer.GetAttributeValue(tagSetShortName, tagShortName);
-    }
-
-
-    public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
-    {
-        return AttributeSetContainer.GetAttributeBase(attrSetTag, attrTag);
-    }
-
-    public AttributeBase GetAttributeBase(string attrSetName, string attrName)
-    {
-        return AttributeSetContainer.GetAttributeBase(attrSetName, attrName);
-    }
-
-    public CalculateMode? GetAttributeCalculateMode(Tag attrSetTag, Tag attrTag)
-    {
-        return AttributeSetContainer.GetAttributeCalculateMode(attrSetTag, attrTag);
-    }
-
-    public float? GetAttributeCurrentValue(Tag attrSetTag, Tag attrTag)
-    {
-        return AttributeSetContainer.GetAttributeCurrentValue(attrSetTag, attrTag);
-    }
-
-    public float? GetAttributeCurrentValue(string attrSetName, string attrName)
-    {
-        return AttributeSetContainer.GetAttributeCurrentValue(attrSetName, attrName);
-    }
-
-    public float? GetAttributeBaseValue(Tag attrSetTag, Tag attrTag)
-    {
-        return AttributeSetContainer.GetAttributeBaseValue(attrSetTag, attrTag);
-    }
-
-    public float? GetAttributeBaseValue(string attrSetName, string attrName)
-    {
-        return AttributeSetContainer.GetAttributeBaseValue(attrSetName, attrName);
-    }
-
-    public Dictionary<Tag, float> DataSnapshot()
-    {
-        return AttributeSetContainer.Snapshot();
-    }
-
-    public T AttrSet<T>() where T : AttributeSet
-    {
-        AttributeSetContainer.TryGetAttributeSet<T>(out var attrSet);
-        return attrSet;
-    }
-
-    #endregion
 }
