@@ -29,7 +29,7 @@ public class AbsAgent
         else if (AttributeSetContainer.TryGetAttributeBase(attrName,out var attr))
         {
             _attributes[attrName] = attr.CurrentValue;
-			attr.UnregisterPostCurrentValueChange(OnUpdateAttributes);
+			attr.RegisterPostCurrentValueChange(OnUpdateAttributes);
             return attr.CurrentValue;
         }
 

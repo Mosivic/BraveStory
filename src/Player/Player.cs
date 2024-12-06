@@ -201,6 +201,23 @@ public partial class Player : Character
         }
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        if (@event.IsActionPressed("jump"))
+        {
+            GD.Print("HP (before): " + Agent.Attr("HP"));
+            var effect = new Effect(Tags.Effect_Buff, Agent)
+            {
+                DurationPolicy = DurationPolicy.Instant,
+                Modifiers = [
+                    new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_HP), 10, ModifierOperation.Add)
+                ]
+            };
+            Agent.AddState(ExecutorType.EffectExecutor, effect);
+            GD.Print("HP (after): " + Agent.Attr("HP"));
+        }
+    }
 
     // 添加一个统一处理朝向的方法
     private void UpdateFacing(float direction)
