@@ -124,8 +124,8 @@ public class Agent : AbsAgent, IAgent
 				var attribute = GetAttributeBase(modifierOption.AttributeSetName, modifierOption.AttributeName);
                 var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
                     modifierOption.Magnitude, modifierOption.Operation);
-					
-                ApplyModifier(effect, modifier);
+
+                ApplyModifier(effect, modifier, attribute);
             }
         }
     }
@@ -138,21 +138,23 @@ public class Agent : AbsAgent, IAgent
             ApplyModifier(effect, modifier);
     }
 
-    private void ApplyModifier(Effect effect, Modifier modifier)
+
+    private void ApplyModifier(Effect effect, Modifier modifier,AttributeBase attributeBase = null)
     {
-        var attribute = GetAttributeBase(modifier.AttributeSetTag, modifier.AttributeTag);
-        if (attribute == null) return;
+		attributeBase ??= GetAttributeBase(modifier.AttributeSetTag, modifier.AttributeTag);
+			
+		if (attributeBase == null) return;
 
         // if (attribute.IsSupportOperation(modifier.Operation) == false)
         //     throw new InvalidOperationException("Unsupported operation.");
 
-        if (attribute.CalculateMode != CalculateMode.Stacking)
+        if (attributeBase.CalculateMode != CalculateMode.Stacking)
             throw new InvalidOperationException(
                 $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-                $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attribute.CalculateMode}");
+                $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeBase	.CalculateMode}");
 
         var magnitude = modifier.CalculateMagnitude(effect);
-        var baseValue = attribute.BaseValue;
+        var baseValue = attributeBase.BaseValue;
         switch (modifier.Operation)
         {
             case ModifierOperation.Add:
