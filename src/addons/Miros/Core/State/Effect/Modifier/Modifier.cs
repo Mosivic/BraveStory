@@ -6,7 +6,7 @@ public enum ModifierMagnitudeType
     AttributeBased,
     AttributeBasedWithStack,
     SetByCallerFromName,
-    SetByCallerFromTag,
+    SetByCallerFromTag
 }
 
 public struct ModifierMagnitude
@@ -14,20 +14,25 @@ public struct ModifierMagnitude
     public ModifierMagnitudeType Type { get; set; }
 }
 
-public struct AttributeIdentifier(Tag setTag, Tag tag)
-{
-    public Tag SetTag { get; set; } = setTag;
-    public Tag Tag { get; set; } = tag;
-}
 
-public class Modifier(AttributeIdentifier attributeIdentifier, float magnitude, ModifierOperation operation)
+public class Modifier
 {
     public ModifierMagnitudeCalculation MMC; // 幅度计算
-    public AttributeIdentifier AttributeIdentifier { get; set; } = attributeIdentifier; // 属性标识符
-    public float Magnitude { get; set; } = magnitude; // 幅度
-    public ModifierOperation Operation { get; set; } = operation; // 操作
+
+    public Tag AttributeSetTag { get; set; }
+    public Tag AttributeTag { get; set; }
+
+    public float Magnitude { get; set; }
+    public ModifierOperation Operation { get; set; }
 
 
+    public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation)
+    {
+        AttributeSetTag = attributeSetTag;
+        AttributeTag = attributeTag;
+        Magnitude = magnitude;
+        Operation = operation;
+    }
     public float CalculateMagnitude(Effect effect)
     {
         return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;

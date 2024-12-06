@@ -19,13 +19,11 @@ public class EffectStacking
     public Effect[] OverflowEffects { get; set; } // 超过StackLimitCount数量的Effect被Apply时将会调用该OverflowEffects
 
     public Action<int> OnStackCountChanged { get; set; }
-    
-    
+
+
     public void ChangeStackCount(int count)
     {
         StackCount = count;
         OnStackCountChanged?.Invoke(count);
     }
-
-
 }

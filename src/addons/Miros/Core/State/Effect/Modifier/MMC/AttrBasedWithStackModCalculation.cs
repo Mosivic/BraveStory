@@ -53,4 +53,4 @@ public class AttrBasedWithStackModCalculation : AttributeBasedModCalculation
             _ => attrMagnitude + stackMagnitude
         };
     }
-}   
+}

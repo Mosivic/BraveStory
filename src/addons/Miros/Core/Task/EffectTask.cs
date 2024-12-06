@@ -1,5 +1,4 @@
 using System;
-
 # if GODOT
 using Godot;
 # endif
@@ -8,18 +7,16 @@ namespace Miros.Core;
 
 public class EffectTask(Effect effect) : TaskBase(effect)
 {
-    public event Action<EffectTask> OnStacked;
-    public event Action<EffectTask> OnStackOverflowed;
-    public event Action<EffectTask> OnDurationOvered;
-    public event Action<EffectTask> OnPeriodOvered;
+    private EffectUpdateHandler _updateHandler;
 
     public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
     public EffectStacking Stacking => effect.Stacking;
     public bool RemoveSelfOnEnterFailed => effect.RemoveSelfOnEnterFailed;
     public bool KeepSelfOnExitSucceeded => effect.KeepSelfOnExitSucceeded;
-
-    
-    private EffectUpdateHandler _updateHandler;
+    public event Action<EffectTask> OnStacked;
+    public event Action<EffectTask> OnStackOverflowed;
+    public event Action<EffectTask> OnDurationOvered;
+    public event Action<EffectTask> OnPeriodOvered;
 
     public override void Enter()
     {
@@ -32,17 +29,17 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
             effect.Owner.ApplyModWithInstant(effect);
+            effect.Owner.ApplyExecWithInstant(effect);
+
             effect.Status = RunningStatus.Succeed;
         }
-        else if(effect.DurationPolicy == DurationPolicy.Infinite)
+        else if (effect.DurationPolicy == DurationPolicy.Infinite)
         {
-            
         }
-        else if(effect.DurationPolicy == DurationPolicy.Duration || effect.DurationPolicy == DurationPolicy.Periodic)
+        else if (effect.DurationPolicy == DurationPolicy.Duration || effect.DurationPolicy == DurationPolicy.Periodic)
         {
             _updateHandler = new EffectUpdateHandler(effect);
         }
-
     }
 
 
@@ -70,14 +67,16 @@ public class EffectTask(Effect effect) : TaskBase(effect)
             case StackingType.AggregateBySource:
                 if (isFromSameSource)
 # if GODOT && DEBUG
-                GD.Print($"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
+                    GD.Print(
+                        $"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
 # endif
-                    stacking.ChangeStackCount(stacking.StackCount + 1);
+                stacking.ChangeStackCount(stacking.StackCount + 1);
                 break;
             case StackingType.AggregateByTarget:
-                
+
 # if GODOT && DEBUG
-                GD.Print($"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
+                GD.Print(
+                    $"[EffectTask][{effect.Tag.ShortName}] StackCount changed from {stacking.StackCount} to {stacking.StackCount + 1}");
 # endif
                 stacking.ChangeStackCount(stacking.StackCount + 1);
                 break;
@@ -95,8 +94,8 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
     public override bool CanExit()
     {
-        if(!effect.Owner.HasAll(effect.OngoingRequiredTags)) return true;
-        if(effect.Owner.HasAny(effect.ApplicationImmunityTags)) return true;
+        if (!effect.Owner.HasAll(effect.OngoingRequiredTags)) return true;
+        if (effect.Owner.HasAny(effect.ApplicationImmunityTags)) return true;
         return effect.Status != RunningStatus.Running;
     }
 

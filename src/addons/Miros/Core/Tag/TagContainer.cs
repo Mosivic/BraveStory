@@ -18,40 +18,40 @@ public class TagContainer(HashSet<Tag> tags)
     {
         return _tags.Contains(tag);
     }
-    
+
     public bool HasAny(TagSet other)
     {
-        if(other.Empty) return false;
+        if (other.Empty) return false;
         return _tags.Overlaps(other.Tags);
     }
-    
+
     public bool HasAny(TagContainer other)
     {
-        if(other == null) return false;
+        if (other == null) return false;
         return _tags.Overlaps(other._tags);
     }
 
     public bool HasAny(HashSet<Tag> other)
     {
-        if(other == null) return false;
+        if (other == null) return false;
         return _tags.Overlaps(other);
     }
 
     public bool HasAll(TagSet other)
     {
-        if(other.Empty) return true;
+        if (other.Empty) return true;
         return _tags.IsSupersetOf(other.Tags);
     }
-    
+
     public bool HasAll(TagContainer other)
     {
-        if(other == null) return true;
+        if (other == null) return true;
         return _tags.IsSupersetOf(other._tags);
     }
 
     public bool HasAll(HashSet<Tag> other)
     {
-        if(other == null) return true;
+        if (other == null) return true;
         return _tags.IsSupersetOf(other);
     }
 
@@ -73,7 +73,7 @@ public class TagContainer(HashSet<Tag> tags)
     public void AppendTags(TagContainer other)
     {
         var addedTags = other._tags.Except(_tags).ToList();
-        
+
         if (addedTags.Count == 0) return;
         _tags.UnionWith(addedTags);
         foreach (var tag in addedTags) OnTagAdded(tag);
@@ -83,7 +83,7 @@ public class TagContainer(HashSet<Tag> tags)
     public void RemoveTags(TagContainer other)
     {
         var removedTags = _tags.Intersect(other._tags).ToList();
-        
+
         if (removedTags.Count == 0) return;
         _tags.ExceptWith(removedTags);
         foreach (var tag in removedTags) OnTagRemoved(tag);

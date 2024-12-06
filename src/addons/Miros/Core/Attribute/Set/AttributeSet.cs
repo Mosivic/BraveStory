@@ -1,4 +1,3 @@
-
 using System;
 
 
@@ -10,19 +9,19 @@ namespace Miros.Core;
 public abstract class AttributeSet
 {
     public abstract AttributeBase[] Attributes { get; }
-
     public abstract Tag[] AttributeTags { get; }
     public abstract Tag AttributeSetTag { get; }
+
     public Agent Owner { get; private set; }
 
     /// <summary>
     ///     设置属性集的拥有者
     /// </summary>
     /// <param name="owner">拥有者</param>
-    public void SetOwner(Agent owner)
+    public void Init(Agent owner)
     {
         Owner = owner;
-        foreach (var attribute in Attributes) attribute.SetOwner(owner);
+        foreach (var attribute in Attributes) attribute.Init(owner, AttributeSetTag);
     }
 
 
@@ -33,25 +32,34 @@ public abstract class AttributeSet
     /// <param name="value">新值</param>
     public void ChangeAttributeBase(Tag attributeSign, float value)
     {
-        if (GetAttributeBase(attributeSign) != null) GetAttributeBase(attributeSign).SetBaseValue(value);
+        GetAttributeBase(attributeSign)?.SetBaseValue(value);
     }
 
+    public bool TryGetAttribute(string attrName, out AttributeBase attribute)
+    {
+        foreach (var attr in Attributes)
+            if (attr.AttributeTag.ShortName == attrName)
+            {
+                attribute = attr;
+                return true;
+            }
+        attribute = null;
+        return false;
+    }
 
     public AttributeBase GetAttributeBase(string tagName)
     {
         foreach (var attribute in Attributes)
-        {
-            if (attribute.AttributeTag.ShortName == tagName) return attribute;
-        }
+            if (attribute.AttributeTag.ShortName == tagName)
+                return attribute;
         throw new Exception($"AttributeSet {AttributeSetTag} does not contain attribute {tagName}");
     }
 
     public AttributeBase GetAttributeBase(Tag tag)
     {
         foreach (var attribute in Attributes)
-        {
-            if (attribute.AttributeTag == tag) return attribute;
-        }
+            if (attribute.AttributeTag == tag)
+                return attribute;
         throw new Exception($"AttributeSet {AttributeSetTag} does not contain attribute {tag.ShortName}");
     }
 }

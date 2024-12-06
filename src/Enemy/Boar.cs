@@ -1,17 +1,14 @@
 using BraveStory;
 using Godot;
 using Miros.Core;
-using static BraveStory.TestData;
 
 public partial class Boar : Character
 {
-    private readonly EnemyData _data = new();
     private RayCast2D _floorChecker;
     private int _hp = 5;
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
-    private EnemyData Data = new();
 
     public override void _Ready()
     {
@@ -21,12 +18,12 @@ public partial class Boar : Character
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
 
-        Agent = new Agent(this, new StaticTaskProvider());
+        Agent = new Agent(this, new StaticTaskProvider(), [typeof(BoarAttributeSet)]);
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
         // Idle
-        var idle = new State(Tags.State_Action_Idle,Agent)
+        var idle = new State(Tags.State_Action_Idle, Agent)
             .OnEntered(s => PlayAnimation("idle"));
 
         // Walk
@@ -57,7 +54,7 @@ public partial class Boar : Character
                 // 应用击退力
                 var velocity = Velocity;
                 velocity += _knockbackVelocity;
-                velocity.Y += (float)d * _data.Gravity;
+                velocity.Y += (float)d * Agent.Attr("Gravity");
                 // 逐渐减弱击退效果
                 _knockbackVelocity *= 0.8f;
                 Velocity = velocity;
@@ -118,15 +115,14 @@ public partial class Boar : Character
 
         // 移动逻辑
         var velocity = Velocity;
-        velocity.X = _data.WalkSpeed * -Graphics.Scale.X; // 注意这里加了负号
-        velocity.Y += (float)delta * _data.Gravity;
+        velocity.X = Agent.Attr("WalkSpeed") * -Graphics.Scale.X; // 注意这里加了负号
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
         Velocity = velocity;
         MoveAndSlide();
     }
 
     private void Chase(double delta)
     {
-        // Implement chase logic when player is detected
         if (_playerChecker.IsColliding())
         {
             var playerPosition = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
@@ -134,8 +130,8 @@ public partial class Boar : Character
             {
                 var direction = (playerPosition.Value - GlobalPosition).Normalized();
                 var velocity = Velocity;
-                velocity.X = direction.X * _data.RunSpeed;
-                velocity.Y += (float)delta * _data.Gravity;
+                velocity.X = direction.X * Agent.Attr("RunSpeed");
+                velocity.Y += (float)delta * Agent.Attr("Gravity");
                 Velocity = velocity;
                 // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
                 Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);

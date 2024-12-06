@@ -53,13 +53,23 @@ public partial class Character : CharacterBody2D
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        // GD.Print($"[Hurt]{Name} Received buff :{e.Buff.Name}");
-        // _hasHit = true;
-    }
+        GD.Print($"[Damage] {e.Hitbox.Owner.Name} -> {Name} | HP : {Agent.Attr("HP")}");
+    }   
 
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
+        var suffer = e.HurtBox.Owner as Character;
+
+        var damageEffect = new Effect(Tags.Effect_Buff, Agent)
+        {
+            DurationPolicy = DurationPolicy.Instant,
+            Executions = [
+                new DamageExecution()
+            ]
+        };
+
+        suffer.Agent.AddState(ExecutorType.EffectExecutor, damageEffect);
     }
 
 

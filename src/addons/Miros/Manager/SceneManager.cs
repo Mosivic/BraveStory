@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Godot;
 
-
 public partial class SceneManager : Node
 {
     // 存储场景状态的字典

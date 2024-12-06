@@ -86,6 +86,4 @@ public class TaskBase(State state) : AbsTask(state), ITask
         state.Status = RunningStatus.Failed;
         OnFail();
     }
-
-
 }

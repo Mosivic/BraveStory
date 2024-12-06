@@ -4,31 +4,29 @@ namespace BraveStory;
 
 public class DamageExecution : Execution
 {
-    struct DamageData
+    public override void Execute(Effect effect, out ModifierOption[] modifierOptions)
     {
-        public float SourceAttack;
-        public float TargetDefense;
-        public float TargetHP;
+        var data = new DamageData(effect);
+        var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
+
+
+        var hpModifier = new ModifierOption("AttributeSet.Character", "HP", newHp, ModifierOperation.Override);
+
+        modifierOptions = [hpModifier];
+    }
+
+    private readonly struct DamageData
+    {
+        public readonly float SourceAttack;
+        public readonly float TargetDefense;
+        public readonly float TargetHP;
 
 
         public DamageData(Effect effect)
         {
-            SourceAttack = effect.Source.GetAttributeCurrentValue("Character", "Attack") ?? 0;
-            TargetDefense = effect.Owner.GetAttributeCurrentValue("Character", "Defense") ?? 0;
-            TargetHP = effect.Owner.GetAttributeCurrentValue("Character", "HP") ?? 0;
-
+            SourceAttack = effect.Source.Attr("Attack");
+            TargetDefense = effect.Owner.Attr("Defense");
+            TargetHP = effect.Owner.Attr("HP");
         }
-    }
-
-    public override void Execute(Effect effect, out Modifier[] modifiers)
-    {  
-        var data = new DamageData(effect);
-        var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
-        
-
-    
-        var hpModifier = new Modifier(effect.Owner.GetAttributeIdentifier("Character", "HP"), newHp, ModifierOperation.Override);
-
-        modifiers = [hpModifier];
     }
 }

@@ -4,8 +4,8 @@ namespace Miros.Core;
 
 public class MultiLayerStateMachineBuilder
 {
-    private readonly MultiLayerStateMachine _stateMachine;
     private readonly StateExecutionRegistry _stateExecutionRegistry;
+    private readonly MultiLayerStateMachine _stateMachine;
     private readonly ITaskProvider _taskProvider;
 
     public MultiLayerStateMachineBuilder(ITaskProvider taskProvider)
@@ -20,8 +20,10 @@ public class MultiLayerStateMachineBuilder
         foreach (var state in states)
         {
             var task = _taskProvider.GetTask(state);
-            _stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, _stateMachine));
+            _stateExecutionRegistry.AddStateExecutionContext(state.Tag,
+                new StateExecutionContext(state, task, _stateMachine));
         }
+
         return this;
     }
 

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-
-public class State(Tag tag,Agent source)
+public class State(Tag tag, Agent source)
 {
     public Tag Tag { get; init; } = tag;
     public virtual Type Type => typeof(TaskBase);
     public int Priority { get; init; } = 0;
-    public Agent Owner { get;  set; }
+    public Agent Owner { get; set; }
     public Agent Source { get; init; } = source;
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;

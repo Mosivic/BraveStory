@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
-using Godot;
+using System.Reflection.Metadata;
 
 namespace Miros.Core;
 
 public class AttributeSetContainer(Agent owner)
 {
-    private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
-    
-    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
-
     private static readonly Dictionary<Type, Tag> AttributeSetTypeMap = [];
 
+    private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
 
+    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
+
+
+    #region AttributeSet Management
     public void AddAttributeSet<T>() where T : AttributeSet
     {
         AddAttributeSet(typeof(T));
@@ -36,7 +37,7 @@ public class AttributeSetContainer(Agent owner)
                 _attributeAggregators.Add(attrSet.GetAttributeBase(tag), attrAggt);
             }
 
-        attrSet.SetOwner(owner);
+        attrSet.Init(owner);
     }
 
     public void RemoveAttributeSet<T>() where T : AttributeSet
@@ -48,7 +49,9 @@ public class AttributeSetContainer(Agent owner)
         Sets.Remove(setTag);
     }
 
+    #endregion
 
+    #region AttributeSet Access
     public bool TryGetAttributeSet<T>(out T attributeSet) where T : AttributeSet
     {
         if (Sets.TryGetValue(AttributeSetTypeMap[typeof(T)], out var set))
@@ -63,15 +66,13 @@ public class AttributeSetContainer(Agent owner)
 
     public bool TryGetAttributeSet(Type attrSetType, out AttributeSet attributeSet)
     {
-
         if (AttributeSetTypeMap.TryGetValue(attrSetType, out var tag))
-        {
             if (Sets.TryGetValue(tag, out var set))
             {
                 attributeSet = set;
                 return true;
             }
-        }
+
         attributeSet = null;
         return false;
     }
@@ -90,92 +91,57 @@ public class AttributeSetContainer(Agent owner)
                 attributeSet = Sets[tag];
                 return true;
             }
+
         attributeSet = null;
         return false;
     }
 
-    public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
+    #endregion
+
+    #region AttributeBase Access
+    public bool TryGetAttributeBase(Tag attrSetTag, Tag attrTag, out AttributeBase attr)
+    {
+        if (Sets.TryGetValue(attrSetTag, out var set))
+            if (set.TryGetAttribute(attrTag.ShortName, out attr))
+                return true;
+        attr = null;
+        return false;
+    }
+
+    public bool TryGetAttributeBase(string attrSetName, string attrName, out AttributeBase attr)
     {
         if (TryGetAttributeSet(attrSetName, out var set))
-            foreach (var attrTag in set.AttributeTags)
-                if (attrTag.ShortName == attrName)
-                    return new (set.AttributeSetTag, attrTag);
-
-        throw new Exception($"Attribute {attrName} not found in attribute set {attrSetName}");
+            if (set.TryGetAttribute(attrName, out attr))
+                return true;
+        attr = null;
+        return false;
     }
 
-    public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
+    public bool TryGetAttributeBase(string attrName, out AttributeBase attr)
     {
-        return Sets.TryGetValue(attrSetTag, out var set) ? set.GetAttributeBase(attrTag) : null;
+        foreach (var attrSet in Sets)
+            if (attrSet.Value.TryGetAttribute(attrName, out attr))
+                return true;
+        attr = null;
+        return false;
     }
 
+    #endregion
 
-    public AttributeBase GetAttributeBase(string attrSetName, string attrName)
-    {
-        return TryGetAttributeSet(attrSetName, out var set) ? set.GetAttributeBase(attrName) : null;
-    }
-
-
-    public AttributeValue? GetAttributeValue(Tag attrSetTag, Tag attrTag)
-    {
-        return Sets.TryGetValue(attrSetTag, out var set)
-            ? set.GetAttributeBase(attrTag).Value
-            : null;
-    }
-
-    public AttributeValue? GetAttributeValue(string attrSetName, string attrName)
-    {
-        return TryGetAttributeSet(attrSetName, out var set)
-            ? set.GetAttributeBase(attrName).Value
-            : null;
-    }
-
-    public CalculateMode? GetAttributeCalculateMode(Tag attrSetSign, Tag attrSign)
-    {
-        return Sets.TryGetValue(attrSetSign, out var set)
-            ? set.GetAttributeBase(attrSign).CalculateMode
-            : null;
-    }
-
-
-    public float? GetAttributeBaseValue(Tag attrSetTag, Tag attrTag)
-    {
-        return Sets.TryGetValue(attrSetTag, out var set) ? set.GetAttributeBase(attrTag).BaseValue : null;
-    }
-
-
-    public float? GetAttributeBaseValue(string attrSetName, string attrName)
-    {
-        return TryGetAttributeSet(attrSetName, out var set) ? set.GetAttributeBase(attrName).BaseValue : null;
-    }
-
-
-    public float? GetAttributeCurrentValue(Tag attrSetTag, Tag attrTag)
-    {
-        return Sets.TryGetValue(attrSetTag, out var set)
-            ? set.GetAttributeBase(attrTag).CurrentValue
-            : null;
-    }
-
-
-    public float? GetAttributeCurrentValue(string attrSetName, string attrName)
-    {
-        return TryGetAttributeSet(attrSetName, out var set) ? set.GetAttributeBase(attrName).CurrentValue : null;
-    }
-
-
+    #region Tool Methods
     public Dictionary<Tag, float> Snapshot()
     {
         Dictionary<Tag, float> snapshot = [];
         foreach (var attributeSet in Sets)
-        foreach (var tag in attributeSet.Value.AttributeTags)
-        {
-            var attr = attributeSet.Value.GetAttributeBase(tag);
-            snapshot.Add(tag, attr.CurrentValue);
-        }
+            foreach (var tag in attributeSet.Value.AttributeTags)
+            {
+                var attr = attributeSet.Value.GetAttributeBase(tag);
+                snapshot.Add(tag, attr.CurrentValue);
+            }
 
         return snapshot;
     }
+    #endregion
 
     /// <summary>
     /// 禁用所有属性集。
