@@ -117,10 +117,16 @@ public class Agent : AbsAgent, IAgent
 
         foreach (var execution in effect.Executions)
         {
-            execution.Execute(effect, out var modifiers);
+            execution.Execute(effect, out var modifierOptions);
 
-            foreach (var modifier in modifiers)
+            foreach (var modifierOption in modifierOptions)
+			{
+				var attribute = GetAttributeBase(modifierOption.AttributeSetName, modifierOption.AttributeName);
+                var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
+                    modifierOption.Magnitude, modifierOption.Operation);
+					
                 ApplyModifier(effect, modifier);
+            }
         }
     }
 
@@ -134,19 +140,19 @@ public class Agent : AbsAgent, IAgent
 
     private void ApplyModifier(Effect effect, Modifier modifier)
     {
-        var attributeValue = GetAttributeBase(modifier.AttributeIdentifier.SetTag, modifier.AttributeIdentifier.Tag);
-        if (attributeValue == null) return;
+        var attribute = GetAttributeBase(modifier.AttributeSetTag, modifier.AttributeTag);
+        if (attribute == null) return;
 
-        if (attributeValue.Value.IsSupportOperation(modifier.Operation) == false)
-            throw new InvalidOperationException("Unsupported operation.");
+        // if (attribute.IsSupportOperation(modifier.Operation) == false)
+        //     throw new InvalidOperationException("Unsupported operation.");
 
-        if (attributeValue.Value.CalculateMode != CalculateMode.Stacking)
+        if (attribute.CalculateMode != CalculateMode.Stacking)
             throw new InvalidOperationException(
                 $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-                $"But {modifier.AttributeIdentifier.SetTag}.{modifier.AttributeIdentifier.Tag} is {attributeValue.Value.CalculateMode}");
+                $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attribute.CalculateMode}");
 
         var magnitude = modifier.CalculateMagnitude(effect);
-        var baseValue = attributeValue.Value.BaseValue;
+        var baseValue = attribute.BaseValue;
         switch (modifier.Operation)
         {
             case ModifierOperation.Add:
@@ -168,8 +174,8 @@ public class Agent : AbsAgent, IAgent
                 throw new ArgumentOutOfRangeException();
         }
 
-        AttributeSetContainer.Sets[modifier.AttributeIdentifier.SetTag]
-            .ChangeAttributeBase(modifier.AttributeIdentifier.Tag, baseValue);
+        AttributeSetContainer.Sets[modifier.AttributeSetTag]
+            .ChangeAttributeBase(modifier.AttributeTag, baseValue);
     }
 
     public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)

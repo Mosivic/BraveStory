@@ -180,7 +180,7 @@ class AttributeGenerator:
         # 只初始化新增的属性
         for attr_name, attr_def in attr_set.attributes.items():
             if attr_name not in inherited_attrs:
-                code_parts.append(f'        _{attr_name.lower()} = new AttributeBase(Tags.AttributeSet_{parent_name_underscore}, Tags.Attribute_{attr_name}, {attr_def.value}f);')
+                code_parts.append(f'        _{attr_name.lower()} = new AttributeBase(Tags.Attribute_{attr_name}, {attr_def.value}f);')
             elif attr_name in attr_set.overridden_attributes:  # 只对被覆盖的属性进行操作
                 code_parts.append(f'        _{attr_name.lower()}.SetValueWithoutEvent({attr_def.value}f);')
 

@@ -4,19 +4,18 @@ namespace BraveStory;
 
 public class DamageExecution : Execution
 {
-    public override void Execute(Effect effect, out Modifier[] modifiers)
+    public override void Execute(Effect effect, out ModifierOption[] modifierOptions)
     {
         var data = new DamageData(effect);
         var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
 
 
-        var hpModifier = new Modifier(effect.Owner.GetAttributeIdentifier("Character", "HP"), newHp,
-            ModifierOperation.Override);
+        var hpModifier = new ModifierOption("AttributeSet.Character", "HP", newHp, ModifierOperation.Override);
 
-        modifiers = [hpModifier];
+        modifierOptions = [hpModifier];
     }
 
-    private struct DamageData
+    private readonly struct DamageData
     {
         public readonly float SourceAttack;
         public readonly float TargetDefense;

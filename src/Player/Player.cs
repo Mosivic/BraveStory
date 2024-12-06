@@ -210,7 +210,7 @@ public partial class Player : Character
             {
                 DurationPolicy = DurationPolicy.Instant,
                 Modifiers = [
-                    new Modifier(new (Tags.AttributeSet_Character_Player, Tags.Attribute_HP), 10, ModifierOperation.Add)
+                    new Modifier(Tags.AttributeSet_Character_Player, Tags.Attribute_HP, 10, ModifierOperation.Add)
                 ]
             };
             Agent.AddState(ExecutorType.EffectExecutor, effect);

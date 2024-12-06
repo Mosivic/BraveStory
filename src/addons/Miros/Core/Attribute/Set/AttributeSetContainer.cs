@@ -7,7 +7,7 @@ namespace Miros.Core;
 public class AttributeSetContainer(Agent owner)
 {
     private static readonly Dictionary<Type, Tag> AttributeSetTypeMap = [];
-    
+
     private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
 
     public Dictionary<Tag, AttributeSet> Sets { get; } = [];
@@ -37,7 +37,7 @@ public class AttributeSetContainer(Agent owner)
                 _attributeAggregators.Add(attrSet.GetAttributeBase(tag), attrAggt);
             }
 
-        attrSet.SetOwner(owner);
+        attrSet.Init(owner);
     }
 
     public void RemoveAttributeSet<T>() where T : AttributeSet
@@ -141,18 +141,6 @@ public class AttributeSetContainer(Agent owner)
 
         return snapshot;
     }
-
-
-    public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
-    {
-        if (TryGetAttributeSet(attrSetName, out var set))
-            foreach (var attrTag in set.AttributeTags)
-                if (attrTag.ShortName == attrName)
-                    return new AttributeIdentifier(set.AttributeSetTag, attrTag);
-
-        throw new Exception($"Attribute {attrName} not found in attribute set {attrSetName}");
-    }
-
     #endregion
 
     /// <summary>

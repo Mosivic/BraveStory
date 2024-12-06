@@ -76,11 +76,6 @@ public class AbsAgent
 
     #region AttributeSet
 
-    public AttributeIdentifier GetAttributeIdentifier(string attrSetName, string attrName)
-    {
-        return AttributeSetContainer.GetAttributeIdentifier(attrSetName, attrName);
-    }
-
     public void AddAttributeSet(Type attrSetType)
     {
         AttributeSetContainer.AddAttributeSet(attrSetType);
@@ -92,6 +87,13 @@ public class AbsAgent
             return value;
         return null;
     }
+
+	public AttributeBase GetAttributeBase(string attrSetName, string attrName)
+	{
+		if(AttributeSetContainer.TryGetAttributeBase(attrSetName, attrName, out var value))
+			return value;
+		return null;
+	}
 
 
     public Dictionary<Tag, float> DataSnapshot()

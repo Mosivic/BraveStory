@@ -44,16 +44,16 @@ public class CharacterAttributeSet : AttributeSet
 
     public CharacterAttributeSet() : base()
     {
-        _hp = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_HP, 100.0f);
-        _defense = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Defense, 5.0f);
-        _attack = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Attack, 10.0f);
-        _gravity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_Gravity, 980.0f);
-        _runspeed = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_RunSpeed, 200.0f);
-        _walkspeed = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_WalkSpeed, 80.0f);
-        _jumpvelocity = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_JumpVelocity, -300.0f);
-        _flooracceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_FloorAcceleration, 1000.0f);
-        _airacceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_AirAcceleration, 800.0f);
-        _slidingdeceleration = new AttributeBase(Tags.AttributeSet_Character, Tags.Attribute_SlidingDeceleration, 600.0f);
+        _hp = new AttributeBase(Tags.Attribute_HP, 100.0f);
+        _defense = new AttributeBase(Tags.Attribute_Defense, 5.0f);
+        _attack = new AttributeBase(Tags.Attribute_Attack, 10.0f);
+        _gravity = new AttributeBase(Tags.Attribute_Gravity, 980.0f);
+        _runspeed = new AttributeBase(Tags.Attribute_RunSpeed, 200.0f);
+        _walkspeed = new AttributeBase(Tags.Attribute_WalkSpeed, 80.0f);
+        _jumpvelocity = new AttributeBase(Tags.Attribute_JumpVelocity, -300.0f);
+        _flooracceleration = new AttributeBase(Tags.Attribute_FloorAcceleration, 1000.0f);
+        _airacceleration = new AttributeBase(Tags.Attribute_AirAcceleration, 800.0f);
+        _slidingdeceleration = new AttributeBase(Tags.Attribute_SlidingDeceleration, 600.0f);
     }
 
     public AttributeBase HP => _hp;

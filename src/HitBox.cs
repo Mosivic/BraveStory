@@ -14,7 +14,7 @@ public class HitEventArgs : EventArgs
 
 public partial class HitBox : Area2D
 {
-    private Buff _buffState;
+
 
     public HitBox()
     {
@@ -24,18 +24,14 @@ public partial class HitBox : Area2D
     public event EventHandler<HitEventArgs> OnHit;
 
 
-    public void SetBuffState(Buff buffState)
-    {
-        _buffState = buffState;
-    }
 
-    private void OnAreaEntered(Area2D hurtBox)
+    private void OnAreaEntered(Area2D area2D)
     {
-        if (hurtBox is HurtBox box)
+        if (area2D is HurtBox hurtBox)
         {
             GD.Print($"[Hit] {Owner.Name} -> {hurtBox.Owner.Name}");
             OnHit?.Invoke(this, new HitEventArgs(hurtBox));
-            box.Emit(this, _buffState);
+            hurtBox.Emit(this); //Emit HurtBox OnHurt
         }
     }
 }

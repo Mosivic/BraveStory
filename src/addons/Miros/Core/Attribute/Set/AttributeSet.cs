@@ -11,17 +11,17 @@ public abstract class AttributeSet
     public abstract AttributeBase[] Attributes { get; }
     public abstract Tag[] AttributeTags { get; }
     public abstract Tag AttributeSetTag { get; }
-    
+
     public Agent Owner { get; private set; }
 
     /// <summary>
     ///     设置属性集的拥有者
     /// </summary>
     /// <param name="owner">拥有者</param>
-    public void SetOwner(Agent owner)
+    public void Init(Agent owner)
     {
         Owner = owner;
-        foreach (var attribute in Attributes) attribute.SetOwner(owner);
+        foreach (var attribute in Attributes) attribute.Init(owner, AttributeSetTag);
     }
 
 

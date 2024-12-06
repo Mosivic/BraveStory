@@ -9,18 +9,18 @@ namespace Miros.Core;
 
 public class AttributeBase
 {
-    public readonly Tag AttributeSetTag;
-    public readonly Tag AttributeTag;
+    public Tag AttributeSetTag { get; private set; }
+
+    public Tag AttributeTag { get; }
     private AttributeValue _value;
     protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners; // 基础值变化前的事件监听器
 
-    public AttributeBase(Tag setSign, Tag sign, float value = 0,
+    public AttributeBase(Tag tag, float value = 0,
         CalculateMode calculateMode = CalculateMode.Stacking,
         SupportedOperation supportedOperation = SupportedOperation.All,
         float minValue = float.MinValue, float maxValue = float.MaxValue)
     {
-        AttributeSetTag = setSign;
-        AttributeTag = sign;
+        AttributeTag = tag;
         _value = new AttributeValue(value, calculateMode, supportedOperation, minValue, maxValue);
     }
 
@@ -39,9 +39,10 @@ public class AttributeBase
     protected event Func<AttributeBase, float, float> OnPreBaseValueChange; // 基础值变化前的事件
     protected event Action<AttributeBase, float, float> OnPostBaseValueChange; // 基础值变化后的事件
 
-    public void SetOwner(Agent owner)
+    public void Init(Agent owner, Tag attributeSetTag)
     {
         Owner = owner;
+        AttributeSetTag = attributeSetTag;
     }
 
     public void SetValueWithoutEvent(float value)
