@@ -1,17 +1,14 @@
 using BraveStory;
 using Godot;
 using Miros.Core;
-using static BraveStory.TestData;
 
 public partial class Boar : Character
 {
-    private readonly EnemyData _data = new();
     private RayCast2D _floorChecker;
     private int _hp = 5;
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
-    private EnemyData Data = new();
 
     public override void _Ready()
     {
@@ -57,7 +54,7 @@ public partial class Boar : Character
                 // 应用击退力
                 var velocity = Velocity;
                 velocity += _knockbackVelocity;
-                velocity.Y += (float)d * _data.Gravity;
+                velocity.Y += (float)d * Agent.Attr("Gravity");
                 // 逐渐减弱击退效果
                 _knockbackVelocity *= 0.8f;
                 Velocity = velocity;
@@ -118,8 +115,8 @@ public partial class Boar : Character
 
         // 移动逻辑
         var velocity = Velocity;
-        velocity.X = _data.WalkSpeed * -Graphics.Scale.X; // 注意这里加了负号
-        velocity.Y += (float)delta * _data.Gravity;
+        velocity.X = Agent.Attr("WalkSpeed") * -Graphics.Scale.X; // 注意这里加了负号
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
         Velocity = velocity;
         MoveAndSlide();
     }
@@ -134,8 +131,8 @@ public partial class Boar : Character
             {
                 var direction = (playerPosition.Value - GlobalPosition).Normalized();
                 var velocity = Velocity;
-                velocity.X = direction.X * _data.RunSpeed;
-                velocity.Y += (float)delta * _data.Gravity;
+                velocity.X = direction.X * Agent.Attr("RunSpeed");
+                velocity.Y += (float)delta * Agent.Attr("Gravity");
                 Velocity = velocity;
                 // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
                 Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);

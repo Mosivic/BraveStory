@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Miros.Core;
-using static BraveStory.TestData;
 
 namespace BraveStory;
 
