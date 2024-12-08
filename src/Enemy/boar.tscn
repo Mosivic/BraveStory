@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://b60glotno805d"]
+[gd_scene load_steps=19 format=3 uid="uid://b60glotno805d"]
 
 [ext_resource type="PackedScene" uid="uid://5f6ngwh4b25f" path="res://Enemy/Character.tscn" id="1_w3tnv"]
 [ext_resource type="Texture2D" uid="uid://diasn0p580ws0" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Idle/Idle-Sheet.png" id="2_e4ssd"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bkmqhykoigyuy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Run/Run-Sheet.png" id="2_l8evk"]
 [ext_resource type="Texture2D" uid="uid://ddtr8ovkgqhwy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_i5lod"]
 [ext_resource type="Script" path="res://Enemy/EnemyAgent.cs" id="7_labl6"]
+[ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_ynqoc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q70f8"]
 size = Vector2(18, 7)
@@ -320,6 +321,15 @@ _data = {
 [node name="Boar" instance=ExtResource("1_w3tnv")]
 script = ExtResource("2_gphwb")
 
+[node name="StatusPanel" parent="." index="0" instance=ExtResource("8_ynqoc")]
+offset_left = -28.0
+offset_top = -52.0
+offset_right = 64.0
+offset_bottom = -22.0
+
+[node name="AvatarBox" parent="StatusPanel" index="0"]
+visible = false
+
 [node name="Sprite2D" parent="Graphics" index="0"]
 position = Vector2(1, -16)
 texture = ExtResource("2_ii47p")
@@ -356,14 +366,16 @@ collision_mask = 0
 position = Vector2(0, -13)
 shape = SubResource("CircleShape2D_ik7lp")
 
-[node name="CollisionShape2D" parent="." index="1"]
+[node name="CollisionShape2D" parent="." index="2"]
 position = Vector2(0, -13)
 shape = SubResource("CircleShape2D_lk46v")
 
-[node name="AnimationPlayer" parent="." index="2"]
+[node name="AnimationPlayer" parent="." index="3"]
 libraries = {
 "": SubResource("AnimationLibrary_2r4i3")
 }
 
-[node name="Agent" type="Node" parent="." index="4"]
+[node name="Agent" type="Node" parent="." index="5"]
 script = ExtResource("7_labl6")
+
+[editable path="StatusPanel"]
