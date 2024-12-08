@@ -160,7 +160,7 @@ public partial class Player : Character
 			.Add(wallSlide, wallJump, KeyDownJump) // 如果按下跳跃键，则进入墙壁跳跃状态
 			.Add(wallJump, fall) // 墙壁跳跃状态结束后，进入坠落状态
 			.Add(hit, idle, IsAnimationFinished) // 如果动画播放完毕，则进入空闲状态
-			.Add(sliding, idle) // 滑行状态结束后，进入空闲状态
+			.Add(sliding, idle, () => IsAnimationFinished()) // 滑行状态结束后，进入空闲状态
 			.AddAny(hit, () => Hurt, StateTransitionMode.Force) // 如果受到伤害，则强制进入受伤状态
 			.AddAny(die, () => Agent.Attr("HP") <= 0); // 如果生命值小于等于0，则进入死亡状态
 
