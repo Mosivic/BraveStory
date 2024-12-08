@@ -23,7 +23,6 @@ public partial class StatsPanel : Control
 	public void OnUpdateHealthBar(AttributeBase attr, float oldValue, float newValue)
 	{
 		var percent = newValue / attr.MaxValue;
-		GD.Print($"Health: {newValue} / {attr.MaxValue} = {percent}");
 		_healthBar.Value = percent;
 
 		CreateTween().TweenProperty(_easeHealthBar, "value", percent, 0.5f).SetTrans(Tween.TransitionType.Cubic).SetEase(Tween.EaseType.InOut);

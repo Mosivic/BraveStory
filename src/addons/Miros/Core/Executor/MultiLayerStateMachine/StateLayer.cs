@@ -63,7 +63,7 @@ public class StateLayer
             .Where(t => t.Mode switch
             {
                 StateTransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() &&
-                                              t.ToTask.CanEnter(),
+                                                t.ToTask.CanEnter(),
                 StateTransitionMode.Force => t.CanTransition() && t.ToTask.CanEnter(),
                 StateTransitionMode.DelayFront => t.CanTransition() && t.ToTask.CanEnter(),
                 _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
@@ -90,18 +90,8 @@ public class StateLayer
 
     private void TransformState(TaskBase nextTask)
     {
-        // 检查是否可以堆叠
-        // if (nextState.IsStack)
-        // {
-        //     nextTask.Stack(nextState.Source);
-        // }
-
         _currentTask.Exit();
         nextTask.Enter();
-
-        // Tags
-        // _ownedTags.RemoveTag(_currentState.Tag);
-        // _ownedTags.AddTag(nextState.Tag);
 
         _lastTask = _currentTask;
         _currentTask = nextTask;

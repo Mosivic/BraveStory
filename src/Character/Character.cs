@@ -9,7 +9,7 @@ public partial class Character : CharacterBody2D
 
     protected AnimationPlayer AnimationPlayer;
     protected Node2D Graphics;
-    protected bool HasHit;
+    protected bool Hurt;
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
@@ -49,6 +49,7 @@ public partial class Character : CharacterBody2D
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
+        Hurt = true;
         GD.Print($"[Damage] {e.Hitbox.Owner.Name} -> {Name} | HP : {Agent.Attr("HP")}");
     }   
 

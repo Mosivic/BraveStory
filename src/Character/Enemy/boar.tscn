@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_ynqoc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q70f8"]
-size = Vector2(18, 7)
+size = Vector2(16, 7)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ik7lp"]
 radius = 20.025
@@ -355,7 +355,7 @@ collision_layer = 0
 collision_mask = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/HitBox" index="0"]
-position = Vector2(-9, -10.5)
+position = Vector2(-8, -10.5)
 shape = SubResource("RectangleShape2D_q70f8")
 
 [node name="HurtBox" parent="Graphics" index="5"]

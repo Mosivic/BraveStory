@@ -40,13 +40,14 @@ public partial class Boar : Character
         var hit = new State(Tags.State_Action_Hit, Agent)
             .OnEntered(s =>
             {
+                Hurt = false;
                 PlayAnimation("hit");
                 // 方式1：根据玩家位置计算击退方向
                 var playerPos = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
                 if (playerPos.HasValue)
                 {
                     var direction = (GlobalPosition - playerPos.Value).Normalized();
-                    _knockbackVelocity = direction * 300f; // 击退力度
+                    _knockbackVelocity = new Vector2(direction.X * 300f, 0); // 击退力度
                 }
             })
             .OnPhysicsUpdated((s, d) =>
@@ -62,7 +63,7 @@ public partial class Boar : Character
             })
             .OnExited(s =>
             {
-                HasHit = false;
+                Hurt = false;
                 _knockbackVelocity = Vector2.Zero;
             });
 
@@ -88,7 +89,7 @@ public partial class Boar : Character
                 (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
             .Add(walk, run, () => _playerChecker.IsColliding())
             .Add(run, idle, () => !_playerChecker.IsColliding())
-            .AddAny(hit, () => HasHit)
+            .AddAny(hit, () => Hurt)
             .Add(hit, idle, IsAnimationFinished)
             .AddAny(die, () => _hp <= 0);
 
@@ -123,20 +124,18 @@ public partial class Boar : Character
 
     private void Chase(double delta)
     {
-        if (_playerChecker.IsColliding())
-        {
-            var playerPosition = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
-            if (playerPosition.HasValue)
-            {
-                var direction = (playerPosition.Value - GlobalPosition).Normalized();
-                var velocity = Velocity;
-                velocity.X = direction.X * Agent.Attr("RunSpeed");
-                velocity.Y += (float)delta * Agent.Attr("Gravity");
-                Velocity = velocity;
-                // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
-                Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
-                MoveAndSlide();
-            }
-        }
+        if (!_playerChecker.IsColliding()) return;
+
+        var playerPosition = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
+        if (!playerPosition.HasValue) return;
+        
+        var direction = (playerPosition.Value - GlobalPosition).Normalized();
+        var velocity = Velocity;
+        velocity.X = direction.X * Agent.Attr("RunSpeed");
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        Velocity = velocity;
+        // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
+        Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
+        MoveAndSlide();
     }
 }

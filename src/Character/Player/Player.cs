@@ -103,8 +103,7 @@ public partial class Player : Character
 
 		// Hit
 		var hit = new State(Tags.State_Action_Hit, Agent)
-			.OnEntered(_ => PlayAnimation("hit"))
-			.OnExited(_ => HasHit = false);
+			.OnEntered(_ => { PlayAnimation("hit"); Hurt = false; });
 
 		// Die
 		var die = new State(Tags.State_Status_Die, Agent)
@@ -163,7 +162,7 @@ public partial class Player : Character
 			.Add(wallJump, fall) // 墙壁跳跃状态结束后，进入坠落状态
 			.Add(hit, idle, IsAnimationFinished) // 如果动画播放完毕，则进入空闲状态
 			.Add(sliding, idle) // 滑行状态结束后，进入空闲状态
-			.AddAny(hit, () => HasHit, StateTransitionMode.Force) // 如果受到伤害，则强制进入受伤状态
+			.AddAny(hit, () => Hurt, StateTransitionMode.Force) // 如果受到伤害，则强制进入受伤状态
 			.AddAny(die, () => Agent.Attr("HP") <= 0); // 如果生命值小于等于0，则进入死亡状态
 
 		Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle,

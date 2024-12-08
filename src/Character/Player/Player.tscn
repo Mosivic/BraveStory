@@ -1,7 +1,8 @@
-[gd_scene load_steps=36 format=3 uid="uid://domj7ott646q7"]
+[gd_scene load_steps=38 format=3 uid="uid://domj7ott646q7"]
 
 [ext_resource type="Script" path="res://Character/Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://csyrvg2w36bm3" path="res://Art/generic_char_v0.2/png/red/char_red_2.png" id="2_735ug"]
+[ext_resource type="Shader" path="res://Shaders/hurt.gdshader" id="2_g1xpc"]
 [ext_resource type="Texture2D" uid="uid://cmk51oivoq0j6" path="res://Art/generic_char_v0.2/png/red/char_red_1.png" id="2_vcyf2"]
 [ext_resource type="Script" path="res://Character/Player/StateInfoDisplay.cs" id="4_6uk3r"]
 [ext_resource type="Script" path="res://HurtBox.cs" id="4_nuvsh"]
@@ -12,6 +13,13 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
 size = Vector2(18, 32)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a2ooh"]
+shader = ExtResource("2_g1xpc")
+shader_parameter/flash_duration = 0.2
+shader_parameter/flash_intensity = 1.0
+shader_parameter/flash_color = Vector4(1, 1, 1, 1)
+shader_parameter/is_hurt = false
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d16dq"]
 size = Vector2(7, 32)
@@ -146,6 +154,18 @@ tracks/9/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Graphics/Sprite2D:material:shader_parameter/is_hurt")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 
 [sub_resource type="Animation" id="Animation_pks6h"]
@@ -531,6 +551,18 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Graphics/Sprite2D:material:shader_parameter/is_hurt")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
 }
 
 [sub_resource type="Animation" id="Animation_8n6bt"]
@@ -1148,6 +1180,7 @@ drag_vertical_enabled = true
 [node name="Graphics" type="Node2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+material = SubResource("ShaderMaterial_a2ooh")
 position = Vector2(0, -16)
 texture = ExtResource("2_735ug")
 flip_h = true
