@@ -121,7 +121,7 @@ public class Agent : AbsAgent, IAgent
 
             foreach (var modifierOption in modifierOptions)
 			{
-				var attribute = GetAttributeBase(modifierOption.AttributeSetName, modifierOption.AttributeName);
+				var attribute = GetAttributeBase(modifierOption.AttributeName);
                 var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
                     modifierOption.Magnitude, modifierOption.Operation);
 

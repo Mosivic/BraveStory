@@ -8,9 +8,7 @@ public class DamageExecution : Execution
     {
         var data = new DamageData(effect);
         var newHp = data.TargetHP - (data.SourceAttack - data.TargetDefense);
-
-
-        var hpModifier = new ModifierOption("AttributeSet.Character", "HP", newHp, ModifierOperation.Override);
+        var hpModifier = new ModifierOption("HP", newHp, ModifierOperation.Override);
 
         modifierOptions = [hpModifier];
     }

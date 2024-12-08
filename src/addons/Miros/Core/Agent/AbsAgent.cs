@@ -88,9 +88,9 @@ public class AbsAgent
         return null;
     }
 
-	public AttributeBase GetAttributeBase(string attrSetName, string attrName)
+	public AttributeBase GetAttributeBase(string attrName)
 	{
-		if(AttributeSetContainer.TryGetAttributeBase(attrSetName, attrName, out var value))
+		if(AttributeSetContainer.TryGetAttributeBase(attrName, out var value))
 			return value;
 		return null;
 	}
