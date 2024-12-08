@@ -20,13 +20,13 @@ public class AbsAgent
 
 	
 
-    public float Attr(string attrName)
+    public float Attr(string attrName, string attrSetName = "")
     {
         if (_attributes.TryGetValue(attrName, out var value))
         {
             return value;
         } 
-        else if (AttributeSetContainer.TryGetAttributeBase(attrName,out var attr))
+        else if (AttributeSetContainer.TryGetAttributeBase(attrName, out var attr, attrSetName))
         {
             _attributes[attrName] = attr.CurrentValue;
 			attr.RegisterPostCurrentValueChange(OnUpdateAttributes);
@@ -88,9 +88,9 @@ public class AbsAgent
         return null;
     }
 
-	public AttributeBase GetAttributeBase(string attrName)
+	public AttributeBase GetAttributeBase(string attrName, string attrSetName = "")
 	{
-		if(AttributeSetContainer.TryGetAttributeBase(attrName, out var value))
+		if(AttributeSetContainer.TryGetAttributeBase(attrName, out var value, attrSetName))
 			return value;
 		return null;
 	}

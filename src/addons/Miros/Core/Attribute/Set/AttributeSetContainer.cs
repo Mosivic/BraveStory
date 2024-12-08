@@ -12,7 +12,6 @@ public class AttributeSetContainer(Agent owner)
 
     public Dictionary<Tag, AttributeSet> Sets { get; } = [];
 
-
     #region AttributeSet Management
     public void AddAttributeSet<T>() where T : AttributeSet
     {
@@ -108,17 +107,14 @@ public class AttributeSetContainer(Agent owner)
         return false;
     }
 
-    public bool TryGetAttributeBase(string attrSetName, string attrName, out AttributeBase attr)
-    {
-        if (TryGetAttributeSet(attrSetName, out var set))
-            if (set.TryGetAttribute(attrName, out attr))
-                return true;
-        attr = null;
-        return false;
-    }
 
-    public bool TryGetAttributeBase(string attrName, out AttributeBase attr)
+    public bool TryGetAttributeBase(string attrName, out AttributeBase attr, string attrSetName = "")
     {
+        if (attrSetName != "")
+            if (TryGetAttributeSet(attrSetName, out var set))
+                if (set.TryGetAttribute(attrName, out attr))
+                    return true;
+
         foreach (var attrSet in Sets)
             if (attrSet.Value.TryGetAttribute(attrName, out attr))
                 return true;
