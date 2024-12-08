@@ -4,10 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://boub6swj2g75j" path="res://Art/Legacy-Fantasy - High Forest 2.3/Assets/Tree-Assets.png" id="2_jsf3d"]
 [ext_resource type="PackedScene" uid="uid://djtsla3eopxai" path="res://Object/mine_gate.tscn" id="3_0jw26"]
 [ext_resource type="Script" path="res://Interactable.cs" id="4_560ve"]
-[ext_resource type="PackedScene" uid="uid://domj7ott646q7" path="res://Player/Player.tscn" id="5_k7g31"]
+[ext_resource type="PackedScene" uid="uid://domj7ott646q7" path="res://Character/Player/Player.tscn" id="5_k7g31"]
 [ext_resource type="Texture2D" uid="uid://dru4wao286suo" path="res://Art/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="6_updyp"]
 [ext_resource type="Texture2D" uid="uid://djdmtq6jnrtyt" path="res://Art/Legacy-Fantasy - High Forest 2.3/Trees/Background.png" id="7_wnsr4"]
-[ext_resource type="PackedScene" uid="uid://b60glotno805d" path="res://Enemy/boar.tscn" id="8_pkutf"]
+[ext_resource type="PackedScene" uid="uid://b60glotno805d" path="res://Character/Enemy/boar.tscn" id="8_pkutf"]
 [ext_resource type="PackedScene" uid="uid://bmtx6e5xi32o2" path="res://save_stone.tscn" id="9_b055e"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_22a03"]

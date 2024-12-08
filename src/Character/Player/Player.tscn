@@ -1,15 +1,25 @@
-[gd_scene load_steps=34 format=3 uid="uid://domj7ott646q7"]
+[gd_scene load_steps=38 format=3 uid="uid://domj7ott646q7"]
 
-[ext_resource type="Script" path="res://Player/Player.cs" id="1_d4cnt"]
+[ext_resource type="Script" path="res://Character/Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://csyrvg2w36bm3" path="res://Art/generic_char_v0.2/png/red/char_red_2.png" id="2_735ug"]
+[ext_resource type="Shader" path="res://Shaders/hurt.gdshader" id="2_g1xpc"]
 [ext_resource type="Texture2D" uid="uid://cmk51oivoq0j6" path="res://Art/generic_char_v0.2/png/red/char_red_1.png" id="2_vcyf2"]
-[ext_resource type="Script" path="res://Player/StateInfoDisplay.cs" id="4_6uk3r"]
+[ext_resource type="Script" path="res://Character/Player/StateInfoDisplay.cs" id="4_6uk3r"]
 [ext_resource type="Script" path="res://HurtBox.cs" id="4_nuvsh"]
 [ext_resource type="Script" path="res://HitBox.cs" id="5_i8nox"]
 [ext_resource type="Texture2D" uid="uid://b4baa7e42g6ko" path="res://Art/gamepad-ui/gdb-keyboard-2.png" id="7_l7dr7"]
+[ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_oddwo"]
+[ext_resource type="Script" path="res://Character/Player/PlayerAgent.cs" id="9_7u3hq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
 size = Vector2(18, 32)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a2ooh"]
+shader = ExtResource("2_g1xpc")
+shader_parameter/flash_duration = 0.2
+shader_parameter/flash_intensity = 1.0
+shader_parameter/flash_color = Vector4(1, 1, 1, 1)
+shader_parameter/is_hurt = false
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d16dq"]
 size = Vector2(7, 32)
@@ -145,10 +155,22 @@ tracks/9/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Graphics/Sprite2D:material:shader_parameter/is_hurt")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_pks6h"]
 resource_name = "attack1"
-length = 0.4
+length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -168,7 +190,7 @@ tracks/1/path = NodePath("Graphics/Sprite2D:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
@@ -204,7 +226,7 @@ tracks/4/path = NodePath("Graphics/HitBox/CollisionShape2D:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.3, 0.4),
+"times": PackedFloat32Array(0, 0.1, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [true, false, true]
@@ -212,7 +234,7 @@ tracks/4/keys = {
 
 [sub_resource type="Animation" id="Animation_d6el4"]
 resource_name = "attack11"
-length = 0.4
+length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -244,7 +266,7 @@ tracks/2/path = NodePath("Graphics/Sprite2D:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.166667),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
@@ -268,7 +290,7 @@ tracks/4/path = NodePath("Graphics/HitBox/CollisionShape2D2:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.3),
+"times": PackedFloat32Array(0, 0.0666667, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [true, false, true]
@@ -276,7 +298,7 @@ tracks/4/keys = {
 
 [sub_resource type="Animation" id="Animation_7mod8"]
 resource_name = "attack111"
-length = 0.8
+length = 0.32
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -308,7 +330,7 @@ tracks/2/path = NodePath("Graphics/Sprite2D:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.166667, 0.2, 0.233333, 0.266667, 0.3),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3, 4, 5, 6, 7]
@@ -332,7 +354,7 @@ tracks/4/path = NodePath("Graphics/HitBox/CollisionShape2D3:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.3),
+"times": PackedFloat32Array(0, 0.0666667, 0.3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [true, false, true]
@@ -529,6 +551,18 @@ tracks/3/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Graphics/Sprite2D:material:shader_parameter/is_hurt")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
 }
 
 [sub_resource type="Animation" id="Animation_8n6bt"]
@@ -1139,13 +1173,14 @@ position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_cxnk6")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
+zoom = Vector2(3, 3)
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
 [node name="Graphics" type="Node2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+material = SubResource("ShaderMaterial_a2ooh")
 position = Vector2(0, -16)
 texture = ExtResource("2_735ug")
 flip_h = true
@@ -1204,3 +1239,13 @@ script = ExtResource("4_6uk3r")
 position = Vector2(0, -43)
 sprite_frames = SubResource("SpriteFrames_gb8ve")
 frame_progress = 0.0572009
+
+[node name="Agent" type="Node" parent="."]
+script = ExtResource("9_7u3hq")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="StatusPanel" parent="CanvasLayer" instance=ExtResource("8_oddwo")]
+offset_right = 92.0
+offset_bottom = 30.0
+scale = Vector2(2.44, 2.44)

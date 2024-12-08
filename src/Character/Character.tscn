@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://5f6ngwh4b25f"]
 
-[ext_resource type="Script" path="res://Enemy/Character.cs" id="1_atnfq"]
-[ext_resource type="Script" path="res://Player/StateInfoDisplay.cs" id="2_eql2w"]
+[ext_resource type="Script" path="res://Character/Character.cs" id="1_atnfq"]
+[ext_resource type="Script" path="res://Character/Player/StateInfoDisplay.cs" id="2_eql2w"]
 [ext_resource type="Script" path="res://HitBox.cs" id="2_wqhsd"]
 [ext_resource type="Script" path="res://HurtBox.cs" id="3_ttc38"]
 

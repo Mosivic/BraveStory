@@ -82,7 +82,7 @@ public class AttributeBase
 
 #if GODOT
         GD.Print(
-            $"[AttributeBase] CurrentValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
+            $"[{Owner.HostName}] CurrentValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
 #endif
 
         if (Math.Abs(oldValue - value) > float.Epsilon)
@@ -98,7 +98,7 @@ public class AttributeBase
 
 #if GODOT
         GD.Print(
-            $"[AttributeBase] BaseValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
+            $"[{Owner.HostName}] BaseValue: {AttributeSetTag.ShortName}.{AttributeTag.ShortName} from {oldValue} to {value}");
 #endif
 
         if (Math.Abs(oldValue - value) > float.Epsilon)

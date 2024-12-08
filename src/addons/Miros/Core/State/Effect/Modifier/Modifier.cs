@@ -33,6 +33,7 @@ public class Modifier
         Magnitude = magnitude;
         Operation = operation;
     }
+    
     public float CalculateMagnitude(Effect effect)
     {
         return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;

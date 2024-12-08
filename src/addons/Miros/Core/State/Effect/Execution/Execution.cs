@@ -1,20 +1,12 @@
 namespace Miros.Core;
 
 
-public struct ModifierOption
+public struct ModifierOption(string attributeName, float magnitude, ModifierOperation operation, string attributeSetName = "")
 {
-    public string AttributeSetName { get; set; }
-    public string AttributeName { get; set; }
-    public float Magnitude { get; set; }
-    public ModifierOperation Operation { get; set; }
-
-    public ModifierOption(string attributeSetName, string attributeName, float magnitude, ModifierOperation operation)
-    {
-        AttributeSetName = attributeSetName;
-        AttributeName = attributeName;
-        Magnitude = magnitude;
-        Operation = operation;
-    }
+    public string AttributeSetName { get; set; } = attributeSetName;
+    public string AttributeName { get; set; } = attributeName;
+    public float Magnitude { get; set; } = magnitude;
+    public ModifierOperation Operation { get; set; } = operation;
 }
 
 public abstract class Execution
