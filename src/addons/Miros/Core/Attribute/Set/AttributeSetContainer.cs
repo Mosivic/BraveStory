@@ -4,6 +4,14 @@ using System.Reflection.Metadata;
 
 namespace Miros.Core;
 
+public enum AttributeValueType
+{
+    CurrentValue,
+    BaseValue,
+    MinValue,
+    MaxValue
+}
+
 public class AttributeSetContainer(Agent owner)
 {
     private static readonly Dictionary<Type, Tag> AttributeSetTypeMap = [];
@@ -11,6 +19,35 @@ public class AttributeSetContainer(Agent owner)
     private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
 
     public Dictionary<Tag, AttributeSet> Sets { get; } = [];
+
+    private readonly Dictionary<string, AttributeBase> _attributes = []; // Lazy load attribute base
+
+
+#region AttributeBase Access
+    public float Attribute(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
+    {
+        if (_attributes.TryGetValue(attrName, out var attr))
+            return valueType switch
+            {
+                AttributeValueType.CurrentValue => attr.CurrentValue,
+                AttributeValueType.BaseValue => attr.BaseValue,
+                AttributeValueType.MinValue => attr.MinValue,
+                AttributeValueType.MaxValue => attr.MaxValue,
+                _ => throw new ArgumentException($"Invalid attribute value type: {valueType}")
+            };
+        else
+        {
+            if (TryGetAttributeBase(attrName, out attr))
+            {
+                _attributes.Add(attrName, attr);
+                return Attribute(attrName, valueType);
+            }
+        }
+
+        throw new Exception($"Attribute {attrName} not found");
+    }
+#endregion
+
 
     #region AttributeSet Management
     public void AddAttributeSet<T>() where T : AttributeSet
@@ -29,12 +66,16 @@ public class AttributeSetContainer(Agent owner)
         AttributeSetTypeMap.Add(attrSetType, attrSetTag);
 
         foreach (var tag in attrSet.AttributeTags)
-            if (!_attributeAggregators.ContainsKey(attrSet.GetAttributeBase(tag)))
+        {
+            var attr = attrSet.GetAttributeBase(tag);
+
+            if (!_attributeAggregators.ContainsKey(attr))
             {
-                var attrAggt = new AttributeAggregator(attrSet.GetAttributeBase(tag), owner);
+                var attrAggt = new AttributeAggregator(attr, owner);
                 if (owner.Enabled) attrAggt.OnEnable();
-                _attributeAggregators.Add(attrSet.GetAttributeBase(tag), attrAggt);
+                _attributeAggregators.Add(attr, attrAggt);
             }
+        }
 
         attrSet.Init(owner);
     }

@@ -6,6 +6,7 @@ namespace BraveStory;
 public partial class Character : CharacterBody2D
 {
     protected Agent Agent;
+
     protected AnimationPlayer AnimationPlayer;
     protected Node2D Graphics;
     protected bool HasHit;
@@ -19,6 +20,13 @@ public partial class Character : CharacterBody2D
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        Agent = GetNode<Agent>("Agent");
+
+        if(Agent == null)
+        {
+            GD.PrintErr($"[{Name}] Agent not found");
+            return;
+        }
 
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
@@ -27,18 +35,6 @@ public partial class Character : CharacterBody2D
         // 处理受伤事件
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
-    }
-
-
-    public override void _Process(double delta)
-    {
-        Agent.Update(delta);
-    }
-
-
-    public override void _PhysicsProcess(double delta)
-    {
-        Agent.PhysicsUpdate(delta);
     }
 
     protected bool IsAnimationFinished()

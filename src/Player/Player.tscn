@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://domj7ott646q7"]
+[gd_scene load_steps=36 format=3 uid="uid://domj7ott646q7"]
 
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://csyrvg2w36bm3" path="res://Art/generic_char_v0.2/png/red/char_red_2.png" id="2_735ug"]
@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://HurtBox.cs" id="4_nuvsh"]
 [ext_resource type="Script" path="res://HitBox.cs" id="5_i8nox"]
 [ext_resource type="Texture2D" uid="uid://b4baa7e42g6ko" path="res://Art/gamepad-ui/gdb-keyboard-2.png" id="7_l7dr7"]
+[ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_oddwo"]
+[ext_resource type="Script" path="res://Player/PlayerAgent.cs" id="9_7u3hq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
 size = Vector2(18, 32)
@@ -1139,7 +1141,7 @@ position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_cxnk6")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
+zoom = Vector2(3, 3)
 drag_horizontal_enabled = true
 drag_vertical_enabled = true
 
@@ -1204,3 +1206,13 @@ script = ExtResource("4_6uk3r")
 position = Vector2(0, -43)
 sprite_frames = SubResource("SpriteFrames_gb8ve")
 frame_progress = 0.0572009
+
+[node name="Agent" type="Node" parent="."]
+script = ExtResource("9_7u3hq")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="StatusPanel" parent="CanvasLayer" instance=ExtResource("8_oddwo")]
+offset_right = 92.0
+offset_bottom = 30.0
+scale = Vector2(2.44, 2.44)
