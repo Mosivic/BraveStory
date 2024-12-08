@@ -142,10 +142,9 @@ public partial class Player : Character
 			.Add(idle, attack1, KeyDownAttack) // 如果按下攻击键，则进入攻击1状态
 			.Add(idle, sliding, KeyDownSliding) // 如果按下滑动键，则进入滑行状态
 			.Add(attack1, idle) // 攻击1状态结束后，进入空闲状态
-			.Add(attack1, attack11, () => attack1.RunningTime > 0.2f && KeyDownAttack(), StateTransitionMode.DelayFront) // 如果攻击1状态运行时间超过0.2秒，并且再次按下攻击键，则进入攻击11状态
+			.Add(attack1, attack11, () => KeyDownAttack(), StateTransitionMode.DelayFront) // 如果攻击1过程中按下攻击键，则等待攻击1结束进入攻击11状态
 			.Add(attack11, idle) // 攻击11状态结束后，进入空闲状态
-			.Add(attack11, attack111, () => attack11.RunningTime > 0.2f && KeyDownAttack(),
-				StateTransitionMode.DelayFront) // 如果攻击11状态运行时间超过0.2秒，并且再次按下攻击键，则进入攻击111状态
+			.Add(attack11, attack111, () => KeyDownAttack(),StateTransitionMode.DelayFront) // 如果攻击11过程中按下攻击键，则等待攻击11结束进入攻击111状态
 			.Add(attack111, idle) // 攻击111状态结束后，进入空闲状态
 			.Add(run, idle, () => !KeyDownMove()) // 如果未按下移动键，则进入空闲状态
 			.Add(run, jump, KeyDownJump) // 如果按下跳跃键，则进入跳跃状态

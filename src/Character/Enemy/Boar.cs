@@ -75,8 +75,9 @@ public partial class Boar : Character
                 // 应用击退力
                 Velocity = Velocity * 0.9f;
                 MoveAndSlide();
-            })
-            .OnExited(s => QueueFree());
+                if(IsAnimationFinished()) QueueFree();
+            });
+ 
 
 
         // Transitions
@@ -91,7 +92,7 @@ public partial class Boar : Character
             .Add(run, idle, () => !_playerChecker.IsColliding())
             .AddAny(hit, () => Hurt)
             .Add(hit, idle, IsAnimationFinished)
-            .AddAny(die, () => _hp <= 0);
+            .AddAny(die, () => Agent.Attr("HP") <= 0);
 
         Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
 
