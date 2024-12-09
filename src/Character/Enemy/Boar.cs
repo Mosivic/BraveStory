@@ -47,7 +47,7 @@ public partial class Boar : Character
                 if (playerPos.HasValue)
                 {
                     var direction = (GlobalPosition - playerPos.Value).Normalized();
-                    _knockbackVelocity = new Vector2(direction.X * 300f, 0); // 击退力度
+                    _knockbackVelocity = new Vector2(direction.X * 100f, 0); // 击退力度
                 }
             })
             .OnPhysicsUpdated((s, d) =>

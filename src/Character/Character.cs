@@ -50,7 +50,16 @@ public partial class Character : CharacterBody2D
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
         Hurt = true;
-        GD.Print($"[Damage] {e.Hitbox.Owner.Name} -> {Name} | HP : {Agent.Attr("HP")}");
+       // GD.Print($"[Damage] {e.Hitbox.Owner.Name} -> {Name} | HP : {Agent.Attr("HP")}");
+        
+        // 创建伤害数字实例
+        var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
+        var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
+        GetTree().CurrentScene.AddChild(damageNumber);
+        
+        // 设置伤害数值和位置
+        damageNumber.SetDamage(10); // 这里的伤害值应该从 e 中获取
+        damageNumber.Position = Position; // 设置在角色位置
     }   
 
 
