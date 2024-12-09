@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class DamageSlice(float damage) : EventStreamSlice("Damage")
+public class DamageSlice(float damage) : EventStreamArgs("Damage")
 {
     public float Damage { get; } = damage;
 }

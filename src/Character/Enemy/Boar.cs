@@ -9,6 +9,12 @@ public partial class Boar : Character
     private Vector2 _knockbackVelocity = Vector2.Zero;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
+    private bool _isStunned = false;
+    private float _stunDuration = 2.0f;
+    private float _stunTimer = 0.0f;
+    private float _chargeDuration = 0.5f;  // 冲刺持续时间
+    private float _chargeTimer = 0f;       // 冲刺计时器
+    private bool _isCharging = false;      // 是否正在冲刺
 
     public override void _Ready()
     {
@@ -32,7 +38,7 @@ public partial class Boar : Character
             .OnPhysicsUpdated((s, d) => Patrol(d));
 
         // Run
-        var run = new State(Tags.State_Action_Run, Agent)
+        var attack = new State(Tags.State_Action_Run, Agent)
             .OnEntered(s => PlayAnimation("run"))
             .OnPhysicsUpdated((s, d) => Chase(d));
 
@@ -77,24 +83,45 @@ public partial class Boar : Character
                 MoveAndSlide();
                 if(IsAnimationFinished()) QueueFree();
             });
- 
 
+        // Charge
+        var charge = new State(Tags.State_Action_Run, Agent)
+            .OnEntered(s =>
+            {
+                PlayAnimation("run");
+                _isStunned = false;
+                _stunTimer = 0.0f;
+                _chargeTimer = 0f;
+                _isCharging = true;
+            })
+            .OnPhysicsUpdated((s, d) => Charge(d))
+            .OnExited(s =>
+            {
+                _isStunned = false;
+                _stunTimer = 0.0f;
+                _isCharging = false;
+                _chargeTimer = 0f;
+            });
 
         // Transitions
         var transitions = new StateTransitionConfig();
         transitions
             .Add(idle, walk, () => !_playerChecker.IsColliding())
-            .Add(idle, run, () => _playerChecker.IsColliding())
+            .Add(idle, charge, () => _playerChecker.IsColliding())
             .Add(walk, idle, () =>
                 (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
                 (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
-            .Add(walk, run, () => _playerChecker.IsColliding())
-            .Add(run, idle, () => !_playerChecker.IsColliding())
+            .Add(walk, charge, () => _playerChecker.IsColliding())
+            //.Add(attack, idle, () => !_playerChecker.IsColliding())
             .AddAny(hit, () => Hurt)
             .Add(hit, idle, IsAnimationFinished)
-            .AddAny(die, () => Agent.Attr("HP") <= 0);
+            .AddAny(die, () => Agent.Attr("HP") <= 0)
+            .Add(charge, idle, () => 
+                _isStunned || // 晕眩结束后
+                (_isCharging && _chargeTimer >= _chargeDuration)) // 或冲刺时间结束
+            .Add(charge, hit, () => _isStunned); // 撞墙时转为受击状态
 
-        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, run, hit, die], transitions);
+        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, attack, hit, die, charge], transitions);
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
@@ -137,6 +164,48 @@ public partial class Boar : Character
         Velocity = velocity;
         // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
         Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
+        MoveAndSlide();
+    }
+
+    private void Charge(double delta)
+    {
+        if (_isStunned)
+        {
+            _stunTimer += (float)delta;
+            if (_stunTimer >= _stunDuration)
+            {
+                _isStunned = false;
+                _stunTimer = 0.0f;
+            }
+            return;
+        }
+
+        // 更新冲刺计时器
+        _chargeTimer += (float)delta;
+
+        // 检查是否撞墙
+        if (_wallChecker.IsColliding())
+        {
+            _isStunned = true;
+            return;
+        }
+
+        var velocity = Velocity;
+        
+        // 使用初始方向进行冲刺，不跟随玩家
+        float chargeSpeed = Agent.Attr("RunSpeed") * 2.0f; // 冲刺速度可以设置得更快
+        velocity.X = -Graphics.Scale.X * chargeSpeed; // 使用当前朝向决定冲刺方向
+
+        // 在冲刺即将结束时减速
+        float slowdownThreshold = 0.3f; // 最后0.3秒开始减速
+        if (_chargeTimer >= _chargeDuration - slowdownThreshold)
+        {
+            float slowdownFactor = 1.0f - ((_chargeTimer - (_chargeDuration - slowdownThreshold)) / slowdownThreshold);
+            velocity.X *= slowdownFactor;
+        }
+
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        Velocity = velocity;
         MoveAndSlide();
     }
 }
