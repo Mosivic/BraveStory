@@ -1,3 +1,4 @@
+using System;
 using BraveStory;
 using Godot;
 using Miros.Core;
@@ -10,7 +11,7 @@ public partial class Boar : Character
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
     private bool _isStunned = false;
-    private float _stunDuration = 2.0f;
+    private float _stunDuration = 1.0f;
     private float _stunTimer = 0.0f;
     private float _chargeDuration = 0.5f;  // 冲刺持续时间
     private float _chargeTimer = 0f;       // 冲刺计时器
@@ -37,10 +38,6 @@ public partial class Boar : Character
             .OnEntered(s => PlayAnimation("walk"))
             .OnPhysicsUpdated((s, d) => Patrol(d));
 
-        // Run
-        var attack = new State(Tags.State_Action_Run, Agent)
-            .OnEntered(s => PlayAnimation("run"))
-            .OnPhysicsUpdated((s, d) => Chase(d));
 
         // Hit
         var hit = new State(Tags.State_Action_Hit, Agent)
@@ -89,20 +86,28 @@ public partial class Boar : Character
             .OnEntered(s =>
             {
                 PlayAnimation("run");
-                _isStunned = false;
-                _stunTimer = 0.0f;
                 _chargeTimer = 0f;
                 _isCharging = true;
             })
             .OnPhysicsUpdated((s, d) => Charge(d))
             .OnExited(s =>
             {
-                _isStunned = false;
-                _stunTimer = 0.0f;
                 _isCharging = false;
                 _chargeTimer = 0f;
             });
 
+        // Stun
+        var stun = new State(Tags.State_Action_Stun, Agent)
+            .OnEntered(s => { 
+                PlayAnimation("idle");
+                _stunTimer = 0.0f;
+                _isStunned = false;
+            })
+            .OnPhysicsUpdated((s, d) => {
+                _stunTimer += (float)d;
+            });
+
+            
         // Transitions
         var transitions = new StateTransitionConfig();
         transitions
@@ -112,21 +117,18 @@ public partial class Boar : Character
                 (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
                 (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
             .Add(walk, charge, () => _playerChecker.IsColliding())
-            //.Add(attack, idle, () => !_playerChecker.IsColliding())
             .AddAny(hit, () => Hurt)
             .Add(hit, idle, IsAnimationFinished)
             .AddAny(die, () => Agent.Attr("HP") <= 0)
-            .Add(charge, idle, () => 
-                _isStunned || // 晕眩结束后
-                (_isCharging && _chargeTimer >= _chargeDuration)) // 或冲刺时间结束
-            .Add(charge, hit, () => _isStunned); // 撞墙时转为受击状态
+            .Add(charge, idle, () => _chargeTimer >= _chargeDuration) // 冲刺时间结束
+            .Add(charge, stun, () => _isStunned) // 撞墙时转为晕眩状态
+            .Add(stun, idle, () => _stunTimer >= _stunDuration); // 晕眩时间结束
 
-        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, attack, hit, die, charge], transitions);
+        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, hit, die, charge, stun], transitions);
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
     }
-
 
     private void UpdateFacing(float direction)
     {
@@ -150,36 +152,9 @@ public partial class Boar : Character
         MoveAndSlide();
     }
 
-    private void Chase(double delta)
-    {
-        if (!_playerChecker.IsColliding()) return;
-
-        var playerPosition = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
-        if (!playerPosition.HasValue) return;
-        
-        var direction = (playerPosition.Value - GlobalPosition).Normalized();
-        var velocity = Velocity;
-        velocity.X = direction.X * Agent.Attr("RunSpeed");
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
-        Velocity = velocity;
-        // 修改朝向：当向左移动时 Scale.X = -1，向右移动时 Scale.X = 1
-        Graphics.Scale = new Vector2(direction.X >= 0 ? -1 : 1, 1);
-        MoveAndSlide();
-    }
 
     private void Charge(double delta)
     {
-        if (_isStunned)
-        {
-            _stunTimer += (float)delta;
-            if (_stunTimer >= _stunDuration)
-            {
-                _isStunned = false;
-                _stunTimer = 0.0f;
-            }
-            return;
-        }
-
         // 更新冲刺计时器
         _chargeTimer += (float)delta;
 
@@ -191,10 +166,7 @@ public partial class Boar : Character
         }
 
         var velocity = Velocity;
-        
-        // 使用初始方向进行冲刺，不跟随玩家
-        float chargeSpeed = Agent.Attr("RunSpeed") * 2.0f; // 冲刺速度可以设置得更快
-        velocity.X = -Graphics.Scale.X * chargeSpeed; // 使用当前朝向决定冲刺方向
+        velocity.X = -Graphics.Scale.X * Agent.Attr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
         float slowdownThreshold = 0.3f; // 最后0.3秒开始减速
