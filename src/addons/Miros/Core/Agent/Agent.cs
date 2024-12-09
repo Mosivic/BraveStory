@@ -159,7 +159,7 @@ public partial class Agent : Node
 			{
 				var attribute = GetAttributeBase(modifierOption.AttributeName, modifierOption.AttributeSetName);
 				var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
-					modifierOption.Magnitude, modifierOption.Operation);
+					modifierOption.Magnitude, modifierOption.Operation, modifierOption.MMC);
 
 				ApplyModifier(effect, modifier, attribute);
 			}
