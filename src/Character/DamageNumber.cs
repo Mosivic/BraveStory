@@ -40,7 +40,7 @@ public partial class DamageNumber : Node2D
         
         // 颜色变化效果
         _tween.TweenProperty(_label, "modulate", new Color(1.0f, 0.0f, 0.0f, 1.0f), 0.2f); // 从红色开始
-        _tween.TweenProperty(_label, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.2f).SetDelay(0.2f); // 变为白色
+        _tween.TweenProperty(_label, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.3f).SetDelay(0.2f); // 变为白色
         
         // //旋转效果
         // _tween.TweenProperty(this, "rotation_degrees", 10.0f, 0.2f).SetTrans(Tween.TransitionType.Bounce);

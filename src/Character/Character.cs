@@ -1,6 +1,5 @@
 using Godot;
 using Miros.Core;
-using Miros.EventBus;
 
 namespace BraveStory;
 
@@ -37,12 +36,36 @@ public partial class Character : CharacterBody2D
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
 
-        Agent.GetAttributeBase("HP").RegisterPostCurrentValueChange(OnAttributeHPChanged);
+        // 处理伤害事件
+        Agent.EventStream.Throttle<DamageSlice>("Damage", HandleDamage);
     }
+
+
+    public override void _ExitTree()
+    {
+        if (HitBox != null)
+            HitBox.OnHit -= HandleHit;
+        if (HurtBox != null)
+            HurtBox.OnHurt -= HandleHurt;
+
+        Agent.EventStream.Unthrottle<DamageSlice>("Damage", HandleDamage);
+
+        base._ExitTree();
+    }
+
 
     protected bool IsAnimationFinished()
     {
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
+    }
+
+    private void HandleDamage(object sender, DamageSlice e)
+    {
+        var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
+        var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
+        AddChild(damageNumber);
+        
+        damageNumber.SetDamage((int)e.Damage); 
     }
 
     protected void PlayAnimation(string animationName)
@@ -53,35 +76,6 @@ public partial class Character : CharacterBody2D
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
         Hurt = true;
-    }
-
-    public override void _EnterTree()
-    {
-        base._EnterTree();
-    }
-
-    public override void _ExitTree()
-    {
-        if (HitBox != null)
-            HitBox.OnHit -= HandleHit;
-        if (HurtBox != null)
-            HurtBox.OnHurt -= HandleHurt;
-
-        Agent.GetAttributeBase("HP").UnregisterPostCurrentValueChange(OnAttributeHPChanged);
-
-        base._ExitTree();
-    }
-
-    private void OnAttributeHPChanged(AttributeBase attr, float oldValue, float newValue)
-    {
-        // 创建伤害数字实例
-        var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
-        var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
-        AddChild(damageNumber);
-        
-        var damage = oldValue - newValue;
-        // 设置伤害数值和位置
-        damageNumber.SetDamage((int)damage); // 这里的伤害值应该从 e 中获取
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)

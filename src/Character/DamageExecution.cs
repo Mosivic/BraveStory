@@ -1,8 +1,13 @@
 using Godot;
 using Miros.Core;
-using Miros.EventBus;
 
 namespace BraveStory;
+
+public class DamageSlice(float damage) : EventStreamSlice("Damage")
+{
+    public float Damage { get; } = damage;
+}
+
 
 public class DamageExecution : Execution
 {
@@ -12,6 +17,8 @@ public class DamageExecution : Execution
         var damage = data.SourceAttack - data.TargetDefense;
         var newHp = data.TargetHP - damage;
         var hpModifier = new ModifierOption("HP", newHp, ModifierOperation.Override);
+
+        effect.Owner.EventStream.Push("Damage", new DamageSlice(damage));
 
         modifierOptions = [hpModifier];
     }
@@ -30,4 +37,5 @@ public class DamageExecution : Execution
             TargetHP = effect.Owner.Attr("HP");
         }
     }
+
 }
