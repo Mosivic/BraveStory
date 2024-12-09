@@ -36,6 +36,8 @@ public partial class Character : CharacterBody2D
         // 处理受伤事件
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
+
+        Agent.GetAttributeBase("HP").RegisterPostCurrentValueChange(OnAttributeHPChanged);
     }
 
     protected bool IsAnimationFinished()
@@ -56,32 +58,30 @@ public partial class Character : CharacterBody2D
     public override void _EnterTree()
     {
         base._EnterTree();
-        EventBus.Instance.Subscribe<DamagedEventArgs>("Damaged", CueDamageNumber);
     }
 
     public override void _ExitTree()
     {
-        EventBus.Instance.Unsubscribe<DamagedEventArgs>("Damaged", CueDamageNumber);
         if (HitBox != null)
             HitBox.OnHit -= HandleHit;
         if (HurtBox != null)
             HurtBox.OnHurt -= HandleHurt;
 
+        Agent.GetAttributeBase("HP").UnregisterPostCurrentValueChange(OnAttributeHPChanged);
+
         base._ExitTree();
     }
 
-    private void CueDamageNumber(object sender, DamagedEventArgs e)
+    private void OnAttributeHPChanged(AttributeBase attr, float oldValue, float newValue)
     {
-        if (e.Target != Agent)
-            return;
-
         // 创建伤害数字实例
         var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
         var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
         AddChild(damageNumber);
         
+        var damage = oldValue - newValue;
         // 设置伤害数值和位置
-        damageNumber.SetDamage((int)e.Damage); // 这里的伤害值应该从 e 中获取
+        damageNumber.SetDamage((int)damage); // 这里的伤害值应该从 e 中获取
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)

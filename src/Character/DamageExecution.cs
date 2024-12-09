@@ -12,8 +12,6 @@ public class DamageExecution : Execution
         var damage = data.SourceAttack - data.TargetDefense;
         var newHp = data.TargetHP - damage;
         var hpModifier = new ModifierOption("HP", newHp, ModifierOperation.Override);
-      
-        EventBus.Instance.Publish("Damaged", new DamagedEventArgs((int)damage, effect.Owner));
 
         modifierOptions = [hpModifier];
     }
