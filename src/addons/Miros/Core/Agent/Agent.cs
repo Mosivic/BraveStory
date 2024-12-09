@@ -17,20 +17,19 @@ public enum ExecutorType
 public partial class Agent : Node
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-	private Node2D _host;
+	public Node2D Host;
 	private AttributeSetContainer AttributeSetContainer { get; set; }
 	private TagContainer _ownedTags;
 	private readonly StateExecutionRegistry _stateExecutionRegistry = new();
 	private ITaskProvider _taskProvider;
 	
 	public bool Enabled { get;private set; }
-	public string HostName => _host.Name;
 
 
 	public void Initialize(Node2D host, Type[] attrSetTypes)
 	{
 		Enabled = true;
-		_host = host;
+		Host = host;
 		
 		_taskProvider = new StaticTaskProvider();
 		_ownedTags = new TagContainer([]);
