@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkvswo815hqti"]
+
+[ext_resource type="Script" path="res://Character/DamageNumber.cs" id="1_s3nyu"]
+[ext_resource type="FontFile" uid="uid://cs3rytrtn7vnb" path="res://Asset/fonts/SmileySans-Oblique.otf" id="2_bpuct"]
+
+[node name="DamageNumber" type="Node2D"]
+script = ExtResource("1_s3nyu")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -20.0
+offset_top = -59.0
+offset_right = 20.0
+pivot_offset = Vector2(20, 23)
+theme_override_fonts/font = ExtResource("2_bpuct")
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1

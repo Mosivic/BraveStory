@@ -21,17 +21,17 @@ public class Modifier
 
     public Tag AttributeSetTag { get; set; }
     public Tag AttributeTag { get; set; }
-
     public float Magnitude { get; set; }
     public ModifierOperation Operation { get; set; }
 
 
-    public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation)
+    public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation, ModifierMagnitudeCalculation mmc)
     {
         AttributeSetTag = attributeSetTag;
         AttributeTag = attributeTag;
         Magnitude = magnitude;
         Operation = operation;
+        MMC = mmc;
     }
     
     public float CalculateMagnitude(Effect effect)

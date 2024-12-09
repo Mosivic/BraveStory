@@ -22,7 +22,7 @@ shader_parameter/flash_color = Vector4(1, 1, 1, 1)
 shader_parameter/is_hurt = false
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d16dq"]
-size = Vector2(7, 32)
+size = Vector2(6, 31)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8logo"]
 size = Vector2(34, 12)
@@ -438,7 +438,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Rect2(112, 224, 224, 56)]
+"values": [Rect2(112, 224, 224, 74.2166)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -644,7 +644,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Rect2(112, 184, 224, 40)]
+"values": [Rect2(112, 184, 224, 42.0795)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -689,10 +689,10 @@ tracks/4/path = NodePath("Graphics/Sprite2D:position")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0.000949577, 0.00565216),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0.000949577),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, -16), Vector2(0, -16)]
+"values": [Vector2(0, -16)]
 }
 
 [sub_resource type="Animation" id="Animation_pi230"]
@@ -1079,10 +1079,10 @@ tracks/3/path = NodePath("Graphics/Sprite2D:flip_h")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.366667, 0.368743),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [true]
+"values": [false, true, false]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -1203,7 +1203,7 @@ collision_mask = 0
 script = ExtResource("4_nuvsh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/HurtBox"]
-position = Vector2(0.5, -15)
+position = Vector2(0, -15.5)
 shape = SubResource("RectangleShape2D_d16dq")
 
 [node name="HitBox" type="Area2D" parent="Graphics"]
@@ -1246,6 +1246,8 @@ script = ExtResource("9_7u3hq")
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="StatusPanel" parent="CanvasLayer" instance=ExtResource("8_oddwo")]
-offset_right = 92.0
-offset_bottom = 30.0
+offset_left = 20.0
+offset_top = 18.0
+offset_right = 112.0
+offset_bottom = 48.0
 scale = Vector2(2.44, 2.44)

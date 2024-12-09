@@ -35,24 +35,49 @@ public partial class Character : CharacterBody2D
         // 处理受伤事件
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
+
+        // 处理伤害事件
+        Agent.EventStream.Throttle<DamageSlice>("Damage", HandleDamage);
     }
+
+
+    public override void _ExitTree()
+    {
+        if (HitBox != null)
+            HitBox.OnHit -= HandleHit;
+        if (HurtBox != null)
+            HurtBox.OnHurt -= HandleHurt;
+
+        Agent.EventStream.Unthrottle<DamageSlice>("Damage", HandleDamage);
+
+        base._ExitTree();
+    }
+
 
     protected bool IsAnimationFinished()
     {
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
 
+    private void HandleDamage(object sender, DamageSlice e)
+    {
+        var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
+        var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
+        AddChild(damageNumber);
+        
+        damageNumber.SetDamage((int)e.Damage); 
+    }
+
     protected void PlayAnimation(string animationName)
     {
+        AnimationPlayer.Play("RESET");
         AnimationPlayer.Play(animationName);
     }
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
         Hurt = true;
-        GD.Print($"[Damage] {e.Hitbox.Owner.Name} -> {Name} | HP : {Agent.Attr("HP")}");
-    }   
-
+    }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
@@ -67,15 +92,5 @@ public partial class Character : CharacterBody2D
         };
 
         suffer.Agent.AddState(ExecutorType.EffectExecutor, damageEffect);
-    }
-
-
-    public override void _ExitTree()
-    {
-        if (HitBox != null)
-            HitBox.OnHit -= HandleHit;
-        if (HurtBox != null)
-            HurtBox.OnHurt -= HandleHurt;
-        base._ExitTree();
     }
 }

@@ -17,7 +17,9 @@ tags:
       - name: Attack1
       - name: Attack11
       - name: Attack111
+      - name: Stun
   - name: Status
     children:
       - name: Die
+
   

@@ -17,21 +17,23 @@ public enum ExecutorType
 public partial class Agent : Node
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-	private Node2D _host;
 	private AttributeSetContainer AttributeSetContainer { get; set; }
 	private TagContainer _ownedTags;
 	private readonly StateExecutionRegistry _stateExecutionRegistry = new();
 	private ITaskProvider _taskProvider;
-	
+
+
+	public Node2D Host { get; private set; }
 	public bool Enabled { get;private set; }
-	public string HostName => _host.Name;
+	public EventStream EventStream { get; private set; }
 
 
 	public void Initialize(Node2D host, Type[] attrSetTypes)
 	{
 		Enabled = true;
-		_host = host;
-		
+		Host = host;
+		EventStream = new EventStream();
+        
 		_taskProvider = new StaticTaskProvider();
 		_ownedTags = new TagContainer([]);
 		AttributeSetContainer = new AttributeSetContainer(this);
@@ -159,7 +161,7 @@ public partial class Agent : Node
 			{
 				var attribute = GetAttributeBase(modifierOption.AttributeName, modifierOption.AttributeSetName);
 				var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
-					modifierOption.Magnitude, modifierOption.Operation);
+					modifierOption.Magnitude, modifierOption.Operation, modifierOption.MMC);
 
 				ApplyModifier(effect, modifier, attribute);
 			}
