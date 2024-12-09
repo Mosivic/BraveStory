@@ -6,10 +6,10 @@ using Miros.Core;
 public partial class Boar : Character
 {
     private RayCast2D _floorChecker;
-    private int _hp = 5;
-    private Vector2 _knockbackVelocity = Vector2.Zero;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
+
+    private float _knockbackVelocity = 50.0f;
     private bool _isStunned = false;
     private float _stunDuration = 1.0f;
     private float _stunTimer = 0.0f;
@@ -50,14 +50,14 @@ public partial class Boar : Character
                 if (playerPos.HasValue)
                 {
                     var direction = (GlobalPosition - playerPos.Value).Normalized();
-                    _knockbackVelocity = new Vector2(direction.X * 100f, 0); // 击退力度
+                    _knockbackVelocity = direction.X * _knockbackVelocity; // 击退力度
                 }
             })
             .OnPhysicsUpdated((s, d) =>
             {
                 // 应用击退力
                 var velocity = Velocity;
-                velocity += _knockbackVelocity;
+                velocity.X += _knockbackVelocity;
                 velocity.Y += (float)d * Agent.Attr("Gravity");
                 // 逐渐减弱击退效果
                 _knockbackVelocity *= 0.8f;
@@ -67,7 +67,6 @@ public partial class Boar : Character
             .OnExited(s =>
             {
                 Hurt = false;
-                _knockbackVelocity = Vector2.Zero;
             });
 
         // Die
@@ -75,9 +74,6 @@ public partial class Boar : Character
             .OnEntered(s => PlayAnimation("die"))
             .OnPhysicsUpdated((s, d) =>
             {
-                // 应用击退力
-                Velocity = Velocity * 0.9f;
-                MoveAndSlide();
                 if(IsAnimationFinished()) QueueFree();
             });
 

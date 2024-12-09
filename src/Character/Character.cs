@@ -70,6 +70,7 @@ public partial class Character : CharacterBody2D
 
     protected void PlayAnimation(string animationName)
     {
+        AnimationPlayer.Play("RESET");
         AnimationPlayer.Play(animationName);
     }
 

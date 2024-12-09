@@ -152,7 +152,7 @@ public partial class Player : Character
 			.Add(run, sliding, KeyDownSliding) // 如果按下滑动键，则进入滑行状态
 			.Add(jump, fall) // 跳跃状态结束后，进入坠落状态
 			.Add(fall, idle, IsOnFloor) // 如果在地面上，则进入空闲状态
-			.Add(fall, wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove()) // 如果脚部和手部检查器都碰撞到墙壁，并且未按下移动键，则进入墙壁滑行状态
+			.Add(fall, wallSlide, () => _footChecker.IsColliding() && _handChecker.IsColliding() && !KeyDownMove()) // 如果脚部检查器未碰撞到墙壁，则进入墙壁滑行状态
 			.Add(fall, doubleJump, () => KeyDownJump() && _jumpCount < _maxJumpCount) // 如果按下跳跃键，并且跳跃次数小于最大跳跃次数，则进入双跳跃状态
 			.Add(doubleJump, fall) // 双跳跃状态结束后，进入坠落状态
 			.Add(wallSlide, idle, IsOnFloor) // 墙壁滑行状态结束后，如果在地面上，则进入空闲状态
@@ -238,12 +238,12 @@ public partial class Player : Character
 
 	private void WallSlide(double delta)
 	{
-		var direction = Input.GetAxis("move_left", "move_right");
+		
 		var velocity = Velocity;
 		velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Attr("Gravity"), 600);
 		Velocity = velocity;
 
-		UpdateFacing(direction); // 使用新方法处理朝向
+		UpdateFacing(0); // 使用新方法处理朝向
 		MoveAndSlide();
 	}
 
