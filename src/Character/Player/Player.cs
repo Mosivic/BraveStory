@@ -20,6 +20,16 @@ public partial class Player : Character
 	public HashSet<Interactable> Interactions { get; set; } = new();
 
 
+	public void ClearInteractions()
+	{
+		Interactions.Clear();
+	}
+
+	public void SetHurtBoxMonitorable(bool monitorable)
+	{
+		HurtBox.SetDeferred("monitorable", monitorable);
+	}
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -29,109 +39,6 @@ public partial class Player : Character
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
 
-		// Idle  
-		var idle = new State(Tags.State_Action_Idle, Agent)
-			.OnEntered(_ =>
-			{
-				PlayAnimation("idle");
-				_jumpCount = 0;
-			});
-
-
-		// Jump
-		var jump = new State(Tags.State_Action_Jump, Agent)
-			.OnEntered(_ =>
-			{
-				PlayAnimation("jump");
-				Velocity = new Vector2(Velocity.X, Agent.Attr("JumpVelocity"));
-				_jumpCount++;
-			});
-
-		// Wall Jump
-		var wallJump = new State(Tags.State_Action_WallJump, Agent)
-			.OnEntered(_ =>
-			{
-				PlayAnimation("jump");
-				var wallJumpDirectionX = Graphics.Scale.X;
-				Velocity = new Vector2(-wallJumpDirectionX * 400, -320);
-				_jumpCount = 0;
-			});
-
-		// Run
-		var run = new State(Tags.State_Action_Run, Agent)
-			.OnEntered(_ => PlayAnimation("run"))
-			.OnPhysicsUpdated((_, delta) => Move(delta));
-
-
-		// Fall
-		var fall = new State(Tags.State_Action_Fall, Agent)
-			.OnEntered(_ => PlayAnimation("fall"))
-			.OnPhysicsUpdated((_, delta) => Fall(delta));
-
-
-		// Double Jump
-		var doubleJump = new State(Tags.State_Action_DoubleJump, Agent)
-			.OnEntered(_ =>
-			{
-				PlayAnimation("jump");
-				Velocity = new Vector2(Velocity.X, Agent.Attr("JumpVelocity"));
-				_jumpCount++;
-			});
-
-
-		// Wall Slide
-		var wallSlide = new State(Tags.State_Action_WallSlide, Agent)
-			.OnEntered(_ => PlayAnimation("wall_sliding"))
-			.OnPhysicsUpdated((_, delta) => WallSlide(delta));
-
-
-		// Attack1
-		var attack1 = new State(Tags.State_Action_Attack1, Agent)
-			.OnEntered(_ => PlayAnimation("attack1"))
-			.ExitCondition(_ => IsAnimationFinished());
-
-
-		// Attack11
-		var attack11 = new State(Tags.State_Action_Attack11, Agent)
-			.OnEntered(_ => PlayAnimation("attack11"))
-			.ExitCondition(_ => IsAnimationFinished());
-
-		// Attack111
-		var attack111 = new State(Tags.State_Action_Attack111, Agent)
-			.OnEntered(_ => PlayAnimation("attack111"))
-			.ExitCondition(_ => IsAnimationFinished());
-
-		// Hit
-		var hit = new State(Tags.State_Action_Hit, Agent)
-			.OnEntered(_ => { PlayAnimation("hit"); Hurt = false; });
-
-		// Die
-		var die = new State(Tags.State_Status_Die, Agent)
-			.OnEntered(_ =>
-			{
-				PlayAnimation("die");
-				Interactions.Clear();
-			})
-			.OnPhysicsUpdated((_, _) =>
-			{
-				if (IsAnimationFinished()) QueueFree();
-			});
-
-		// Sliding
-		var sliding = new State(Tags.State_Action_Sliding, Agent)
-			.OnEntered(_ =>
-			{
-				PlayAnimation("sliding_start");
-			})
-			.OnExited(_ => HurtBox.SetDeferred("monitorable", true))
-			.OnPhysicsUpdated((_, delta) =>
-			{
-				if (AnimationPlayer.CurrentAnimation == "sliding_start" && IsAnimationFinished())
-					PlayAnimation("sliding_loop");
-				else if (AnimationPlayer.CurrentAnimation == "sliding_loop" && IsAnimationFinished())
-					PlayAnimation("sliding_end");
-				Slide(delta);
-			});
 
 		// 转换规则
 		var transitions = new StateTransitionConfig();
@@ -195,8 +102,8 @@ public partial class Player : Character
 		}
 	}
 
-	// 添加一个统一处理朝向的方法
-	private void UpdateFacing(float direction)
+
+	public void UpdateFacing(float direction)
 	{
 		// 如果有输入，根据输入方向转向
 		if (!Mathf.IsZeroApprox(direction))
@@ -205,47 +112,7 @@ public partial class Player : Character
 		else if (!Mathf.IsZeroApprox(Velocity.X)) Graphics.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 	}
 
-	private void Move(double delta)
-	{
-		var direction = Input.GetAxis("move_left", "move_right");
-		var velocity = Velocity;
-		velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Attr("RunSpeed"), Agent.Attr("FloorAcceleration"));
-		velocity.Y += (float)delta * Agent.Attr("Gravity");
-		Velocity = velocity;
 
-		UpdateFacing(direction); // 使用新方法处理朝向
-		MoveAndSlide();
-	}
-
-	private void Fall(double delta)
-	{
-		var direction = Input.GetAxis("move_left", "move_right");
-		var velocity = Velocity;
-
-		// 确保空中移动控制合理
-		velocity.X = Mathf.MoveToward(
-			velocity.X,
-			direction * Agent.Attr("RunSpeed"),
-			Agent.Attr("AirAcceleration")
-		);
-
-		velocity.Y += (float)delta * Agent.Attr("Gravity");
-		Velocity = velocity;
-
-		UpdateFacing(direction);
-		MoveAndSlide();
-	}
-
-	private void WallSlide(double delta)
-	{
-		
-		var velocity = Velocity;
-		velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Attr("Gravity"), 600);
-		Velocity = velocity;
-
-		UpdateFacing(0); // 使用新方法处理朝向
-		MoveAndSlide();
-	}
 
 	private void WallJumpMove(double delta)
 	{
@@ -278,12 +145,5 @@ public partial class Player : Character
 	}
 
 
-	private void Slide(double delta)
-	{
-		var velocity = Velocity;
-		velocity.X = Mathf.MoveToward(velocity.X, 0, Agent.Attr("SlidingDeceleration") * (float)delta);
-		velocity.Y += (float)delta * Agent.Attr("Gravity");
-		Velocity = velocity;
-		MoveAndSlide();
-	}
+
 }

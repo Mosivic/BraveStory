@@ -8,7 +8,7 @@ public partial class Character : CharacterBody2D
     protected Agent Agent;
 
     protected AnimationPlayer AnimationPlayer;
-    protected Node2D Graphics;
+    public Node2D Graphics;
     protected bool Hurt;
     protected HitBox HitBox;
     protected HurtBox HurtBox;
@@ -54,7 +54,7 @@ public partial class Character : CharacterBody2D
     }
 
 
-    protected bool IsAnimationFinished()
+    public bool IsAnimationFinished()
     {
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
@@ -68,10 +68,15 @@ public partial class Character : CharacterBody2D
         damageNumber.SetDamage((int)e.Damage); 
     }
 
-    protected void PlayAnimation(string animationName)
+    public void PlayAnimation(string animationName)
     {
         AnimationPlayer.Play("RESET");
         AnimationPlayer.Play(animationName);
+    }
+
+    public string GetCurrentAnimation()
+    {
+        return AnimationPlayer.CurrentAnimation;
     }
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
