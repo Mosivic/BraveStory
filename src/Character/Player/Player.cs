@@ -112,18 +112,6 @@ public partial class Player : Character
 		else if (!Mathf.IsZeroApprox(Velocity.X)) Graphics.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 	}
 
-
-
-	private void WallJumpMove(double delta)
-	{
-		var velocity = Velocity;
-		velocity.Y += (float)delta * Agent.Attr("Gravity");
-		Velocity = velocity;
-
-		UpdateFacing(0); // 在空中时只根据速度方向转向
-		MoveAndSlide();
-	}
-
 	private bool KeyDownMove()
 	{
 		return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));

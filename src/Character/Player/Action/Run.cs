@@ -19,13 +19,13 @@ public partial class RunAction : StateNode<Player>
 
     public void Move(double delta)
     {
-		var direction = Input.GetAxis("move_left", "move_right");
-		var velocity = Host.Velocity;
-		velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Attr("RunSpeed"), Agent.Attr("FloorAcceleration"));
-		velocity.Y += (float)delta * Agent.Attr("Gravity");
-		Host.Velocity = velocity;
+        var direction = Input.GetAxis("move_left", "move_right");
+        var velocity = Host.Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Attr("RunSpeed"), Agent.Attr("FloorAcceleration"));
+        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        Host.Velocity = velocity;
 
-		Host.UpdateFacing(direction); // 使用新方法处理朝向
-		Host.MoveAndSlide();
-	}
+        Host.UpdateFacing(direction); // 使用新方法处理朝向
+        Host.MoveAndSlide();
+    }
 }
