@@ -10,10 +10,11 @@ public class CharacterShared : Shared
 {
     public bool IsHit { get; set; } = false;
     public bool IsHurt { get; set; } = false;
-    public AgentNodeBase HitAgentNode { get; set; }
+    public AgentorBase HitAgentor { get; set; }
 }
 
-public partial class Character<TShared> : CharacterBody2D
+public partial class Character<TAgentor, TShared> : CharacterBody2D
+where TAgentor : AgentorBase
 where TShared : CharacterShared, new()
 {
     protected AnimationPlayer AnimationPlayer;
@@ -22,8 +23,10 @@ where TShared : CharacterShared, new()
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
-    protected AgentNodeBase AgentNode;
-    protected CharacterShared Shared;
+    public StatsPanel StatusPanel;
+    
+    protected TAgentor Agentor;
+    protected TShared Shared;
 
 
     public override void _Ready()
@@ -32,11 +35,8 @@ where TShared : CharacterShared, new()
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        StatusPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
         
-        // 获取 AgentNode
-        AgentNode = GetNode<AgentNodeBase>("Agent");
-        Shared = AgentNode.GetShared<CharacterShared>();
-
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
         HitBox.OnHit += HandleHit;
@@ -46,7 +46,7 @@ where TShared : CharacterShared, new()
         HurtBox.OnHurt += HandleHurt;
 
         // 处理伤害事件
-        AgentNode.Throttle<DamageSlice>("Damage", CreateDamageNumber);
+        Agentor.Throttle<DamageSlice>("Damage", CreateDamageNumber);
     }
 
 
@@ -57,7 +57,7 @@ where TShared : CharacterShared, new()
         if (HurtBox != null)
             HurtBox.OnHurt -= HandleHurt;
 
-        AgentNode.Unthrottle<DamageSlice>("Damage", CreateDamageNumber);
+        Agentor.Unthrottle<DamageSlice>("Damage", CreateDamageNumber);
 
         base._ExitTree();
     }
@@ -96,7 +96,12 @@ where TShared : CharacterShared, new()
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
         Shared.IsHit = true;
-        Shared.HitAgentNode = (e.HurtBox.Owner as Character<TShared>).AgentNode;
+        Shared.HitAgentor = (e.HurtBox.Owner as Character<TAgentor, TShared>).Agentor;
+    }
+
+    public override void _Process(double delta)
+    {
+        Agentor.Process(delta);
     }
 
 }

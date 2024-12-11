@@ -7,7 +7,7 @@ using Miros.Core;
 
 namespace Miros.Core;
 
-public abstract  class AgentNodeBase
+public abstract  class AgentorBase
 {
     protected Agent Agent { get; private set; } = new();
     public abstract TShared GetShared<TShared>()
@@ -33,5 +33,15 @@ public abstract  class AgentNodeBase
     where T : EventStreamArgs
     {
         Agent.EventStream.Unthrottle<T>(eventName,handler);
+    }
+
+    public void Process(double delta)
+    {
+        Agent.Process(delta);
+    }
+
+    public void PhysicsProcess(double delta)
+    {
+        Agent.PhysicsProcess(delta);
     }
 }

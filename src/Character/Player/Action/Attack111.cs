@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class Attack111Action : StateNode<State,Player,PlayerShared>
+public  class Attack111Action : Stator<State,Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_Attack111;
     public override Tag LayerTag => Tags.StateLayer_Movement;
@@ -20,7 +20,7 @@ public partial class Attack111Action : StateNode<State,Player,PlayerShared>
 
     protected override void PhysicsUpdate(double delta)
     {
-        if(Shared.IsHit && Shared.HitAgentNode != null)
+        if(Shared.IsHit && Shared.HitAgentor != null)
         {
             var damageEffect = new Effect()
             {
@@ -30,7 +30,7 @@ public partial class Attack111Action : StateNode<State,Player,PlayerShared>
                 Executions = [new DamageExecution()]
             };
 
-            Shared.HitAgentNode.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Shared.HitAgentor.AddState(ExecutorType.EffectExecutor, damageEffect);
             Shared.IsHit = false;
         }
     }

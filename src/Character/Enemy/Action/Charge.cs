@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class ChargeEnemyAction : StateNode<State, Enemy,EnemyShared>
+public partial class ChargeEnemyAction : Stator<State, Enemy,EnemyShared>
 {
     // FIXME：Charge 和 Run 是同一个状态，需要合并
     public override Tag StateTag => Tags.State_Action_Run;
@@ -31,7 +31,7 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy,EnemyShared>
     {
         Charge(delta);
 
-        if(Shared.IsHit && Shared.HitAgentNode != null)
+        if(Shared.IsHit && Shared.HitAgentor != null)
         {
             var damageEffect = new Effect()
             {
@@ -41,7 +41,7 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy,EnemyShared>
                 Executions = [new DamageExecution()]
             };
 
-            Shared.HitAgentNode.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Shared.HitAgentor.AddState(ExecutorType.EffectExecutor, damageEffect);
             Shared.IsHit = false;
         }
     }

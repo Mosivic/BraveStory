@@ -7,7 +7,7 @@ public class Shared{}
 
 
 [GodotClassName("StateNode")]
-public abstract class StateNode<TState, THost,TShared>
+public abstract class Stator<TState, THost,TShared>
 where THost : Node 
 where TState : State, new()
 where TShared : Shared, new()
@@ -23,7 +23,7 @@ where TShared : Shared, new()
     public TShared Shared { get; set; }
 
 
-    public StateNode(Agent agent, THost host,TShared shared)
+    public void Initialize(Agent agent, THost host,TShared shared)
     {
         Agent = agent;
         Host = host;

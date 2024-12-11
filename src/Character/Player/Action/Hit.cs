@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class HitAction : StateNode<State, Player,PlayerShared>
+public class HitAction : Stator<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_Hit;
     public override Tag LayerTag => Tags.StateLayer_Movement;

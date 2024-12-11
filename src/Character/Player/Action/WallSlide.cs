@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class WallSlideAction : StateNode<State, Player,PlayerShared>
+public class WallSlideAction : Stator<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_WallSlide;
     public override Tag LayerTag  => Tags.StateLayer_Movement;

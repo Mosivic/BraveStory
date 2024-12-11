@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class IdleAction : StateNode<State, Player,PlayerShared>
+public class IdleAction : Stator<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_Idle;
     public override Tag LayerTag => Tags.StateLayer_Movement;

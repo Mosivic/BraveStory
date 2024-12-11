@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://domj7ott646q7"]
+[gd_scene load_steps=37 format=3 uid="uid://domj7ott646q7"]
 
 [ext_resource type="Script" path="res://Character/Player/Player.cs" id="1_d4cnt"]
 [ext_resource type="Texture2D" uid="uid://csyrvg2w36bm3" path="res://Art/generic_char_v0.2/png/red/char_red_2.png" id="2_735ug"]
@@ -9,7 +9,6 @@
 [ext_resource type="Script" path="res://HitBox.cs" id="5_i8nox"]
 [ext_resource type="Texture2D" uid="uid://b4baa7e42g6ko" path="res://Art/gamepad-ui/gdb-keyboard-2.png" id="7_l7dr7"]
 [ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_oddwo"]
-[ext_resource type="Script" path="res://Character/Player/PlayerAgent.cs" id="9_7u3hq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cxnk6"]
 size = Vector2(18, 32)
@@ -1239,9 +1238,6 @@ script = ExtResource("4_6uk3r")
 position = Vector2(0, -43)
 sprite_frames = SubResource("SpriteFrames_gb8ve")
 frame_progress = 0.0572009
-
-[node name="Agent" type="Node" parent="."]
-script = ExtResource("9_7u3hq")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

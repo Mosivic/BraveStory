@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class JumpAction : StateNode<State, Player,PlayerShared>
+public class JumpAction : Stator<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_Jump;
     public override Tag LayerTag => Tags.StateLayer_Movement;

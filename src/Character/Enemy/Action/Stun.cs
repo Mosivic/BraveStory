@@ -2,7 +2,7 @@ using Godot;
 using Miros.Core;
 namespace BraveStory;
 
-public partial class StunEnemyAction : StateNode<State, Enemy,EnemyShared>
+public partial class StunEnemyAction : Stator<State, Enemy,EnemyShared>
 {
     public override Tag StateTag => Tags.State_Action_Stun;
     public override Tag LayerTag => Tags.StateLayer_Movement;

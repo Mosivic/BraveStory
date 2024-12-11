@@ -12,8 +12,7 @@ using Godot;
 
 namespace BraveStory;
 
-[GodotClassName("AgentNode")]
-public partial class AgentNode<THost,TAttributeSet,TShared> : AgentNodeBase
+public class Agentor<THost,TAttributeSet,TShared> : AgentorBase
 where THost : Node   
 where TAttributeSet : AttributeSet
 where TShared : Shared, new()
@@ -21,58 +20,43 @@ where TShared : Shared, new()
     protected THost Host { get; private set; }
     public TShared Shared { get; private set; }
 
-    public override void _Ready()
+    public virtual void Initialize(THost host,TShared shared,Type[] stators)
     {
-        Host = Owner as THost;
+        Host = host;
         Agent.Initialize(Host as Node2D, [typeof(TAttributeSet)]);
 
-        Shared = new TShared();
-        HandleStateNodes(Shared);
+        Shared = shared;
+        HandleStateNodes(Shared,stators);
     }
 
-    private void HandleStateNodes(TShared shared)
+    private void HandleStateNodes(TShared shared,Type[] stators)
     {
-        var children = GetChildren();
-		foreach (var child in children)
-		{
-            Console.WriteLine(child.GetType());
-            if (child is not StateNode<State, THost,TShared>)
-                continue;
-
-            var stateNode = child as StateNode<State, THost,TShared>;
-            HandleStateNode(stateNode,shared);
+        foreach (var stator in stators)
+        {
+            var s = (Stator<State, THost, TShared>)Activator.CreateInstance(stator);
+            HandleStateNode(s, shared);
         }
     }
 
-    private void HandleStateNode<TStateNode>(TStateNode stateNode,TShared shared) 
-    where TStateNode : StateNode<State, THost,TShared>
+    private void HandleStateNode<TStator>(TStator stator,TShared shared) 
+    where TStator : Stator<State, THost,TShared>
     {
-        stateNode.Initialize(Agent, Host,shared);
-        AddStateFromNode(stateNode.ExecutorType, stateNode);
+        stator.Initialize(Agent, Host,shared);
+        AddStateFromNode(stator.ExecutorType, stator);
     }
 
-    private void AddStateFromNode(ExecutorType executorType, StateNode<State, THost,TShared> stateNode)
+    private void AddStateFromNode(ExecutorType executorType, Stator<State, THost,TShared> stator)
     {
         switch (executorType)
         {
             case ExecutorType.MultiLayerStateMachine:
-                Agent.AddState(executorType, stateNode.State, new StateFSMArgs(
-                    stateNode.StateTag, stateNode.Transitions, stateNode.AnyTransition));
+                Agent.AddState(executorType, stator.State, new StateFSMArgs(
+                    stator.LayerTag, stator.Transitions, stator.AnyTransition));
                 break;
             case ExecutorType.EffectExecutor:
-                Agent.AddState(executorType, stateNode.State);
+                Agent.AddState(executorType, stator.State);
                 break;
         }
-    }
-
-    public override void _Process(double delta)
-    {
-        Agent.Process(delta);
-    }
-
-    public override void _PhysicsProcess(double delta)
-    {
-        Agent.PhysicsProcess(delta);
     }
 
 #pragma warning disable CS0693 // 类型参数与外部类型中的类型参数同名

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -12,7 +13,7 @@ public partial class PlayerShared : CharacterShared
 	public int MaxJumpCount { get; set; } = 2;
 }
 
-public partial class Player : Character<PlayerShared>
+public partial class Player : Character<PlayerAgentor, PlayerShared>
 {
 	private AnimatedSprite2D _animatedSprite;
 	private RayCast2D _footChecker;
@@ -42,17 +43,27 @@ public partial class Player : Character<PlayerShared>
 
 	public override void _Ready()
 	{
-		base._Ready();
+		
 		// Compoents
 		_handChecker = GetNode<RayCast2D>("Graphics/HandChecker");
 		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
+		Shared = new PlayerShared();
+        Agentor = new PlayerAgentor();
+		Agentor.Initialize(this, Shared, [
+			typeof(IdleAction), typeof(JumpAction), typeof(DoubleJumpAction), 
+			typeof(DieAction), typeof(FallAction), typeof(HitAction), 
+			typeof(RunAction), typeof(SlidingAction), typeof(WallJumpAction), typeof(WallSlideAction),
+			typeof(Attack1Action), typeof(Attack11Action), typeof(Attack111Action)]);
+
+        Shared = Agentor.GetShared<PlayerShared>();
 
 		// Canvas Layer
 		var canvasLayer = new CanvasLayer();
 		AddChild(canvasLayer);
 
+		base._Ready();
 		// Debug Window
 		// var debugWindow = new TagDebugWindow(ownedTags.GetTags());
 		// canvasLayer.AddChild(debugWindow);
