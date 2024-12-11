@@ -3,24 +3,22 @@ using Godot;
 
 namespace BraveStory;
 
-public partial class AgentNode<THost,TAttributeSet,TShared> : Node 
+public partial class AgentNode<THost,TAttributeSet,TShared> : AgentNodeBase
 where THost : Node
 where TAttributeSet : AttributeSet
 where TShared : Shared, new()
 {   
-    protected Agent Agent { get; private set; } = new();
     protected THost Host { get; private set; }
 
     public override void _Ready()
     {
-        Host = GetParent<THost>();
+        Host = GetParent() as THost;
         Agent.Initialize(Host as Node2D, [typeof(TAttributeSet)]);
         var Shared = new TShared();
 
         HandleStateNodes(Shared);
     
     }
-
 
     private void HandleStateNodes(TShared shared)
     {
@@ -55,5 +53,15 @@ where TShared : Shared, new()
                 Agent.AddState(executorType, stateNode.State);
                 break;
         }
+    }
+
+    public override void _Process(double delta)
+    {
+        Agent.Process(delta);
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        Agent.PhysicsProcess(delta);
     }
 }

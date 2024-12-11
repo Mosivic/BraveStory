@@ -30,6 +30,20 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy,EnemyShared>
     protected override void PhysicsUpdate(double delta)
     {
         Charge(delta);
+
+        if(Shared.IsHit && Shared.HitAgentNode != null)
+        {
+            var damageEffect = new Effect()
+            {
+                Tag = Tags.Effect_Buff,
+                Source = Agent,
+                DurationPolicy = DurationPolicy.Instant,
+                Executions = [new DamageExecution()]
+            };
+
+            Shared.HitAgentNode.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Shared.IsHit = false;
+        }
     }
 
     protected override void Exit()

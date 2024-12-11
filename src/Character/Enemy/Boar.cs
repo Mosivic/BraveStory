@@ -3,7 +3,7 @@ using BraveStory;
 using Godot;
 using Miros.Core;
 
-public class EnemyShared : Shared
+public class EnemyShared : CharacterShared
 {
     public float KnockbackVelocity{get;set;} = 50.0f;
     public bool IsStunned{get;set;} = false;
@@ -12,7 +12,6 @@ public class EnemyShared : Shared
     public float ChargeDuration{get;set;} = 0.5f;  // 冲刺持续时间
     public float ChargeTimer{get;set;} = 0f;       // 冲刺计时器
     public bool IsCharging{get;set;} = false;      // 是否正在冲刺
-    public bool IsHurt{get;set;} = false;
 }
 
 public partial class Enemy : Character

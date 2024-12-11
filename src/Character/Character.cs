@@ -1,18 +1,28 @@
+using System;
+using System.Collections.Generic;
 using Godot;
 using Miros.Core;
 
 namespace BraveStory;
 
+
+public class CharacterShared : Shared
+{
+    public bool IsHit { get; set; } = false;
+    public bool IsHurt { get; set; } = false;
+    public AgentNodeBase HitAgentNode { get; set; }
+}
+
 public partial class Character : CharacterBody2D
 {
-    protected Agent Agent;
-
     protected AnimationPlayer AnimationPlayer;
     public Node2D Graphics;
     protected bool Hurt;
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
+    protected AgentNodeBase AgentNode;
+    protected CharacterShared Shared;
 
 
     public override void _Ready()
@@ -20,13 +30,7 @@ public partial class Character : CharacterBody2D
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        Agent = GetNode<Agent>("Agent");
-
-        if(Agent == null)
-        {
-            GD.PrintErr($"[{Name}] Agent not found");
-            return;
-        }
+        AgentNode = GetNode<AgentNodeBase>("Agent");
 
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
@@ -37,9 +41,13 @@ public partial class Character : CharacterBody2D
         HurtBox.OnHurt += HandleHurt;
 
         // 处理伤害事件
-        Agent.EventStream.Throttle<DamageSlice>("Damage", HandleDamage);
+        AgentNode.Throttle<DamageSlice>("Damage", CreateDamageNumber);
     }
 
+    public void SetShared(CharacterShared shared)
+    {
+        Shared = shared;
+    }
 
     public override void _ExitTree()
     {
@@ -48,7 +56,7 @@ public partial class Character : CharacterBody2D
         if (HurtBox != null)
             HurtBox.OnHurt -= HandleHurt;
 
-        Agent.EventStream.Unthrottle<DamageSlice>("Damage", HandleDamage);
+        AgentNode.Unthrottle<DamageSlice>("Damage", CreateDamageNumber);
 
         base._ExitTree();
     }
@@ -59,7 +67,7 @@ public partial class Character : CharacterBody2D
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
 
-    private void HandleDamage(object sender, DamageSlice e)
+    private void CreateDamageNumber(object sender, DamageSlice e)
     {
         var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
         var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
@@ -81,23 +89,13 @@ public partial class Character : CharacterBody2D
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        Hurt = true;
+        Shared.IsHurt = true;
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
-        var suffer = e.HurtBox.Owner as Character;
-
-        var damageEffect = new Effect()
-        {
-            Tag = Tags.Effect_Buff,
-            Source = Agent,
-            DurationPolicy = DurationPolicy.Instant,
-            Executions = [
-                new DamageExecution()
-            ]
-        };
-
-        suffer.Agent.AddState(ExecutorType.EffectExecutor, damageEffect);
+        Shared.IsHit = true;
+        Shared.HitAgentNode = (e.HurtBox.Owner as Character).AgentNode;
     }
 }
+

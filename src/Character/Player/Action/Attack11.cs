@@ -18,6 +18,23 @@ public partial class Attack11Action : StateNode<State, Player,PlayerShared>
         Host.PlayAnimation("attack11");
     }
 
+    protected override void PhysicsUpdate(double delta)
+    {
+        if(Shared.IsHit && Shared.HitAgentNode != null)
+        {
+            var damageEffect = new Effect()
+            {
+                Tag = Tags.Effect_Buff,
+                Source = Agent,
+                DurationPolicy = DurationPolicy.Instant,
+                Executions = [new DamageExecution()]
+            };
+
+            Shared.HitAgentNode.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Shared.IsHit = false;
+        }
+    }
+
     protected override bool ExitCondition()
     {
         return Host.IsAnimationFinished();

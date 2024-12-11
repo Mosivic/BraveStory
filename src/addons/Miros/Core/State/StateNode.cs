@@ -3,7 +3,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public abstract class Shared{}
+public class Shared{}
 
 
 public abstract partial class StateNode<TState, THost,TShared> : Node 

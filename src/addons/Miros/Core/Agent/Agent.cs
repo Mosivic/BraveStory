@@ -9,7 +9,7 @@ public enum ExecutorType
 {
 	MultiLayerStateMachine,
 	EffectExecutor,
-	AbilityExecutor
+	ConditionMachine
 }
 
 public abstract class StateExecuteArgs{}
