@@ -17,10 +17,6 @@ public partial class Enemy : Character
     private float _chargeTimer = 0f;       // 冲刺计时器
     private bool _isCharging = false;      // 是否正在冲刺
 
-    public bool IsWallColliding() => _wallChecker.IsColliding();
-    
-    public bool IsFloorColliding() => _floorChecker.IsColliding();
-    public bool IsPlayerColliding() => _playerChecker.GetCollider() is Player;
 
     public override void _Ready()
     {
@@ -35,37 +31,6 @@ public partial class Enemy : Character
         Graphics.Scale = new Vector2(-1, 1);
 
 
-
-        // Stun
-        var stun = new State(Tags.State_Action_Stun, Agent)
-            .OnEntered(s => { 
-                PlayAnimation("idle");
-                _stunTimer = 0.0f;
-                _isStunned = false;
-            })
-            .OnPhysicsUpdated((s, d) => {
-                _stunTimer += (float)d;
-            });
-
-            
-        // Transitions
-        var transitions = new StateTransitionConfig();
-        transitions
-            .Add(idle, walk, () => !_playerChecker.IsColliding())
-            .Add(idle, charge, () => _playerChecker.IsColliding())
-            .Add(walk, idle, () =>
-                (!_floorChecker.IsColliding() && !_playerChecker.IsColliding() && walk.RunningTime > 2) ||
-                (!_floorChecker.IsColliding() && _playerChecker.IsColliding()))
-            .Add(walk, charge, () => _playerChecker.IsColliding())
-            .AddAny(hit, () => Hurt)
-            .Add(hit, idle, IsAnimationFinished)
-            .AddAny(die, () => Agent.Attr("HP") <= 0)
-            .Add(charge, idle, () => _chargeTimer >= _chargeDuration) // 冲刺时间结束
-            .Add(charge, stun, () => _isStunned) // 撞墙时转为晕眩状态
-            .Add(stun, idle, () => _stunTimer >= _stunDuration); // 晕眩时间结束
-
-        Agent.CreateMultiLayerStateMachine(Tags.StateLayer_Movement, idle, [idle, walk, hit, die, charge, stun], transitions);
-
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);
     }
@@ -77,4 +42,8 @@ public partial class Enemy : Character
             Graphics.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
     }
 
+    public bool IsWallColliding() => _wallChecker.IsColliding();
+    public bool IsFloorColliding() => _floorChecker.IsColliding();
+    public bool IsPlayerColliding() => _playerChecker.IsColliding();
+    public Player GetPlayer() => _playerChecker.GetCollider() as Player;
 }

@@ -9,6 +9,13 @@ public partial class PatrolEnemyAction : StateNode<State, Enemy>
     public override Tag StateTag => Tags.State_Action_Walk;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    
+    public override Transition[] Transitions => [
+        new (Tags.State_Action_Idle, () =>
+                (!Host.IsFloorColliding() && !Host.IsPlayerColliding() && State.RunningTime > 2) ||
+                (!Host.IsFloorColliding() && Host.IsPlayerColliding())),
+        new (Tags.State_Action_Run, () => Host.IsPlayerColliding())
+    ];
 
     protected override void Enter()
     {
@@ -17,7 +24,7 @@ public partial class PatrolEnemyAction : StateNode<State, Enemy>
 
     protected override void PhysicsUpdate(double delta)
     {
-        Host.Patrol(delta);
+        Patrol(delta);
     }
 
     public void Patrol(double delta)

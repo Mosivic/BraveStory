@@ -1,3 +1,5 @@
+
+using Godot;
 using Miros.Core;
 
 namespace BraveStory;
@@ -7,6 +9,14 @@ public partial class HitEnemyAction : StateNode<State, Enemy>
     public override Tag StateTag => Tags.State_Action_Hit;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+
+    public override Transition[] Transitions => [
+        new (Tags.State_Action_Idle, Host.IsAnimationFinished)
+    ];
+
+    public override Transition AnyTransition => new (Tags.State_Action_Idle, () => !Res["Hurt"]);
+
+
 
     protected override void ShareRes()
     {
@@ -18,10 +28,10 @@ public partial class HitEnemyAction : StateNode<State, Enemy>
         Res["Hurt"] = false;
         Host.PlayAnimation("hit");
         // 方式1：根据玩家位置计算击退方向
-        var playerPos = Host.IsPlayerColliding() ? Host.GetPlayer().GlobalPosition : null;
-        if (playerPos.HasValue)
+        var playerPos = Host.IsPlayerColliding() ? Host.GetPlayer().GlobalPosition : Vector2.Zero;
+        if (playerPos != Vector2.Zero)
         {
-            var direction = (Host.GlobalPosition - playerPos.Value).Normalized();
+            var direction = (Host.GlobalPosition - playerPos).Normalized();
             Res["Hurt"] = direction.X * Res["Hurt"]; // 击退力度
         }
     }

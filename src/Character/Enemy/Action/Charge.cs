@@ -10,6 +10,11 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy>
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
 
+    public override Transition[] Transitions => [
+        new (Tags.State_Action_Idle, () => _chargeTimer >= _chargeDuration),
+        new (Tags.State_Action_Stun, () => _isStunned)
+    ];
+
     [Export]
     private float _chargeDuration = 0.5f;
     private float _chargeTimer;
