@@ -5,12 +5,14 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
 {
     public virtual void AddTask(ITask task)
     {
-        _tasks.Add(task as TTask);
+        var t = task as TTask;
+        _tasks.Add(t.Tag, t);
     }
 
     public virtual void RemoveTask(ITask task)
     {
-        _tasks.Remove(task as TTask);
+        var t = task as TTask;
+        _tasks.Remove(t.Tag);
     }
 
     public virtual double GetCurrentTaskTime(Tag layer)
@@ -44,6 +46,6 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
 
     public virtual ITask[] GetAllTasks()
     {
-        return [.. _tasks];
+        return [.. _tasks.Values];
     }
 }

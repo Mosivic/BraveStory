@@ -3,12 +3,12 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class WallSlideAction : StateNode<Player>
+public partial class WallSlideAction : StateNode<State, Player>
 {
-    protected override Tag StateTag => Tags.State_Action_WallSlide;
-    protected override Tag LayerTag => Tags.StateLayer_Movement;
-    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
-    protected override Transition[] Transitions => [
+    public override Tag StateTag  => Tags.State_Action_WallSlide;
+    public override Tag LayerTag  => Tags.StateLayer_Movement;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override Transition[] Transitions  => [
 			new (Tags.State_Action_Idle, () => Host.IsOnFloor()),
 			new (Tags.State_Action_Fall, () => !Host.IsFootColliding()),
 			new (Tags.State_Action_WallJump, () => Host.KeyDownJump()),

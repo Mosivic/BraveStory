@@ -26,7 +26,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
     private void UpdateTasks()
     {
         // Enter
-        foreach (var task in _tasks)
+        foreach (var task in _tasks.Values)
         {
             if (!task.CanEnter())
             {
@@ -68,12 +68,12 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
 
             if (task.KeepSelfOnExitSucceeded)
-                _tasks.Add(task);
+                _tasks.Add(task.Tag, task);
         }
 
         // Clear
         foreach (var task in _tasksRemoveCache)
-            _tasks.Remove(task);
+            _tasks.Remove(task.Tag);
         _tasksRemoveCache.Clear();
     }
 

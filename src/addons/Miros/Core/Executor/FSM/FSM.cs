@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using Miros.Core;
 
-public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
+public class FSM : ExecutorBase<TaskBase>, IExecutor
 {
-    private readonly Dictionary<Tag, StateLayer> _layers = [];
+    private readonly Dictionary<Tag, FSMExecutor> _layers = [];
+    private readonly TransitionContainer _transitionContainer = new();
 
     public override bool HasTaskRunning(ITask task)
     {
@@ -28,9 +29,22 @@ public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
     }
 
 
-    public void AddLayer(Tag layer, TaskBase defaultTask, StateTransitionContainer container)
+    public void AddTask(Tag layer, TaskBase task, Transition[] transitions, Transition anyTransition)
     {
-        _layers[layer] = new StateLayer(layer, defaultTask, container);
+        if (!_layers.ContainsKey(layer))
+        {
+            _layers[layer] = new FSMExecutor(layer, _transitionContainer, _tasks);
+        }
+        _tasks.Add(task.Tag, task);
+        _transitionContainer.AddTransitions(task, transitions);
+        _transitionContainer.AddAnyTransition(anyTransition);
+    }
+
+    public void RemoveTask(TaskBase task)
+    {
+        _tasks.Remove(task.Tag);
+        _transitionContainer.RemoveTransitions(task);
+        _transitionContainer.RemoveAnyTransition(task);
     }
 
     public override TaskBase GetNowTask(Tag layer)

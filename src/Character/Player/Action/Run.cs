@@ -3,12 +3,12 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class RunAction : StateNode<Player>
+public partial class RunAction : StateNode<State, Player>
 {
-    protected override Tag StateTag =>Tags.State_Action_Run;
-    protected override Tag LayerTag  => Tags.StateLayer_Movement;
-    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
-    protected override Transition[] Transitions  => [
+    public override Tag StateTag  => Tags.State_Action_Run;
+    public override Tag LayerTag => Tags.StateLayer_Movement;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override Transition[] Transitions  => [
             new (Tags.State_Action_Idle, () => !Host.KeyDownMove()),
             new (Tags.State_Action_Jump, () => Host.KeyDownJump()),
             new (Tags.State_Action_Attack1, () => Host.KeyDownAttack()),

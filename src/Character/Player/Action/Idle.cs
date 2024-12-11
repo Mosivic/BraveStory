@@ -2,12 +2,12 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class IdleAction : StateNode<Player>
+public partial class IdleAction : StateNode<State, Player>
 {
-    protected override Tag StateTag => Tags.State_Action_Idle;
-    protected override Tag LayerTag => Tags.StateLayer_Movement;
-    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
-    protected override Transition[] Transitions  => [
+    public override Tag StateTag  => Tags.State_Action_Idle;
+    public override Tag LayerTag => Tags.StateLayer_Movement;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override Transition[] Transitions  => [
             new (Tags.State_Action_Run, () => Host.KeyDownMove()),
             new (Tags.State_Action_Fall, () => !Host.IsOnFloor()),
             new (Tags.State_Action_Jump, () => Host.KeyDownJump()),

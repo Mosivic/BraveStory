@@ -10,7 +10,7 @@ where TState : State, new()
 {
     protected Agent Agent { get; private set; }
     protected THost Host { get; private set; }
-    public abstract TState State { get; }
+    public TState State { get; private set; }
     public abstract Tag StateTag { get; }
     public abstract Tag LayerTag { get; }
     public abstract ExecutorType ExecutorType { get; }
@@ -24,6 +24,13 @@ where TState : State, new()
         Agent = agent;
         Host = host;
 
+        State = new TState
+        {
+            Tag = StateTag,
+            Source = Agent,
+            Owner = Agent
+        };
+        
         State.OnEntered(State => Enter());
         State.OnExited(State => Exit());
         State.OnUpdated((State, delta) => Update(delta));

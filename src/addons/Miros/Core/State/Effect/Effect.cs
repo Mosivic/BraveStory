@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class Effect(Tag tag, Agent source) : State(tag, source)
+public class Effect : State
 {
     // TODO: Expiration Effects 
     public readonly Effect[] PrematureExpirationEffect;

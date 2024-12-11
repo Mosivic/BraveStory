@@ -2,14 +2,14 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class HitAction : StateNode<Player>
+public partial class HitAction : StateNode<State, Player>
 {
-    protected override Tag StateTag  => Tags.State_Action_Hit;
-    protected override Tag LayerTag => Tags.StateLayer_Movement;
-    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
-    protected override Transition AnyTransition  => new (Tags.State_Action_Idle,() => Res["Hurt"], TransitionMode.Force); 
+    public override Tag StateTag  => Tags.State_Action_Hit;
+    public override Tag LayerTag => Tags.StateLayer_Movement;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override Transition AnyTransition  => new (Tags.State_Action_Idle,() => Res["Hurt"], TransitionMode.Force); 
 
-    protected override Transition[] Transitions  => [
+    public override Transition[] Transitions  => [
             new (Tags.State_Action_Idle, () => Host.IsAnimationFinished()),
         ];
     

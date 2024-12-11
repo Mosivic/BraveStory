@@ -1,30 +1,31 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Miros.Core;
 
-public class StateLayer
+public class FSMExecutor
 {
+    public Tag Layer { get; }
     private readonly TaskBase _defaultTask;
 
-    private readonly StateTransitionContainer _transitionContainer;
+    private readonly TransitionContainer _transitionContainer;
+    private readonly Dictionary<Tag, TaskBase> _tasks = [];
     private double _currentStateTime;
     private TaskBase _currentTask;
     private TaskBase _delayTask;
     private TaskBase _lastTask;
 
-    public StateLayer(Tag layerTag, TaskBase defaultTask,
-        StateTransitionContainer transitionContainer)
+    public FSMExecutor(Tag layerTag,
+        TransitionContainer transitionContainer, Dictionary<Tag, TaskBase> tasks)
     {
         Layer = layerTag;
-        _defaultTask = defaultTask;
         _currentTask = _defaultTask;
         _lastTask = _defaultTask;
         _delayTask = null;
         _transitionContainer = transitionContainer;
+        _tasks = tasks;
     }
-
-    public Tag Layer { get; }
 
 
     public void Update(double delta)
@@ -58,34 +59,44 @@ public class StateLayer
         var transitions = _transitionContainer.GetPossibleTransition(_currentTask);
 
         // 使用LINQ获取优先级最高且可进入的状态
-        var nextTransition = transitions
-            .OrderByDescending(t => t.ToTask.Priority)
-            .Where(t => t.Mode switch
+        var sortedTransitions = transitions
+            .OrderByDescending(t => t.Priority)
+            .ToArray();
+
+        if (sortedTransitions.Length == 0) return; // 没有可转换的状态
+        
+        foreach (var t in sortedTransitions)
+        {
+            TaskBase task = _tasks[t.To];
+            if (t.Mode switch
             {
-                TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() &&
-                                                t.ToTask.CanEnter(),
-                TransitionMode.Force => t.CanTransition() && t.ToTask.CanEnter(),
-                TransitionMode.DelayFront => t.CanTransition() && t.ToTask.CanEnter(),
+                TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() && task.CanEnter(),
+                TransitionMode.Force => t.CanTransition() && task.CanEnter(),
+                TransitionMode.DelayFront => t.CanTransition() && task.CanEnter(),
+                TransitionMode.DelayBackend => t.CanTransition() && _currentTask.CanExit(),
                 _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
             })
-            .FirstOrDefault();
-
-        if (nextTransition == null) return;
-
-        if (nextTransition.Mode == TransitionMode.DelayFront)
-        {
-            _delayTask = nextTransition.ToTask;
-
-            if (_currentTask.CanExit())
             {
-                TransformState(_delayTask);
-                _delayTask = null;
+
+                if (t.Mode == TransitionMode.DelayFront)
+                {
+                    _delayTask = task;
+
+                    if (_currentTask.CanExit())
+                    {
+                        TransformState(_delayTask);
+                        _delayTask = null;
+                    }
+                }
+                else
+                {
+                    TransformState(task);
+                }
             }
         }
-        else
-        {
-            TransformState(nextTransition.ToTask);
-        }
+
+
+
     }
 
     private void TransformState(TaskBase nextTask)
@@ -97,6 +108,7 @@ public class StateLayer
         _currentTask = nextTask;
         _currentStateTime = 0.0;
     }
+
 
     public TaskBase GetNowTask()
     {

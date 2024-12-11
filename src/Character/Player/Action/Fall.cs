@@ -3,12 +3,12 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class FallAction : StateNode<Player>
+public partial class FallAction : StateNode<State, Player>
 {
-    protected override Tag StateTag  => Tags.State_Action_Fall;
-    protected override Tag LayerTag => Tags.StateLayer_Movement;
-    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
-    protected override Transition[] Transitions  => [
+    public override Tag StateTag  => Tags.State_Action_Fall;
+    public override Tag LayerTag => Tags.StateLayer_Movement;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override Transition[] Transitions  => [
 			new (Tags.State_Action_Idle, () => Host.IsOnFloor()),
 			new (Tags.State_Action_WallSlide, () => Host.IsHandColliding() && Host.IsFootColliding() && !Host.KeyDownMove()),
 			new (Tags.State_Action_DoubleJump, () => Host.KeyDownJump() && Res["JumpCount"] < Res["MaxJumpCount"]),
