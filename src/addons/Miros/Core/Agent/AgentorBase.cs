@@ -7,16 +7,12 @@ using Miros.Core;
 
 namespace Miros.Core;
 
-[GodotClassName("AgentNodeBase")]
-public abstract partial class AgentNodeBase : Node
+public abstract  class AgentNodeBase
 {
     protected Agent Agent { get; private set; } = new();
-
-
     public abstract TShared GetShared<TShared>()
     where TShared : Shared, new();
-
-
+    
     public void AddState(ExecutorType executorType,State state)
     {
         Agent.AddState(executorType,state);

@@ -7,7 +7,7 @@ public class Shared{}
 
 
 [GodotClassName("StateNode")]
-public abstract partial class StateNode<TState, THost,TShared> : Node 
+public abstract class StateNode<TState, THost,TShared>
 where THost : Node 
 where TState : State, new()
 where TShared : Shared, new()
@@ -16,14 +16,14 @@ where TShared : Shared, new()
     protected THost Host { get; private set; }
     public TState State { get; private set; }
     public abstract Tag StateTag { get; }
-    public abstract Tag LayerTag { get; }
+    public virtual Tag LayerTag { get; } = Tags.Default;
     public abstract ExecutorType ExecutorType { get; }
     public virtual Transition[] Transitions { get; }
     public virtual Transition AnyTransition { get; }
     public TShared Shared { get; set; }
 
 
-    public void Initialize(Agent agent, THost host,TShared shared)
+    public StateNode(Agent agent, THost host,TShared shared)
     {
         Agent = agent;
         Host = host;
@@ -35,10 +35,10 @@ where TShared : Shared, new()
             Source = Agent,
         };
         
-        State.OnEntered(State => Enter());
-        State.OnExited(State => Exit());
-        State.OnUpdated((State, delta) => Update(delta));
-        State.OnPhysicsUpdated((State, delta) => PhysicsUpdate(delta));
+        State.OnEntered(_ => Enter());
+        State.OnExited(_ => Exit());
+        State.OnUpdated((_, delta) => Update(delta));
+        State.OnPhysicsUpdated((_, delta) => PhysicsUpdate(delta));
     }
     
     protected virtual void Enter() { }

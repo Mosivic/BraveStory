@@ -1,17 +1,16 @@
-using Godot;
 using Miros.Core;
+using Godot;
 
 namespace BraveStory;
 
-public partial class EnemyAgent : AgentNode<Enemy,BoarAttributeSet,EnemyShared>
+public partial class PlayerAgent : Agentor<Player, PlayerAttributeSet,PlayerShared>
 {
 	private StatsPanel _statusPanel;
 
 	public override void _Ready()
 	{
 		base._Ready();
-
-		_statusPanel = GetNode<StatsPanel>("../StatusPanel");
+		_statusPanel = GetNode<StatsPanel>("../CanvasLayer/StatusPanel");
 
 		var hp = Agent.GetAttributeBase("HP");
 		hp.SetMaxValue(hp.CurrentValue);
