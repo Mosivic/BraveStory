@@ -14,14 +14,14 @@ public class StateTransitionConfig
 
 
     public StateTransitionConfig AddAny(State toState, Func<bool> condition = null,
-        StateTransitionMode mode = StateTransitionMode.Normal)
+        TransitionMode mode = TransitionMode.Normal)
     {
         _anyTransitions.Add(new Transition(null, toState, condition, mode));
         return this;
     }
 
     public StateTransitionConfig Add(State fromState, State toState, Func<bool> condition = null,
-        StateTransitionMode mode = StateTransitionMode.Normal)
+        TransitionMode mode = TransitionMode.Normal)
     {
         if (!Transitions.ContainsKey(fromState))
             Transitions[fromState] = [];
@@ -29,5 +29,5 @@ public class StateTransitionConfig
         return this;
     }
 
-    public record Transition(State FromState, State ToState, Func<bool> Condition, StateTransitionMode Mode);
+    public record Transition(State FromState, State ToState, Func<bool> Condition, TransitionMode Mode);
 }

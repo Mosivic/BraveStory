@@ -5,7 +5,16 @@ namespace BraveStory;
 
 public partial class RunAction : StateNode<Player>
 {
-    protected override Tag StateTag { get; init; } = Tags.State_Action_Run;
+    protected override Tag StateTag =>Tags.State_Action_Run;
+    protected override Tag LayerTag  => Tags.StateLayer_Movement;
+    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    protected override Transition[] Transitions  => [
+            new (Tags.State_Action_Idle, () => !Host.KeyDownMove()),
+            new (Tags.State_Action_Jump, () => Host.KeyDownJump()),
+            new (Tags.State_Action_Attack1, () => Host.KeyDownAttack()),
+            new (Tags.State_Action_Sliding, () => Host.KeyDownSliding()),
+        ];
+
 
     protected override void Enter()
     {

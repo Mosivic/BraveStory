@@ -5,20 +5,23 @@ namespace BraveStory;
 
 public partial class JumpAction : StateNode<Player>
 {
-    protected override Tag StateTag { get; init; } = Tags.State_Action_Jump;
-    private int _jumpCount;
-
-
+    protected override Tag StateTag  => Tags.State_Action_Jump;
+    protected override Tag LayerTag => Tags.StateLayer_Movement;
+    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    protected override Transition[] Transitions  => [
+            new (Tags.State_Action_Fall),
+        ];
+    
     protected override void ShareRes()
     {
-        Res["JumpCount"] = _jumpCount;
+        Res["JumpCount"] = 0;
     }
 
     protected override void Enter()
     {
         Host.PlayAnimation("jump");
         Host.Velocity = new Vector2(Host.Velocity.X, Agent.Attr("JumpVelocity"));
-        _jumpCount++;
+        Res["JumpCount"]++;
     }
 }
 

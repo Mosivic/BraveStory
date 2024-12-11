@@ -62,17 +62,17 @@ public class StateLayer
             .OrderByDescending(t => t.ToTask.Priority)
             .Where(t => t.Mode switch
             {
-                StateTransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() &&
+                TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() &&
                                                 t.ToTask.CanEnter(),
-                StateTransitionMode.Force => t.CanTransition() && t.ToTask.CanEnter(),
-                StateTransitionMode.DelayFront => t.CanTransition() && t.ToTask.CanEnter(),
+                TransitionMode.Force => t.CanTransition() && t.ToTask.CanEnter(),
+                TransitionMode.DelayFront => t.CanTransition() && t.ToTask.CanEnter(),
                 _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
             })
             .FirstOrDefault();
 
         if (nextTransition == null) return;
 
-        if (nextTransition.Mode == StateTransitionMode.DelayFront)
+        if (nextTransition.Mode == TransitionMode.DelayFront)
         {
             _delayTask = nextTransition.ToTask;
 

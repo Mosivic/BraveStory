@@ -5,7 +5,12 @@ namespace BraveStory;
 
 public partial class SlidingAction : StateNode<Player>
 {
-    protected override Tag StateTag { get; init; } = Tags.State_Action_Sliding;
+    protected override Tag StateTag  => Tags.State_Action_Sliding;
+    protected override Tag LayerTag  => Tags.StateLayer_Movement;
+    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    protected override Transition[] Transitions  => [
+            new (Tags.State_Action_Idle, () => Host.IsAnimationFinished()),
+        ];
 
     protected override void Enter()
     {

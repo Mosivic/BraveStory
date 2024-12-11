@@ -20,7 +20,7 @@ public partial class Agent : Node
 	private AttributeSetContainer AttributeSetContainer { get; set; }
 	private TagContainer _ownedTags;
 	private readonly StateExecutionRegistry _stateExecutionRegistry = new();
-	private ITaskProvider _taskProvider;
+	protected ITaskProvider _taskProvider;
 
 
 	public Node2D Host { get; private set; }

@@ -5,7 +5,9 @@ namespace BraveStory;
 
 public partial class WallJumpAction : StateNode<Player>
 {
-    protected override Tag StateTag { get; init; } = Tags.State_Action_WallJump;
+    protected override Tag StateTag  => Tags.State_Action_WallJump;
+    protected override Tag LayerTag  => Tags.StateLayer_Movement;
+    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
 
     protected override void Enter()
     {

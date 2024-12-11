@@ -5,7 +5,13 @@ namespace BraveStory;
 
 public partial class DoubleJumpAction : StateNode<Player>
 {
-    protected override Tag StateTag { get; init; } = Tags.State_Action_DoubleJump;
+    protected override Tag StateTag  => Tags.State_Action_DoubleJump;
+    protected override Tag LayerTag => Tags.StateLayer_Movement;
+    protected override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    protected override Transition[] Transitions  => [
+            new (Tags.State_Action_Fall),
+        ];
+    
 
     protected override void Enter()
     {

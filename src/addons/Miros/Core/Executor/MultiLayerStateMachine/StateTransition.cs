@@ -5,7 +5,7 @@ namespace Miros.Core;
 public class StateTransition
 {
     public StateTransition(TaskBase toTask, Func<bool> condition = null,
-        StateTransitionMode mode = StateTransitionMode.Normal)
+        TransitionMode mode = TransitionMode.Normal)
     {
         ToTask = toTask;
         Condition = condition;
@@ -14,7 +14,7 @@ public class StateTransition
 
     public TaskBase ToTask { get; }
     public Func<bool> Condition { get; }
-    public StateTransitionMode Mode { get; }
+    public TransitionMode Mode { get; }
 
     public bool CanTransition()
     {
