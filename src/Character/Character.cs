@@ -88,8 +88,10 @@ public partial class Character : CharacterBody2D
     {
         var suffer = e.HurtBox.Owner as Character;
 
-        var damageEffect = new Effect(Tags.Effect_Buff, Agent)
+        var damageEffect = new Effect()
         {
+            Tag = Tags.Effect_Buff,
+            Source = Agent,
             DurationPolicy = DurationPolicy.Instant,
             Executions = [
                 new DamageExecution()

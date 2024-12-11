@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Miros.Core;
 
@@ -29,15 +30,20 @@ public class FSM : ExecutorBase<TaskBase>, IExecutor
     }
 
 
-    public void AddTask(Tag layer, TaskBase task, Transition[] transitions, Transition anyTransition)
+    public override void AddTask(ITask task, StateExecuteArgs args)
     {
-        if (!_layers.ContainsKey(layer))
-        {
-            _layers[layer] = new FSMExecutor(layer, _transitionContainer, _tasks);
-        }
-        _tasks.Add(task.Tag, task);
-        _transitionContainer.AddTransitions(task, transitions);
-        _transitionContainer.AddAnyTransition(anyTransition);
+        if (args is not StateFSMArgs fsmArgs)
+            throw new Exception("Invalid arguments for FSM ");
+        
+        var stateTask = task as TaskBase;
+        base.AddTask(stateTask, args);
+        
+        if (!_layers.ContainsKey(fsmArgs.Layer))
+            _layers[fsmArgs.Layer] = new FSMExecutor(fsmArgs.Layer, _transitionContainer, _tasks);
+
+        _tasks.Add(stateTask.Tag, stateTask);
+        _transitionContainer.AddTransitions(stateTask, fsmArgs.Transitions);
+        _transitionContainer.AddAnyTransition(fsmArgs.AnyTransition);
     }
 
     public void RemoveTask(TaskBase task)

@@ -3,7 +3,7 @@ namespace Miros.Core;
 public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
     where TTask : TaskBase
 {
-    public virtual void AddTask(ITask task)
+    public virtual void AddTask(ITask task, StateExecuteArgs args = null)
     {
         var t = task as TTask;
         _tasks.Add(t.Tag, t);

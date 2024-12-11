@@ -28,7 +28,6 @@ where TState : State, new()
         {
             Tag = StateTag,
             Source = Agent,
-            Owner = Agent
         };
         
         State.OnEntered(State => Enter());

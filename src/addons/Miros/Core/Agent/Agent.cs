@@ -12,9 +12,23 @@ public enum ExecutorType
 	AbilityExecutor
 }
 
+public abstract class StateExecuteArgs{}
 
+public class StateFSMArgs : StateExecuteArgs
+{
+	public Tag Layer { get; private set; }
+	public Transition[] Transitions { get; private set; }
+	public Transition AnyTransition { get; private set; }
 
-public partial class Agent : Node
+	public StateFSMArgs(Tag layer, Transition[] transitions, Transition anyTransition)
+	{
+		Layer = layer;
+		Transitions = transitions;
+		AnyTransition = anyTransition;
+	}
+
+}
+public class Agent 
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
 	private AttributeSetContainer AttributeSetContainer { get; set; }
@@ -44,13 +58,13 @@ public partial class Agent : Node
 	}
 
 
-	public override void _Process(double delta)
+	public void Process(double delta)
 	{
 		if(Enabled) Update(delta);
 	}
 
 
-	public override void _PhysicsProcess(double delta)
+	public void PhysicsProcess(double delta)
 	{
 		if(Enabled) PhysicsUpdate(delta);
 	}
@@ -62,58 +76,30 @@ public partial class Agent : Node
 	}
 
 
-	public void CreateMultiLayerStateMachine(Tag layer, State defaultState, HashSet<State> states,
-		StateTransitionConfig transitions)
-	{
-		var executor = new MultiLayerStateMachine();
-		var container = new StateTransitionContainer();
-
-		foreach (var state in states)
-		{
-			var task = _taskProvider.GetTask(state);
-			state.Owner = this;
-			_stateExecutionRegistry.AddStateExecutionContext(state.Tag,
-				new StateExecutionContext(state, task, executor));
-		}
-
-		foreach (var transition in transitions.AnyTransitions)
-			container.AddAny(new StateTransition(_stateExecutionRegistry.GetTask(transition.ToState),
-				transition.Condition,
-				transition.Mode));
-
-		foreach (var (fromState, stateTransitions) in transitions.Transitions)
-		foreach (var transition in stateTransitions)
-			container.Add(_stateExecutionRegistry.GetTask(fromState),
-				new StateTransition(_stateExecutionRegistry.GetTask(transition.ToState), transition.Condition,
-					transition.Mode));
-
-
-		executor.AddLayer(layer, _stateExecutionRegistry.GetTask(defaultState), container);
-		_executors[ExecutorType.MultiLayerStateMachine] = executor;
-	}
-
-
 	public EffectExecutor GetEffectExecutor()
 	{
 		return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
 	}
 
 
-	public void AddState(ExecutorType executorType, State state)
+	public void AddState(ExecutorType executorType, State state, StateExecuteArgs args = null)
 	{
-		if (!_executors.TryGetValue(executorType, out var executor))
+		if (!_executors.TryGetValue(executorType, out var executor)) 
 		{
-#if GODOT4 && DEBUG
-			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
-#else
-			return;
-#endif
+			executor = executorType switch
+			{
+				ExecutorType.MultiLayerStateMachine => new FSM(),
+				ExecutorType.EffectExecutor => new EffectExecutor(this),
+				_ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
+			};
+			_executors[executorType] = executor;
 		}
 
 		state.Owner = this;
 		var task = _taskProvider.GetTask(state);
-		executor.AddTask(task);
 		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
+
+		executor.AddTask(task, args);
 	}
 
 
@@ -128,8 +114,7 @@ public partial class Agent : Node
 		if (!_executors.TryGetValue(executorType, out var executor))
 		{
 #if GODOT4 && DEBUG
-			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
-#else
+			GD.Print($"[Miros] executor of {executorType} not found");
 			return;
 #endif
 		}

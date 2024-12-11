@@ -3,7 +3,7 @@ using BraveStory;
 using Godot;
 using Miros.Core;
 
-public partial class Boar : Character
+public partial class Enemy : Character
 {
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
@@ -17,6 +17,11 @@ public partial class Boar : Character
     private float _chargeTimer = 0f;       // 冲刺计时器
     private bool _isCharging = false;      // 是否正在冲刺
 
+    public bool IsWallColliding() => _wallChecker.IsColliding();
+    
+    public bool IsFloorColliding() => _floorChecker.IsColliding();
+    public bool IsPlayerColliding() => _playerChecker.GetCollider() is Player;
+
     public override void _Ready()
     {
         base._Ready();
@@ -29,68 +34,7 @@ public partial class Boar : Character
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
-        // Idle
-        var idle = new State(Tags.State_Action_Idle, Agent)
-            .OnEntered(s => PlayAnimation("idle"));
 
-        // Walk
-        var walk = new State(Tags.State_Action_Walk, Agent)
-            .OnEntered(s => PlayAnimation("walk"))
-            .OnPhysicsUpdated((s, d) => Patrol(d));
-
-
-        // Hit
-        var hit = new State(Tags.State_Action_Hit, Agent)
-            .OnEntered(s =>
-            {
-                Hurt = false;
-                PlayAnimation("hit");
-                // 方式1：根据玩家位置计算击退方向
-                var playerPos = (_playerChecker.GetCollider() as Node2D)?.GlobalPosition;
-                if (playerPos.HasValue)
-                {
-                    var direction = (GlobalPosition - playerPos.Value).Normalized();
-                    _knockbackVelocity = direction.X * _knockbackVelocity; // 击退力度
-                }
-            })
-            .OnPhysicsUpdated((s, d) =>
-            {
-                // 应用击退力
-                var velocity = Velocity;
-                velocity.X += _knockbackVelocity;
-                velocity.Y += (float)d * Agent.Attr("Gravity");
-                // 逐渐减弱击退效果
-                _knockbackVelocity *= 0.8f;
-                Velocity = velocity;
-                MoveAndSlide();
-            })
-            .OnExited(s =>
-            {
-                Hurt = false;
-            });
-
-        // Die
-        var die = new State(Tags.State_Status_Die, Agent)
-            .OnEntered(s => PlayAnimation("die"))
-            .OnPhysicsUpdated((s, d) =>
-            {
-                if(IsAnimationFinished()) QueueFree();
-            });
-
-        // Charge
-        var charge = new State(Tags.State_Action_Run, Agent)
-            .OnEntered(s =>
-            {
-                PlayAnimation("run");
-                _chargeTimer = 0f;
-                _isCharging = true;
-            })
-            .OnPhysicsUpdated((s, d) => Charge(d))
-            .OnExited(s =>
-            {
-                _isCharging = false;
-                _chargeTimer = 0f;
-            });
 
         // Stun
         var stun = new State(Tags.State_Action_Stun, Agent)
@@ -133,47 +77,4 @@ public partial class Boar : Character
             Graphics.Scale = new Vector2(direction < 0 ? -1 : 1, 1);
     }
 
-    private void Patrol(double delta)
-    {
-        // 检查是否碰到墙壁
-        if (_wallChecker.IsColliding())
-            // 转向：将 X 缩放在 1 和 -1 之间切换
-            Graphics.Scale = new Vector2(Graphics.Scale.X * -1, 1);
-
-        // 移动逻辑
-        var velocity = Velocity;
-        velocity.X = Agent.Attr("WalkSpeed") * -Graphics.Scale.X; // 注意这里加了负号
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
-        Velocity = velocity;
-        MoveAndSlide();
-    }
-
-
-    private void Charge(double delta)
-    {
-        // 更新冲刺计时器
-        _chargeTimer += (float)delta;
-
-        // 检查是否撞墙
-        if (_wallChecker.IsColliding())
-        {
-            _isStunned = true;
-            return;
-        }
-
-        var velocity = Velocity;
-        velocity.X = -Graphics.Scale.X * Agent.Attr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
-
-        // 在冲刺即将结束时减速
-        float slowdownThreshold = 0.3f; // 最后0.3秒开始减速
-        if (_chargeTimer >= _chargeDuration - slowdownThreshold)
-        {
-            float slowdownFactor = 1.0f - ((_chargeTimer - (_chargeDuration - slowdownThreshold)) / slowdownThreshold);
-            velocity.X *= slowdownFactor;
-        }
-
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
-        Velocity = velocity;
-        MoveAndSlide();
-    }
 }

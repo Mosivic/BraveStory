@@ -11,9 +11,6 @@ public partial class Player : Character
 	private RayCast2D _footChecker;
 	private RayCast2D _handChecker;
 
-
-
-
 	public HashSet<Interactable> Interactions { get; set; } = new();
 
 	public bool IsFootColliding() => _footChecker.IsColliding();
@@ -101,7 +98,4 @@ public partial class Player : Character
 	{
 		return Input.IsActionJustPressed("sliding");
 	}
-
-
-
 }
