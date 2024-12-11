@@ -7,8 +7,7 @@ namespace Miros.Core;
 public class FSMExecutor
 {
     public Tag Layer { get; }
-    private readonly TaskBase _defaultTask;
-
+    private TaskBase _defaultTask;
     private readonly TransitionContainer _transitionContainer;
     private readonly Dictionary<Tag, TaskBase> _tasks = [];
     private double _currentStateTime;
@@ -27,6 +26,10 @@ public class FSMExecutor
         _tasks = tasks;
     }
 
+    public void SetDefaultTask(TaskBase task)
+    {
+        _defaultTask = task;
+    }
 
     public void Update(double delta)
     {
@@ -94,9 +97,6 @@ public class FSMExecutor
                 }
             }
         }
-
-
-
     }
 
     private void TransformState(TaskBase nextTask)

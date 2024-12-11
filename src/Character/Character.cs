@@ -13,7 +13,8 @@ public class CharacterShared : Shared
     public AgentNodeBase HitAgentNode { get; set; }
 }
 
-public partial class Character : CharacterBody2D
+public partial class Character<TShared> : CharacterBody2D
+where TShared : CharacterShared, new()
 {
     protected AnimationPlayer AnimationPlayer;
     public Node2D Graphics;
@@ -27,10 +28,14 @@ public partial class Character : CharacterBody2D
 
     public override void _Ready()
     {
+        // 获取功能子节点
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        
+        // 获取 AgentNode
         AgentNode = GetNode<AgentNodeBase>("Agent");
+        Shared = AgentNode.GetShared<CharacterShared>();
 
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
@@ -44,10 +49,6 @@ public partial class Character : CharacterBody2D
         AgentNode.Throttle<DamageSlice>("Damage", CreateDamageNumber);
     }
 
-    public void SetShared(CharacterShared shared)
-    {
-        Shared = shared;
-    }
 
     public override void _ExitTree()
     {
@@ -95,7 +96,8 @@ public partial class Character : CharacterBody2D
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
         Shared.IsHit = true;
-        Shared.HitAgentNode = (e.HurtBox.Owner as Character).AgentNode;
+        Shared.HitAgentNode = (e.HurtBox.Owner as Character<TShared>).AgentNode;
     }
+
 }
 

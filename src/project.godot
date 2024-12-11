@@ -35,6 +35,10 @@ window/stretch/aspect="expand"
 
 project/assembly_name="BraveStory"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/customclasses/plugin.cfg")
+
 [input]
 
 move_left={

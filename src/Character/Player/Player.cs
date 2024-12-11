@@ -12,7 +12,7 @@ public partial class PlayerShared : CharacterShared
 	public int MaxJumpCount { get; set; } = 2;
 }
 
-public partial class Player : Character
+public partial class Player : Character<PlayerShared>
 {
 	private AnimatedSprite2D _animatedSprite;
 	private RayCast2D _footChecker;

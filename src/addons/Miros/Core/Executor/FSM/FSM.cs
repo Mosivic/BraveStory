@@ -39,7 +39,10 @@ public class FSM : ExecutorBase<TaskBase>, IExecutor
         base.AddTask(stateTask, args);
         
         if (!_layers.ContainsKey(fsmArgs.Layer))
+        {
             _layers[fsmArgs.Layer] = new FSMExecutor(fsmArgs.Layer, _transitionContainer, _tasks);
+            _layers[fsmArgs.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务
+        }
 
         _tasks.Add(stateTask.Tag, stateTask);
         _transitionContainer.AddTransitions(stateTask, fsmArgs.Transitions);

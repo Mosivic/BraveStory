@@ -6,6 +6,7 @@ namespace Miros.Core;
 public class Shared{}
 
 
+[GodotClassName("StateNode")]
 public abstract partial class StateNode<TState, THost,TShared> : Node 
 where THost : Node 
 where TState : State, new()
@@ -19,7 +20,7 @@ where TShared : Shared, new()
     public abstract ExecutorType ExecutorType { get; }
     public virtual Transition[] Transitions { get; }
     public virtual Transition AnyTransition { get; }
-    protected TShared Shared { get; set; }
+    public TShared Shared { get; set; }
 
 
     public void Initialize(Agent agent, THost host,TShared shared)

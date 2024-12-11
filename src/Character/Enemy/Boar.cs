@@ -14,13 +14,11 @@ public class EnemyShared : CharacterShared
     public bool IsCharging{get;set;} = false;      // 是否正在冲刺
 }
 
-public partial class Enemy : Character
+public partial class Enemy : Character<EnemyShared>
 {
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
-
-
 
 
     public override void _Ready()

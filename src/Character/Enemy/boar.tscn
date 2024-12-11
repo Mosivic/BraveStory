@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://b60glotno805d"]
+[gd_scene load_steps=25 format=3 uid="uid://b60glotno805d"]
 
 [ext_resource type="PackedScene" uid="uid://5f6ngwh4b25f" path="res://Character/Character.tscn" id="1_w3tnv"]
 [ext_resource type="Texture2D" uid="uid://diasn0p580ws0" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Idle/Idle-Sheet.png" id="2_e4ssd"]
@@ -8,6 +8,12 @@
 [ext_resource type="Texture2D" uid="uid://ddtr8ovkgqhwy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_i5lod"]
 [ext_resource type="Script" path="res://Character/Enemy/EnemyAgent.cs" id="7_labl6"]
 [ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_ynqoc"]
+[ext_resource type="Script" path="res://Character/Enemy/Action/Hit.cs" id="9_qe6k6"]
+[ext_resource type="Script" path="res://Character/Enemy/Action/Die.cs" id="10_q4lyv"]
+[ext_resource type="Script" path="res://Character/Enemy/Action/Charge.cs" id="11_0pov0"]
+[ext_resource type="Script" path="res://Character/Enemy/Action/Patrol.cs" id="12_6l04d"]
+[ext_resource type="Script" path="res://Character/Enemy/Action/Stun.cs" id="13_77041"]
+[ext_resource type="Script" path="res://addons/Miros/Core/State/StateNode.cs" id="14_jw381"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q70f8"]
 size = Vector2(16, 7)
@@ -487,5 +493,23 @@ libraries = {
 
 [node name="Agent" type="Node" parent="." index="5"]
 script = ExtResource("7_labl6")
+
+[node name="Idle" type="Node" parent="Agent" index="0"]
+script = ExtResource("10_q4lyv")
+
+[node name="Hit" type="Node" parent="Agent" index="1"]
+script = ExtResource("9_qe6k6")
+
+[node name="Charge" type="Node" parent="Agent" index="2"]
+script = ExtResource("11_0pov0")
+
+[node name="Patrol" type="Node" parent="Agent" index="3"]
+script = ExtResource("12_6l04d")
+
+[node name="Stun" type="Node" parent="Agent" index="4"]
+script = ExtResource("13_77041")
+
+[node name="StateNode" type="Node" parent="Agent" index="5"]
+script = ExtResource("14_jw381")
 
 [editable path="StatusPanel"]
