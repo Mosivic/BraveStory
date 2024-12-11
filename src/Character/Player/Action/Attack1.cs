@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class Attack1Action : StateNode<State, Player>
+public partial class Attack1Action : StateNode<State, Player,PlayerShared>
 {
     
     public override Tag StateTag  => Tags.State_Action_Attack1;
@@ -14,9 +14,6 @@ public partial class Attack1Action : StateNode<State, Player>
             new (Tags.State_Action_Attack11,() => Host.KeyDownAttack(), TransitionMode.DelayFront),
         ];
     
-
-    
-
 
     protected override void Enter()
     {

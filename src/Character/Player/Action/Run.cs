@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class RunAction : StateNode<State, Player>
+public partial class RunAction : StateNode<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_Run;
     public override Tag LayerTag => Tags.StateLayer_Movement;

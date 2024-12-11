@@ -3,10 +3,13 @@ using Godot;
 
 namespace Miros.Core;
 
+public abstract class Shared{}
 
-public abstract partial class StateNode<TState, THost> : Node 
+
+public abstract partial class StateNode<TState, THost,TShared> : Node 
 where THost : Node 
 where TState : State, new()
+where TShared : Shared, new()
 {
     protected Agent Agent { get; private set; }
     protected THost Host { get; private set; }
@@ -16,13 +19,14 @@ where TState : State, new()
     public abstract ExecutorType ExecutorType { get; }
     public virtual Transition[] Transitions { get; }
     public virtual Transition AnyTransition { get; }
-    protected Dictionary<string, dynamic> Res { get; private set; }
+    protected TShared Shared { get; set; }
 
 
-    public void Initialize(Agent agent, THost host)
+    public void Initialize(Agent agent, THost host,TShared shared)
     {
         Agent = agent;
         Host = host;
+        Shared = shared;
 
         State = new TState
         {
@@ -34,10 +38,7 @@ where TState : State, new()
         State.OnExited(State => Exit());
         State.OnUpdated((State, delta) => Update(delta));
         State.OnPhysicsUpdated((State, delta) => PhysicsUpdate(delta));
-
-        ShareRes();
     }
-    protected virtual void ShareRes(){ }
     
     protected virtual void Enter() { }
 

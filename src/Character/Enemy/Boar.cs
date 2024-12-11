@@ -3,19 +3,25 @@ using BraveStory;
 using Godot;
 using Miros.Core;
 
+public class EnemyShared : Shared
+{
+    public float KnockbackVelocity{get;set;} = 50.0f;
+    public bool IsStunned{get;set;} = false;
+    public float StunDuration{get;set;} = 1.0f;
+    public float StunTimer{get;set;} = 0.0f;
+    public float ChargeDuration{get;set;} = 0.5f;  // 冲刺持续时间
+    public float ChargeTimer{get;set;} = 0f;       // 冲刺计时器
+    public bool IsCharging{get;set;} = false;      // 是否正在冲刺
+    public bool IsHurt{get;set;} = false;
+}
+
 public partial class Enemy : Character
 {
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
 
-    private float _knockbackVelocity = 50.0f;
-    private bool _isStunned = false;
-    private float _stunDuration = 1.0f;
-    private float _stunTimer = 0.0f;
-    private float _chargeDuration = 0.5f;  // 冲刺持续时间
-    private float _chargeTimer = 0f;       // 冲刺计时器
-    private bool _isCharging = false;      // 是否正在冲刺
+
 
 
     public override void _Ready()

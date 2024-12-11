@@ -5,6 +5,14 @@ using Miros.Core;
 
 namespace BraveStory;
 
+public partial class PlayerShared : Shared
+{
+    public bool IsHurt { get; set; } = false;
+	public float KnockbackVelocity { get; set; } = 50.0f;
+	public int JumpCount { get; set; } = 0;
+	public int MaxJumpCount { get; set; } = 2;
+}
+
 public partial class Player : Character
 {
 	private AnimatedSprite2D _animatedSprite;

@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class PatrolEnemyAction : StateNode<State, Enemy>
+public partial class PatrolEnemyAction : StateNode<State, Enemy,EnemyShared>
 {
     // FIXME：Walk 和 Patrol 是同一个状态，需要合并
     public override Tag StateTag => Tags.State_Action_Walk;

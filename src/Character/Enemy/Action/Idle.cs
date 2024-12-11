@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class IdleEnemyAction : StateNode<State, Enemy>
+public partial class IdleEnemyAction : StateNode<State, Enemy,EnemyShared>
 {
     public override Tag StateTag => Tags.State_Action_Idle;
 

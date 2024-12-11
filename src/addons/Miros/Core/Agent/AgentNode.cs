@@ -3,9 +3,10 @@ using Godot;
 
 namespace BraveStory;
 
-public partial class AgentNode<THost,TAttributeSet> : Node 
+public partial class AgentNode<THost,TAttributeSet,TShared> : Node 
 where THost : Node
 where TAttributeSet : AttributeSet
+where TShared : Shared, new()
 {   
     protected Agent Agent { get; private set; } = new();
     protected THost Host { get; private set; }
@@ -14,30 +15,34 @@ where TAttributeSet : AttributeSet
     {
         Host = GetParent<THost>();
         Agent.Initialize(Host as Node2D, [typeof(TAttributeSet)]);
+        var Shared = new TShared();
+
+        HandleStateNodes(Shared);
+    
     }
 
 
-    private void HandleStateNodes()
+    private void HandleStateNodes(TShared shared)
     {
-       	var children = GetChildren();
+        var children = GetChildren();
 		foreach (var child in children)
 		{
-            if (child is not StateNode<State, THost>)
+            if (child is not StateNode<State, THost,TShared>)
                 continue;
 
-            var stateNode = child as StateNode<State, THost>;
-            HandleStateNode(stateNode);
+            var stateNode = child as StateNode<State, THost,TShared>;
+            HandleStateNode(stateNode,shared);
         }
     }
 
-    private void HandleStateNode<TStateNode>(TStateNode stateNode) 
-    where TStateNode : StateNode<State, THost>
+    private void HandleStateNode<TStateNode>(TStateNode stateNode,TShared shared) 
+    where TStateNode : StateNode<State, THost,TShared>
     {
-        stateNode.Initialize(Agent, Host);
+        stateNode.Initialize(Agent, Host,shared);
         AddStateFromNode(stateNode.ExecutorType, stateNode);
     }
 
-    private void AddStateFromNode(ExecutorType executorType, StateNode<State, THost> stateNode)
+    private void AddStateFromNode(ExecutorType executorType, StateNode<State, THost,TShared> stateNode)
     {
         switch (executorType)
         {

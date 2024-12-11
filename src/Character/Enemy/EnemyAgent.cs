@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class EnemyAgent : Agent
+public partial class EnemyAgent : AgentNode<Enemy,BoarAttributeSet,EnemyShared>
 {
 	private StatsPanel _statusPanel;
 
@@ -13,9 +13,7 @@ public partial class EnemyAgent : Agent
 
 		_statusPanel = GetNode<StatsPanel>("../StatusPanel");
 
-		Initialize(GetParent<Node2D>(), [typeof(BoarAttributeSet)]);
-
-		var hp = GetAttributeBase("HP");
+		var hp = Agent.GetAttributeBase("HP");
 		hp.SetMaxValue(hp.CurrentValue);
 		hp.RegisterPostCurrentValueChange(_statusPanel.OnUpdateHealthBar);
 	}

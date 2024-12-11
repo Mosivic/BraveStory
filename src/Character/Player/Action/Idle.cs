@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class IdleAction : StateNode<State, Player>
+public partial class IdleAction : StateNode<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_Idle;
     public override Tag LayerTag => Tags.StateLayer_Movement;
@@ -20,7 +20,7 @@ public partial class IdleAction : StateNode<State, Player>
     protected override void Enter()
     {
         Host.PlayAnimation("idle");
-        Res["JumpCount"] = 0;
+        Shared.JumpCount = 0;
     }
 
 

@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class ChargeEnemyAction : StateNode<State, Enemy>
+public partial class ChargeEnemyAction : StateNode<State, Enemy,EnemyShared>
 {
     // FIXME：Charge 和 Run 是同一个状态，需要合并
     public override Tag StateTag => Tags.State_Action_Run;
@@ -11,8 +11,8 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy>
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
 
     public override Transition[] Transitions => [
-        new (Tags.State_Action_Idle, () => _chargeTimer >= _chargeDuration),
-        new (Tags.State_Action_Stun, () => _isStunned)
+        new (Tags.State_Action_Idle, () => Shared.ChargeTimer >= Shared.ChargeDuration),
+        new (Tags.State_Action_Stun, () => Shared.IsStunned)
     ];
 
     [Export]
@@ -23,8 +23,8 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy>
     protected override void Enter()
     {
         Host.PlayAnimation("run");
-        _chargeTimer = 0f;
-        _isCharging = true;
+        Shared.ChargeTimer = 0f;
+        Shared.IsCharging = true;
     }
 
     protected override void PhysicsUpdate(double delta)
@@ -34,8 +34,8 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy>
 
     protected override void Exit()
     {
-        _isCharging = false;
-        _chargeTimer = 0f;
+        Shared.IsCharging = false;
+        Shared.ChargeTimer = 0f;
     }
 
     private void Charge(double delta)
@@ -46,7 +46,7 @@ public partial class ChargeEnemyAction : StateNode<State, Enemy>
         // 检查是否撞墙
         if (Host.IsWallColliding())
         {
-            _isStunned = true;
+            Shared.IsStunned = true;
             return;
         }
 

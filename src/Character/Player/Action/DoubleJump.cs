@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class DoubleJumpAction : StateNode<State, Player>
+public partial class DoubleJumpAction : StateNode<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Action_DoubleJump;
     public override Tag LayerTag => Tags.StateLayer_Movement;
@@ -17,6 +17,6 @@ public partial class DoubleJumpAction : StateNode<State, Player>
     {
         Host.PlayAnimation("jump");
         Host.Velocity = new Vector2(Host.Velocity.X, Agent.Attr("JumpVelocity"));
-        Res["JumpCount"] = 0;
+        Shared.JumpCount = 0;
     }
 }

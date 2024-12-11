@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class DieAction : StateNode<State, Player>
+public partial class DieAction : StateNode<State, Player,PlayerShared>
 {
     public override Tag StateTag  => Tags.State_Status_Die;
     public override Tag LayerTag => Tags.StateLayer_Movement;

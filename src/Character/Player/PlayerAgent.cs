@@ -3,7 +3,7 @@ using Godot;
 
 namespace BraveStory;
 
-public partial class PlayerAgent : AgentNode<Player, PlayerAttributeSet>
+public partial class PlayerAgent : AgentNode<Player, PlayerAttributeSet,PlayerShared>
 {
 	private StatsPanel _statusPanel;
 
