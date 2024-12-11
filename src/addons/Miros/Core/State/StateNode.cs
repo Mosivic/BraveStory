@@ -9,6 +9,8 @@ public abstract partial class StateNode<THost> : Node where THost : Node
     protected Agent Agent { get; private set; }
     protected THost Host { get; private set; }
     protected abstract Tag StateTag { get; init; }
+    protected virtual Transition[] Transitions { get; init; }
+    protected virtual bool IsAnyTransState { get; init; } = false;
     protected Dictionary<string, dynamic> Res { get; private set; }
 
 
