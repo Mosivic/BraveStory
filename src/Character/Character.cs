@@ -13,9 +13,10 @@ public class CharacterShared : Shared
     public AgentorBase HitAgentor { get; set; }
 }
 
-public partial class Character<TAgentor, TShared> : CharacterBody2D
-where TAgentor : AgentorBase
+public partial class Character<TAgentor, TShared,TAttributeSet> : CharacterBody2D
+where TAgentor : AgentorBase,new()
 where TShared : CharacterShared, new()
+where TAttributeSet : AttributeSet,new()
 {
     protected AnimationPlayer AnimationPlayer;
     public Node2D Graphics;
@@ -44,6 +45,11 @@ where TShared : CharacterShared, new()
         // 处理受伤事件
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
+
+        // 初始化 Agentor
+        Shared = new TShared();
+        Agentor = new TAgentor();
+        Agentor.Initialize<Character<TAgentor, TShared, TAttributeSet>,TAttributeSet>(this);
 
         // 处理伤害事件
         Agentor.Throttle<DamageSlice>("Damage", CreateDamageNumber);
@@ -96,7 +102,7 @@ where TShared : CharacterShared, new()
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
         Shared.IsHit = true;
-        Shared.HitAgentor = (e.HurtBox.Owner as Character<TAgentor, TShared>).Agentor;
+        Shared.HitAgentor = (e.HurtBox.Owner as Character<TAgentor, TShared, TAttributeSet>).Agentor;
     }
 
     public override void _Process(double delta)

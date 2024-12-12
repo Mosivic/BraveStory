@@ -12,21 +12,14 @@ using Godot;
 
 namespace BraveStory;
 
-public class Agentor<THost,TAttributeSet,TShared> : AgentorBase
+public class Agentor<THost,TShared> : AgentorBase
 where THost : Node   
-where TAttributeSet : AttributeSet
 where TShared : Shared, new()
 {   
-    protected THost Host { get; private set; }
-    public TShared Shared { get; private set; }
-
-    public virtual void Initialize(THost host,TShared shared,Type[] stators)
+ 
+    public void AddStators(TShared shared,Type[] stators)
     {
-        Host = host;
-        Agent.Initialize(Host as Node2D, [typeof(TAttributeSet)]);
-
-        Shared = shared;
-        HandleStateNodes(Shared,stators);
+        HandleStateNodes(shared,stators);
     }
 
     private void HandleStateNodes(TShared shared,Type[] stators)
@@ -41,7 +34,7 @@ where TShared : Shared, new()
     private void HandleStateNode<TStator>(TStator stator,TShared shared) 
     where TStator : Stator<State, THost,TShared>
     {
-        stator.Initialize(Agent, Host,shared);
+        stator.Initialize(Agent, Agent.Host as THost,shared);
         AddStateFromNode(stator.ExecutorType, stator);
     }
 
@@ -57,12 +50,5 @@ where TShared : Shared, new()
                 Agent.AddState(executorType, stator.State);
                 break;
         }
-    }
-
-#pragma warning disable CS0693 // 类型参数与外部类型中的类型参数同名
-    public override TShared GetShared<TShared>()
-#pragma warning restore CS0693 // 类型参数与外部类型中的类型参数同名
-    {
-        return Shared as TShared;
     }
 }

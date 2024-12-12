@@ -19,8 +19,6 @@ public class FSMExecutor
         TransitionContainer transitionContainer, Dictionary<Tag, TaskBase> tasks)
     {
         Layer = layerTag;
-        _currentTask = _defaultTask;
-        _lastTask = _defaultTask;
         _delayTask = null;
         _transitionContainer = transitionContainer;
         _tasks = tasks;
@@ -29,6 +27,8 @@ public class FSMExecutor
     public void SetDefaultTask(TaskBase task)
     {
         _defaultTask = task;
+        _currentTask = _defaultTask;
+        _lastTask = _defaultTask;
     }
 
     public void Update(double delta)

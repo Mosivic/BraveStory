@@ -37,12 +37,12 @@ public class Agent
 	protected ITaskProvider _taskProvider;
 
 
-	public Node2D Host { get; private set; }
+	public Node Host { get; private set; }
 	public bool Enabled { get;private set; }
 	public EventStream EventStream { get; private set; }
 
 
-	public void Initialize(Node2D host, Type[] attrSetTypes)
+	public void Initialize(Node host, Type[] attrSetTypes)
 	{
 		Enabled = true;
 		Host = host;

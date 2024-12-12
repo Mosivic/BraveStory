@@ -14,7 +14,7 @@ public class EnemyShared : CharacterShared
     public bool IsCharging{get;set;} = false;      // 是否正在冲刺
 }
 
-public partial class Enemy : Character<EnemyAgentor, EnemyShared>
+public partial class Enemy : Character<EnemyAgentor, EnemyShared,BoarAttributeSet>
 {
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
@@ -23,7 +23,7 @@ public partial class Enemy : Character<EnemyAgentor, EnemyShared>
 
     public override void _Ready()
     {
-        
+        base._Ready();
         // Components
         _wallChecker = GetNode<RayCast2D>("Graphics/WallChecker");
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
@@ -34,13 +34,12 @@ public partial class Enemy : Character<EnemyAgentor, EnemyShared>
         Graphics.Scale = new Vector2(-1, 1);
 
         // 初始化 Agentor
-        Shared = Agentor.GetShared<EnemyShared>();
-        Agentor = new EnemyAgentor();
-        Agentor.Initialize(this, Shared, [
+        Agentor.AddStators(Shared, [
             typeof(IdleEnemyAction), typeof(PatrolEnemyAction), typeof(DieEnemyAction), 
             typeof(ChargeEnemyAction), typeof(HitEnemyAction), typeof(StunEnemyAction)]);
+        Agentor.Binding();
         
-        base._Ready();
+        
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);

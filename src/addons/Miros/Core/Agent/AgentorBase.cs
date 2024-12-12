@@ -10,9 +10,15 @@ namespace Miros.Core;
 public abstract  class AgentorBase
 {
     protected Agent Agent { get; private set; } = new();
-    public abstract TShared GetShared<TShared>()
-    where TShared : Shared, new();
-    
+
+    public virtual void Initialize<THost,TAttributeSet>(THost host)
+    where THost : Node
+    where TAttributeSet : AttributeSet
+    {
+        Agent.Initialize(host as Node2D, [typeof(TAttributeSet)]);
+    }
+
+    public virtual void Binding(){}
     public void AddState(ExecutorType executorType,State state)
     {
         Agent.AddState(executorType,state);
