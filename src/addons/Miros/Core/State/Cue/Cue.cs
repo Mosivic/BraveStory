@@ -1,8 +1,9 @@
 namespace Miros.Core;
 
-public abstract class Cue : State
+public abstract class Cue(Tag sign, Agent source) : State(sign, source)
 {
+    protected object[] CustomArguments;
     public TagSet ImmunityTags;
     public TagSet RequiredTags;
-    public Effect SourceEffect;
+    protected Effect SourceEffect;
 }

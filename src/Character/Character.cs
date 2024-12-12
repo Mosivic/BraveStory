@@ -1,43 +1,33 @@
-using System;
-using System.Collections.Generic;
 using Godot;
 using Miros.Core;
 
 namespace BraveStory;
 
-
-public class CharacterShared : Shared
+public partial class Character : CharacterBody2D
 {
-    public bool IsHit { get; set; } = false;
-    public bool IsHurt { get; set; } = false;
-    public AgentorBase HitAgentor { get; set; }
-}
+    protected Agent Agent;
 
-public partial class Character<TAgentor, TShared,TAttributeSet> : CharacterBody2D
-where TAgentor : AgentorBase,new()
-where TShared : CharacterShared, new()
-where TAttributeSet : AttributeSet,new()
-{
     protected AnimationPlayer AnimationPlayer;
-    public Node2D Graphics;
+    protected Node2D Graphics;
     protected bool Hurt;
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
-    public StatsPanel StatusPanel;
-    
-    protected TAgentor Agentor;
-    protected TShared Shared;
 
 
     public override void _Ready()
     {
-        // 获取功能子节点
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        StatusPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
-        
+        Agent = GetNode<Agent>("Agent");
+
+        if(Agent == null)
+        {
+            GD.PrintErr($"[{Name}] Agent not found");
+            return;
+        }
+
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
         HitBox.OnHit += HandleHit;
@@ -46,13 +36,8 @@ where TAttributeSet : AttributeSet,new()
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
 
-        // 初始化 Agentor
-        Shared = new TShared();
-        Agentor = new TAgentor();
-        Agentor.Initialize<Character<TAgentor, TShared, TAttributeSet>,TAttributeSet>(this);
-
         // 处理伤害事件
-        Agentor.Throttle<DamageSlice>("Damage", CreateDamageNumber);
+        Agent.EventStream.Throttle<DamageSlice>("Damage", HandleDamage);
     }
 
 
@@ -63,18 +48,18 @@ where TAttributeSet : AttributeSet,new()
         if (HurtBox != null)
             HurtBox.OnHurt -= HandleHurt;
 
-        Agentor.Unthrottle<DamageSlice>("Damage", CreateDamageNumber);
+        Agent.EventStream.Unthrottle<DamageSlice>("Damage", HandleDamage);
 
         base._ExitTree();
     }
 
 
-    public bool IsAnimationFinished()
+    protected bool IsAnimationFinished()
     {
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
 
-    private void CreateDamageNumber(object sender, DamageSlice e)
+    private void HandleDamage(object sender, DamageSlice e)
     {
         var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
         var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
@@ -83,32 +68,29 @@ where TAttributeSet : AttributeSet,new()
         damageNumber.SetDamage((int)e.Damage); 
     }
 
-    public void PlayAnimation(string animationName)
+    protected void PlayAnimation(string animationName)
     {
         AnimationPlayer.Play("RESET");
         AnimationPlayer.Play(animationName);
     }
 
-    public string GetCurrentAnimation()
-    {
-        return AnimationPlayer.CurrentAnimation;
-    }
-
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        Shared.IsHurt = true;
+        Hurt = true;
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
-        Shared.IsHit = true;
-        Shared.HitAgentor = (e.HurtBox.Owner as Character<TAgentor, TShared, TAttributeSet>).Agentor;
-    }
+        var suffer = e.HurtBox.Owner as Character;
 
-    public override void _Process(double delta)
-    {
-        Agentor.Process(delta);
-    }
+        var damageEffect = new Effect(Tags.Effect_Buff, Agent)
+        {
+            DurationPolicy = DurationPolicy.Instant,
+            Executions = [
+                new DamageExecution()
+            ]
+        };
 
+        suffer.Agent.AddState(ExecutorType.EffectExecutor, damageEffect);
+    }
 }
-

@@ -7,25 +7,12 @@ namespace Miros.Core;
 
 public enum ExecutorType
 {
-	MultiLayerStateMachine,
+	MultiLayerExecutor,
 	EffectExecutor,
-	ConditionMachine
+	ConditionExecutor
 }
 
-public abstract class StateExecuteArgs{}
 
-public class StateFSMArgs : StateExecuteArgs
-{
-	public Tag Layer { get; private set; }
-	public Transition[] Transitions { get; private set; }
-
-	public StateFSMArgs(Tag layer, Transition[] transitions)
-	{
-		Layer = layer;
-		Transitions = transitions;
-	}
-
-}
 public class Agent 
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];

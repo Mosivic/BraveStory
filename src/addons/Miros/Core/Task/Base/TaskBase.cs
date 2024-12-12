@@ -4,6 +4,7 @@ public class TaskBase(State state) : AbsTask(state), ITask
 {
     private readonly State state = state;
 
+
     public virtual void Enter()
     {
         state.Status = RunningStatus.Running;
