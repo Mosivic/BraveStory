@@ -24,6 +24,7 @@ public class FSMExecutor
         _tasks = tasks;
     }
 
+
     public void SetDefaultTask(TaskBase task)
     {
         _defaultTask = task;

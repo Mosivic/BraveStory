@@ -13,7 +13,12 @@ public class CharacterShared : Shared
     public AgentorBase HitAgentor { get; set; }
 }
 
-public partial class Character<TAgentor, TShared,TAttributeSet> : CharacterBody2D
+public interface IGetAgentor 
+{
+    TAgentor GetAgent<TAgentor>() where TAgentor : AgentorBase, new();
+}
+
+public partial class Character<TAgentor, TShared,TAttributeSet> : CharacterBody2D,IGetAgentor
 where TAgentor : AgentorBase,new()
 where TShared : CharacterShared, new()
 where TAttributeSet : AttributeSet,new()
@@ -29,6 +34,10 @@ where TAttributeSet : AttributeSet,new()
     protected TAgentor Agentor;
     protected TShared Shared;
 
+    public TAgentor GetAgent<TAgentor>() where TAgentor : AgentorBase, new()
+    {
+        return Agentor as TAgentor;
+    }
 
     public override void _Ready()
     {
@@ -102,7 +111,8 @@ where TAttributeSet : AttributeSet,new()
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
         Shared.IsHit = true;
-        Shared.HitAgentor = (e.HurtBox.Owner as Character<TAgentor, TShared, TAttributeSet>).Agentor;
+        // FIXME:
+        Shared.HitAgentor = (e.HurtBox.Owner as IGetAgentor).GetAgent<TAgentor>();
     }
 
     public override void _Process(double delta)
@@ -110,5 +120,9 @@ where TAttributeSet : AttributeSet,new()
         Agentor.Process(delta);
     }
 
+    public override void _PhysicsProcess(double delta)
+    {
+        Agentor.PhysicsProcess(delta);
+    }
 }
 

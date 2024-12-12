@@ -34,10 +34,12 @@ where TShared : Shared, new()
             Source = Agent,
         };
         
-        State.OnEntered(_ => Enter());
-        State.OnExited(_ => Exit());
-        State.OnUpdated((_, delta) => Update(delta));
-        State.OnPhysicsUpdated((_, delta) => PhysicsUpdate(delta));
+        State.EnterFunc = _ => Enter();
+        State.ExitFunc =_ => Exit();
+        State.UpdateFunc = (_, delta) => Update(delta);
+        State.PhysicsUpdateFunc = (_, delta) => PhysicsUpdate(delta);
+        State.EnterCondition = _=> EnterCondition();
+        State.ExitCondition = _ => ExitCondition();
     }
     
     protected virtual void Enter() { }
