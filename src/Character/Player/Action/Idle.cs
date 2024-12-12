@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class IdleAction(Agent agent, Player host, PlayerContext context) : Task<State, Player,PlayerContext>(agent, host, context)
+public class IdleAction : Task<State, Player,PlayerContext>
 {
     public override Tag StateTag  => Tags.State_Action_Idle;
     public override Tag LayerTag => Tags.StateLayer_Movement;

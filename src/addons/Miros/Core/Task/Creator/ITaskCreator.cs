@@ -1,4 +1,6 @@
-﻿namespace Miros.Core;
+﻿using System;
+
+namespace Miros.Core;
 
 public interface ITaskProvider
 {
