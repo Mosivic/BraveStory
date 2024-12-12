@@ -22,14 +22,13 @@ public partial class Character : CharacterBody2D
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
-    protected StatsPanel StatsPanel;
+
     
     public override void _Ready()
     {
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        StatsPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
 
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");

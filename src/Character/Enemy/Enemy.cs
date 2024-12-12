@@ -19,15 +19,17 @@ public partial class Enemy : Character
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
+    protected StatsPanel StatsPanel;
 
 
-    public override void _Ready()
+    public override void _Ready()   
     {
         base._Ready();
         // Components
         _wallChecker = GetNode<RayCast2D>("Graphics/WallChecker");
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
+        StatsPanel = GetNode<StatsPanel>("StatusPanel");
 
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);

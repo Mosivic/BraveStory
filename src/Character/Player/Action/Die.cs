@@ -8,7 +8,7 @@ public class DieAction : Task<State, Player,PlayerContext>
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
     public override Transition[] Transitions  => [
-            new (Tags.State_Status_Die, () => Agent.Attr("HP") <= 0,TransitionMode.Force,0,true)
+            new (Tags.State_Status_Die, () => Agent.Attr("HP") <= 0,TransitionMode.Normal,0,true)
         ]; 
 
     protected override void OnEnter()
@@ -19,7 +19,7 @@ public class DieAction : Task<State, Player,PlayerContext>
 
     protected override void OnPhysicsUpdate(double delta)
     {
-        if (Host.IsAnimationFinished())
+        if (State.RunningTime > 1.0f)
         {
             Host.QueueFree();
         }

@@ -39,6 +39,6 @@ public class TransitionContainer
     {
         if (!_transitions.TryGetValue(fromTask, out var rules)) return Enumerable.Empty<Transition>();
         var ts = rules.Union(_anyTransitions);
-        return ts.Where(r => r.CanTransition());
+        return ts.Where(r => r.To != fromTask.Tag && r.CanTransition()); // 排除自身
     }
 }

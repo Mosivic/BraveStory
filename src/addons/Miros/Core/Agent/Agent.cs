@@ -115,7 +115,7 @@ public class Agent
 	{
 		state.Owner = this;
 
-		var task = TaskCreator.GetTask<TaskBase>(state);
+		var task = TaskCreator.GetTask(state);
 		var executor = PushTaskOnExecutor(executorType, task, args);
 
 		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));

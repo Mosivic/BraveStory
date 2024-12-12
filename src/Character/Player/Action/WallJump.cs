@@ -8,6 +8,9 @@ public class WallJumpAction : Task<State, Player,PlayerContext>
     public override Tag StateTag  => Tags.State_Action_WallJump;
     public override Tag LayerTag  => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
+    public override Transition[] Transitions  => [
+        new (Tags.State_Action_Fall),
+    ];
 
     protected override void OnEnter()
     {

@@ -18,28 +18,9 @@ public partial class Player : Character
 	private AnimatedSprite2D _animatedSprite;
 	private RayCast2D _footChecker;
 	private RayCast2D _handChecker;
-
+	protected StatsPanel StatsPanel;
 	public HashSet<Interactable> Interactions { get; set; } = new();
 
-	public bool IsFootColliding() => _footChecker.IsColliding();
-
-	public bool IsHandColliding() => _handChecker.IsColliding();
-
-
-	public void ClearInteractions()
-	{
-		Interactions.Clear();
-	}
-
-	public void SetHitBoxMonitorable(bool monitorable)
-	{
-		HitBox.SetDeferred("monitorable", monitorable);
-	}
-
-	public void SetHurtBoxMonitorable(bool monitorable)
-	{
-		HurtBox.SetDeferred("monitorable", monitorable);
-	}
 
 	public override void _Ready()
 	{
@@ -48,9 +29,10 @@ public partial class Player : Character
 		_handChecker = GetNode<RayCast2D>("Graphics/HandChecker");
 		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
+		StatsPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
 
 		Context = new PlayerContext();
-		
+
 		Agent.SetAttributeSet(typeof(PlayerAttributeSet));
 		Agent.AddTasksFromType<State,Player,PlayerContext>(this,Context as PlayerContext, [
 			typeof(IdleAction), typeof(JumpAction), typeof(DoubleJumpAction), 
@@ -101,6 +83,26 @@ public partial class Player : Character
 		else if (!Mathf.IsZeroApprox(Velocity.X)) Graphics.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 	}
 
+
+	public bool IsFootColliding() => _footChecker.IsColliding();
+
+	public bool IsHandColliding() => _handChecker.IsColliding();
+
+
+	public void ClearInteractions()
+	{
+		Interactions.Clear();
+	}
+
+	public void SetHitBoxMonitorable(bool monitorable)
+	{
+		HitBox.SetDeferred("monitorable", monitorable);
+	}
+
+	public void SetHurtBoxMonitorable(bool monitorable)
+	{
+		HurtBox.SetDeferred("monitorable", monitorable);
+	}
 	public bool KeyDownMove()
 	{
 		return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));

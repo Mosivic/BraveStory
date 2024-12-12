@@ -8,10 +8,10 @@ public partial class DieEnemyAction : Task<State, Enemy,EnemyContext>
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
     public override Transition[] Transitions => [
-        new (Tags.State_Action_Idle, () => Agent.Attr("HP") <= 0,TransitionMode.Force,0,true)
+        new (Tags.State_Status_Die, () => Agent.Attr("HP") <= 0,TransitionMode.Normal,0,true)
     ];
     
-    
+
     protected override void OnEnter()
     {
         Host.PlayAnimation("die");

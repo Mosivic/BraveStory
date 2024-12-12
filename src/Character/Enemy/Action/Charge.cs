@@ -15,11 +15,6 @@ public partial class ChargeEnemyAction : Task<State, Enemy,EnemyContext>
         new (Tags.State_Action_Stun, () => Context.IsStunned)
     ];
 
-    [Export]
-    private float _chargeDuration = 0.5f;
-    private float _chargeTimer;
-    private bool _isCharging;
-
     protected override void OnEnter()
     {
         Host.PlayAnimation("run");
@@ -55,7 +50,7 @@ public partial class ChargeEnemyAction : Task<State, Enemy,EnemyContext>
     private void Charge(double delta)
     {
         // 更新冲刺计时器
-        _chargeTimer += (float)delta;
+        Context.ChargeTimer += (float)delta;
 
         // 检查是否撞墙
         if (Host.IsWallColliding())
@@ -69,9 +64,9 @@ public partial class ChargeEnemyAction : Task<State, Enemy,EnemyContext>
 
         // 在冲刺即将结束时减速
         float slowdownThreshold = 0.3f; // 最后0.3秒开始减速
-        if (_chargeTimer >= _chargeDuration - slowdownThreshold)
+        if (Context.ChargeTimer >= Context.ChargeDuration - slowdownThreshold)
         {
-            float slowdownFactor = 1.0f - ((_chargeTimer - (_chargeDuration - slowdownThreshold)) / slowdownThreshold);
+            float slowdownFactor = 1.0f - ((Context.ChargeTimer - (Context.ChargeDuration - slowdownThreshold)) / slowdownThreshold);
             velocity.X *= slowdownFactor;
         }
 

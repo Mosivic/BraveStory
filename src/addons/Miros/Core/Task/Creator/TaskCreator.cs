@@ -21,4 +21,16 @@ public class TaskCreator
         var task = (TTask)Activator.CreateInstance(taskType);
         return task;
     }
+    
+    public static TaskBase GetTask(State state)
+    {
+        return CreateTask(state);
+    }
+    
+    private static TaskBase CreateTask(State state)
+    {
+        var type = state.Type;
+        var task = (TaskBase)Activator.CreateInstance(type, state);
+        return task;
+    }
 }
