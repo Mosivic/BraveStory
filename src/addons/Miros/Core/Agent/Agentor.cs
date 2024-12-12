@@ -46,7 +46,7 @@ where TShared : Shared, new()
         {
             case ExecutorType.MultiLayerStateMachine:
                 Agent.AddState(executorType, stator.State, new StateFSMArgs(
-                    stator.LayerTag, stator.Transitions, stator.AnyTransition));
+                    stator.LayerTag, stator.Transitions));
                 break;
             case ExecutorType.EffectExecutor:
                 Agent.AddState(executorType, stator.State);

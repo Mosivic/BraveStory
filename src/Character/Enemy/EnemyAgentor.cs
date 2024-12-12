@@ -12,6 +12,6 @@ public class EnemyAgentor : Agentor<Enemy,EnemyShared>
 
 		var hp = Agent.GetAttributeBase("HP");
 		hp.SetMaxValue(hp.CurrentValue);
-		//hp.RegisterPostCurrentValueChange(Host.StatusPanel.OnUpdateHealthBar);
+		hp.RegisterPostCurrentValueChange(host.StatusPanel.OnUpdateHealthBar);
 	}
 }

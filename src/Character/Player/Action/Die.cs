@@ -7,7 +7,9 @@ public class DieAction : Stator<State, Player,PlayerShared>
     public override Tag StateTag  => Tags.State_Status_Die;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
-    public override Transition AnyTransition  => new (Tags.State_Status_Die, () => Agent.Attr("HP") <= 0); 
+    public override Transition[] Transitions  => [
+            new (Tags.State_Status_Die, () => Agent.Attr("HP") <= 0,TransitionMode.Force,0,true)
+        ]; 
 
     protected override void Enter()
     {

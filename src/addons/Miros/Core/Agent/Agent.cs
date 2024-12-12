@@ -18,13 +18,11 @@ public class StateFSMArgs : StateExecuteArgs
 {
 	public Tag Layer { get; private set; }
 	public Transition[] Transitions { get; private set; }
-	public Transition AnyTransition { get; private set; }
 
-	public StateFSMArgs(Tag layer, Transition[] transitions, Transition anyTransition)
+	public StateFSMArgs(Tag layer, Transition[] transitions)
 	{
 		Layer = layer;
 		Transitions = transitions;
-		AnyTransition = anyTransition;
 	}
 
 }
@@ -100,12 +98,6 @@ public class Agent
 		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
 
 		executor.AddTask(task, args);
-	}
-
-
-	public void AddStateTo(ExecutorType executorType, State state, Agent target)
-	{
-		target.AddState(executorType, state);
 	}
 
 

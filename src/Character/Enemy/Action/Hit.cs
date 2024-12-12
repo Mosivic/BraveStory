@@ -11,10 +11,9 @@ public  class HitEnemyAction : Stator<State, Enemy,EnemyShared>
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
 
     public override Transition[] Transitions => [
-        new (Tags.State_Action_Idle, Host.IsAnimationFinished)
+        new (Tags.State_Action_Idle, Host.IsAnimationFinished),
+        new (Tags.State_Action_Hit, () => Shared.IsHurt,TransitionMode.Force,0,true)
     ];
-
-    public override Transition AnyTransition => new (Tags.State_Action_Idle, () => !Shared.IsHurt);
 
 
     protected override void Enter()

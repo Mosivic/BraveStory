@@ -19,7 +19,6 @@ where TShared : Shared, new()
     public virtual Tag LayerTag { get; } = Tags.Default;
     public abstract ExecutorType ExecutorType { get; }
     public virtual Transition[] Transitions { get; }
-    public virtual Transition AnyTransition { get; }
     public TShared Shared { get; set; }
 
 

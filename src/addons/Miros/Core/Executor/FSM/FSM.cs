@@ -46,8 +46,6 @@ public class FSM : ExecutorBase<TaskBase>, IExecutor
         
         if(fsmArgs.Transitions != null)
             _transitionContainer.AddTransitions(stateTask, fsmArgs.Transitions);
-        
-        _transitionContainer.AddAnyTransition(fsmArgs.AnyTransition);
     }
 
     public void RemoveTask(TaskBase task)

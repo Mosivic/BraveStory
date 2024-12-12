@@ -13,13 +13,14 @@ public class TransitionContainer
     {
         if (!_transitions.ContainsKey(fromTask))
             _transitions[fromTask] = [];
-        _transitions[fromTask].AddRange(transitions);
-        return this;
-    }
 
-    public TransitionContainer AddAnyTransition(Transition transition)
-    {
-        _anyTransitions.Add(transition);
+        foreach (var transition in transitions)
+        {
+            if (transition.IsAny)
+                _anyTransitions.Add(transition);
+            else
+                _transitions[fromTask].Add(transition);
+        }
         return this;
     }
 
