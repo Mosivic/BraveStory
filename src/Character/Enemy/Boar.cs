@@ -34,12 +34,9 @@ public partial class Enemy : Character<EnemyAgentor, EnemyShared,BoarAttributeSe
         Graphics.Scale = new Vector2(-1, 1);
 
         // 初始化 Agentor
-        Agentor.AddStators(Shared, [
+        Agentor.BindStators(this,Shared, [
             typeof(IdleEnemyAction), typeof(PatrolEnemyAction), typeof(DieEnemyAction), 
-            typeof(ChargeEnemyAction), typeof(HitEnemyAction), typeof(StunEnemyAction)]);
-        Agentor.Binding();
-        
-        
+            typeof(ChargeEnemyAction), typeof(HitEnemyAction), typeof(StunEnemyAction)]);        
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);

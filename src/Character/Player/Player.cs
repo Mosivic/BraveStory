@@ -50,12 +50,11 @@ public partial class Player : Character<PlayerAgentor, PlayerShared,PlayerAttrib
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
 
-		Agentor.AddStators(Shared, [
+		Agentor.BindStators(this,Shared, [
 			typeof(IdleAction), typeof(JumpAction), typeof(DoubleJumpAction), 
 			typeof(DieAction), typeof(FallAction), typeof(HitAction), 
 			typeof(RunAction), typeof(SlidingAction), typeof(WallJumpAction), typeof(WallSlideAction),
 			typeof(Attack1Action), typeof(Attack11Action), typeof(Attack111Action)]);
-		Agentor.Binding();
 
 		// Canvas Layer
 		var canvasLayer = new CanvasLayer();

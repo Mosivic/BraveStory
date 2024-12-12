@@ -18,7 +18,6 @@ public abstract  class AgentorBase
         Agent.Initialize(host as Node2D, [typeof(TAttributeSet)]);
     }
 
-    public virtual void Binding(){}
     public void AddState(ExecutorType executorType,State state)
     {
         Agent.AddState(executorType,state);

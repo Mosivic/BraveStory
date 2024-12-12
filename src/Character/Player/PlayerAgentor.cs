@@ -7,11 +7,13 @@ namespace BraveStory;
 public partial class PlayerAgentor : Agentor<Player,PlayerShared>
 {
 
-    public override void Binding()
+    public override void BindStators(Player host,PlayerShared shared,Type[] stators)
     {
+        base.BindStators(host,shared,stators);
+        
         var hp = Agent.GetAttributeBase("HP");
 		hp.SetMaxValue(hp.CurrentValue);
-		//hp.RegisterPostCurrentValueChange(Host.StatusPanel.OnUpdateHealthBar);
+		hp.RegisterPostCurrentValueChange(host.StatusPanel.OnUpdateHealthBar);
 	}
 
 	

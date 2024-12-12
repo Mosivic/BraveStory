@@ -16,9 +16,11 @@ public class Agentor<THost,TShared> : AgentorBase
 where THost : Node   
 where TShared : Shared, new()
 {   
+    public THost Host { get; private set; }
  
-    public void AddStators(TShared shared,Type[] stators)
+    public virtual void BindStators(THost host,TShared shared,Type[] stators)
     {
+        Host = host;
         HandleStateNodes(shared,stators);
     }
 
