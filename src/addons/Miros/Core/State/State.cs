@@ -5,11 +5,11 @@ namespace Miros.Core;
 
 public class State
 {
-    public Tag Tag { get; init; }
+    public Tag Tag { get; set; }
     public virtual Type Type => typeof(TaskBase);
     public int Priority { get; set; } = 0;
     public Agent Owner { get; set; }
-    public Agent Source { get; init; }
+    public Agent Source { get; set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;

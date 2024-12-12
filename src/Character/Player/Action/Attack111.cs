@@ -2,25 +2,25 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public  class Attack111Action : Stator<State,Player,PlayerShared>
+public  class Attack111Action : Task<State,Player,PlayerContext>
 {
     public override Tag StateTag  => Tags.State_Action_Attack111;
     public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
     public override Transition[] Transitions  => [
             new (Tags.State_Action_Idle),
             new (Tags.State_Action_Attack111,() => Host.KeyDownAttack(), TransitionMode.DelayFront),
         ];
     
 
-    protected override void Enter()
+    protected override void OnEnter()
     {
         Host.PlayAnimation("attack111");
     }
 
-    protected override void PhysicsUpdate(double delta)
+    protected override void OnPhysicsUpdate(double delta)
     {
-        if(Shared.IsHit && Shared.HitAgentor != null)
+        if(Context.IsHit && Context.HitAgent != null)
         {
             var damageEffect = new Effect()
             {
@@ -30,12 +30,12 @@ public  class Attack111Action : Stator<State,Player,PlayerShared>
                 Executions = [new DamageExecution()]
             };
 
-            Shared.HitAgentor.AddState(ExecutorType.EffectExecutor, damageEffect);
-            Shared.IsHit = false;
+            Context.HitAgent.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Context.IsHit = false;
         }
     }
 
-    protected override bool ExitCondition()
+    protected override bool OnExitCondition()
     {
         return Host.IsAnimationFinished();
     }

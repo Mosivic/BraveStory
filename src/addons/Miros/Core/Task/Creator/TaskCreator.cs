@@ -4,23 +4,21 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class StaticITaskCreator : ITaskCreator
+public class TaskCreator
 {
-    
-    public TaskBase GetTask(State state)
+    public static  TTask GetTask<TTask>(State state) where TTask : TaskBase
     {
-        return CreateTask(state.GetType());
+        return CreateTask<TTask>(state.GetType());
     }
 
-    public TaskBase GetTask(Type taskType)
+    public static TTask GetTask<TTask>(Type taskType) where TTask : TaskBase
     {
-        return CreateTask(taskType);
+        return CreateTask<TTask>(taskType);
     }
-
     
-    private TaskBase CreateTask(Type taskType)
+    private static TTask CreateTask<TTask>(Type taskType) where TTask : TaskBase
     {
-        var task = (TaskBase)Activator.CreateInstance(taskType);
+        var task = (TTask)Activator.CreateInstance(taskType);
         return task;
     }
 }

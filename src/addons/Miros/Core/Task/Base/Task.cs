@@ -1,10 +1,11 @@
+using Godot;
 using Miros.Core;
 
-namespace BraveStory;
+namespace Miros.Core;
 
-public class Task<TState, THost, TContext> : TaskBase
+public class Task<TState, THost, TContext>() : TaskBase(new TState())
 where TState : State, new()
-where THost : Character
+where THost : Node
 where TContext : Context
 {
     protected Agent Agent { get; private set; }
@@ -14,12 +15,14 @@ where TContext : Context
     public virtual Tag LayerTag { get; } = Tags.Default;
     public virtual ExecutorType ExecutorType { get; }
     public virtual Transition[] Transitions { get; }
+    
 
-    public Task(Agent agent, THost host, TContext context)
+    public void Init(Agent agent, THost host, TContext context)
     {
         Agent = agent;
         Host = host;
         Context = context;
-        SetState(new TState() { Tag = StateTag, Source = Agent});
+
+        InitState(StateTag, Agent);
     }
 }

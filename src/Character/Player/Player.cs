@@ -49,12 +49,19 @@ public partial class Player : Character
 		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
 
-	
-		Agentor.BindStators(this,Context, [
+		Context = new PlayerContext();
+		
+		Agent.SetAttributeSet(typeof(PlayerAttributeSet));
+		Agent.AddTasksFromType<State,Player,PlayerContext>(this,Context as PlayerContext, [
 			typeof(IdleAction), typeof(JumpAction), typeof(DoubleJumpAction), 
 			typeof(DieAction), typeof(FallAction), typeof(HitAction), 
 			typeof(RunAction), typeof(SlidingAction), typeof(WallJumpAction), typeof(WallSlideAction),
 			typeof(Attack1Action), typeof(Attack11Action), typeof(Attack111Action)]);
+
+
+        var hp = Agent.GetAttributeBase("HP");
+        hp.SetMaxValue(hp.CurrentValue);
+        hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);
 
 		// Canvas Layer
 		var canvasLayer = new CanvasLayer();

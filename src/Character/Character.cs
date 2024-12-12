@@ -1,3 +1,5 @@
+using System;
+using System.Security.Cryptography.X509Certificates;
 using Godot;
 using Miros.Core;
 
@@ -12,28 +14,22 @@ public class CharacterContext : Context
 
 public partial class Character : CharacterBody2D
 {
-    protected Agent Agent;
+    protected Agent Agent = new();
+    protected CharacterContext Context;
 
     protected AnimationPlayer AnimationPlayer;
-    protected Node2D Graphics;
-    protected bool Hurt;
+    public Node2D Graphics { get; private set; }
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
-
-
+    protected StatsPanel StatsPanel;
+    
     public override void _Ready()
     {
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        Agent = GetNode<Agent>("Agent");
-
-        if(Agent == null)
-        {
-            GD.PrintErr($"[{Name}] Agent not found");
-            return;
-        }
+        StatsPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
 
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
@@ -44,6 +40,7 @@ public partial class Character : CharacterBody2D
         HurtBox.OnHurt += HandleHurt;
 
         // 处理伤害事件
+        Agent.Init(this);
         Agent.EventStream.Throttle<DamageSlice>("Damage", HandleDamage);
     }
 
@@ -59,9 +56,13 @@ public partial class Character : CharacterBody2D
 
         base._ExitTree();
     }
+    
+    public string GetCurrentAnimation()
+    {
+        return AnimationPlayer.GetCurrentAnimation();
+    }
 
-
-    protected bool IsAnimationFinished()
+    public bool IsAnimationFinished()
     {
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
@@ -83,21 +84,12 @@ public partial class Character : CharacterBody2D
 
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        Hurt = true;
+        Context.IsHurt = true;
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
-        var suffer = e.HurtBox.Owner as Character;
-
-        var damageEffect = new Effect(Tags.Effect_Buff, Agent)
-        {
-            DurationPolicy = DurationPolicy.Instant,
-            Executions = [
-                new DamageExecution()
-            ]
-        };
-
-        suffer.Agent.AddState(ExecutorType.EffectExecutor, damageEffect);
+        Context.IsHit = true;
+        Context.HitAgent = (e.HurtBox.Owner as Character).Agent;
     }
 }

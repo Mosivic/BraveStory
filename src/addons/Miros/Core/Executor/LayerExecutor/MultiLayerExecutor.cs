@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class MultiLayerStateMachine : ExecutorBase<TaskBase>, IExecutor
+public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 {
     private readonly Dictionary<Tag, LayerExecutor> _layers = [];
     private readonly TransitionContainer _transitionContainer = new();
