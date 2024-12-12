@@ -192,23 +192,7 @@ public class Agent
 		return state1.Source == state2.Source;
 	}
 
-	// public AbilityExecutor AbilityExecutor()
-	// {
-	//     if(Executors.TryGetValue(typeof(AbilityExecutor),out var executor))
-	//     {
-	//         return executor as AbilityExecutor;
-	//     }
-	//     return null;
-	// }
 
-	// public EffectExecutor GetEffectExecutor()
-	// {
-	//     if(_executors.TryGetValue(typeof(EffectTask),out var executor))
-	//     {
-	//         return executor as EffectExecutor;
-	//     }
-	//     return null;
-	// }
 
 	public Effect[] GetRunningEffects()
 	{
