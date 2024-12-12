@@ -3,18 +3,17 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class FallAction : Task<State, Player, PlayerContext>
+public class FallAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
 {
     public override Tag StateTag => Tags.State_Action_Fall;
-    public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
-
-    public override Transition[] Transitions =>
-    [
-        new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
-        new(Tags.State_Action_WallSlide, () => Host.IsHandColliding() && Host.IsFootColliding() && !Host.KeyDownMove()),
-        new(Tags.State_Action_DoubleJump, () => Host.KeyDownJump() && Context.JumpCount < Context.MaxJumpCount)
-    ];
+    public override MultiLayerExecuteArgs ExecuteArgs => new(
+        Tags.StateLayer_Movement,
+        [
+            new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
+            new(Tags.State_Action_WallSlide, () => Host.IsHandColliding() && Host.IsFootColliding() && !Host.KeyDownMove()),
+            new(Tags.State_Action_Jump, () => Host.KeyDownJump() && Context.JumpCount < Context.MaxJumpCount)
+        ]
+    );
 
     protected override void OnEnter()
     {

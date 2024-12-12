@@ -2,17 +2,17 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class ChargeEnemyAction : Task<State, Enemy, EnemyContext>
+public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag StateTag => Tags.State_Action_Charge;
-    public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
 
-    public override Transition[] Transitions =>
-    [
-        new(Tags.State_Action_Idle, () => Context.ChargeTimer >= Context.ChargeDuration),
-        new(Tags.State_Action_Stun, () => Context.IsStunned)
-    ];
+    public override MultiLayerExecuteArgs ExecuteArgs => new(
+        Tags.StateLayer_Movement,
+        [
+            new(Tags.State_Action_Idle, () => Context.ChargeTimer >= Context.ChargeDuration),
+            new(Tags.State_Action_Stun, () => Context.IsStunned)
+        ]
+    );
 
     protected override void OnEnter()
     {

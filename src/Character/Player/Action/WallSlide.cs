@@ -3,18 +3,17 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class WallSlideAction : Task<State, Player, PlayerContext>
+public class WallSlideAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
 {
     public override Tag StateTag => Tags.State_Action_WallSlide;
-    public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
-
-    public override Transition[] Transitions =>
-    [
-        new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
-        new(Tags.State_Action_Fall, () => !Host.IsFootColliding()),
-        new(Tags.State_Action_WallJump, () => Host.KeyDownJump())
-    ];
+    public override MultiLayerExecuteArgs ExecuteArgs => new(
+        Tags.StateLayer_Movement,
+        [
+            new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
+            new(Tags.State_Action_Fall, () => !Host.IsFootColliding()),
+            new(Tags.State_Action_WallJump, () => Host.KeyDownJump())
+        ]
+    );
 
 
     protected override void OnEnter()

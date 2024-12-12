@@ -1,12 +1,12 @@
 namespace Miros.Core;
 
-public class ExecutorContext : Context
+public class ExecuteArgs : Context
 {
 }
 
-public class MultiLayerExecutorContext : ExecutorContext
+public class MultiLayerExecuteArgs : ExecuteArgs
 {
-    public MultiLayerExecutorContext(Tag layer, Transition[] transitions)
+    public MultiLayerExecuteArgs(Tag layer, Transition[] transitions)
     {
         Layer = layer;
         Transitions = transitions;

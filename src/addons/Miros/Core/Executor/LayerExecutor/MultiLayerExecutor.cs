@@ -33,7 +33,7 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 
     public override void AddTask(ITask task, Context context)
     {
-        if (context is not MultiLayerExecutorContext fsmContext)
+        if (context is not MultiLayerExecuteArgs fsmContext)
             throw new Exception("Invalid arguments for FSM ");
 
         var stateTask = task as TaskBase;

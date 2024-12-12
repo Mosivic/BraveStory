@@ -3,20 +3,18 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class RunAction : Task<State, Player, PlayerContext>
+public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
 {
     public override Tag StateTag => Tags.State_Action_Run;
-    public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
-
-    public override Transition[] Transitions =>
-    [
-        new(Tags.State_Action_Idle, () => !Host.KeyDownMove()),
-        new(Tags.State_Action_Jump, () => Host.KeyDownJump()),
-        new(Tags.State_Action_Attack1, () => Host.KeyDownAttack()),
-        new(Tags.State_Action_Sliding, () => Host.KeyDownSliding())
-    ];
-
+    public override MultiLayerExecuteArgs ExecuteArgs => new(
+        Tags.StateLayer_Movement,
+        [
+            new(Tags.State_Action_Idle, () => !Host.KeyDownMove()),
+            new(Tags.State_Action_Jump, () => Host.KeyDownJump()),
+            new(Tags.State_Action_Attack1, () => Host.KeyDownAttack()),
+            new(Tags.State_Action_Sliding, () => Host.KeyDownSliding())
+        ]
+    );
 
     protected override void OnEnter()
     {

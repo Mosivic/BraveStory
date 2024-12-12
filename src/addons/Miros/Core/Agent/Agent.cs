@@ -62,34 +62,34 @@ public class Agent
     }
 
 
-    public void AddTasksFromType<TState, THost, TContext>(TContext context, Type[] tasks)
+    public void AddTasksFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] tasks)
         where TState : State, new()
         where THost : Node
         where TContext : Context
+        where TExecuteArgs : ExecuteArgs
     {
 		foreach (var taskType in tasks)
-			AddTaskFromType<TState, THost, TContext>(context, taskType);
+			AddTaskFromType<TState, THost, TContext, TExecuteArgs>(executorType, context, taskType);
     }
 
-
-	public void AddTaskFromType<TState, THost, TContext>(TContext context, Type taskType)
+	
+	public void AddTaskFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type taskType)
 	where TState : State, new()
 	where THost : Node
 	where TContext : Context
+	where TExecuteArgs : ExecuteArgs
 	{
-		var task = (Task<TState, THost, TContext>)Activator.CreateInstance(taskType);
+		var task = (Task<TState, THost, TContext, TExecuteArgs>)Activator.CreateInstance(taskType);
 		task.Init(this, Host as THost, context);
 
-		var executorType = task.ExecutorType;
-		if (task.ExecutorType == ExecutorType.MultiLayerExecutor)
+		if (executorType == ExecutorType.MultiLayerExecutor)
 		{
-			var executor = PushTaskOnExecutor(executorType, task,
-				new MultiLayerExecutorContext(task.LayerTag, task.Transitions));
+			var executor = PushTaskOnExecutor(executorType, task, task.ExecuteArgs);
 
 			_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
 				new StateExecutionContext(task.State, task, executor));
 		}
-		else if (task.ExecutorType == ExecutorType.EffectExecutor)
+		else if (executorType == ExecutorType.EffectExecutor)
 		{
 			var executor = PushTaskOnExecutor(executorType, task);
 
@@ -99,18 +99,25 @@ public class Agent
 	}
     
     
-    public void AddTaskFromState(ExecutorType executorType, State state, ExecutorContext args = null)
+	public void AddTasksFromState(ExecutorType executorType, State[] states)
+	{
+		foreach (var state in states)
+			AddTaskFromState(executorType, state);
+	}
+
+
+    public void AddTaskFromState(ExecutorType executorType, State state, ExecuteArgs args = null)
     {
         state.Owner = this;
 
         var task = TaskCreator.GetTask(state);
-        var executor = PushTaskOnExecutor(executorType, task, args);
+        var executor = PushTaskOnExecutor(executorType, task);
 
         _stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
     }
     
 
-    private IExecutor PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecutorContext args = null)
+    private IExecutor PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
