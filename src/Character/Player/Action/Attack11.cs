@@ -29,7 +29,7 @@ public class Attack11Action : Task<State, Player, PlayerContext>
                 Tag = Tags.Effect_Buff,
                 Source = Agent,
                 DurationPolicy = DurationPolicy.Instant,
-                Executions = [new DamageExecution()]
+                Executions = [new CustomAttackDamageExecution(Agent.Attr("Attack") + 1)]
             };
 
             Context.HitAgent.AddState(ExecutorType.EffectExecutor, damageEffect);
