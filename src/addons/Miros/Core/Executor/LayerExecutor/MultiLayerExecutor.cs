@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Miros.Core;
 
-public class FSM : ExecutorBase<TaskBase>, IExecutor
+namespace Miros.Core;
+
+public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 {
-    private readonly Dictionary<Tag, FSMExecutor> _layers = [];
+    private readonly Dictionary<Tag, LayerExecutor> _layers = [];
     private readonly TransitionContainer _transitionContainer = new();
 
     public override bool HasTaskRunning(ITask task)
@@ -30,22 +31,22 @@ public class FSM : ExecutorBase<TaskBase>, IExecutor
     }
 
 
-    public override void AddTask(ITask task, StateExecuteArgs args)
+    public override void AddTask(ITask task, Context context)
     {
-        if (args is not StateFSMArgs fsmArgs)
+        if (context is not MultiLayerExecutorContext fsmContext)
             throw new Exception("Invalid arguments for FSM ");
         
         var stateTask = task as TaskBase;
-        base.AddTask(stateTask, args);
+        base.AddTask(stateTask, context);
         
-        if (!_layers.ContainsKey(fsmArgs.Layer))
+        if (!_layers.ContainsKey(fsmContext.Layer))
         {
-            _layers[fsmArgs.Layer] = new FSMExecutor(fsmArgs.Layer, _transitionContainer, _tasks);
-            _layers[fsmArgs.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务
+            _layers[fsmContext.Layer] = new LayerExecutor(fsmContext.Layer, _transitionContainer, _tasks);
+            _layers[fsmContext.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务
         }
         
-        if(fsmArgs.Transitions != null)
-            _transitionContainer.AddTransitions(stateTask, fsmArgs.Transitions);
+        if(fsmContext.Transitions != null)
+            _transitionContainer.AddTransitions(stateTask, fsmContext.Transitions);
     }
 
     public void RemoveTask(TaskBase task)

@@ -5,6 +5,7 @@ namespace Miros.Core;
 
 public class TaskBuff(Buff buff) : TaskBase(buff)
 {
+    
     public override void Enter()
     {
         if (buff.DurationPolicy == DurationPolicy.Instant)

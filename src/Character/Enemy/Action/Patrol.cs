@@ -3,12 +3,12 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class PatrolEnemyAction : Stator<State, Enemy,EnemyShared>
+public partial class PatrolEnemyAction : Task<State, Enemy,EnemyContext>
 {
     // FIXME：Walk 和 Patrol 是同一个状态，需要合并
     public override Tag StateTag => Tags.State_Action_Walk;
     public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
     
     public override Transition[] Transitions => [
         new (Tags.State_Action_Idle, () =>
@@ -17,12 +17,12 @@ public partial class PatrolEnemyAction : Stator<State, Enemy,EnemyShared>
         new (Tags.State_Action_Run, () => Host.IsPlayerColliding())
     ];
 
-    protected override void Enter()
+    protected override void OnEnter()
     {
         Host.PlayAnimation("walk");
     }
 
-    protected override void PhysicsUpdate(double delta)
+    protected override void OnPhysicsUpdate(double delta)
     {
         Patrol(delta);
     }

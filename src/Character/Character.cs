@@ -1,52 +1,35 @@
 using System;
-using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Godot;
 using Miros.Core;
 
 namespace BraveStory;
 
-
-public class CharacterShared : Shared
+public class CharacterContext : Context
 {
     public bool IsHit { get; set; } = false;
     public bool IsHurt { get; set; } = false;
-    public AgentorBase HitAgentor { get; set; }
+    public Agent HitAgent { get; set; }
 }
 
-public interface IGetAgentor 
+public partial class Character : CharacterBody2D
 {
-    TAgentor GetAgent<TAgentor>() where TAgentor : AgentorBase, new();
-}
+    protected Agent Agent = new();
+    protected CharacterContext Context;
 
-public partial class Character<TAgentor, TShared,TAttributeSet> : CharacterBody2D,IGetAgentor
-where TAgentor : AgentorBase,new()
-where TShared : CharacterShared, new()
-where TAttributeSet : AttributeSet,new()
-{
     protected AnimationPlayer AnimationPlayer;
-    public Node2D Graphics;
-    protected bool Hurt;
+    public Node2D Graphics { get; private set; }
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
-    public StatsPanel StatusPanel;
+
     
-    protected TAgentor Agentor;
-    protected TShared Shared;
-
-    public TAgentor GetAgent<TAgentor>() where TAgentor : AgentorBase, new()
-    {
-        return Agentor as TAgentor;
-    }
-
     public override void _Ready()
     {
-        // 获取功能子节点
         Graphics = GetNode<Node2D>("Graphics");
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        StatusPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
-        
+
         // 处理击中事件 
         HitBox = Graphics.GetNode<HitBox>("HitBox");
         HitBox.OnHit += HandleHit;
@@ -55,13 +38,9 @@ where TAttributeSet : AttributeSet,new()
         HurtBox = Graphics.GetNode<HurtBox>("HurtBox");
         HurtBox.OnHurt += HandleHurt;
 
-        // 初始化 Agentor
-        Shared = new TShared();
-        Agentor = new TAgentor();
-        Agentor.Initialize<Character<TAgentor, TShared, TAttributeSet>,TAttributeSet>(this);
-
         // 处理伤害事件
-        Agentor.Throttle<DamageSlice>("Damage", CreateDamageNumber);
+        Agent.Init(this);
+        Agent.EventStream.Throttle<DamageSlice>("Damage", HandleDamage);
     }
 
 
@@ -72,18 +51,22 @@ where TAttributeSet : AttributeSet,new()
         if (HurtBox != null)
             HurtBox.OnHurt -= HandleHurt;
 
-        Agentor.Unthrottle<DamageSlice>("Damage", CreateDamageNumber);
+        Agent.EventStream.Unthrottle<DamageSlice>("Damage", HandleDamage);
 
         base._ExitTree();
     }
-
+    
+    public string GetCurrentAnimation()
+    {
+        return AnimationPlayer.GetCurrentAnimation();
+    }
 
     public bool IsAnimationFinished()
     {
         return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
     }
 
-    private void CreateDamageNumber(object sender, DamageSlice e)
+    private void HandleDamage(object sender, DamageSlice e)
     {
         var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
         var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
@@ -98,31 +81,26 @@ where TAttributeSet : AttributeSet,new()
         AnimationPlayer.Play(animationName);
     }
 
-    public string GetCurrentAnimation()
-    {
-        return AnimationPlayer.CurrentAnimation;
-    }
-
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
-        Shared.IsHurt = true;
+        Context.IsHurt = true;
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
     {
-        Shared.IsHit = true;
-        // FIXME:
-        Shared.HitAgentor = (e.HurtBox.Owner as IGetAgentor).GetAgent<TAgentor>();
+        Context.IsHit = true;
+        Context.HitAgent = (e.HurtBox.Owner as Character).Agent;
     }
 
     public override void _Process(double delta)
     {
-        Agentor.Process(delta);
+        Agent.Process(delta);
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        Agentor.PhysicsProcess(delta);
+        Agent.PhysicsProcess(delta);
     }
+    
+    
 }
-

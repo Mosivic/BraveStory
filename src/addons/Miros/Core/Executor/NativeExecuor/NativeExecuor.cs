@@ -8,7 +8,7 @@ public class ConditionMachine : ExecutorBase<TaskBase>
     protected readonly Dictionary<Tag, List<TaskBase>> RunningTasks = new();
     protected Dictionary<Tag, List<TaskBase>> WaitingTasks { get; set; } = new();
 
-    public override void AddTask(ITask task,StateExecuteArgs args=null)
+    public override void AddTask(ITask task, Context context)
     {
         var conditionTask = task as TaskBase;
         var layer = conditionTask.Tag;

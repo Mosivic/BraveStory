@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class FSMExecutor
+public class LayerExecutor
 {
     public Tag Layer { get; }
     private TaskBase _defaultTask;
@@ -15,7 +15,7 @@ public class FSMExecutor
     private TaskBase _delayTask;
     private TaskBase _lastTask;
 
-    public FSMExecutor(Tag layerTag,
+    public LayerExecutor(Tag layerTag,
         TransitionContainer transitionContainer, Dictionary<Tag, TaskBase> tasks)
     {
         Layer = layerTag;

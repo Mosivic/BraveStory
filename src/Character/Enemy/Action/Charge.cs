@@ -3,35 +3,30 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class ChargeEnemyAction : Stator<State, Enemy,EnemyShared>
+public partial class ChargeEnemyAction : Task<State, Enemy,EnemyContext>
 {
     // FIXME：Charge 和 Run 是同一个状态，需要合并
     public override Tag StateTag => Tags.State_Action_Run;
     public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
 
     public override Transition[] Transitions => [
-        new (Tags.State_Action_Idle, () => Shared.ChargeTimer >= Shared.ChargeDuration),
-        new (Tags.State_Action_Stun, () => Shared.IsStunned)
+        new (Tags.State_Action_Idle, () => Context.ChargeTimer >= Context.ChargeDuration),
+        new (Tags.State_Action_Stun, () => Context.IsStunned)
     ];
 
-    [Export]
-    private float _chargeDuration = 0.5f;
-    private float _chargeTimer;
-    private bool _isCharging;
-
-    protected override void Enter()
+    protected override void OnEnter()
     {
         Host.PlayAnimation("run");
-        Shared.ChargeTimer = 0f;
-        Shared.IsCharging = true;
+        Context.ChargeTimer = 0f;
+        Context.IsCharging = true;
     }
 
-    protected override void PhysicsUpdate(double delta)
+    protected override void OnPhysicsUpdate(double delta)
     {
         Charge(delta);
 
-        if(Shared.IsHit && Shared.HitAgentor != null)
+        if(Context.IsHit && Context.HitAgent != null)
         {
             var damageEffect = new Effect()
             {
@@ -41,26 +36,26 @@ public partial class ChargeEnemyAction : Stator<State, Enemy,EnemyShared>
                 Executions = [new DamageExecution()]
             };
 
-            Shared.HitAgentor.AddState(ExecutorType.EffectExecutor, damageEffect);
-            Shared.IsHit = false;
+            Context.HitAgent.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Context.IsHit = false;
         }
     }
 
-    protected override void Exit()
+    protected override void OnExit()
     {
-        Shared.IsCharging = false;
-        Shared.ChargeTimer = 0f;
+        Context.IsCharging = false;
+        Context.ChargeTimer = 0f;
     }
 
     private void Charge(double delta)
     {
         // 更新冲刺计时器
-        _chargeTimer += (float)delta;
+        Context.ChargeTimer += (float)delta;
 
         // 检查是否撞墙
         if (Host.IsWallColliding())
         {
-            Shared.IsStunned = true;
+            Context.IsStunned = true;
             return;
         }
 
@@ -69,9 +64,9 @@ public partial class ChargeEnemyAction : Stator<State, Enemy,EnemyShared>
 
         // 在冲刺即将结束时减速
         float slowdownThreshold = 0.3f; // 最后0.3秒开始减速
-        if (_chargeTimer >= _chargeDuration - slowdownThreshold)
+        if (Context.ChargeTimer >= Context.ChargeDuration - slowdownThreshold)
         {
-            float slowdownFactor = 1.0f - ((_chargeTimer - (_chargeDuration - slowdownThreshold)) / slowdownThreshold);
+            float slowdownFactor = 1.0f - ((Context.ChargeTimer - (Context.ChargeDuration - slowdownThreshold)) / slowdownThreshold);
             velocity.X *= slowdownFactor;
         }
 

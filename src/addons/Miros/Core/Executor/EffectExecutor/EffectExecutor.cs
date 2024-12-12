@@ -83,7 +83,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
-    public override void AddTask(ITask task, StateExecuteArgs args = null)
+    public override void AddTask(ITask task, Context context)
     {
         var effectTask = (EffectTask)task;
         var isAddTask = true;
@@ -106,7 +106,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                     existingTask.Stack();
             }
 
-        if (isAddTask) base.AddTask(task);
+        if (isAddTask) base.AddTask(task, context);
     }
 
     #region Event

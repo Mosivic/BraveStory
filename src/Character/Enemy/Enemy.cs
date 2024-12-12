@@ -3,7 +3,7 @@ using BraveStory;
 using Godot;
 using Miros.Core;
 
-public class EnemyShared : CharacterShared
+public class EnemyContext : CharacterContext
 {
     public float KnockbackVelocity{get;set;} = 50.0f;
     public bool IsStunned{get;set;} = false;
@@ -14,29 +14,37 @@ public class EnemyShared : CharacterShared
     public bool IsCharging{get;set;} = false;      // 是否正在冲刺
 }
 
-public partial class Enemy : Character<EnemyAgentor, EnemyShared,BoarAttributeSet>
+public partial class Enemy : Character
 {
     private RayCast2D _floorChecker;
     private RayCast2D _playerChecker;
     private RayCast2D _wallChecker;
+    protected StatsPanel StatsPanel;
 
 
-    public override void _Ready()
+    public override void _Ready()   
     {
         base._Ready();
         // Components
         _wallChecker = GetNode<RayCast2D>("Graphics/WallChecker");
         _floorChecker = GetNode<RayCast2D>("Graphics/FloorChecker");
         _playerChecker = GetNode<RayCast2D>("Graphics/PlayerChecker");
+        StatsPanel = GetNode<StatsPanel>("StatusPanel");
 
-        
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
+        Context = new EnemyContext();
+
         // 初始化 Agentor
-        Agentor.BindStators(this,Shared, [
+        Agent.SetAttributeSet(typeof(BoarAttributeSet));
+        Agent.AddTasksFromType<State,Enemy,EnemyContext>(this,Context as EnemyContext, [
             typeof(IdleEnemyAction), typeof(PatrolEnemyAction), typeof(DieEnemyAction), 
-            typeof(ChargeEnemyAction), typeof(HitEnemyAction), typeof(StunEnemyAction)]);        
+            typeof(ChargeEnemyAction), typeof(HitEnemyAction), typeof(StunEnemyAction)]);     
+
+        var hp = Agent.GetAttributeBase("HP");
+        hp.SetMaxValue(hp.CurrentValue);
+        hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);   
 
         // State Info Display
         // GetNode<StateInfoDisplay>("StateInfoDisplay").Setup(_connect, Tags.LayerMovement);

@@ -3,11 +3,11 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class RunAction : Stator<State, Player,PlayerShared>
+public class RunAction : Task<State, Player,PlayerContext>
 {
     public override Tag StateTag  => Tags.State_Action_Run;
     public override Tag LayerTag => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
     public override Transition[] Transitions  => [
             new (Tags.State_Action_Idle, () => !Host.KeyDownMove()),
             new (Tags.State_Action_Jump, () => Host.KeyDownJump()),
@@ -16,12 +16,12 @@ public class RunAction : Stator<State, Player,PlayerShared>
         ];
 
 
-    protected override void Enter()
+    protected override void OnEnter()
     {
         Host.PlayAnimation("run");
     }
 
-    protected override void PhysicsUpdate(double delta)
+    protected override void OnPhysicsUpdate(double delta)
     {
         Move(delta);
     }

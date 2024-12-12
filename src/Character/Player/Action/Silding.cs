@@ -3,21 +3,21 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class SlidingAction : Stator<State, Player,PlayerShared>
+public class SlidingAction : Task<State, Player,PlayerContext>
 {
     public override Tag StateTag  => Tags.State_Action_Sliding;
     public override Tag LayerTag  => Tags.StateLayer_Movement;
-    public override ExecutorType ExecutorType => ExecutorType.MultiLayerStateMachine;
+    public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
     public override Transition[] Transitions  => [
             new (Tags.State_Action_Idle, () => Host.IsAnimationFinished()),
         ];
 
-    protected override void Enter()
+    protected override void OnEnter()
     {
         Host.PlayAnimation("sliding_start");
     }
 
-    protected override void PhysicsUpdate(double delta)
+    protected override void OnPhysicsUpdate(double delta)
     {
         if (Host.GetCurrentAnimation() == "sliding_start" && Host.IsAnimationFinished())
             Host.PlayAnimation("sliding_loop");
@@ -26,7 +26,7 @@ public class SlidingAction : Stator<State, Player,PlayerShared>
         Slide(delta);
     }
 
-    protected override void Exit()
+    protected override void OnExit()
     {
         Host.SetHurtBoxMonitorable(true);
     }

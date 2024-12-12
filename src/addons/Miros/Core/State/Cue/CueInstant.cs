@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public abstract class CueInstant() : Cue()
+public abstract class CueInstant : Cue
 {
     // public override Cue ApplyFrom(Effect effect)
     // {

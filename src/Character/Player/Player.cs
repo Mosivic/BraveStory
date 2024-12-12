@@ -6,40 +6,21 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class PlayerShared : CharacterShared
+public partial class PlayerContext : CharacterContext
 {
 	public float KnockbackVelocity { get; set; } = 50.0f;
 	public int JumpCount { get; set; } = 0;
 	public int MaxJumpCount { get; set; } = 2;
 }
 
-public partial class Player : Character<PlayerAgentor, PlayerShared,PlayerAttributeSet>
+public partial class Player : Character
 {
 	private AnimatedSprite2D _animatedSprite;
 	private RayCast2D _footChecker;
 	private RayCast2D _handChecker;
-
+	protected StatsPanel StatsPanel;
 	public HashSet<Interactable> Interactions { get; set; } = new();
 
-	public bool IsFootColliding() => _footChecker.IsColliding();
-
-	public bool IsHandColliding() => _handChecker.IsColliding();
-
-
-	public void ClearInteractions()
-	{
-		Interactions.Clear();
-	}
-
-	public void SetHitBoxMonitorable(bool monitorable)
-	{
-		HitBox.SetDeferred("monitorable", monitorable);
-	}
-
-	public void SetHurtBoxMonitorable(bool monitorable)
-	{
-		HurtBox.SetDeferred("monitorable", monitorable);
-	}
 
 	public override void _Ready()
 	{
@@ -48,13 +29,21 @@ public partial class Player : Character<PlayerAgentor, PlayerShared,PlayerAttrib
 		_handChecker = GetNode<RayCast2D>("Graphics/HandChecker");
 		_footChecker = GetNode<RayCast2D>("Graphics/FootChecker");
 		_animatedSprite = GetNode<AnimatedSprite2D>("InteractionIcon");
+		StatsPanel = GetNode<StatsPanel>("CanvasLayer/StatusPanel");
 
+		Context = new PlayerContext();
 
-		Agentor.BindStators(this,Shared, [
+		Agent.SetAttributeSet(typeof(PlayerAttributeSet));
+		Agent.AddTasksFromType<State,Player,PlayerContext>(this,Context as PlayerContext, [
 			typeof(IdleAction), typeof(JumpAction), typeof(DoubleJumpAction), 
 			typeof(DieAction), typeof(FallAction), typeof(HitAction), 
 			typeof(RunAction), typeof(SlidingAction), typeof(WallJumpAction), typeof(WallSlideAction),
 			typeof(Attack1Action), typeof(Attack11Action), typeof(Attack111Action)]);
+
+
+        var hp = Agent.GetAttributeBase("HP");
+        hp.SetMaxValue(hp.CurrentValue);
+        hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);
 
 		// Canvas Layer
 		var canvasLayer = new CanvasLayer();
@@ -94,6 +83,26 @@ public partial class Player : Character<PlayerAgentor, PlayerShared,PlayerAttrib
 		else if (!Mathf.IsZeroApprox(Velocity.X)) Graphics.Scale = new Vector2(Velocity.X < 0 ? -1 : 1, 1);
 	}
 
+
+	public bool IsFootColliding() => _footChecker.IsColliding();
+
+	public bool IsHandColliding() => _handChecker.IsColliding();
+
+
+	public void ClearInteractions()
+	{
+		Interactions.Clear();
+	}
+
+	public void SetHitBoxMonitorable(bool monitorable)
+	{
+		HitBox.SetDeferred("monitorable", monitorable);
+	}
+
+	public void SetHurtBoxMonitorable(bool monitorable)
+	{
+		HurtBox.SetDeferred("monitorable", monitorable);
+	}
 	public bool KeyDownMove()
 	{
 		return !Mathf.IsZeroApprox(Input.GetAxis("move_left", "move_right"));
