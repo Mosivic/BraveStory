@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Miros.Core;
 
 public class HurtEventArgs : EventArgs
 {

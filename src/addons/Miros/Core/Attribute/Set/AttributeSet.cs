@@ -43,6 +43,7 @@ public abstract class AttributeSet
                 attribute = attr;
                 return true;
             }
+
         attribute = null;
         return false;
     }

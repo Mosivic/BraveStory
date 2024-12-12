@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
 
 namespace Miros.Core;
 
@@ -18,12 +17,13 @@ public class AttributeSetContainer(Agent owner)
 
     private readonly Dictionary<AttributeBase, AttributeAggregator> _attributeAggregators = [];
 
-    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
-
     private readonly Dictionary<string, AttributeBase> _attributes = []; // Lazy load attribute base
 
+    public Dictionary<Tag, AttributeSet> Sets { get; } = [];
 
-#region AttributeBase Access
+
+    #region AttributeBase Access
+
     public float Attribute(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
     {
         if (_attributes.TryGetValue(attrName, out var attr))
@@ -35,21 +35,37 @@ public class AttributeSetContainer(Agent owner)
                 AttributeValueType.MaxValue => attr.MaxValue,
                 _ => throw new ArgumentException($"Invalid attribute value type: {valueType}")
             };
-        else
+        if (TryGetAttributeBase(attrName, out attr))
         {
-            if (TryGetAttributeBase(attrName, out attr))
-            {
-                _attributes.Add(attrName, attr);
-                return Attribute(attrName, valueType);
-            }
+            _attributes.Add(attrName, attr);
+            return Attribute(attrName, valueType);
         }
 
         throw new Exception($"Attribute {attrName} not found");
     }
-#endregion
+
+    #endregion
+
+    #region Tool Methods
+
+    public Dictionary<Tag, float> Snapshot()
+    {
+        Dictionary<Tag, float> snapshot = [];
+        foreach (var attributeSet in Sets)
+        foreach (var tag in attributeSet.Value.AttributeTags)
+        {
+            var attr = attributeSet.Value.GetAttributeBase(tag);
+            snapshot.Add(tag, attr.CurrentValue);
+        }
+
+        return snapshot;
+    }
+
+    #endregion
 
 
     #region AttributeSet Management
+
     public void AddAttributeSet<T>() where T : AttributeSet
     {
         AddAttributeSet(typeof(T));
@@ -92,6 +108,7 @@ public class AttributeSetContainer(Agent owner)
     #endregion
 
     #region AttributeSet Access
+
     public bool TryGetAttributeSet<T>(out T attributeSet) where T : AttributeSet
     {
         if (Sets.TryGetValue(AttributeSetTypeMap[typeof(T)], out var set))
@@ -139,6 +156,7 @@ public class AttributeSetContainer(Agent owner)
     #endregion
 
     #region AttributeBase Access
+
     public bool TryGetAttributeBase(Tag attrSetTag, Tag attrTag, out AttributeBase attr)
     {
         if (Sets.TryGetValue(attrSetTag, out var set))
@@ -163,21 +181,6 @@ public class AttributeSetContainer(Agent owner)
         return false;
     }
 
-    #endregion
-
-    #region Tool Methods
-    public Dictionary<Tag, float> Snapshot()
-    {
-        Dictionary<Tag, float> snapshot = [];
-        foreach (var attributeSet in Sets)
-            foreach (var tag in attributeSet.Value.AttributeTags)
-            {
-                var attr = attributeSet.Value.GetAttributeBase(tag);
-                snapshot.Add(tag, attr.CurrentValue);
-            }
-
-        return snapshot;
-    }
     #endregion
 
     /// <summary>

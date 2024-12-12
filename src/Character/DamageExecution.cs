@@ -1,4 +1,3 @@
-using Godot;
 using Miros.Core;
 
 namespace BraveStory;
@@ -7,7 +6,6 @@ public class DamageSlice(float damage) : EventStreamArgs("Damage")
 {
     public float Damage { get; } = damage;
 }
-
 
 public class DamageExecution : Execution
 {
@@ -37,5 +35,4 @@ public class DamageExecution : Execution
             TargetHP = effect.Owner.Attr("HP");
         }
     }
-
 }

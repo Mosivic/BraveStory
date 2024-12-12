@@ -20,9 +20,7 @@ public class EventStream
     public void Throttle<T>(string eventStreamSliceName, EventHandler<T> handler) where T : EventStreamArgs
     {
         if (!_eventHandlers.ContainsKey(eventStreamSliceName))
-        {
             _eventHandlers[eventStreamSliceName] = new List<Delegate>();
-        }
         _eventHandlers[eventStreamSliceName].Add(handler);
     }
 
@@ -38,41 +36,30 @@ public class EventStream
         if (_eventHandlers.ContainsKey(eventStreamSliceName))
         {
             _eventHandlers[eventStreamSliceName].Remove(handler);
-            if (_eventHandlers[eventStreamSliceName].Count == 0)
-            {
-                _eventHandlers.Remove(eventStreamSliceName);
-            }
+            if (_eventHandlers[eventStreamSliceName].Count == 0) _eventHandlers.Remove(eventStreamSliceName);
         }
     }
 
     // 发布无参数事件
     public void Push(string eventStreamSliceName)
     {
-        Push<EventStreamArgs>(eventStreamSliceName, new EventStreamArgs(eventStreamSliceName));
+        Push(eventStreamSliceName, new EventStreamArgs(eventStreamSliceName));
     }
 
     // 发布带参数事件
     public void Push<T>(string eventStreamSliceName, T args) where T : EventStreamArgs
     {
-        if (!_eventHandlers.ContainsKey(eventStreamSliceName))
-        {
-            return;
-        }
+        if (!_eventHandlers.ContainsKey(eventStreamSliceName)) return;
 
         foreach (var handler in _eventHandlers[eventStreamSliceName].ToArray())
-        {
             try
             {
-                if (handler is EventHandler<T> typedHandler)
-                {
-                    typedHandler(this, args);
-                }
+                if (handler is EventHandler<T> typedHandler) typedHandler(this, args);
             }
             catch (Exception e)
             {
                 GD.PrintErr($"Error handling event {eventStreamSliceName}: {e}");
             }
-        }
     }
 
     // 清除所有事件订阅

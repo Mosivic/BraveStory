@@ -6,12 +6,11 @@ namespace Miros.Core;
 
 public class LayerExecutor
 {
-    public Tag Layer { get; }
-    private TaskBase _defaultTask;
-    private readonly TransitionContainer _transitionContainer;
     private readonly Dictionary<Tag, TaskBase> _tasks = [];
+    private readonly TransitionContainer _transitionContainer;
     private double _currentStateTime;
     private TaskBase _currentTask;
+    private TaskBase _defaultTask;
     private TaskBase _delayTask;
     private TaskBase _lastTask;
 
@@ -23,6 +22,8 @@ public class LayerExecutor
         _transitionContainer = transitionContainer;
         _tasks = tasks;
     }
+
+    public Tag Layer { get; }
 
 
     public void SetDefaultTask(TaskBase task)
@@ -68,20 +69,19 @@ public class LayerExecutor
             .ToArray();
 
         if (sortedTransitions.Length == 0) return; // 没有可转换的状态
-        
+
         foreach (var t in sortedTransitions)
         {
-            TaskBase task = _tasks[t.To];
+            var task = _tasks[t.To];
             if (t.Mode switch
+                {
+                    TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() && task.CanEnter(),
+                    TransitionMode.Force => t.CanTransition() && task.CanEnter(),
+                    TransitionMode.DelayFront => t.CanTransition() && task.CanEnter(),
+                    TransitionMode.DelayBackend => t.CanTransition() && _currentTask.CanExit(),
+                    _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
+                })
             {
-                TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() && task.CanEnter(),
-                TransitionMode.Force => t.CanTransition() && task.CanEnter(),
-                TransitionMode.DelayFront => t.CanTransition() && task.CanEnter(),
-                TransitionMode.DelayBackend => t.CanTransition() && _currentTask.CanExit(),
-                _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
-            })
-            {
-
                 if (t.Mode == TransitionMode.DelayFront)
                 {
                     _delayTask = task;

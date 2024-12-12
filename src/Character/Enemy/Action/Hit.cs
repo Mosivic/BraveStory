@@ -1,18 +1,18 @@
-
 using Godot;
 using Miros.Core;
 
 namespace BraveStory;
 
-public  class HitEnemyAction : Task<State, Enemy,EnemyContext>
+public class HitEnemyAction : Task<State, Enemy, EnemyContext>
 {
     public override Tag StateTag => Tags.State_Action_Hit;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
 
-    public override Transition[] Transitions => [
-        new (Tags.State_Action_Idle, Host.IsAnimationFinished),
-        new (Tags.State_Action_Hit, () => Context.IsHurt,TransitionMode.Force,0,true)
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Idle, Host.IsAnimationFinished),
+        new(Tags.State_Action_Hit, () => Context.IsHurt, TransitionMode.Force, 0, true)
     ];
 
 
@@ -38,7 +38,7 @@ public  class HitEnemyAction : Task<State, Enemy,EnemyContext>
         // 逐渐减弱击退效果
         Context.KnockbackVelocity *= 0.8f;
         Host.Velocity = velocity;
-        Host.MoveAndSlide();        
+        Host.MoveAndSlide();
     }
 
     protected override void OnExit()

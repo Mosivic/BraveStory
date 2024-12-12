@@ -2,16 +2,18 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class Attack11Action : Task<State, Player,PlayerContext>
+public class Attack11Action : Task<State, Player, PlayerContext>
 {
-    public override Tag StateTag  => Tags.State_Action_Attack11;
+    public override Tag StateTag => Tags.State_Action_Attack11;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
-    public override Transition[] Transitions  => [
-            new (Tags.State_Action_Idle),
-            new (Tags.State_Action_Attack11,() => Host.KeyDownAttack(), TransitionMode.DelayFront),
-        ];
-    
+
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Idle),
+        new(Tags.State_Action_Attack11, () => Host.KeyDownAttack(), TransitionMode.DelayFront)
+    ];
+
 
     protected override void OnEnter()
     {
@@ -20,9 +22,9 @@ public class Attack11Action : Task<State, Player,PlayerContext>
 
     protected override void OnPhysicsUpdate(double delta)
     {
-        if(Context.IsHit && Context.HitAgent != null)
+        if (Context.IsHit && Context.HitAgent != null)
         {
-            var damageEffect = new Effect()
+            var damageEffect = new Effect
             {
                 Tag = Tags.Effect_Buff,
                 Source = Agent,

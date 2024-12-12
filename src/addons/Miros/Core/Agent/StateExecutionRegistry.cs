@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public struct StateExecutionContext(State state, TaskBase task, IExecutor executor) 
+public struct StateExecutionContext(State state, TaskBase task, IExecutor executor)
 {
     public State State { get; } = state;
     public TaskBase Task { get; } = task;

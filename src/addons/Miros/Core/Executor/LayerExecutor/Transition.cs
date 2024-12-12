@@ -10,7 +10,8 @@ public struct Transition
     public bool IsAny { get; } = false;
     public int Priority { get; }
 
-    public Transition(Tag to, Func<bool> condition = null, TransitionMode mode = TransitionMode.Normal, int priority = 0, bool isAny = false)
+    public Transition(Tag to, Func<bool> condition = null, TransitionMode mode = TransitionMode.Normal,
+        int priority = 0, bool isAny = false)
     {
         To = to;
         Condition = condition;

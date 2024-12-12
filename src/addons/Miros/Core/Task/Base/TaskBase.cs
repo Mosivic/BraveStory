@@ -2,7 +2,6 @@
 
 public class TaskBase(State state) : AbsTask(state), ITask
 {
-
     public virtual void Enter()
     {
         State.Status = RunningStatus.Running;

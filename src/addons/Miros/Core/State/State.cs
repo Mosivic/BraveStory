@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Miros.Core;
 
 public class State
 {
-    public Tag Tag { get; init; }
+    public Tag Tag { get; set; }
     public virtual Type Type => typeof(TaskBase);
     public int Priority { get; set; } = 0;
     public Agent Owner { get; set; }
-    public Agent Source { get; init; }
+    public Agent Source { get; set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.NoRun;
     public bool IsActive => Status == RunningStatus.Running;
     public double RunningTime { get; set; } = 0;
-    
+
     public Func<State, bool> EnterCondition { get; set; }
     public Func<State, bool> ExitCondition { get; set; }
     public Action<State> EnterFunc { get; set; }
@@ -29,5 +28,4 @@ public class State
     public Action<State> PeriodOverFunc { get; set; }
     public Action<State, double> UpdateFunc { get; set; }
     public Action<State, double> PhysicsUpdateFunc { get; set; }
-    
 }

@@ -35,17 +35,17 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
     {
         if (context is not MultiLayerExecutorContext fsmContext)
             throw new Exception("Invalid arguments for FSM ");
-        
+
         var stateTask = task as TaskBase;
         base.AddTask(stateTask, context);
-        
+
         if (!_layers.ContainsKey(fsmContext.Layer))
         {
             _layers[fsmContext.Layer] = new LayerExecutor(fsmContext.Layer, _transitionContainer, _tasks);
             _layers[fsmContext.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务
         }
-        
-        if(fsmContext.Transitions != null)
+
+        if (fsmContext.Transitions != null)
             _transitionContainer.AddTransitions(stateTask, fsmContext.Transitions);
     }
 

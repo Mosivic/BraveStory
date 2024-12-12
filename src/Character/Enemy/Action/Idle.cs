@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public partial class IdleEnemyAction : Task<State, Enemy,EnemyContext>
+public class IdleEnemyAction : Task<State, Enemy, EnemyContext>
 {
     public override Tag StateTag => Tags.State_Action_Idle;
 
@@ -10,9 +10,10 @@ public partial class IdleEnemyAction : Task<State, Enemy,EnemyContext>
 
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
 
-    public override Transition[] Transitions => [
-        new (Tags.State_Action_Walk, () => !Host.IsPlayerColliding()),
-        new (Tags.State_Action_Run, () => Host.IsPlayerColliding())
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Walk, () => !Host.IsPlayerColliding()),
+        new(Tags.State_Action_Run, () => Host.IsPlayerColliding())
     ];
 
     protected override void OnEnter()
@@ -20,4 +21,3 @@ public partial class IdleEnemyAction : Task<State, Enemy,EnemyContext>
         Host.PlayAnimation("idle");
     }
 }
-

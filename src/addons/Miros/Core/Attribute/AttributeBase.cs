@@ -9,9 +9,6 @@ namespace Miros.Core;
 
 public class AttributeBase
 {
-    public Tag AttributeSetTag { get; private set; }
-
-    public Tag AttributeTag { get; }
     private AttributeValue _value;
     protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners; // 基础值变化前的事件监听器
 
@@ -23,6 +20,10 @@ public class AttributeBase
         AttributeTag = tag;
         _value = new AttributeValue(value, calculateMode, supportedOperation, minValue, maxValue);
     }
+
+    public Tag AttributeSetTag { get; private set; }
+
+    public Tag AttributeTag { get; }
 
     public Agent Owner { get; private set; }
 

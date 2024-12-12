@@ -3,14 +3,16 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class JumpAction : Task<State, Player,PlayerContext>
+public class JumpAction : Task<State, Player, PlayerContext>
 {
-    public override Tag StateTag  => Tags.State_Action_Jump;
+    public override Tag StateTag => Tags.State_Action_Jump;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
-    public override Transition[] Transitions  => [
-            new (Tags.State_Action_Fall),
-        ];
+
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Fall)
+    ];
 
 
     protected override void OnEnter()
@@ -20,4 +22,3 @@ public class JumpAction : Task<State, Player,PlayerContext>
         Context.JumpCount++;
     }
 }
-
