@@ -92,4 +92,16 @@ public partial class Character : CharacterBody2D
         Context.IsHit = true;
         Context.HitAgent = (e.HurtBox.Owner as Character).Agent;
     }
+
+    public override void _Process(double delta)
+    {
+        Agent.Process(delta);
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        Agent.PhysicsProcess(delta);
+    }
+    
+    
 }
