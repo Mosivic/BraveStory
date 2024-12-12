@@ -1,16 +1,12 @@
 ﻿namespace Miros.Core;
 
-public class TaskBase(State state) : AbsTask(state), ITask
+public class TaskBase : AbsTask, ITask
 {
-    private readonly State state = state;
 
-
-    public virtual void Enter()
+      public virtual void Enter()
     {
         state.Status = RunningStatus.Running;
         state.RunningTime = 0;
-
-        foreach (var component in state.Components.Values) component.Activate(this);
 
         OnEnter();
     }
@@ -22,8 +18,6 @@ public class TaskBase(State state) : AbsTask(state), ITask
             Succeed();
         else
             Failed();
-
-        foreach (var component in state.Components.Values) component.Deactivate(this);
 
         OnExit();
     }
@@ -66,13 +60,6 @@ public class TaskBase(State state) : AbsTask(state), ITask
     {
         OnPhysicsUpdate(delta);
     }
-
-
-    public T GetComponent<T>() where T : class
-    {
-        return state.Components.TryGetValue(typeof(T), out var component) ? component as T : null;
-    }
-
 
     protected virtual void Succeed()
     {

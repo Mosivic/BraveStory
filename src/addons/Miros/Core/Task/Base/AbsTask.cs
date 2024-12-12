@@ -3,8 +3,14 @@
 namespace Miros.Core;
 // 对自定义回调函数的处理
 
-public abstract class AbsTask(State state)
+public abstract class AbsTask
 {
+
+    protected State state { get; private set; }
+    public void SetState(State state)
+    {
+        this.state = state;
+    }
     public Tag Tag => state.Tag;
     public int Priority => state.Priority;
     public bool IsActive => state.IsActive;
@@ -22,52 +28,52 @@ public abstract class AbsTask(State state)
     public event Func<State, bool> ExitCondition;
 
 
-    protected void OnEnter()
+    protected virtual void OnEnter()
     {
         OnEntered?.Invoke(state);
     }
 
-    protected void OnExit()
+    protected virtual void OnExit()
     {
         OnExited?.Invoke(state);
     }
 
-    protected void OnDeactivate()
+    protected virtual void OnDeactivate()
     {
         OnPaused?.Invoke(state);
     }
 
-    protected void OnActivate()
+    protected virtual void OnActivate()
     {
         OnResumed?.Invoke(state);
     }
 
-    protected void OnUpdate(double delta)
+    protected virtual void OnUpdate(double delta)
     {
         OnUpdated?.Invoke(state, delta);
     }
 
-    protected void OnPhysicsUpdate(double delta)
+    protected virtual void OnPhysicsUpdate(double delta)
     {
         OnPhysicsUpdated?.Invoke(state, delta);
     }
 
-    protected void OnSucceed()
+    protected virtual void OnSucceed()
     {
         OnSucceeded?.Invoke(state);
     }
 
-    protected void OnFail()
+    protected virtual void OnFail()
     {
         OnFailed?.Invoke(state);
     }
 
-    protected bool OnCanEnter()
+    protected virtual bool OnCanEnter()
     {
         return EnterCondition?.Invoke(state) ?? true;
     }
 
-    protected bool OnCanExit()
+    protected virtual bool OnCanExit()
     {
         return ExitCondition?.Invoke(state) ?? true;
     }

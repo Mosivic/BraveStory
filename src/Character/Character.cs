@@ -3,6 +3,13 @@ using Miros.Core;
 
 namespace BraveStory;
 
+public class CharacterContext : Context
+{
+    public bool IsHit { get; set; } = false;
+    public bool IsHurt { get; set; } = false;
+    public Agent HitAgent { get; set; }
+}
+
 public partial class Character : CharacterBody2D
 {
     protected Agent Agent;
@@ -68,7 +75,7 @@ public partial class Character : CharacterBody2D
         damageNumber.SetDamage((int)e.Damage); 
     }
 
-    protected void PlayAnimation(string animationName)
+    public void PlayAnimation(string animationName)
     {
         AnimationPlayer.Play("RESET");
         AnimationPlayer.Play(animationName);
