@@ -11,7 +11,7 @@ public class Attack11Action : Task<State, Player, PlayerContext>
     public override Transition[] Transitions =>
     [
         new(Tags.State_Action_Idle),
-        new(Tags.State_Action_Attack11, () => Host.KeyDownAttack(), TransitionMode.DelayFront)
+        new(Tags.State_Action_Attack111, () => Host.KeyDownAttack(), TransitionMode.DelayFront)
     ];
 
 

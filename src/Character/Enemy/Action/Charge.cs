@@ -4,8 +4,7 @@ namespace BraveStory;
 
 public class ChargeEnemyAction : Task<State, Enemy, EnemyContext>
 {
-    // FIXME：Charge 和 Run 是同一个状态，需要合并
-    public override Tag StateTag => Tags.State_Action_Run;
+    public override Tag StateTag => Tags.State_Action_Charge;
     public override Tag LayerTag => Tags.StateLayer_Movement;
     public override ExecutorType ExecutorType => ExecutorType.MultiLayerExecutor;
 

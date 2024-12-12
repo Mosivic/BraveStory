@@ -39,7 +39,7 @@ public partial class Enemy : Character
         Agent.SetAttributeSet(typeof(BoarAttributeSet));
         Agent.AddTasksFromType<State, Enemy, EnemyContext>(this, Context as EnemyContext, [
             typeof(IdleEnemyAction), typeof(PatrolEnemyAction), typeof(DieEnemyAction),
-            typeof(ChargeEnemyAction), typeof(HitEnemyAction), typeof(StunEnemyAction)
+            typeof(ChargeEnemyAction), typeof(HurtEnemyAction), typeof(StunEnemyAction)
         ]);
 
         var hp = Agent.GetAttributeBase("HP");
