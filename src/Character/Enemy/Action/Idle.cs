@@ -12,8 +12,8 @@ public class IdleEnemyAction : Task<State, Enemy, EnemyContext>
 
     public override Transition[] Transitions =>
     [
-        new(Tags.State_Action_Walk, () => !Host.IsPlayerColliding()),
-        new(Tags.State_Action_Run, () => Host.IsPlayerColliding())
+        new(Tags.State_Action_Patrol, () => !Host.IsPlayerColliding()),
+        new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
     ];
 
     protected override void OnEnter()
