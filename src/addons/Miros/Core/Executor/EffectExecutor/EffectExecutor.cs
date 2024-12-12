@@ -26,7 +26,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
     private void UpdateTasks()
     {
         // Enter
-        foreach (var task in _tasks)
+        foreach (var task in _tasks.Values)
         {
             if (!task.CanEnter())
             {
@@ -68,12 +68,12 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
 
             if (task.KeepSelfOnExitSucceeded)
-                _tasks.Add(task);
+                _tasks.Add(task.Tag, task);
         }
 
         // Clear
         foreach (var task in _tasksRemoveCache)
-            _tasks.Remove(task);
+            _tasks.Remove(task.Tag);
         _tasksRemoveCache.Clear();
     }
 
@@ -83,7 +83,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
-    public override void AddTask(ITask task)
+    public override void AddTask(ITask task, Context context)
     {
         var effectTask = (EffectTask)task;
         var isAddTask = true;
@@ -106,7 +106,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                     existingTask.Stack();
             }
 
-        if (isAddTask) base.AddTask(task);
+        if (isAddTask) base.AddTask(task, context);
     }
 
     #region Event

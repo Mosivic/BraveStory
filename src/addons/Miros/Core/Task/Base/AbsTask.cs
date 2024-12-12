@@ -5,9 +5,15 @@ namespace Miros.Core;
 
 public abstract class AbsTask(State state)
 {
-    public Tag Tag => state.Tag;
-    public int Priority => state.Priority;
-    public bool IsActive => state.IsActive;
+    public State State { get; private set; } = state;
+    public void InitState(Tag tag,Agent source)
+    {
+        State.Tag = tag;
+        State.Source = source;
+    }
+    public Tag Tag => State.Tag;
+    public int Priority => State.Priority;
+    public bool IsActive => State.IsActive;
 
     public event Action<State> OnEntered;
     public event Action<State> OnExited;
@@ -22,53 +28,53 @@ public abstract class AbsTask(State state)
     public event Func<State, bool> ExitCondition;
 
 
-    protected void OnEnter()
+    protected virtual void OnEnter()
     {
-        OnEntered?.Invoke(state);
+        OnEntered?.Invoke(State);
     }
 
-    protected void OnExit()
+    protected virtual void OnExit()
     {
-        OnExited?.Invoke(state);
+        OnExited?.Invoke(State);
     }
 
-    protected void OnDeactivate()
+    protected virtual void OnDeactivate()
     {
-        OnPaused?.Invoke(state);
+        OnPaused?.Invoke(State);
     }
 
-    protected void OnActivate()
+    protected virtual void OnActivate()
     {
-        OnResumed?.Invoke(state);
+        OnResumed?.Invoke(State);
     }
 
-    protected void OnUpdate(double delta)
+    protected virtual void OnUpdate(double delta)
     {
-        OnUpdated?.Invoke(state, delta);
+        OnUpdated?.Invoke(State, delta);
     }
 
-    protected void OnPhysicsUpdate(double delta)
+    protected virtual void OnPhysicsUpdate(double delta)
     {
-        OnPhysicsUpdated?.Invoke(state, delta);
+        OnPhysicsUpdated?.Invoke(State, delta);
     }
 
-    protected void OnSucceed()
+    protected virtual void OnSucceed()
     {
-        OnSucceeded?.Invoke(state);
+        OnSucceeded?.Invoke(State);
     }
 
-    protected void OnFail()
+    protected virtual void OnFail()
     {
-        OnFailed?.Invoke(state);
+        OnFailed?.Invoke(State);
     }
 
-    protected bool OnCanEnter()
+    protected virtual bool OnEnterCondition()
     {
-        return EnterCondition?.Invoke(state) ?? true;
+        return EnterCondition?.Invoke(State) ?? true;
     }
 
-    protected bool OnCanExit()
+    protected virtual bool OnExitCondition()
     {
-        return ExitCondition?.Invoke(state) ?? true;
+        return ExitCondition?.Invoke(State) ?? true;
     }
 }

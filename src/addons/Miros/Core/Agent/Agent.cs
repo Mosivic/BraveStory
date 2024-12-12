@@ -7,50 +7,48 @@ namespace Miros.Core;
 
 public enum ExecutorType
 {
-	MultiLayerStateMachine,
+	MultiLayerExecutor,
 	EffectExecutor,
-	AbilityExecutor
+	ConditionExecutor
 }
 
 
-
-public partial class Agent : Node
+public class Agent 
 {
 	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
 	private AttributeSetContainer AttributeSetContainer { get; set; }
 	private TagContainer _ownedTags;
 	private readonly StateExecutionRegistry _stateExecutionRegistry = new();
-	private ITaskProvider _taskProvider;
 
 
-	public Node2D Host { get; private set; }
+	public Node Host { get; private set; }
 	public bool Enabled { get;private set; }
 	public EventStream EventStream { get; private set; }
 
 
-	public void Initialize(Node2D host, Type[] attrSetTypes)
+	public void Init(Node host)
 	{
 		Enabled = true;
 		Host = host;
 		EventStream = new EventStream();
-        
-		_taskProvider = new StaticTaskProvider();
+
 		_ownedTags = new TagContainer([]);
 		AttributeSetContainer = new AttributeSetContainer(this);
 		_executors[ExecutorType.EffectExecutor] = new EffectExecutor(this);;
-
-		foreach (var attrSetType in attrSetTypes)
-			AddAttributeSet(attrSetType);
 	}
 
+	public void SetAttributeSet(Type attrSetType)
+	{
+		AttributeSetContainer.AddAttributeSet(attrSetType);
+	}
 
-	public override void _Process(double delta)
+	public void Process(double delta)
 	{
 		if(Enabled) Update(delta);
 	}
 
 
-	public override void _PhysicsProcess(double delta)
+	public void PhysicsProcess(double delta)
 	{
 		if(Enabled) PhysicsUpdate(delta);
 	}
@@ -62,64 +60,65 @@ public partial class Agent : Node
 	}
 
 
-	public void CreateMultiLayerStateMachine(Tag layer, State defaultState, HashSet<State> states,
-		StateTransitionConfig transitions)
-	{
-		var executor = new MultiLayerStateMachine();
-		var container = new StateTransitionContainer();
-
-		foreach (var state in states)
-		{
-			var task = _taskProvider.GetTask(state);
-			state.Owner = this;
-			_stateExecutionRegistry.AddStateExecutionContext(state.Tag,
-				new StateExecutionContext(state, task, executor));
-		}
-
-		foreach (var transition in transitions.AnyTransitions)
-			container.AddAny(new StateTransition(_stateExecutionRegistry.GetTask(transition.ToState),
-				transition.Condition,
-				transition.Mode));
-
-		foreach (var (fromState, stateTransitions) in transitions.Transitions)
-		foreach (var transition in stateTransitions)
-			container.Add(_stateExecutionRegistry.GetTask(fromState),
-				new StateTransition(_stateExecutionRegistry.GetTask(transition.ToState), transition.Condition,
-					transition.Mode));
-
-
-		executor.AddLayer(layer, _stateExecutionRegistry.GetTask(defaultState), container);
-		_executors[ExecutorType.MultiLayerStateMachine] = executor;
-	}
-
-
 	public EffectExecutor GetEffectExecutor()
 	{
 		return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
 	}
 
 
-	public void AddState(ExecutorType executorType, State state)
+    public  void AddTasksFromType<TState,THost,TContext>(Node host,TContext context,Type[] tasks)
+	where TState : State,new()
+	where THost : Node
+	where TContext : Context
+    {
+        Host = host;
+        foreach (var taskType in tasks)
+        {
+            var task = (Task<TState,THost,TContext>)Activator.CreateInstance(taskType);
+            task.Init(this,Host as THost,context);
+
+			var executorType = task.ExecutorType;
+			if (task.ExecutorType == ExecutorType.MultiLayerExecutor)
+			{
+				var executor = PushTaskOnExecutor(executorType, task, new MultiLayerExecutorContext(task.LayerTag, task.Transitions));
+
+				_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag, new StateExecutionContext(task.State, task, executor));
+			}
+			else if (task.ExecutorType == ExecutorType.EffectExecutor)
+			{
+				var executor = PushTaskOnExecutor(executorType, task);
+				
+				_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag, new StateExecutionContext(task.State, task, executor));
+			}
+        }
+    }
+
+	private IExecutor PushTaskOnExecutor(ExecutorType executorType, TaskBase task,ExecutorContext args = null)
 	{
-		if (!_executors.TryGetValue(executorType, out var executor))
+		if (!_executors.TryGetValue(executorType, out var executor)) 
 		{
-#if GODOT4 && DEBUG
-			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
-#else
-			return;
-#endif
+			executor = executorType switch
+			{
+				ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
+				ExecutorType.EffectExecutor => new EffectExecutor(this),
+				_ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
+			};
+			_executors[executorType] = executor;
 		}
 
-		state.Owner = this;
-		var task = _taskProvider.GetTask(state);
-		executor.AddTask(task);
-		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
+		executor.AddTask(task, args);
+		return executor;
 	}
 
 
-	public void AddStateTo(ExecutorType executorType, State state, Agent target)
+	public void AddState(ExecutorType executorType, State state, ExecutorContext args = null)
 	{
-		target.AddState(executorType, state);
+		state.Owner = this;
+
+		var task = TaskCreator.GetTask(state);
+		var executor = PushTaskOnExecutor(executorType, task, args);
+
+		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
 	}
 
 
@@ -128,8 +127,7 @@ public partial class Agent : Node
 		if (!_executors.TryGetValue(executorType, out var executor))
 		{
 #if GODOT4 && DEBUG
-			throw new Exception($"[Miros.Connect] executor of {executorType} not found");
-#else
+			GD.Print($"[Miros] executor of {executorType} not found");
 			return;
 #endif
 		}
@@ -228,23 +226,7 @@ public partial class Agent : Node
 		return state1.Source == state2.Source;
 	}
 
-	// public AbilityExecutor AbilityExecutor()
-	// {
-	//     if(Executors.TryGetValue(typeof(AbilityExecutor),out var executor))
-	//     {
-	//         return executor as AbilityExecutor;
-	//     }
-	//     return null;
-	// }
 
-	// public EffectExecutor GetEffectExecutor()
-	// {
-	//     if(_executors.TryGetValue(typeof(EffectTask),out var executor))
-	//     {
-	//         return executor as EffectExecutor;
-	//     }
-	//     return null;
-	// }
 
 	public Effect[] GetRunningEffects()
 	{

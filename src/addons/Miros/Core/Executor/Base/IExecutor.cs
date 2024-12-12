@@ -2,7 +2,7 @@
 
 public interface IExecutor
 {
-    void AddTask(ITask task);
+    void AddTask(ITask task, Context context);
     void RemoveTask(ITask task);
     ITask GetNowTask(Tag layer);
     ITask GetLastTask(Tag layer);

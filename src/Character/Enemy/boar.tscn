@@ -1,12 +1,11 @@
-[gd_scene load_steps=19 format=3 uid="uid://b60glotno805d"]
+[gd_scene load_steps=18 format=3 uid="uid://b60glotno805d"]
 
 [ext_resource type="PackedScene" uid="uid://5f6ngwh4b25f" path="res://Character/Character.tscn" id="1_w3tnv"]
 [ext_resource type="Texture2D" uid="uid://diasn0p580ws0" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Idle/Idle-Sheet.png" id="2_e4ssd"]
-[ext_resource type="Script" path="res://Character/Enemy/Boar.cs" id="2_gphwb"]
+[ext_resource type="Script" path="res://Character/Enemy/Enemy.cs" id="2_gphwb"]
 [ext_resource type="Texture2D" uid="uid://cehsld3emvxjh" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Walk/Walk-Base-Sheet.png" id="2_ii47p"]
 [ext_resource type="Texture2D" uid="uid://bkmqhykoigyuy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Run/Run-Sheet.png" id="2_l8evk"]
 [ext_resource type="Texture2D" uid="uid://ddtr8ovkgqhwy" path="res://Art/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="5_i5lod"]
-[ext_resource type="Script" path="res://Character/Enemy/EnemyAgent.cs" id="7_labl6"]
 [ext_resource type="PackedScene" uid="uid://ck7amcl4xn3y6" path="res://UI/status_panel.tscn" id="8_ynqoc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q70f8"]
@@ -484,8 +483,5 @@ shape = SubResource("CircleShape2D_lk46v")
 libraries = {
 "": SubResource("AnimationLibrary_2r4i3")
 }
-
-[node name="Agent" type="Node" parent="." index="5"]
-script = ExtResource("7_labl6")
 
 [editable path="StatusPanel"]

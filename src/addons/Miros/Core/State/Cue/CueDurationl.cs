@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public abstract class CueDurational(Tag sign, Agent source) : Cue(sign, source)
+public abstract class CueDurational : Cue
 {
     // public override Cue ApplyFrom(Effect effect)
     // {

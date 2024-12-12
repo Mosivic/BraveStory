@@ -1,6 +1,6 @@
 namespace Miros.Core;
 
-public enum StateTransitionMode
+public enum TransitionMode
 {
     None, // 无
     Normal, // 正常,当退出条件、转换条件、进入条件都满足 -> 转换状态

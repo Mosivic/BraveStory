@@ -7,5 +7,6 @@ public static partial class Tags
     public static Tag Executor_MultiLayerConditionMachine { get; } =
         TagManager.RequestTag("Executor.MultiLayerConditionMachine");
 
+    public static Tag Default { get; } = TagManager.RequestTag("Default");
     public static Tag Executor_Effect { get; } = TagManager.RequestTag("Executor.Effect");
 }
