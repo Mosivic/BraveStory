@@ -32,8 +32,8 @@ public partial class Player : Character
 
         Context = new PlayerContext();
 
-        Agent.SetAttributeSet(typeof(PlayerAttributeSet));
-        Agent.AddTasksFromType<State, Player, PlayerContext>(this, Context as PlayerContext, [
+        Agent.AddAttributeSet(typeof(PlayerAttributeSet));
+        Agent.AddTasksFromType<State, Player, PlayerContext>(Context as PlayerContext, [
             typeof(IdleAction), typeof(JumpAction), typeof(DoubleJumpAction),
             typeof(DieAction), typeof(FallAction), typeof(HurtAction),
             typeof(RunAction), typeof(SlidingAction), typeof(WallJumpAction), typeof(WallSlideAction),

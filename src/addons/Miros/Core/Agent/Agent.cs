@@ -37,10 +37,6 @@ public class Agent
         ;
     }
 
-    public void SetAttributeSet(Type attrSetType)
-    {
-        AttributeSetContainer.AddAttributeSet(attrSetType);
-    }
 
     public void Process(double delta)
     {
@@ -66,35 +62,53 @@ public class Agent
     }
 
 
-    public void AddTasksFromType<TState, THost, TContext>(Node host, TContext context, Type[] tasks)
+    public void AddTasksFromType<TState, THost, TContext>(TContext context, Type[] tasks)
         where TState : State, new()
         where THost : Node
         where TContext : Context
     {
-        Host = host;
-        foreach (var taskType in tasks)
-        {
-            var task = (Task<TState, THost, TContext>)Activator.CreateInstance(taskType);
-            task.Init(this, Host as THost, context);
-
-            var executorType = task.ExecutorType;
-            if (task.ExecutorType == ExecutorType.MultiLayerExecutor)
-            {
-                var executor = PushTaskOnExecutor(executorType, task,
-                    new MultiLayerExecutorContext(task.LayerTag, task.Transitions));
-
-                _stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
-                    new StateExecutionContext(task.State, task, executor));
-            }
-            else if (task.ExecutorType == ExecutorType.EffectExecutor)
-            {
-                var executor = PushTaskOnExecutor(executorType, task);
-
-                _stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
-                    new StateExecutionContext(task.State, task, executor));
-            }
-        }
+		foreach (var taskType in tasks)
+			AddTaskFromType<TState, THost, TContext>(context, taskType);
     }
+
+
+	public void AddTaskFromType<TState, THost, TContext>(TContext context, Type taskType)
+	where TState : State, new()
+	where THost : Node
+	where TContext : Context
+	{
+		var task = (Task<TState, THost, TContext>)Activator.CreateInstance(taskType);
+		task.Init(this, Host as THost, context);
+
+		var executorType = task.ExecutorType;
+		if (task.ExecutorType == ExecutorType.MultiLayerExecutor)
+		{
+			var executor = PushTaskOnExecutor(executorType, task,
+				new MultiLayerExecutorContext(task.LayerTag, task.Transitions));
+
+			_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
+				new StateExecutionContext(task.State, task, executor));
+		}
+		else if (task.ExecutorType == ExecutorType.EffectExecutor)
+		{
+			var executor = PushTaskOnExecutor(executorType, task);
+
+			_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
+				new StateExecutionContext(task.State, task, executor));
+		}
+	}
+    
+    
+    public void AddTaskFromState(ExecutorType executorType, State state, ExecutorContext args = null)
+    {
+        state.Owner = this;
+
+        var task = TaskCreator.GetTask(state);
+        var executor = PushTaskOnExecutor(executorType, task, args);
+
+        _stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
+    }
+    
 
     private IExecutor PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecutorContext args = null)
     {
@@ -113,19 +127,8 @@ public class Agent
         return executor;
     }
 
-
-    public void AddState(ExecutorType executorType, State state, ExecutorContext args = null)
-    {
-        state.Owner = this;
-
-        var task = TaskCreator.GetTask(state);
-        var executor = PushTaskOnExecutor(executorType, task, args);
-
-        _stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
-    }
-
-
-    public void RemoveState(ExecutorType executorType, State state)
+    
+    public void RemoveTaskByState(ExecutorType executorType, State state)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
@@ -262,7 +265,7 @@ public class Agent
                 removeList.Add(effect);
         }
 
-        foreach (var effect in removeList) RemoveState(ExecutorType.EffectExecutor, effect);
+        foreach (var effect in removeList) RemoveTaskByState(ExecutorType.EffectExecutor, effect);
     }
 
 
@@ -292,7 +295,8 @@ public class Agent
     {
         AttributeSetContainer.AddAttributeSet(attrSetType);
     }
-
+    
+    
     public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
     {
         if (AttributeSetContainer.TryGetAttributeBase(attrSetTag, attrTag, out var value))

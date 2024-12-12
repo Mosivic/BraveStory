@@ -35,7 +35,7 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext>
                 Executions = [new DamageExecution()]
             };
 
-            Context.HitAgent.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);
             Context.IsHit = false;
         }
     }

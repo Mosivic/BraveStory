@@ -32,7 +32,7 @@ public class Attack111Action : Task<State, Player, PlayerContext>
                 Executions = [new CustomAttackDamageExecution(Agent.Attr("Attack") + 2)]
             };
 
-            Context.HitAgent.AddState(ExecutorType.EffectExecutor, damageEffect);
+            Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);
             Context.IsHit = false;
         }
     }
