@@ -31,6 +31,7 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
             {
                 Tag = Tags.Effect_Buff,
                 SourceAgent = Agent,
+                RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
                 Executions = [new DamageExecution()]
             };

@@ -30,6 +30,7 @@ public enum RemovePolicy
     Condition, //自定义条件移除
     WhenFailed, //任务失败时移除
     WhenSucceed, //任务成功时移除
+    WhenEnterFailed, //任务进入失败时移除
     WhenExited, //任务结束时移除（成功或失败）
     WhenSourceAgentNull, //任务的 Source Agent为空时移除
     WhenSourceTaskRemoved, //任务的 Source Task被移除时移除

@@ -29,16 +29,6 @@ public abstract class AbsTask(State state)
         State.ExitFunc?.Invoke(State);
     }
 
-    protected virtual void OnDeactivate()
-    {
-        State.PauseFunc?.Invoke(State);
-    }
-
-    protected virtual void OnActivate()
-    {
-        State.ResumeFunc?.Invoke(State);
-    }
-
     protected virtual void OnUpdate(double delta)
     {
         State.UpdateFunc?.Invoke(State, delta);

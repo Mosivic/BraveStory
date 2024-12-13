@@ -6,17 +6,26 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
     public virtual void AddTask(ITask task, Context context)
     {
         var t = task as TTask;
+
         if(t.RemovePolicy != RemovePolicy.None)
             _tempTasks.Add(t.Tag, t);
+
         _tasks.Add(t.Tag, t);
+        t.TriggerOnAdd(); 
     }
 
     public virtual void RemoveTask(ITask task)
     {
         var t = task as TTask;
-        if (t.RemovePolicy != RemovePolicy.None)
+
+        if (t.RemovePolicy != RemovePolicy.None) // 如果任务有移除策略(非None)，则将任务从临时任务列表中移除
             _tempTasks.Remove(t.Tag);
+
+        if (t.Status() == RunningStatus.Running) // 如果任务正在运行，则调用Exit方法
+            t.Exit();
+
         _tasks.Remove(t.Tag);
+        t.TriggerOnRemove(); 
     }
 
     public virtual double GetCurrentTaskTime(Tag layer)
@@ -77,6 +86,10 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
                 break;
             case RemovePolicy.WhenSucceed:
                 if (task.Status() == RunningStatus.Succeed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenEnterFailed:
+                if (task.CanEnter() == false)
                     RemoveTask(task);
                 break;
             case RemovePolicy.WhenExited:

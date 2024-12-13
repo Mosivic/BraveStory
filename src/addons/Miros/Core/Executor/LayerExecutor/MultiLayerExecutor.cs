@@ -16,6 +16,7 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 
     public override void Update(double delta)
     {
+        base.Update(delta);
         foreach (var key in _layers.Keys) _layers[key].Update(delta);
     }
 
@@ -26,12 +27,10 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 
     public override void AddTask(ITask task, Context context)
     {
-        if (context is not MultiLayerExecuteArgs fsmContext)
-            throw new Exception("Invalid arguments for FSM ");
+        base.AddTask(task, context);
 
         var stateTask = task as TaskBase;
-        base.AddTask(stateTask, context);
-        task.Add();
+        var fsmContext = context as MultiLayerExecuteArgs;
 
         if (!_layers.ContainsKey(fsmContext.Layer))
         {
@@ -49,13 +48,12 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
             _layers[fsmContext.Layer].SetNextTask(stateTask, fsmContext.AsNextTaskTransitionMode);
     }
 
-    public void RemoveTask(TaskBase task)
+    public override void RemoveTask(ITask task)
     {
-        _tasks.Remove(task.Tag);
-        task.Remove();
+        base.RemoveTask(task);
 
-        _transitionContainer.RemoveTransitions(task);
-        _transitionContainer.RemoveAnyTransition(task);
+        _transitionContainer.RemoveTransitions(task as TaskBase);
+        _transitionContainer.RemoveAnyTransition(task as TaskBase);
     }
 
     public override TaskBase GetNowTask(Tag layer)

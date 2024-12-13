@@ -9,7 +9,7 @@ public enum ExecutorType
 {
     MultiLayerExecutor,
     EffectExecutor,
-    ConditionExecutor
+    NativeExecutor
 }
 
 public class Agent
@@ -32,7 +32,9 @@ public class Agent
 
         _ownedTags = new TagContainer([]);
         AttributeSetContainer = new AttributeSetContainer(this);
-        _executors[ExecutorType.EffectExecutor] = new EffectExecutor(this);
+
+		// FIXME: 不应该在这里进行初始化
+        _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
         ;
     }
 
@@ -122,7 +124,7 @@ public class Agent
             executor = executorType switch
             {
                 ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
-                ExecutorType.EffectExecutor => new EffectExecutor(this),
+                ExecutorType.EffectExecutor => new EffectExecutor(),
                 _ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
             };
             _executors[executorType] = executor;

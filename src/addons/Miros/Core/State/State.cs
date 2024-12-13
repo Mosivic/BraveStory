@@ -18,7 +18,7 @@ public class State
 
     public RunningStatus Status { get; set; } = RunningStatus.Null;
     public bool IsActive => Status == RunningStatus.Running;
-    public RemovePolicy RemovePolicy { get; set; } = RemovePolicy.None;
+    public RemovePolicy RemovePolicy { get; set; } = RemovePolicy.None; // 默认不移除
     public double RunningTime { get; set; } = 0;
 
     public Func<State, bool> EnterCondition { get; set; }
@@ -29,8 +29,6 @@ public class State
     public Action<State> ExitFunc { get; set; }
     public Action<State> SucceedFunc { get; set; }
     public Action<State> FailedFunc { get; set; }
-    public Action<State> PauseFunc { get; set; }
-    public Action<State> ResumeFunc { get; set; }
 
     public Action<State> AddFunc { get; set; } // 添加至 Executor 时
     public Action<State> RemoveFunc { get; set; } // 从 Executor 移除时

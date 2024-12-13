@@ -21,21 +21,7 @@ public class TaskBase(State state) : AbsTask(state), ITask
         OnExit();
     }
 
-
-    public virtual void Deactivate()
-    {
-        State.Status = RunningStatus.Null;
-        OnDeactivate();
-    }
-
-
-    public virtual void Activate()
-    {
-        State.Status = RunningStatus.Running;
-        OnActivate();
-    }
-
-
+    
     public virtual bool CanEnter()
     {
         return OnEnterCondition();
@@ -53,12 +39,12 @@ public class TaskBase(State state) : AbsTask(state), ITask
         return OnRemoveCondition();
     }
 
-    public virtual void Add()
+    public virtual void TriggerOnAdd()
     {
         OnAdd();
     }
 
-    public virtual void Remove()
+    public virtual void TriggerOnRemove()
     {
         OnRemove();
     }

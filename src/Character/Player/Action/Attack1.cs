@@ -28,6 +28,7 @@ public class Attack1Action : Task<State, Player, PlayerContext, MultiLayerExecut
             {
                 Tag = Tags.Effect_Buff,
                 SourceAgent = Agent,
+                RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
                 Executions = [new CustomAttackDamageExecution(Agent.Attr("Attack") - 1)]
             };

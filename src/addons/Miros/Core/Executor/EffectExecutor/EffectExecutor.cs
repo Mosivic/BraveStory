@@ -3,13 +3,11 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-// _tasks 即为运行的 EffectTask
-public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
+
+public class EffectExecutor : ExecutorBase<EffectTask>
 {
-    private readonly Agent _agent = agent;
     private readonly List<EffectTask> _runningTasks = [];
 
-    private readonly List<EffectTask> _tasksRemoveCache = [];
 
     public List<EffectTask> GetRunningTasks()
     {
@@ -18,6 +16,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
 
     public override void Update(double delta)
     {
+        base.Update(delta);
         UpdateTasks();
 
         foreach (var task in _runningTasks) task.Update(delta);
@@ -28,30 +27,15 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
         // Enter
         foreach (var task in _tasks.Values)
         {
-            if (!task.CanEnter())
-            {
-                if (task.RemoveSelfOnEnterFailed)
-                    _tasksRemoveCache.Add(task);
-
-                continue;
-            }
-
             if (task.IsInstant)
             {
-                task.Activate();
                 task.Enter();
                 task.Exit();
-                task.Deactivate();
-
-                if (!task.KeepSelfOnExitSucceeded)
-                    _tasksRemoveCache.Add(task);
             }
             else
             {
-                task.Activate();
                 task.Enter();
                 _runningTasks.Add(task);
-                _tasksRemoveCache.Add(task);
                 _onRunningEffectTasksIsDirty?.Invoke(this, task);
             }
         }
@@ -62,19 +46,10 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
             if (!task.CanExit())
                 continue;
 
-            task.Deactivate();
             task.Exit();
             _runningTasks.Remove(task);
             _onRunningEffectTasksIsDirty?.Invoke(this, task);
-
-            if (task.KeepSelfOnExitSucceeded)
-                _tasks.Add(task.Tag, task);
         }
-
-        // Clear
-        foreach (var task in _tasksRemoveCache)
-            _tasks.Remove(task.Tag);
-        _tasksRemoveCache.Clear();
     }
 
     private static bool AreTaskCouldStackByAnotherTask(EffectTask task, EffectTask otherTask)
@@ -85,7 +60,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
 
     public override void AddTask(ITask task, Context context)
     {
-        var effectTask = (EffectTask)task;
+        var effectTask = task as EffectTask;
         var isAddTask = true;
 
         foreach (var existingTask in _runningTasks)
@@ -107,6 +82,18 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
             }
 
         if (isAddTask) base.AddTask(task, context);
+    }
+
+    public override void RemoveTask(ITask task)
+    {
+        base.RemoveTask(task);
+
+        var effectTask = task as EffectTask;
+        if (effectTask.Status() == RunningStatus.Running)
+        {
+            _runningTasks.Remove(effectTask);
+            _onRunningEffectTasksIsDirty?.Invoke(this, effectTask);
+        }
     }
 
     private bool AreFromSameSourceAgent(EffectTask task1, EffectTask task2)
