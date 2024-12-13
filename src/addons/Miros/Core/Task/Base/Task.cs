@@ -1,21 +1,19 @@
 using Godot;
-using Miros.Core;
 
 namespace Miros.Core;
 
-public class Task<TState, THost, TContext>() : TaskBase(new TState())
-where TState : State, new()
-where THost : Node
-where TContext : Context
+public class Task<TState, THost, TContext, TExecuteArgs>() : TaskBase(new TState())
+    where TState : State, new()
+    where THost : Node
+    where TContext : Context
+    where TExecuteArgs : ExecuteArgs
 {
     protected Agent Agent { get; private set; }
     public THost Host { get; private set; }
     public TContext Context { get; private set; }
     public virtual Tag StateTag { get; }
-    public virtual Tag LayerTag { get; } = Tags.Default;
-    public virtual ExecutorType ExecutorType { get; }
-    public virtual Transition[] Transitions { get; }
-    
+    public virtual TExecuteArgs ExecuteArgs { get; }
+
 
     public void Init(Agent agent, THost host, TContext context)
     {

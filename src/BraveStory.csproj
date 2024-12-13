@@ -19,7 +19,6 @@
     <ItemGroup>
         <Content Include="addons\Miros\Experiment\StatsAndModifiers\img.png"/>
         <Content Include="addons\Miros\Experiment\StatsAndModifiers\README.MD"/>
-        <Content Include="Player\Player.tscn"/>
         <Content Include="Scene\Test.tscn"/>
     </ItemGroup>
     <ItemGroup>

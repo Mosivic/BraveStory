@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Miros.Core;
 
 public class HitEventArgs : EventArgs
 {
@@ -14,15 +13,12 @@ public class HitEventArgs : EventArgs
 
 public partial class HitBox : Area2D
 {
-
-
     public HitBox()
     {
         AreaEntered += OnAreaEntered;
     }
 
     public event EventHandler<HitEventArgs> OnHit;
-
 
 
     private void OnAreaEntered(Area2D area2D)

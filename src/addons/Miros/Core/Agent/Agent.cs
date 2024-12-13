@@ -7,313 +7,310 @@ namespace Miros.Core;
 
 public enum ExecutorType
 {
-	MultiLayerExecutor,
-	EffectExecutor,
-	ConditionExecutor
+    MultiLayerExecutor,
+    EffectExecutor,
+    NativeExecutor
 }
 
-
-public class Agent 
+public class Agent
 {
-	private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-	private AttributeSetContainer AttributeSetContainer { get; set; }
-	private TagContainer _ownedTags;
-	private readonly StateExecutionRegistry _stateExecutionRegistry = new();
+    private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
+    private TagContainer _ownedTags;
+    private AttributeSetContainer AttributeSetContainer { get; set; }
 
 
-	public Node Host { get; private set; }
-	public bool Enabled { get;private set; }
-	public EventStream EventStream { get; private set; }
+    public Node Host { get; private set; }
+    public bool Enabled { get; private set; }
+    public EventStream EventStream { get; private set; }
 
 
-	public void Init(Node host)
-	{
-		Enabled = true;
-		Host = host;
-		EventStream = new EventStream();
+    public void Init(Node host)
+    {
+        Enabled = true;
+        Host = host;
+        EventStream = new EventStream();
 
-		_ownedTags = new TagContainer([]);
-		AttributeSetContainer = new AttributeSetContainer(this);
-		_executors[ExecutorType.EffectExecutor] = new EffectExecutor(this);;
-	}
+        _ownedTags = new TagContainer([]);
+        AttributeSetContainer = new AttributeSetContainer(this);
 
-	public void SetAttributeSet(Type attrSetType)
-	{
-		AttributeSetContainer.AddAttributeSet(attrSetType);
-	}
-
-	public void Process(double delta)
-	{
-		if(Enabled) Update(delta);
-	}
+		// FIXME: 不应该在这里进行初始化
+        _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
+        ;
+    }
 
 
-	public void PhysicsProcess(double delta)
-	{
-		if(Enabled) PhysicsUpdate(delta);
-	}
+    public void Process(double delta)
+    {
+        if (Enabled) Update(delta);
+    }
 
 
-	public float Attr(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
-	{
-		return AttributeSetContainer.Attribute(attrName, valueType);
-	}
+    public void PhysicsProcess(double delta)
+    {
+        if (Enabled) PhysicsUpdate(delta);
+    }
 
 
-	public EffectExecutor GetEffectExecutor()
-	{
-		return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
-	}
+    public float Attr(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
+    {
+        return AttributeSetContainer.Attribute(attrName, valueType);
+    }
 
 
-    public  void AddTasksFromType<TState,THost,TContext>(Node host,TContext context,Type[] tasks)
-	where TState : State,new()
+    public EffectExecutor GetEffectExecutor()
+    {
+        return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
+    }
+
+
+    public void AddTasksFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] tasks)
+        where TState : State, new()
+        where THost : Node
+        where TContext : Context
+        where TExecuteArgs : ExecuteArgs
+    {
+		foreach (var taskType in tasks)
+			AddTaskFromType<TState, THost, TContext, TExecuteArgs>(executorType, context, taskType);
+    }
+
+	
+	public void AddTaskFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type taskType)
+	where TState : State, new()
 	where THost : Node
 	where TContext : Context
+	where TExecuteArgs : ExecuteArgs
+	{
+		var task = (Task<TState, THost, TContext, TExecuteArgs>)Activator.CreateInstance(taskType);
+		task.Init(this, Host as THost, context);
+
+		if (executorType == ExecutorType.MultiLayerExecutor)
+		{
+			PushTaskOnExecutor(executorType, task, task.ExecuteArgs);
+			task.State.OwnerTask = task;
+			task.State.ExecutorType = executorType;
+		}
+		else if (executorType == ExecutorType.EffectExecutor)
+		{
+			PushTaskOnExecutor(executorType, task);
+			task.State.OwnerTask = task;
+			task.State.ExecutorType = executorType;
+		}
+	}
+    
+    
+	public void AddTasksFromState(ExecutorType executorType, State[] states)
+	{
+		foreach (var state in states)
+			AddTaskFromState(executorType, state);
+	}
+
+
+    public void AddTaskFromState(ExecutorType executorType, State state, ExecuteArgs args = null)
     {
-        Host = host;
-        foreach (var taskType in tasks)
+        state.OwnerAgent = this;
+
+        var task = TaskCreator.GetTask(state);
+        PushTaskOnExecutor(executorType, task);
+
+        task.State.OwnerTask = task;
+        task.State.ExecutorType = executorType;
+    }
+    
+
+    private void PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
+    {
+        if (!_executors.TryGetValue(executorType, out var executor))
         {
-            var task = (Task<TState,THost,TContext>)Activator.CreateInstance(taskType);
-            task.Init(this,Host as THost,context);
+            executor = executorType switch
+            {
+                ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
+                ExecutorType.EffectExecutor => new EffectExecutor(),
+                _ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
+            };
+            _executors[executorType] = executor;
+        }
 
-			var executorType = task.ExecutorType;
-			if (task.ExecutorType == ExecutorType.MultiLayerExecutor)
-			{
-				var executor = PushTaskOnExecutor(executorType, task, new MultiLayerExecutorContext(task.LayerTag, task.Transitions));
+        executor.AddTask(task, args);
+    }
 
-				_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag, new StateExecutionContext(task.State, task, executor));
-			}
-			else if (task.ExecutorType == ExecutorType.EffectExecutor)
-			{
-				var executor = PushTaskOnExecutor(executorType, task);
-				
-				_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag, new StateExecutionContext(task.State, task, executor));
-			}
+    
+    public void RemoveTaskByState(ExecutorType executorType, State state)
+    {
+        if (!_executors.TryGetValue(executorType, out var executor))
+        {
+#if GODOT4 && DEBUG
+            GD.Print($"[Miros] executor of {executorType} not found");
+            return;
+#endif
+        }
+
+        executor.RemoveTask(state.OwnerTask);
+    }
+
+
+    public void Update(double delta)
+    {
+        foreach (var executor in _executors.Values) executor.Update(delta);
+    }
+
+    public void PhysicsUpdate(double delta)
+    {
+        foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
+    }
+
+    public void ApplyExecWithInstant(Effect effect)
+    {
+        if (effect.Executions == null) return;
+
+        foreach (var execution in effect.Executions)
+        {
+            execution.Execute(effect, out var modifierOptions);
+
+            foreach (var modifierOption in modifierOptions)
+            {
+                var attribute = GetAttributeBase(modifierOption.AttributeName, modifierOption.AttributeSetName);
+                var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
+                    modifierOption.Magnitude, modifierOption.Operation, modifierOption.MMC);
+
+                ApplyModifier(effect, modifier, attribute);
+            }
         }
     }
 
-	private IExecutor PushTaskOnExecutor(ExecutorType executorType, TaskBase task,ExecutorContext args = null)
-	{
-		if (!_executors.TryGetValue(executorType, out var executor)) 
-		{
-			executor = executorType switch
-			{
-				ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
-				ExecutorType.EffectExecutor => new EffectExecutor(this),
-				_ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
-			};
-			_executors[executorType] = executor;
-		}
+    public void ApplyModWithInstant(Effect effect)
+    {
+        if (effect.Modifiers == null) return;
 
-		executor.AddTask(task, args);
-		return executor;
-	}
+        foreach (var modifier in effect.Modifiers)
+            ApplyModifier(effect, modifier);
+    }
 
 
-	public void AddState(ExecutorType executorType, State state, ExecutorContext args = null)
-	{
-		state.Owner = this;
+    private void ApplyModifier(Effect effect, Modifier modifier, AttributeBase attributeBase = null)
+    {
+        attributeBase ??= GetAttributeBase(modifier.AttributeSetTag, modifier.AttributeTag);
 
-		var task = TaskCreator.GetTask(state);
-		var executor = PushTaskOnExecutor(executorType, task, args);
+        if (attributeBase == null) return;
 
-		_stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
-	}
+        // if (attribute.IsSupportOperation(modifier.Operation) == false)
+        //     throw new InvalidOperationException("Unsupported operation.");
 
+        if (attributeBase.CalculateMode != CalculateMode.Stacking)
+            throw new InvalidOperationException(
+                $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
+                $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeBase.CalculateMode}");
 
-	public void RemoveState(ExecutorType executorType, State state)
-	{
-		if (!_executors.TryGetValue(executorType, out var executor))
-		{
-#if GODOT4 && DEBUG
-			GD.Print($"[Miros] executor of {executorType} not found");
-			return;
-#endif
-		}
+        var magnitude = modifier.CalculateMagnitude(effect);
+        var baseValue = attributeBase.BaseValue;
+        switch (modifier.Operation)
+        {
+            case ModifierOperation.Add:
+                baseValue += magnitude;
+                break;
+            case ModifierOperation.Minus:
+                baseValue -= magnitude;
+                break;
+            case ModifierOperation.Multiply:
+                baseValue *= magnitude;
+                break;
+            case ModifierOperation.Divide:
+                baseValue /= magnitude;
+                break;
+            case ModifierOperation.Override:
+                baseValue = magnitude;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
 
-		var task = _stateExecutionRegistry.GetTask(state);
-		executor.RemoveTask(task);
-	}
-
-
-	public void Update(double delta)
-	{
-		foreach (var executor in _executors.Values) executor.Update(delta);
-	}
-
-	public void PhysicsUpdate(double delta)
-	{
-		foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
-	}
-
-	public void ApplyExecWithInstant(Effect effect)
-	{
-		if (effect.Executions == null) return;
-
-		foreach (var execution in effect.Executions)
-		{
-			execution.Execute(effect, out var modifierOptions);
-
-			foreach (var modifierOption in modifierOptions)
-			{
-				var attribute = GetAttributeBase(modifierOption.AttributeName, modifierOption.AttributeSetName);
-				var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
-					modifierOption.Magnitude, modifierOption.Operation, modifierOption.MMC);
-
-				ApplyModifier(effect, modifier, attribute);
-			}
-		}
-	}
-
-	public void ApplyModWithInstant(Effect effect)
-	{
-		if (effect.Modifiers == null) return;
-
-		foreach (var modifier in effect.Modifiers)
-			ApplyModifier(effect, modifier);
-	}
+        AttributeSetContainer.Sets[modifier.AttributeSetTag]
+            .ChangeAttributeBase(modifier.AttributeTag, baseValue);
+    }
 
 
-	private void ApplyModifier(Effect effect, Modifier modifier,AttributeBase attributeBase = null)
-	{
-		attributeBase ??= GetAttributeBase(modifier.AttributeSetTag, modifier.AttributeTag);
-			
-		if (attributeBase == null) return;
-
-		// if (attribute.IsSupportOperation(modifier.Operation) == false)
-		//     throw new InvalidOperationException("Unsupported operation.");
-
-		if (attributeBase.CalculateMode != CalculateMode.Stacking)
-			throw new InvalidOperationException(
-				$"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
-				$"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeBase	.CalculateMode}");
-
-		var magnitude = modifier.CalculateMagnitude(effect);
-		var baseValue = attributeBase.BaseValue;
-		switch (modifier.Operation)
-		{
-			case ModifierOperation.Add:
-				baseValue += magnitude;
-				break;
-			case ModifierOperation.Minus:
-				baseValue -= magnitude;
-				break;
-			case ModifierOperation.Multiply:
-				baseValue *= magnitude;
-				break;
-			case ModifierOperation.Divide:
-				baseValue /= magnitude;
-				break;
-			case ModifierOperation.Override:
-				baseValue = magnitude;
-				break;
-			default:
-				throw new ArgumentOutOfRangeException();
-		}
-
-		AttributeSetContainer.Sets[modifier.AttributeSetTag]
-			.ChangeAttributeBase(modifier.AttributeTag, baseValue);
-	}
-
-	public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
-	{
-		var state1 = _stateExecutionRegistry.GetState(task1);
-		var state2 = _stateExecutionRegistry.GetState(task2);
-
-		if (state1 == null || state2 == null)
-			return false;
-		return state1.Source == state2.Source;
-	}
+    public Effect[] GetRunningEffects()
+    {
+        return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
+            .GetRunningTasks()
+            .Select(task => task.State as Effect).ToArray();
+    }
 
 
+    /// <summary>
+    ///     移除所有包含指定标签的Effect
+    /// </summary>
+    public void RemoveEffectWithAnyTags(TagSet tags)
+    {
+        if (tags.Empty) return;
+        if (!_executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
+        var tasks = executor.GetAllTasks();
+        var removeList = new List<State>();
 
-	public Effect[] GetRunningEffects()
-	{
-		return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
-			.GetRunningTasks()
-			.Select(task => _stateExecutionRegistry.GetState(task) as Effect).ToArray();
-	}
+        foreach (var task in tasks)
+        {
+            var effectTask = task as EffectTask;
+            var effect = effectTask.State as Effect;
 
+            var ownedTags = effect.OwnedTags;
+            if (!ownedTags.Empty && ownedTags.HasAny(tags))
+                removeList.Add(effect);
 
-	/// <summary>
-	///     移除所有包含指定标签的Effect
-	/// </summary>
-	public void RemoveEffectWithAnyTags(TagSet tags)
-	{
-		if (tags.Empty) return;
-		if (!_executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
-		var tasks = executor.GetAllTasks();
-		var removeList = new List<State>();
+            var grantedTags = effect.GrantedTags;
+            if (!grantedTags.Empty && grantedTags.HasAny(tags))
+                removeList.Add(effect);
+        }
 
-		foreach (var task in tasks)
-		{
-			var effectTask = task as EffectTask;
-			var effect = _stateExecutionRegistry.GetState(effectTask) as Effect;
-
-			var ownedTags = effect.OwnedTags;
-			if (!ownedTags.Empty && ownedTags.HasAny(tags))
-				removeList.Add(effect);
-
-			var grantedTags = effect.GrantedTags;
-			if (!grantedTags.Empty && grantedTags.HasAny(tags))
-				removeList.Add(effect);
-		}
-
-		foreach (var effect in removeList) RemoveState(ExecutorType.EffectExecutor, effect);
-	}
-
-	
-	#region Tag Check
-
-	public bool HasTag(Tag gameplayTag)
-	{
-		return _ownedTags.HasTag(gameplayTag);
-	}
-
-	public bool HasAll(TagSet tags)
-	{
-		return _ownedTags.HasAll(tags);
-	}
-
-	public bool HasAny(TagSet tags)
-	{
-		return _ownedTags.HasAny(tags);
-	}
-
-	#endregion	
+        foreach (var effect in removeList) RemoveTaskByState(ExecutorType.EffectExecutor, effect);
+    }
 
 
+    #region Tag Check
 
-	#region AttributeSet
+    public bool HasTag(Tag gameplayTag)
+    {
+        return _ownedTags.HasTag(gameplayTag);
+    }
 
-	public void AddAttributeSet(Type attrSetType)
-	{
-		AttributeSetContainer.AddAttributeSet(attrSetType);
-	}
+    public bool HasAll(TagSet tags)
+    {
+        return _ownedTags.HasAll(tags);
+    }
 
-	public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
-	{
-		if (AttributeSetContainer.TryGetAttributeBase(attrSetTag, attrTag, out var value))
-			return value;
-		return null;
-	}
+    public bool HasAny(TagSet tags)
+    {
+        return _ownedTags.HasAny(tags);
+    }
 
-	public AttributeBase GetAttributeBase(string attrName, string attrSetName = "")
-	{
-		if(AttributeSetContainer.TryGetAttributeBase(attrName, out var value, attrSetName))
-			return value;
-		return null;
-	}
+    #endregion
 
 
-	public Dictionary<Tag, float> DataSnapshot()
-	{
-		return AttributeSetContainer.Snapshot();
-	}
+    #region AttributeSet
 
-	#endregion
+    public void AddAttributeSet(Type attrSetType)
+    {
+        AttributeSetContainer.AddAttributeSet(attrSetType);
+    }
+    
+    
+    public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
+    {
+        if (AttributeSetContainer.TryGetAttributeBase(attrSetTag, attrTag, out var value))
+            return value;
+        return null;
+    }
+
+    public AttributeBase GetAttributeBase(string attrName, string attrSetName = "")
+    {
+        if (AttributeSetContainer.TryGetAttributeBase(attrName, out var value, attrSetName))
+            return value;
+        return null;
+    }
 
 
+    public Dictionary<Tag, float> DataSnapshot()
+    {
+        return AttributeSetContainer.Snapshot();
+    }
 
+    #endregion
 }

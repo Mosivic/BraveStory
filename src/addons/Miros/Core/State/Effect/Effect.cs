@@ -64,7 +64,7 @@ public class Effect : State
 
     public override Type Type => typeof(EffectTask);
 
-    public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
+    public  DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }
     public double Period { get; set; }
 
@@ -73,16 +73,6 @@ public class Effect : State
 
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
     public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }
-
-    /// <summary>
-    ///     进入失败时是否移除自身
-    /// </summary>
-    public bool RemoveSelfOnEnterFailed { get; set; } = false;
-
-    /// <summary>
-    ///     退出成功时是否保留自身
-    /// </summary>
-    public bool KeepSelfOnExitSucceeded { get; set; } = false;
 
     public EffectStacking Stacking { get; set; }
 

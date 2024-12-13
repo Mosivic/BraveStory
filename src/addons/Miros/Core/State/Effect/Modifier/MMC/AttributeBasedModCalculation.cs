@@ -42,8 +42,8 @@ public class AttributeBasedModCalculation : ModifierMagnitudeCalculation
         else
         {
             var agent = attributeFromType == AttributeFromType.Source
-                ? effect.Source
-                : effect.Owner;
+                ? effect.SourceAgent
+                : effect.OwnerAgent;
 
             var attribute = agent.GetAttributeBase(attributeBasedSetTag, attributeBasedTag);
             return (attribute?.CurrentValue ?? 1) * k + b;

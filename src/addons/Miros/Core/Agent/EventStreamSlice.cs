@@ -1,5 +1,3 @@
-using System;
-
 namespace Miros.Core;
 
 public class EventStreamArgs(string eventStreamName)

@@ -15,12 +15,10 @@ public class TransitionContainer
             _transitions[fromTask] = [];
 
         foreach (var transition in transitions)
-        {
             if (transition.IsAny)
                 _anyTransitions.Add(transition);
             else
                 _transitions[fromTask].Add(transition);
-        }
         return this;
     }
 

@@ -1,5 +1,3 @@
-using System;
-using System.Security.Cryptography.X509Certificates;
 using Godot;
 using Miros.Core;
 
@@ -7,23 +5,23 @@ namespace BraveStory;
 
 public class CharacterContext : Context
 {
-    public bool IsHit { get; set; } = false;
-    public bool IsHurt { get; set; } = false;
+    public bool IsHit { get; set; }
+    public bool IsHurt { get; set; }
     public Agent HitAgent { get; set; }
 }
 
 public partial class Character : CharacterBody2D
 {
     protected Agent Agent = new();
-    protected CharacterContext Context;
 
     protected AnimationPlayer AnimationPlayer;
-    public Node2D Graphics { get; private set; }
+    protected CharacterContext Context;
     protected HitBox HitBox;
     protected HurtBox HurtBox;
     protected Sprite2D Sprite;
+    public Node2D Graphics { get; private set; }
 
-    
+
     public override void _Ready()
     {
         Graphics = GetNode<Node2D>("Graphics");
@@ -55,7 +53,7 @@ public partial class Character : CharacterBody2D
 
         base._ExitTree();
     }
-    
+
     public string GetCurrentAnimation()
     {
         return AnimationPlayer.GetCurrentAnimation();
@@ -71,8 +69,8 @@ public partial class Character : CharacterBody2D
         var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
         var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
         AddChild(damageNumber);
-        
-        damageNumber.SetDamage((int)e.Damage); 
+
+        damageNumber.SetDamage((int)e.Damage);
     }
 
     public void PlayAnimation(string animationName)
@@ -101,6 +99,4 @@ public partial class Character : CharacterBody2D
     {
         Agent.PhysicsProcess(delta);
     }
-    
-    
 }

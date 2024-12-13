@@ -1,3 +1,3 @@
 namespace Miros.Core;
 
-public abstract class Context();
+public abstract class Context;

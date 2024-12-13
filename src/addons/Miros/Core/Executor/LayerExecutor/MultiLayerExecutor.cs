@@ -16,6 +16,7 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 
     public override void Update(double delta)
     {
+        base.Update(delta);
         foreach (var key in _layers.Keys) _layers[key].Update(delta);
     }
 
@@ -24,36 +25,35 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public override double GetCurrentTaskTime(Tag layer)
-    {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetCurrentTaskTime();
-        return 0;
-    }
-
-
     public override void AddTask(ITask task, Context context)
     {
-        if (context is not MultiLayerExecutorContext fsmContext)
-            throw new Exception("Invalid arguments for FSM ");
-        
+        base.AddTask(task, context);
+
         var stateTask = task as TaskBase;
-        base.AddTask(stateTask, context);
-        
+        var fsmContext = context as MultiLayerExecuteArgs;
+
         if (!_layers.ContainsKey(fsmContext.Layer))
         {
             _layers[fsmContext.Layer] = new LayerExecutor(fsmContext.Layer, _transitionContainer, _tasks);
-            _layers[fsmContext.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务
+            _layers[fsmContext.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务，以免忘记设置默认任务
         }
-        
-        if(fsmContext.Transitions != null)
+
+        if (fsmContext.Transitions != null)
             _transitionContainer.AddTransitions(stateTask, fsmContext.Transitions);
+
+        if (fsmContext.AsDefaultTask) 
+            _layers[fsmContext.Layer].SetDefaultTask(stateTask);
+
+        if (fsmContext.AsNextTask)
+            _layers[fsmContext.Layer].SetNextTask(stateTask, fsmContext.AsNextTaskTransitionMode);
     }
 
-    public void RemoveTask(TaskBase task)
+    public override void RemoveTask(ITask task)
     {
-        _tasks.Remove(task.Tag);
-        _transitionContainer.RemoveTransitions(task);
-        _transitionContainer.RemoveAnyTransition(task);
+        base.RemoveTask(task);
+
+        _transitionContainer.RemoveTransitions(task as TaskBase);
+        _transitionContainer.RemoveAnyTransition(task as TaskBase);
     }
 
     public override TaskBase GetNowTask(Tag layer)
