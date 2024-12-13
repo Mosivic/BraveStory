@@ -8,6 +8,8 @@ public interface ITask
     void Activate(); // 启用
     bool CanEnter();
     bool CanExit();
+    void Add();
+    void Remove();
     void Update(double delta);
     void PhysicsUpdate(double delta);
 }

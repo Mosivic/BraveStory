@@ -47,6 +47,22 @@ public class TaskBase(State state) : AbsTask(state), ITask
         return OnExitCondition();
     }
 
+
+    public virtual bool CanRemove()
+    {
+        return OnRemoveCondition();
+    }
+
+    public virtual void Add()
+    {
+        OnAdd();
+    }
+
+    public virtual void Remove()
+    {
+        OnRemove();
+    }
+
     public virtual void Update(double delta)
     {
         if (State.Status != RunningStatus.Running) return;

@@ -7,6 +7,9 @@ public abstract class AbsTask(State state)
     public Tag Tag => State.Tag;
     public int Priority => State.Priority;
     public bool IsActive => State.IsActive;
+    public RemovePolicy RemovePolicy => State.RemovePolicy;
+    public RunningStatus Status => State.Status;
+    public bool IsSourceValid => State.Source != null;
 
     public void InitState(Tag tag, Agent source)
     {
@@ -64,4 +67,21 @@ public abstract class AbsTask(State state)
     {
         return State.ExitCondition?.Invoke(State) ?? true;
     }
+
+    protected virtual bool OnRemoveCondition()
+    {
+        return State.RemoveCondition?.Invoke(State) ?? true;
+    }
+
+    protected virtual void OnAdd()
+    {
+        State.AddFunc?.Invoke(State);
+    }
+
+    protected virtual void OnRemove()
+    {
+        State.RemoveFunc?.Invoke(State);
+    }
+
+
 }

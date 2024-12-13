@@ -31,6 +31,7 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 
         var stateTask = task as TaskBase;
         base.AddTask(stateTask, context);
+        task.Add();
 
         if (!_layers.ContainsKey(fsmContext.Layer))
         {
@@ -51,6 +52,8 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
     public void RemoveTask(TaskBase task)
     {
         _tasks.Remove(task.Tag);
+        task.Remove();
+
         _transitionContainer.RemoveTransitions(task);
         _transitionContainer.RemoveAnyTransition(task);
     }

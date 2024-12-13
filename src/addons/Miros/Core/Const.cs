@@ -14,13 +14,28 @@ public enum RunningStatus
     NoRun, //未运行
     Running, //运行中
     Succeed, //成功
-    Failed //失败
+    Failed, //失败
+    Removed //移除
 }
 
 public enum StateStackType
 {
     Source, //对Buff Source 限制层数
     Target //对Buff Target 限制层数
+}
+
+public enum RemovePolicy
+{
+    None, //不移除
+    Condition, //自定义条件移除
+    WhenFailed, //任务失败时移除
+    WhenSucceed, //任务成功时移除
+    WhenExited, //任务结束时移除（成功或失败）
+    WhenSourceAgentNull, //任务的 Source Agent为空时移除
+    WhenSourceTaskRemoved, //任务的 Source Task被移除时移除
+    WhenSourceTaskExited, //任务的 Source Task结束时移除（成功或失败）
+    WhenSourceTaskFailed, //任务的 Source Task失败时移除
+    WhenSourceTaskSucceed, //任务的 Source Task成功时移除
 }
 
 public enum GrantedAbilityActivationPolicy
