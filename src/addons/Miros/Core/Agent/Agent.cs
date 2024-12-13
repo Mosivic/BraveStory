@@ -15,7 +15,6 @@ public enum ExecutorType
 public class Agent
 {
     private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-    private readonly StateExecutionRegistry _stateExecutionRegistry = new();
     private TagContainer _ownedTags;
     private AttributeSetContainer AttributeSetContainer { get; set; }
 
@@ -84,17 +83,15 @@ public class Agent
 
 		if (executorType == ExecutorType.MultiLayerExecutor)
 		{
-			var executor = PushTaskOnExecutor(executorType, task, task.ExecuteArgs);
-
-			_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
-				new StateExecutionContext(task.State, task, executor));
+			PushTaskOnExecutor(executorType, task, task.ExecuteArgs);
+			task.State.OwnerTask = task;
+			task.State.ExecutorType = executorType;
 		}
 		else if (executorType == ExecutorType.EffectExecutor)
 		{
-			var executor = PushTaskOnExecutor(executorType, task);
-
-			_stateExecutionRegistry.AddStateExecutionContext(task.State.Tag,
-				new StateExecutionContext(task.State, task, executor));
+			PushTaskOnExecutor(executorType, task);
+			task.State.OwnerTask = task;
+			task.State.ExecutorType = executorType;
 		}
 	}
     
@@ -108,16 +105,17 @@ public class Agent
 
     public void AddTaskFromState(ExecutorType executorType, State state, ExecuteArgs args = null)
     {
-        state.Owner = this;
+        state.OwnerAgent = this;
 
         var task = TaskCreator.GetTask(state);
-        var executor = PushTaskOnExecutor(executorType, task);
+        PushTaskOnExecutor(executorType, task);
 
-        _stateExecutionRegistry.AddStateExecutionContext(state.Tag, new StateExecutionContext(state, task, executor));
+        task.State.OwnerTask = task;
+        task.State.ExecutorType = executorType;
     }
     
 
-    private IExecutor PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
+    private void PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
@@ -131,7 +129,6 @@ public class Agent
         }
 
         executor.AddTask(task, args);
-        return executor;
     }
 
     
@@ -145,8 +142,7 @@ public class Agent
 #endif
         }
 
-        var task = _stateExecutionRegistry.GetTask(state);
-        executor.RemoveTask(task);
+        executor.RemoveTask(state.OwnerTask);
     }
 
 
@@ -229,22 +225,12 @@ public class Agent
             .ChangeAttributeBase(modifier.AttributeTag, baseValue);
     }
 
-    public bool AreTasksFromSameSource(TaskBase task1, TaskBase task2)
-    {
-        var state1 = _stateExecutionRegistry.GetState(task1);
-        var state2 = _stateExecutionRegistry.GetState(task2);
-
-        if (state1 == null || state2 == null)
-            return false;
-        return state1.Source == state2.Source;
-    }
-
 
     public Effect[] GetRunningEffects()
     {
         return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
             .GetRunningTasks()
-            .Select(task => _stateExecutionRegistry.GetState(task) as Effect).ToArray();
+            .Select(task => task.State as Effect).ToArray();
     }
 
 
@@ -261,7 +247,7 @@ public class Agent
         foreach (var task in tasks)
         {
             var effectTask = task as EffectTask;
-            var effect = _stateExecutionRegistry.GetState(effectTask) as Effect;
+            var effect = effectTask.State as Effect;
 
             var ownedTags = effect.OwnedTags;
             if (!ownedTags.Empty && ownedTags.HasAny(tags))

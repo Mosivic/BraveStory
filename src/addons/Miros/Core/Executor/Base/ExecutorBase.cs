@@ -46,6 +46,7 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
 
     public virtual void Update(double delta)
     {
+        UpdateTempTasks();
     }
 
     public virtual ITask[] GetAllTasks()
@@ -53,56 +54,57 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
         return [.. _tasks.Values];
     }
 
-    private void RemoveTempTasks()
+    private void UpdateTempTasks()
     {
         foreach (var task in _tempTasks.Values)
         {
-            var removePolicy = task.RemovePolicy;
-            switch (removePolicy)
-            {
-                case RemovePolicy.None:
-                    break;
-                case RemovePolicy.Condition:
-                    if (task.CanRemove())
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenFailed:
-                    if (task.Status == RunningStatus.Failed)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenSucceed:
-                    if (task.Status == RunningStatus.Succeed)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenExited:
-                    if (task.Status == RunningStatus.Succeed 
-                    || task.Status == RunningStatus.Failed)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenSourceAgentNull:
-                    if (!task.IsSourceValid)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenSourceTaskRemoved:
-                    if (task.SourceTask == null)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenSourceTaskExited:
-                    if (task.SourceTask.IsExited)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenSourceTaskFailed:
-                    if (task.SourceTask.IsFailed)
-                        _tasks.Remove(task.Tag);
-                    break;
-                case RemovePolicy.WhenSourceTaskSucceed:
-                    if (task.SourceTask.IsSucceed)
-                        _tasks.Remove(task.Tag);
-                    break;
-            }
-            
-            _tasks.Remove(task.Tag);
+            RemoveTempTask(task);
         }
+    }
 
+    private void RemoveTempTask(TTask task)
+    {
+        var removePolicy = task.RemovePolicy;
+        switch (removePolicy)
+        {
+            case RemovePolicy.Condition:
+                if (task.CanRemove())
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenFailed:
+                if (task.Status() == RunningStatus.Failed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenSucceed:
+                if (task.Status() == RunningStatus.Succeed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenExited:
+                if (task.Status() == RunningStatus.Succeed 
+                || task.Status() == RunningStatus.Failed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenSourceAgentNull:
+                if (!task.IsSourceValid)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenSourceTaskRemoved:
+                if (task.SourceTaskStatus() == RunningStatus.Removed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenSourceTaskExited:
+                if (task.SourceTaskStatus() == RunningStatus.Succeed 
+                || task.SourceTaskStatus() == RunningStatus.Failed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenSourceTaskFailed:
+                if (task.SourceTaskStatus() == RunningStatus.Failed)
+                    RemoveTask(task);
+                break;
+            case RemovePolicy.WhenSourceTaskSucceed:
+                if (task.SourceTaskStatus() == RunningStatus.Succeed)
+                    RemoveTask(task);
+                break;
+        }
     }
 }

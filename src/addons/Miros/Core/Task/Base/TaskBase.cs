@@ -24,7 +24,7 @@ public class TaskBase(State state) : AbsTask(state), ITask
 
     public virtual void Deactivate()
     {
-        State.Status = RunningStatus.NoRun;
+        State.Status = RunningStatus.Null;
         OnDeactivate();
     }
 

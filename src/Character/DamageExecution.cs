@@ -12,15 +12,15 @@ public class CustomAttackDamageExecution(float sourceAttack) : Execution
 {
     public override void Execute(Effect effect, out ModifierOption[] modifierOptions)
     {
-        var targetDefense = effect.Owner.Attr("Defense");
-        var targetHP = effect.Owner.Attr("HP");
+        var targetDefense = effect.OwnerAgent.Attr("Defense");
+        var targetHP = effect.OwnerAgent.Attr("HP");
 
         var damage = sourceAttack - targetDefense;
         var newHp = targetHP - damage;
 
         var hpModifier = new ModifierOption("HP", newHp, ModifierOperation.Override);
 
-        effect.Owner.EventStream.Push("Damage", new DamageSlice(damage));
+        effect.OwnerAgent.EventStream.Push("Damage", new DamageSlice(damage));
 
         modifierOptions = [hpModifier];
     }
@@ -35,7 +35,7 @@ public class DamageExecution : Execution
         var newHp = data.TargetHP - damage;
         var hpModifier = new ModifierOption("HP", newHp, ModifierOperation.Override);
 
-        effect.Owner.EventStream.Push("Damage", new DamageSlice(damage));
+        effect.OwnerAgent.EventStream.Push("Damage", new DamageSlice(damage));
 
         modifierOptions = [hpModifier];
     }
@@ -49,9 +49,9 @@ public class DamageExecution : Execution
 
         public DamageData(Effect effect)
         {
-            SourceAttack = effect.Source.Attr("Attack");
-            TargetDefense = effect.Owner.Attr("Defense");
-            TargetHP = effect.Owner.Attr("HP");
+            SourceAttack = effect.SourceAgent.Attr("Attack");
+            TargetDefense = effect.OwnerAgent.Attr("Defense");
+            TargetHP = effect.OwnerAgent.Attr("HP");
         }
     }
 }

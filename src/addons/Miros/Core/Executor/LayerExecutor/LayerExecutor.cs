@@ -33,6 +33,7 @@ public class LayerExecutor
     public void SetDefaultTask(TaskBase task)
     {
         _defaultTask = task;
+        _currentTask = _defaultTask;
     }
 
     public void SetNextTask(TaskBase task, TransitionMode mode)

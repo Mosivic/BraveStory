@@ -30,7 +30,7 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
             var damageEffect = new Effect
             {
                 Tag = Tags.Effect_Buff,
-                Source = Agent,
+                SourceAgent = Agent,
                 DurationPolicy = DurationPolicy.Instant,
                 Executions = [new DamageExecution()]
             };

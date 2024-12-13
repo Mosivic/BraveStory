@@ -8,13 +8,14 @@ public abstract class AbsTask(State state)
     public int Priority => State.Priority;
     public bool IsActive => State.IsActive;
     public RemovePolicy RemovePolicy => State.RemovePolicy;
-    public RunningStatus Status => State.Status;
-    public bool IsSourceValid => State.Source != null;
+    public RunningStatus Status() => State.Status;
+    public RunningStatus SourceTaskStatus() => State.SourceTask?.Status() ?? RunningStatus.Null;
+    public bool IsSourceValid => State.SourceAgent != null;
 
     public void InitState(Tag tag, Agent source)
     {
         State.Tag = tag;
-        State.Source = source;
+        State.SourceAgent = source;
     }
 
 

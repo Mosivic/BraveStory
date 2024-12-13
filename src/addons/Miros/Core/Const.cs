@@ -11,7 +11,7 @@ public enum CompareType
 
 public enum RunningStatus
 {
-    NoRun, //未运行
+    Null, //未运行
     Running, //运行中
     Succeed, //成功
     Failed, //失败

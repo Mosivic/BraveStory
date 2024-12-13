@@ -27,7 +27,7 @@ public class Attack111Action : Task<State, Player, PlayerContext, MultiLayerExec
             var damageEffect = new Effect
             {
                 Tag = Tags.Effect_Buff,
-                Source = Agent,
+                SourceAgent = Agent,
                 DurationPolicy = DurationPolicy.Instant,
                 Executions = [new CustomAttackDamageExecution(Agent.Attr("Attack") + 2)]
             };

@@ -92,7 +92,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
             if (AreTaskCouldStackByAnotherTask(effectTask, existingTask))
             {
                 // 如果Tag相同且来自同一个Agent, 则不添加, 并跳过当前循环
-                if (effectTask.Tag == existingTask.Tag && _agent.AreTasksFromSameSource(effectTask, existingTask))
+                if (effectTask.Tag == existingTask.Tag && AreFromSameSourceAgent(effectTask, existingTask))
                 {
                     existingTask.Stack(true);
                     isAddTask = false;
@@ -100,7 +100,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
                 }
 
                 // 如果来自不同Agent, 则根据是否可以叠加来决定是否添加
-                if (_agent.AreTasksFromSameSource(effectTask, existingTask))
+                if (AreFromSameSourceAgent(effectTask, existingTask))
                     existingTask.Stack(true);
                 else
                     existingTask.Stack();
@@ -108,6 +108,17 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
 
         if (isAddTask) base.AddTask(task, context);
     }
+
+    private bool AreFromSameSourceAgent(EffectTask task1, EffectTask task2)
+    {
+        var state1 = task1.State;
+        var state2 = task2.State;
+
+        if (state1 == null || state2 == null)
+            return false;
+        return state1.SourceAgent == state2.SourceAgent;
+    }
+
 
     #region Event
 
@@ -122,6 +133,7 @@ public class EffectExecutor(Agent agent) : ExecutorBase<EffectTask>
     {
         _onRunningEffectTasksIsDirty -= handler;
     }
+
 
     #endregion
 }

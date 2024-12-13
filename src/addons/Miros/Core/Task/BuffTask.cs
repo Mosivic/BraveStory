@@ -56,7 +56,7 @@ public class TaskBuff(Buff buff) : TaskBase(buff)
         {
             case StateStackType.Source:
                 buff.StackSourceCountDict ??= new Dictionary<object, int>
-                    { { buff.Source, 1 } };
+                    { { buff.SourceAgent, 1 } };
 
                 //Not have stackState in Dict
                 if (buff.StackSourceCountDict.TryAdd(source, 1))
@@ -65,7 +65,7 @@ public class TaskBuff(Buff buff) : TaskBase(buff)
                     OnStack();
                 }
                 //Have stackState in Dict AND stackStateCount less than maxCount
-                else if (buff.StackSourceCountDict[buff.Source] < buff.StackMaxCount)
+                else if (buff.StackSourceCountDict[buff.SourceAgent] < buff.StackMaxCount)
                 {
                     buff.StackSourceCountDict.Add(source, 1);
                     buff.StackCurrentCount += 1;

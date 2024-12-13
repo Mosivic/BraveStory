@@ -4,7 +4,7 @@ public class CueTask(Cue cue) : TaskBase(cue)
 {
     public override bool CanEnter()
     {
-        return Triggerable(cue.Owner);
+        return Triggerable(cue.OwnerAgent);
     }
 
     public virtual bool Triggerable(Agent owner)

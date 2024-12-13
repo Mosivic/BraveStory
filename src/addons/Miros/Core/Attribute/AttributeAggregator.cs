@@ -177,14 +177,14 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         {
             if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Target)
             {
-                if (ge.Owner != null)
-                    ge.Owner.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
+                if (ge.OwnerAgent != null)
+                    ge.OwnerAgent.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
                         .UnregisterPostCurrentValueChange(OnAttributeChanged);
             }
             else
             {
-                if (ge.Source != null)
-                    ge.Source.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
+                if (ge.SourceAgent != null)
+                    ge.SourceAgent.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
                         .UnregisterPostCurrentValueChange(OnAttributeChanged);
             }
         }
@@ -202,14 +202,14 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         {
             if (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Target)
             {
-                if (ge.Owner != null)
-                    ge.Owner.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
+                if (ge.OwnerAgent != null)
+                    ge.OwnerAgent.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
                         .RegisterPostCurrentValueChange(OnAttributeChanged);
             }
             else
             {
-                if (ge.Source != null)
-                    ge.Source.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
+                if (ge.SourceAgent != null)
+                    ge.SourceAgent.GetAttributeBase(mmc.attributeBasedSetTag, mmc.attributeBasedTag)
                         .RegisterPostCurrentValueChange(OnAttributeChanged);
             }
         }
@@ -232,9 +232,9 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
                 mmc.captureType == AttributeBasedModCalculation.AttributeCaptureType.Track &&
                 attribute.AttributeTag == mmc.attributeBasedTag)
                 if ((mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Target &&
-                     attribute.Owner == effect.Owner) ||
+                     attribute.Owner == effect.OwnerAgent) ||
                     (mmc.attributeFromType == AttributeBasedModCalculation.AttributeFromType.Source &&
-                     attribute.Owner == effect.Source))
+                     attribute.Owner == effect.SourceAgent))
                 {
                     UpdateCurrentValueWhenModifierIsDirty();
                     break;

@@ -23,13 +23,13 @@ public class EffectTask(Effect effect) : TaskBase(effect)
         base.Enter();
         CaptureAttributesSnapshot();
 
-        effect.Owner.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
+        effect.OwnerAgent.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
 
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
-            effect.Owner.ApplyModWithInstant(effect);
-            effect.Owner.ApplyExecWithInstant(effect);
+            effect.OwnerAgent.ApplyModWithInstant(effect);
+            effect.OwnerAgent.ApplyExecWithInstant(effect);
 
             effect.Status = RunningStatus.Succeed;
         }
@@ -88,24 +88,24 @@ public class EffectTask(Effect effect) : TaskBase(effect)
 
     public override bool CanEnter()
     {
-        return effect.Owner.HasAll(effect.ApplicationRequiredTags);
+        return effect.OwnerAgent.HasAll(effect.ApplicationRequiredTags);
     }
 
 
     public override bool CanExit()
     {
-        if (!effect.Owner.HasAll(effect.OngoingRequiredTags)) return true;
-        if (effect.Owner.HasAny(effect.ApplicationImmunityTags)) return true;
+        if (!effect.OwnerAgent.HasAll(effect.OngoingRequiredTags)) return true;
+        if (effect.OwnerAgent.HasAny(effect.ApplicationImmunityTags)) return true;
         return effect.Status != RunningStatus.Running;
     }
 
     // 捕获属性快照
     private void CaptureAttributesSnapshot()
     {
-        effect.SnapshotSourceAttributes = effect.Source.DataSnapshot();
-        effect.SnapshotTargetAttributes = effect.Source == effect.Owner
+        effect.SnapshotSourceAttributes = effect.SourceAgent.DataSnapshot();
+        effect.SnapshotTargetAttributes = effect.SourceAgent == effect.OwnerAgent
             ? effect.SnapshotSourceAttributes
-            : effect.Owner.DataSnapshot();
+            : effect.OwnerAgent.DataSnapshot();
     }
 
 
