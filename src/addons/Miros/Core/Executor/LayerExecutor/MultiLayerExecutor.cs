@@ -24,7 +24,10 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-
+    public void SetNextTask(Tag layer, TaskBase task, TransitionMode mode)
+    {
+        _layers[layer].SetNextTask(task, mode);
+    }
 
     public override void AddTask(ITask task, Context context)
     {
@@ -37,14 +40,17 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
         if (!_layers.ContainsKey(fsmContext.Layer))
         {
             _layers[fsmContext.Layer] = new LayerExecutor(fsmContext.Layer, _transitionContainer, _tasks);
-            _layers[fsmContext.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务
+            _layers[fsmContext.Layer].SetDefaultTask(stateTask); //将第一个任务设置为默认任务，以免忘记设置默认任务
         }
 
         if (fsmContext.Transitions != null)
             _transitionContainer.AddTransitions(stateTask, fsmContext.Transitions);
 
-        if (fsmContext.AsCurrentTask)
-            _layers[fsmContext.Layer].SetCurrentTask(stateTask);
+        if (fsmContext.AsDefaultTask) 
+            _layers[fsmContext.Layer].SetDefaultTask(stateTask);
+
+        if (fsmContext.AsNextTask)
+            _layers[fsmContext.Layer].SetNextTask(stateTask, fsmContext.AsNextTaskTransitionMode);
     }
 
     public void RemoveTask(TaskBase task)

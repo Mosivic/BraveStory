@@ -16,16 +16,18 @@ public class MultiLayerExecuteArgs : ExecuteArgs
         AsDefaultTask = asDefaultTask;
     }
 
-    public MultiLayerExecuteArgs(Tag layer, Transition[] transitions, bool asCurrentTask = false, TransitionMode asCurrentTaskTransitionMode = TransitionMode.Normal)
+    public MultiLayerExecuteArgs(Tag layer, Transition[] transitions, bool asNextTask = false, TransitionMode asNextTaskTransitionMode = TransitionMode.Normal)
     {
         Layer = layer;
         Transitions = transitions;
-        AsCurrentTask = asCurrentTask;
+        AsNextTask = asNextTask;
+        AsNextTaskTransitionMode = asNextTaskTransitionMode;
     }
+    
 
     public Tag Layer { get; private set; }
     public Transition[] Transitions { get; private set; }
-    public bool AsCurrentTask { get; set; }
-    public TransitionMode AsCurrentTaskTransitionMode { get; set; }
+    public bool AsNextTask { get; set; }
+    public TransitionMode AsNextTaskTransitionMode { get; set; }
     public bool AsDefaultTask { get; set; }
 }

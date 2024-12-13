@@ -16,6 +16,8 @@ public class LayerExecutor
     private TaskBase _nextTask;
     private TaskBase _defaultTask;
 
+    private TransitionMode _nextTaskTransitionMode;
+
 
     public LayerExecutor(Tag layerTag,
         TransitionContainer transitionContainer, Dictionary<Tag, TaskBase> tasks)
@@ -31,18 +33,17 @@ public class LayerExecutor
     public void SetDefaultTask(TaskBase task)
     {
         _defaultTask = task;
-        _currentTask = _defaultTask;
-        _lastTask = _defaultTask;
     }
 
-    public void SetCurrentTask(TaskBase task, TransitionMode mode = TransitionMode.Normal)
+    public void SetNextTask(TaskBase task, TransitionMode mode)
     {
-
+        _nextTask = task;
+        _nextTaskTransitionMode = mode;
     }
 
     public void Update(double delta)
     {
-        ProcessNextState();
+        ProcessNextTask();
 
         _currentTask.Update(delta);
     }
@@ -53,19 +54,22 @@ public class LayerExecutor
     }
 
 
-    private void ProcessNextState()
+    private void ProcessNextTask()
     {
-        if (_nextTask != null)
+        if (_currentTask == null)
         {
-            if (_currentTask.CanExit())
-            {
-                SwitchNextTask();
-                return;
-            }
-
+            _currentTask = _defaultTask;
             return;
         }
 
+        if (_nextTask != null)
+        {
+            SwitchNextTask();
+            return;
+        }
+
+
+        // 当没有下一个任务时（_nextTask == null），检查当前任务是否有可转换的状态
         var transitions = _transitionContainer.GetPossibleTransition(_currentTask);
 
         // 使用LINQ获取优先级最高且可进入的状态
@@ -81,30 +85,27 @@ public class LayerExecutor
             if (t.Mode switch
                 {
                     TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() && task.CanEnter(),
-                    TransitionMode.Force => t.CanTransition() && task.CanEnter(),
+                    TransitionMode.Force => t.CanTransition(),
                     TransitionMode.DelayFront => t.CanTransition() && task.CanEnter(),
                     TransitionMode.DelayBackend => t.CanTransition() && _currentTask.CanExit(),
                     _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
                 })
             {
                 _nextTask = task;
-                if (t.Mode == TransitionMode.DelayFront)
-                {
-                    if (_currentTask.CanExit())
-                    {
-                        SwitchNextTask();
-                    }
-                }
-                else
-                {
-                    SwitchNextTask();
-                }
+                _nextTaskTransitionMode = t.Mode;
+                return;
             }
         }
     }
 
-    private void SwitchNextTask(TransitionMode mode = TransitionMode.Normal)
+    private void SwitchNextTask()
     {
+        if (_nextTaskTransitionMode == TransitionMode.DelayFront && !_currentTask.CanExit()) // 等待当前任务满足退出条件
+            return;
+
+        if (_nextTaskTransitionMode == TransitionMode.DelayBackend && !_nextTask.CanEnter()) // 等待新任务满足进入条件
+            return;
+
         _currentTask.Exit();
         _nextTask.Enter();
 
