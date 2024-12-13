@@ -24,11 +24,6 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public override double GetCurrentTaskTime(Tag layer)
-    {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetCurrentTaskTime();
-        return 0;
-    }
 
 
     public override void AddTask(ITask task, Context context)
@@ -47,6 +42,9 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
 
         if (fsmContext.Transitions != null)
             _transitionContainer.AddTransitions(stateTask, fsmContext.Transitions);
+
+        if (fsmContext.AsCurrentTask)
+            _layers[fsmContext.Layer].SetCurrentTask(stateTask);
     }
 
     public void RemoveTask(TaskBase task)

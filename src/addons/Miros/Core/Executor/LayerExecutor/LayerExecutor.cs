@@ -4,21 +4,23 @@ using System.Linq;
 
 namespace Miros.Core;
 
+
+// FIXME: 修复状态转换的逻辑
 public class LayerExecutor
 {
     private readonly Dictionary<Tag, TaskBase> _tasks = [];
     private readonly TransitionContainer _transitionContainer;
-    private double _currentStateTime;
+
     private TaskBase _currentTask;
-    private TaskBase _defaultTask;
-    private TaskBase _delayTask;
     private TaskBase _lastTask;
+    private TaskBase _nextTask;
+    private TaskBase _defaultTask;
+
 
     public LayerExecutor(Tag layerTag,
         TransitionContainer transitionContainer, Dictionary<Tag, TaskBase> tasks)
     {
         Layer = layerTag;
-        _delayTask = null;
         _transitionContainer = transitionContainer;
         _tasks = tasks;
     }
@@ -33,12 +35,16 @@ public class LayerExecutor
         _lastTask = _defaultTask;
     }
 
+    public void SetCurrentTask(TaskBase task, TransitionMode mode = TransitionMode.Normal)
+    {
+
+    }
+
     public void Update(double delta)
     {
         ProcessNextState();
 
         _currentTask.Update(delta);
-        _currentStateTime += delta;
     }
 
     public void PhysicsUpdate(double delta)
@@ -49,12 +55,11 @@ public class LayerExecutor
 
     private void ProcessNextState()
     {
-        if (_delayTask != null)
+        if (_nextTask != null)
         {
             if (_currentTask.CanExit())
             {
-                TransformState(_delayTask);
-                _delayTask = null;
+                SwitchNextTask();
                 return;
             }
 
@@ -82,32 +87,30 @@ public class LayerExecutor
                     _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
                 })
             {
+                _nextTask = task;
                 if (t.Mode == TransitionMode.DelayFront)
                 {
-                    _delayTask = task;
-
                     if (_currentTask.CanExit())
                     {
-                        TransformState(_delayTask);
-                        _delayTask = null;
+                        SwitchNextTask();
                     }
                 }
                 else
                 {
-                    TransformState(task);
+                    SwitchNextTask();
                 }
             }
         }
     }
 
-    private void TransformState(TaskBase nextTask)
+    private void SwitchNextTask(TransitionMode mode = TransitionMode.Normal)
     {
         _currentTask.Exit();
-        nextTask.Enter();
+        _nextTask.Enter();
 
         _lastTask = _currentTask;
-        _currentTask = nextTask;
-        _currentStateTime = 0.0;
+        _currentTask = _nextTask;
+        _nextTask = null;
     }
 
 
@@ -119,10 +122,5 @@ public class LayerExecutor
     public TaskBase GetLastTask()
     {
         return _lastTask;
-    }
-
-    public double GetCurrentTaskTime()
-    {
-        return _currentStateTime;
     }
 }

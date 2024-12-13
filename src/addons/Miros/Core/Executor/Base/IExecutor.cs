@@ -7,7 +7,6 @@ public interface IExecutor
     ITask GetNowTask(Tag layer);
     ITask GetLastTask(Tag layer);
     ITask[] GetAllTasks();
-    double GetCurrentTaskTime(Tag layer);
     bool HasTaskRunning(ITask task);
     void Update(double delta);
     void PhysicsUpdate(double delta);
