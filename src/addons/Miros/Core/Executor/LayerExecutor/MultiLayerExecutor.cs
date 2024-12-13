@@ -24,11 +24,6 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public void SetNextTask(Tag layer, TaskBase task, TransitionMode mode)
-    {
-        _layers[layer].SetNextTask(task, mode);
-    }
-
     public override void AddTask(ITask task, Context context)
     {
         if (context is not MultiLayerExecuteArgs fsmContext)
