@@ -14,6 +14,7 @@ public class SerialTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
     where TExecuteArgs : ExecuteArgs
 {
     protected int CurrentIndex = 0;
+    protected Task<TState, THost, TContext, TExecuteArgs> CurrentTask;
 
     public override void Enter()
     {
@@ -24,8 +25,7 @@ public class SerialTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
     {
         base.Exit();
 
-        var subState = state.SubStates[CurrentIndex];  
-        subState.OwnerTask.Exit();
+        CurrentTask.Exit();
     }
 
 
@@ -33,24 +33,24 @@ public class SerialTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
     {
         base.Update(delta);
 
-        if(CurrentIndex < state.SubStates.Count)
+        if(CurrentIndex < state.SubTaskTypes.Length)
         {
-            var subState = state.SubStates[CurrentIndex];
+            var subTaskType = state.SubTaskTypes[CurrentIndex];
 
-            if(subState.OwnerTask == null)
+            if(CurrentTask == null)
             {
-                subState.OwnerTask = TaskCreator.GetTask(subState);
-                subState.OwnerTask.Enter();
+                CurrentTask = TaskCreator.GetTask<TState, THost, TContext, TExecuteArgs>(subTaskType);
+                CurrentTask.Enter();
             }
 
-            if(subState.OwnerTask.CanExit())
+            if(CurrentTask.CanExit())
             {
                 CurrentIndex++;
-                subState.OwnerTask.Exit();
+                CurrentTask.Exit();
             }
 
 
-            subState.OwnerTask.Update(delta);
+            CurrentTask.Update(delta);
         }
     }
 
@@ -58,16 +58,14 @@ public class SerialTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
     {
         base.PhysicsUpdate(delta);
 
-        if(CurrentIndex < state.SubStates.Count)
-        {
-            var subState = state.SubStates[CurrentIndex];
-            subState.OwnerTask.PhysicsUpdate(delta);
-        }
+        if(CurrentIndex < state.SubTaskTypes.Length)
+            CurrentTask.PhysicsUpdate(delta);
+        
     }
 
     public override bool CanExit()
     {
-        return CurrentIndex == state.SubStates.Count;
+        return CurrentIndex == state.SubTaskTypes.Length;
     }
 }
 

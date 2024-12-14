@@ -16,38 +16,48 @@ public class RandomTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
     // 当前选择的子任务索引
     protected int CurrentIndex = 0;
 
+    protected TaskBase CurrentTask = null;
+
     public override void Enter()
     {
         base.Enter();
         CurrentIndex = SelectTaskBasedOnWeights();
+        CurrentTask = TaskCreator.GetTask<TState, THost, TContext, TExecuteArgs>(state.SubTaskTypes[CurrentIndex]);
         
-        state.SubStates[CurrentIndex].OwnerTask = TaskCreator.GetTask(state.SubStates[CurrentIndex]);
-        state.SubStates[CurrentIndex].OwnerTask.Enter();
+        if(IsCurrentCanEnter())
+            CurrentTask.Enter();
+        else
+            state.Status = RunningStatus.Failed;
     }
 
 
     public override void Exit()
     {   
         base.Exit();
-        state.SubStates[CurrentIndex].OwnerTask.Exit();
+        CurrentTask.Exit();
     }
 
 
     public override void Update(double delta)
     {
         base.Update(delta);
-        state.SubStates[CurrentIndex].OwnerTask.Update(delta);
+        CurrentTask.Update(delta);
     }
 
 
     public override void PhysicsUpdate(double delta)
     {
         base.PhysicsUpdate(delta);
-        state.SubStates[CurrentIndex].OwnerTask.PhysicsUpdate(delta);
+        CurrentTask.PhysicsUpdate(delta);
     }
 
 
-    private int SelectTaskBasedOnWeights()
+    protected bool IsCurrentCanEnter()
+    {
+        return CurrentTask.CanEnter();
+    }
+
+    protected int SelectTaskBasedOnWeights()
     {
         if (RandomWeights == null || RandomWeights.Length == 0)
         {
@@ -60,7 +70,7 @@ public class RandomTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
 
         int RandomWeightsLength = RandomWeights.Length;
 
-        for (int i = 0; i < state.SubStates.Count; i++)
+        for (int i = 0; i < state.SubTaskTypes.Length; i++)
         {
             if(i >= RandomWeightsLength) // 如果权重数组长度小于子任务数量，则每个子任务权重为1
                 cumulativeWeight += 1;
@@ -72,7 +82,6 @@ public class RandomTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
                 return i; 
             }
         }
-
         return 0; 
     }
 }

@@ -13,9 +13,9 @@ public class TaskBase(State state) : AbsTask(state), ITask
 
     public virtual void Exit()
     {
-        if (CanExit())
+        if (State.Status == RunningStatus.Succeed)
             Succeed();
-        else
+        else if (State.Status == RunningStatus.Failed)
             Failed();
 
         OnExit();
@@ -28,9 +28,15 @@ public class TaskBase(State state) : AbsTask(state), ITask
     }
 
 
+    // 状态退出条件,有三种情况：
+    // 1. State.Status 为 RunningStatus.Succeed
+    // 2. State.Status 为 RunningStatus.Failed
+    // 3. State.ExitCondition 为真
     public virtual bool CanExit()
     {
-        return OnExitCondition();
+        return State.Status == RunningStatus.Failed 
+        || State.Status == RunningStatus.Succeed 
+        || OnExitCondition() ;
     }
 
 
@@ -64,14 +70,12 @@ public class TaskBase(State state) : AbsTask(state), ITask
 
     protected virtual void Succeed()
     {
-        State.Status = RunningStatus.Succeed;
         OnSucceed();
     }
 
 
     protected virtual void Failed()
     {
-        State.Status = RunningStatus.Failed;
         OnFail();
     }
 }

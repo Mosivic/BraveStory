@@ -7,6 +7,7 @@
     1. 因为结束条件固定为所有子任务运行完毕，所以 ExitConditionFunc 无效
 
 */
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
@@ -18,43 +19,46 @@ public class ParallelTask<TState, THost, TContext, TExecuteArgs>(CompoundState s
     where TContext : Context
     where TExecuteArgs : ExecuteArgs
 {
+    protected List<Task<TState, THost, TContext, TExecuteArgs>> SubTasks = [];
+
     public override void Enter()
     {
         base.Enter();
-        foreach (var subState in state.SubStates)
+        foreach (var subTaskType in state.SubTaskTypes)
         {
-            subState.OwnerTask = TaskCreator.GetTask(subState);
-            subState.OwnerTask.Enter();
+            var subTask = TaskCreator.GetTask<TState, THost, TContext, TExecuteArgs>(subTaskType);
+            SubTasks.Add(subTask);
+            subTask.Enter();
         }
     }
 
     public override void Exit()
     {
         base.Exit();
-        foreach (var subState in state.SubStates)
-            subState.OwnerTask.Exit();
+        foreach (var subTask in SubTasks)
+            subTask.Exit();
         
     }
 
     public override void Update(double delta)
     {
         base.Update(delta);
-        foreach (var subState in state.SubStates)
-            subState.OwnerTask.Update(delta);
+        foreach (var subTask in SubTasks)
+            subTask.Update(delta);
         
     }
 
     public override void PhysicsUpdate(double delta)
     {
         base.PhysicsUpdate(delta);
-        foreach (var subState in state.SubStates)
-            subState.OwnerTask.PhysicsUpdate(delta);
+        foreach (var subTask in SubTasks)
+            subTask.PhysicsUpdate(delta);
     }
 
 
     public override bool CanExit() 
     {
-        return state.SubStates.All(subState => subState.OwnerTask.CanExit());
+        return SubTasks.All(subTask => subTask.CanExit());
     }
 
 }
