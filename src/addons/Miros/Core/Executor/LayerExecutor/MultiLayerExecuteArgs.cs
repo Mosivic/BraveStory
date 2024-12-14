@@ -31,3 +31,15 @@ public class MultiLayerExecuteArgs : ExecuteArgs
     public TransitionMode AsNextTaskTransitionMode { get; set; }
     public bool AsDefaultTask { get; set; }
 }
+
+public class MultiLayerSwitchTaskArgs : ExecuteArgs
+{
+    public MultiLayerSwitchTaskArgs(Tag layer, TransitionMode mode = TransitionMode.Force)
+    {
+        Layer = layer;
+        Mode = mode;
+    }
+
+    public Tag Layer { get; private set; }
+    public TransitionMode Mode { get; private set; }
+}

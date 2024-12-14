@@ -16,6 +16,8 @@ public class SerialTask<TState, THost, TContext, TExecuteArgs>(CompoundState sta
     protected int CurrentIndex = 0;
     protected Task<TState, THost, TContext, TExecuteArgs> CurrentTask;
 
+
+
     public override void Enter()
     {
         base.Enter();

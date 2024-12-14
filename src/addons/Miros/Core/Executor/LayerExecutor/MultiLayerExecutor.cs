@@ -14,6 +14,21 @@ public class MultiLayerExecutor : ExecutorBase<TaskBase>, IExecutor
         return stateTask.IsActive;
     }
 
+    public override void SwitchTaskByTag(Tag tag, Context context)
+    {
+        if (!_tasks.TryGetValue(tag, out var task))
+            return;
+
+        if (context is null || context is not MultiLayerSwitchTaskArgs)
+            Console.WriteLine("context is null or not MultiLayerSwitchTaskArgs");
+
+        var switchTaskArgs = context as MultiLayerSwitchTaskArgs;
+        if (_layers.TryGetValue(switchTaskArgs.Layer, out var layerExecutor))
+        {
+            layerExecutor.SetNextTask(task, switchTaskArgs.Mode);
+        }
+    }
+
     public override void Update(double delta)
     {
         base.Update(delta);

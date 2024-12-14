@@ -10,4 +10,6 @@ public interface IExecutor
     bool HasTaskRunning(ITask task);
     void Update(double delta);
     void PhysicsUpdate(double delta);
+    void SwitchTaskByTag(Tag tag, Context context); 
+
 }

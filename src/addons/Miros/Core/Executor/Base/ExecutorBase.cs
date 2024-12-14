@@ -28,6 +28,12 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
         t.TriggerOnRemove(); 
     }
 
+
+    public virtual void SwitchTaskByTag(Tag tag, Context context)
+    {
+        return;
+    }
+
     public virtual double GetCurrentTaskTime(Tag layer)
     {
         return 0;
@@ -120,4 +126,5 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
                 break;
         }
     }
+
 }

@@ -22,6 +22,20 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         foreach (var task in _runningTasks) task.Update(delta);
     }
 
+
+    public override void SwitchTaskByTag(Tag tag, Context context = null)
+    {
+        if (_tasks.TryGetValue(tag, out var task))
+        {
+            if (task != null)
+            {
+                task.Enter();
+                _runningTasks.Add(task);
+                _onRunningEffectTasksIsDirty?.Invoke(this, task);
+            }
+        }
+    }
+
     private void UpdateTasks()
     {
         // Enter

@@ -19,6 +19,17 @@ public class StunEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecut
         Host.PlayAnimation("idle");
         Context.StunTimer = 0.0f;
         Context.IsStunned = false;
+
+        var stunEffect = new Effect
+        {
+            Tag = Tags.Effect_Buff,
+            SourceAgent = Agent,
+            RemovePolicy = RemovePolicy.WhenExited,
+            DurationPolicy = DurationPolicy.Instant,
+            Executions = [new CustomAttackDamageExecution(13)]
+        };
+
+        Agent.AddTaskFromState(ExecutorType.EffectExecutor, stunEffect); // 添加伤害效果
     }
 
     protected override void OnPhysicsUpdate(double delta)

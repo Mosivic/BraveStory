@@ -21,16 +21,24 @@ public class ParallelTask<TState, THost, TContext, TExecuteArgs>(CompoundState s
 {
     protected List<Task<TState, THost, TContext, TExecuteArgs>> SubTasks = [];
 
-    public override void Enter()
+
+    protected override void OnAdd()
     {
-        base.Enter();
+        base.OnAdd();
         foreach (var subTaskType in state.SubTaskTypes)
         {
             var subTask = TaskCreator.GetTask<TState, THost, TContext, TExecuteArgs>(subTaskType);
             SubTasks.Add(subTask);
-            subTask.Enter();
         }
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        foreach (var subTask in SubTasks)
+            subTask.Enter();
+    }
+
 
     public override void Exit()
     {
@@ -61,6 +69,6 @@ public class ParallelTask<TState, THost, TContext, TExecuteArgs>(CompoundState s
         return SubTasks.All(subTask => subTask.CanExit());
     }
 
+
+
 }
-
-

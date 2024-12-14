@@ -62,6 +62,12 @@ public class Agent
         return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
     }
 
+    public void SwitchTaskFromTag(ExecutorType executorType, Tag tag, Context context = null)
+    {
+        var executor = GetExecutor(executorType);
+        executor.SwitchTaskByTag(tag, context);
+    }
+
 
     public void AddTasksFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] tasks)
         where TState : State, new()
@@ -116,8 +122,7 @@ public class Agent
         task.State.ExecutorType = executorType;
     }
     
-
-    private void PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
+    private IExecutor GetExecutor(ExecutorType executorType)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
@@ -129,7 +134,12 @@ public class Agent
             };
             _executors[executorType] = executor;
         }
+        return executor;
+    }
 
+    private void PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
+    {
+        var executor = GetExecutor(executorType);
         executor.AddTask(task, args);
     }
 
