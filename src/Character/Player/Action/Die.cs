@@ -8,7 +8,7 @@ public class DieAction : Task<State, Player, PlayerContext, MultiLayerExecuteArg
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
-            new(Tags.State_Status_Die, () => Agent.Attr("HP") <= 0, TransitionMode.Normal, 0, true)
+            new(Tags.State_Status_Die, () => Agent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
         ]
     );
 

@@ -37,8 +37,8 @@ public class SlidingAction : Task<State, Player, PlayerContext, MultiLayerExecut
     private void Slide(double delta)
     {
         var velocity = Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, 0, Agent.Attr("SlidingDeceleration") * (float)delta);
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        velocity.X = Mathf.MoveToward(velocity.X, 0, Agent.Atr("SlidingDeceleration") * (float)delta);
+        velocity.Y += (float)delta * Agent.Atr("Gravity");
         Host.Velocity = velocity;
         Host.MoveAndSlide();
     }

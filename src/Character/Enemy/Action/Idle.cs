@@ -10,7 +10,7 @@ public class IdleEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecut
         Tags.StateLayer_Movement,
         [
             new(Tags.State_Action_Patrol, () => !Host.IsPlayerColliding()),
-            new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
+            new(Tags.State_Action_Charge, () => Host.IsOnFloor() && Host.IsPlayerColliding())
         ]
     );
 

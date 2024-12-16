@@ -16,7 +16,7 @@ public class JumpAction : Task<State, Player, PlayerContext, MultiLayerExecuteAr
     protected override void OnEnter()
     {
         Host.PlayAnimation("jump");
-        Host.Velocity = new Vector2(Host.Velocity.X, Agent.Attr("JumpVelocity"));
+        Host.Velocity = new Vector2(Host.Velocity.X, Agent.Atr("JumpVelocity"));
         Context.JumpCount++;
     }
 

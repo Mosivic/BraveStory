@@ -51,7 +51,7 @@ public class Agent
     }
 
 
-    public float Attr(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
+    public float Atr(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
     {
         return AttributeSetContainer.Attribute(attrName, valueType);
     }

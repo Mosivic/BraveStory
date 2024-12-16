@@ -38,8 +38,8 @@ public class PatrolEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
 
         // 移动逻辑
         var velocity = Host.Velocity;
-        velocity.X = Agent.Attr("WalkSpeed") * -Host.Graphics.Scale.X; // 注意这里加了负号
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        velocity.X = Agent.Atr("WalkSpeed") * -Host.Graphics.Scale.X; // 注意这里加了负号
+        velocity.Y += (float)delta * Agent.Atr("Gravity");
         Host.Velocity = velocity;
         Host.MoveAndSlide();
     }

@@ -30,7 +30,7 @@ public class Attack111Action : Task<State, Player, PlayerContext, MultiLayerExec
                 SourceAgent = Agent,
                 RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
-                Executions = [new CustomAttackDamageExecution(Agent.Attr("Attack") + 2)]
+                Executions = [new CustomAttackDamageExecution(Agent.Atr("Attack") + 2)]
             };
 
             Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);

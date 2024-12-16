@@ -29,11 +29,11 @@ public class FallAction : Task<State, Player, PlayerContext, MultiLayerExecuteAr
         // 确保空中移动控制合理
         velocity.X = Mathf.MoveToward(
             velocity.X,
-            direction * Agent.Attr("RunSpeed"),
-            Agent.Attr("AirAcceleration")
+            direction * Agent.Atr("RunSpeed"),
+            Agent.Atr("AirAcceleration")
         );
 
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        velocity.Y += (float)delta * Agent.Atr("Gravity");
         Host.Velocity = velocity;
 
         Host.UpdateFacing(direction);

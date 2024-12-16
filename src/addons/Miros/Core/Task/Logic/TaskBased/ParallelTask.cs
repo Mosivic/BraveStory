@@ -13,7 +13,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class ParallelTask<TState, THost, TContext, TExecuteArgs>(CompoundState state) : Task<TState, THost, TContext, TExecuteArgs>()
+public class ParallelTaskWithTaskBased<TState, THost, TContext, TExecuteArgs>(CompoundStateWithTaskBased state) : Task<TState, THost, TContext, TExecuteArgs>()
     where TState : State, new()
     where THost : Node
     where TContext : Context

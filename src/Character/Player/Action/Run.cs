@@ -30,8 +30,8 @@ public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArg
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Attr("RunSpeed"), Agent.Attr("FloorAcceleration"));
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Atr("RunSpeed"), Agent.Atr("FloorAcceleration"));
+        velocity.Y += (float)delta * Agent.Atr("Gravity");
         Host.Velocity = velocity;
 
         Host.UpdateFacing(direction); // 使用新方法处理朝向

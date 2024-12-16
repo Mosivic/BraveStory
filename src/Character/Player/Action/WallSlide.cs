@@ -24,7 +24,7 @@ public class WallSlideAction : Task<State, Player, PlayerContext, MultiLayerExec
     protected override void OnPhysicsUpdate(double delta)
     {
         var velocity = Host.Velocity;
-        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Attr("Gravity"), 600);
+        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Atr("Gravity"), 600);
         Host.Velocity = velocity;
 
         Host.UpdateFacing(0);

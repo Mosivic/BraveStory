@@ -7,8 +7,10 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
 {
     public override Tag StateTag => Tags.State_Action_Charge;
 
-    private float _waitTime = 0.5f;
+    private float _waitTime = 0.3f;
     private AnimatedSprite2D _smoke;
+    private bool _IsCharging = false;
+    
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -19,33 +21,33 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
 
     protected override void OnEnter()
     {
-        
+        Host.PlayAnimation("run");
 
         _waitTime = 1.0f;
         Context.ChargeTimer = 0f;
         Context.IsCharging = true;
-
-        var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
-        _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
-
-        Host.AddChild(_smoke);
+        
+        _smoke.Visible = true;
         _smoke.Play("smoke");
 
+    }
+    protected override void OnAdd()
+    {
+        var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
+        _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
+        Host.AddChild(_smoke);
+        _smoke.Visible = false;
     }
 
     protected override void OnPhysicsUpdate(double delta)
     {
-        _waitTime -= (float)delta;
-        if (_waitTime < 0)
+        if (_waitTime > 0)
         {
-            Charge(delta);
-
-            Host.PlayAnimation("run");
-
-            _smoke.QueueFree();
+            _waitTime -= (float)delta;
+            return;
         }
 
-        
+        Charge(delta);
 
         if (Context.IsHit && Context.HitAgent != null)
         {
@@ -67,6 +69,10 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
     {
         Context.IsCharging = false;
         Context.ChargeTimer = 0f;
+
+        _smoke.Visible = false;
+        _smoke.Stop();
+
     }
 
     private void Charge(double delta)
@@ -82,7 +88,7 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
         }
 
         var velocity = Host.Velocity;
-        velocity.X = -Host.Graphics.Scale.X * Agent.Attr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
+        velocity.X = -Host.Graphics.Scale.X * Agent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
         var slowdownThreshold = 0.3f; // 最后0.3秒开始减速
@@ -93,7 +99,7 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
             velocity.X *= slowdownFactor;
         }
 
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
+        velocity.Y += (float)delta * Agent.Atr("Gravity");
         Host.Velocity = velocity;
         Host.MoveAndSlide();
     }

@@ -130,6 +130,6 @@ animations = [{
 }]
 
 [node name="Smoke" type="AnimatedSprite2D"]
-position = Vector2(0, -16)
+position = Vector2(-3, -15)
 sprite_frames = SubResource("SpriteFrames_qxhml")
 animation = &"smoke"
