@@ -1,3 +1,4 @@
+using Godot;
 using Miros.Core;
 
 namespace BraveStory;
@@ -6,6 +7,8 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
 {
     public override Tag StateTag => Tags.State_Action_Charge;
 
+    private float _waitTime = 0.5f;
+    private AnimatedSprite2D _smoke;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -16,14 +19,33 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
 
     protected override void OnEnter()
     {
-        Host.PlayAnimation("run");
+        
+
+        _waitTime = 1.0f;
         Context.ChargeTimer = 0f;
         Context.IsCharging = true;
+
+        var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
+        _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
+
+        Host.AddChild(_smoke);
+        _smoke.Play("smoke");
+
     }
 
     protected override void OnPhysicsUpdate(double delta)
     {
-        Charge(delta);
+        _waitTime -= (float)delta;
+        if (_waitTime < 0)
+        {
+            Charge(delta);
+
+            Host.PlayAnimation("run");
+
+            _smoke.QueueFree();
+        }
+
+        
 
         if (Context.IsHit && Context.HitAgent != null)
         {

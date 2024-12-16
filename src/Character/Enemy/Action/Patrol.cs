@@ -14,7 +14,7 @@ public class PatrolEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
             new(Tags.State_Action_Idle, () =>
                 (!Host.IsFloorColliding() && !Host.IsPlayerColliding() && State.RunningTime > 2) ||
                 (!Host.IsFloorColliding() && Host.IsPlayerColliding())),
-            new(Tags.State_Action_StompGround, () => Host.IsPlayerColliding())
+            new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
         ]
     );
 
