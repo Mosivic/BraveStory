@@ -8,69 +8,69 @@ namespace Miros.Core;
 // FIXME: 修复状态转换的逻辑
 public class LayerExecutor
 {
-    private readonly Dictionary<Tag, TaskBase> _tasks = [];
+    private readonly Dictionary<Tag, State> _states = [];
     private readonly TransitionContainer _transitionContainer;
 
-    private TaskBase _currentTask;
-    private TaskBase _lastTask;
-    private TaskBase _nextTask;
-    private TaskBase _defaultTask;
+    private State _currentState;
+    private State _lastState;
+    private State _nextState;
+    private State _defaultState;
 
-    private TransitionMode _nextTaskTransitionMode;
+    private TransitionMode _nextStateTransitionMode;
 
 
     public LayerExecutor(Tag layerTag,
-        TransitionContainer transitionContainer, Dictionary<Tag, TaskBase> tasks)
+        TransitionContainer transitionContainer, Dictionary<Tag, State> states)
     {
         Layer = layerTag;
         _transitionContainer = transitionContainer;
-        _tasks = tasks;
+        _states = states;
     }
 
     public Tag Layer { get; }
 
 
-    public void SetDefaultTask(TaskBase task)
+    public void SetDefaultState(State state)
     {
-        _defaultTask = task;
+        _defaultState = state;
     }
 
-    public void SetNextTask(TaskBase task, TransitionMode mode)
+    public void SetNextState(State state, TransitionMode mode)
     {
-        _nextTask = task;
-        _nextTaskTransitionMode = mode;
+        _nextState = state;
+        _nextStateTransitionMode = mode;
     }
 
     public void Update(double delta)
     {
-        ProcessNextTask();
+        ProcessNextState();
 
-        _currentTask.Update(delta);
+        _currentState.Task.Update(_currentState,delta);
     }
 
     public void PhysicsUpdate(double delta)
     {
-        _currentTask?.PhysicsUpdate(delta);
+        _currentState.Task.PhysicsUpdate(_currentState,delta);
     }
 
 
-    private void ProcessNextTask()
+    private void ProcessNextState()
     {
-        if (_currentTask == null)
+        if (_currentState == null)
         {
-            _currentTask = _defaultTask;
+            _currentState = _defaultState;
             return;
         }
 
-        if (_nextTask != null)
+        if (_nextState != null)
         {
-            SwitchNextTask();
+            SwitchNextState();
             return;
         }
 
 
         // 当没有下一个任务时（_nextTask == null），检查当前任务是否有可转换的状态
-        var transitions = _transitionContainer.GetPossibleTransition(_currentTask);
+        var transitions = _transitionContainer.GetPossibleTransition(_currentState);
 
         // 使用LINQ获取优先级最高且可进入的状态
         var sortedTransitions = transitions
@@ -81,47 +81,47 @@ public class LayerExecutor
 
         foreach (var t in sortedTransitions)
         {
-            var task = _tasks[t.To];
+            var state = _states[t.To];
             if (t.Mode switch
                 {
-                    TransitionMode.Normal => t.CanTransition() && _currentTask.CanExit() && task.CanEnter(),
+                    TransitionMode.Normal => t.CanTransition() && _currentState.Task.CanExit(_currentState) && state.Task.CanEnter(state),
                     TransitionMode.Force => t.CanTransition(),
-                    TransitionMode.DelayFront => t.CanTransition() && task.CanEnter(),
-                    TransitionMode.DelayBackend => t.CanTransition() && _currentTask.CanExit(),
+                    TransitionMode.DelayFront => t.CanTransition() && state.Task.CanEnter(state),
+                    TransitionMode.DelayBackend => t.CanTransition() && _currentState.Task.CanExit(_currentState),
                     _ => throw new ArgumentException($"Unsupported transition mode: {t.Mode}")
                 })
             {
-                _nextTask = task;
-                _nextTaskTransitionMode = t.Mode;
+                _nextState = state;
+                _nextStateTransitionMode = t.Mode;
                 return;
             }
         }
     }
 
-    private void SwitchNextTask()
+    private void SwitchNextState()
     {
-        if (_nextTaskTransitionMode == TransitionMode.DelayFront && !_currentTask.CanExit()) // 等待当前任务满足退出条件
+        if (_nextStateTransitionMode == TransitionMode.DelayFront && !_currentState.Task.CanExit(_currentState)) // 等待当前任务满足退出条件
             return;
 
-        if (_nextTaskTransitionMode == TransitionMode.DelayBackend && !_nextTask.CanEnter()) // 等待新任务满足进入条件
+        if (_nextStateTransitionMode == TransitionMode.DelayBackend && !_nextState.Task.CanEnter(_nextState)) // 等待新任务满足进入条件
             return;
 
-        _currentTask.Exit();
-        _nextTask.Enter();
+        _currentState.Task.Exit(_currentState);
+        _nextState.Task.Enter(_nextState);
 
-        _lastTask = _currentTask;
-        _currentTask = _nextTask;
-        _nextTask = null;
+        _lastState = _currentState;
+        _currentState = _nextState;
+        _nextState = null;
     }
 
 
-    public TaskBase GetNowTask()
+    public State GetNowState()
     {
-        return _currentTask;
+        return _currentState;
     }
 
-    public TaskBase GetLastTask()
+    public State GetLastState()
     {
-        return _lastTask;
+        return _lastState;
     }
 }

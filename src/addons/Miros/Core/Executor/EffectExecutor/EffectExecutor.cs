@@ -92,7 +92,7 @@ public class EffectExecutor : ExecutorBase<Effect>
                 if (AreFromSameSourceAgent(effect, existingEffect))
                     existingEffect.Task.Stack(existingEffect, true);
                 else
-                    existingEffect.Task.Stack(existingEffect);
+                    existingEffect.Task.Stack(existingEffect, false);
             }
 
         if (isAddTask) base.AddState(effect, context);

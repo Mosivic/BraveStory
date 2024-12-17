@@ -1,5 +1,8 @@
 ﻿namespace Miros.Core;
 
+public class Task : TaskBase<State>{}
+
+
 public class TaskBase<TState> : ITask<TState>
     where TState : State
 {
@@ -134,5 +137,10 @@ public class TaskBase<TState> : ITask<TState>
     protected virtual void OnRemove(TState state)
     {
         state.RemoveFunc?.Invoke(state);
+    }
+
+    public virtual void Stack(TState state, bool IsFromSameSource)
+    {
+        
     }
 }

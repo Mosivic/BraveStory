@@ -5,19 +5,16 @@ using Godot;
 
 namespace Miros.Core;
 
-public class EffectTask(Effect effect) : TaskBase(effect)
+public class EffectTask : TaskBase<Effect>
 {
     private EffectUpdateHandler _updateHandler;
 
-    public bool IsInstant => effect.DurationPolicy == DurationPolicy.Instant;
-    public EffectStacking Stacking => effect.Stacking;
 
 
-
-    public override void Enter()
+    public override void Enter(Effect effect)
     {
-        base.Enter();
-        CaptureAttributesSnapshot();
+        base.Enter(effect);
+        CaptureAttributesSnapshot(effect);
 
         effect.OwnerAgent.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
@@ -39,20 +36,20 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
 
-    public override void Update(double delta)
+    public override void Update(Effect effect, double delta)
     {
-        base.Update(delta);
+        base.Update(effect, delta);
         _updateHandler?.Tick(delta);
     }
 
 
-    public override void Exit()
+    public override void Exit(Effect effect)
     {
-        base.Exit();
+        base.Exit(effect);
     }
 
 
-    public void Stack(bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
+    public override void Stack(Effect effect, bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
     {
         var stacking = effect.Stacking;
 
@@ -82,13 +79,13 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
 
-    public override bool CanEnter()
+    public override bool CanEnter(Effect effect)
     {
         return effect.OwnerAgent.HasAll(effect.ApplicationRequiredTags);
     }
 
 
-    public override bool CanExit()
+    public override bool CanExit(Effect effect)
     {
         if (!effect.OwnerAgent.HasAll(effect.OngoingRequiredTags)) return true;
         if (effect.OwnerAgent.HasAny(effect.ApplicationImmunityTags)) return true;
@@ -96,7 +93,7 @@ public class EffectTask(Effect effect) : TaskBase(effect)
     }
 
     // 捕获属性快照
-    private void CaptureAttributesSnapshot()
+    private void CaptureAttributesSnapshot(Effect effect)
     {
         effect.SnapshotSourceAttributes = effect.SourceAgent.DataSnapshot();
         effect.SnapshotTargetAttributes = effect.SourceAgent == effect.OwnerAgent

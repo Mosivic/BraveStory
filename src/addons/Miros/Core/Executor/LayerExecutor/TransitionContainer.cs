@@ -6,37 +6,37 @@ namespace Miros.Core;
 public class TransitionContainer
 {
     private readonly List<Transition> _anyTransitions = [];
-    private readonly Dictionary<TaskBase, List<Transition>> _transitions = [];
+    private readonly Dictionary<State, List<Transition>> _transitions = [];
 
 
-    public TransitionContainer AddTransitions(TaskBase fromTask, Transition[] transitions)
+    public TransitionContainer AddTransitions(State fromState, Transition[] transitions)
     {
-        if (!_transitions.ContainsKey(fromTask))
-            _transitions[fromTask] = [];
+        if (!_transitions.ContainsKey(fromState))
+            _transitions[fromState] = [];
 
         foreach (var transition in transitions)
             if (transition.IsAny)
                 _anyTransitions.Add(transition);
             else
-                _transitions[fromTask].Add(transition);
+                _transitions[fromState].Add(transition);
         return this;
     }
 
-    public void RemoveTransitions(TaskBase task)
+    public void RemoveTransitions(State state)
     {
-        _transitions.Remove(task);
+        _transitions.Remove(state);
     }
 
-    public void RemoveAnyTransition(TaskBase task)
+    public void RemoveAnyTransition(State state)
     {
-        _anyTransitions.RemoveAll(t => t.To == task.Tag);
+        _anyTransitions.RemoveAll(t => t.To == state.Tag);
     }
 
     // 返回满足转换条件的所有状态
-    public IEnumerable<Transition> GetPossibleTransition(TaskBase fromTask)
+    public IEnumerable<Transition> GetPossibleTransition(State fromState)
     {
-        if (!_transitions.TryGetValue(fromTask, out var rules)) return Enumerable.Empty<Transition>();
+        if (!_transitions.TryGetValue(fromState, out var rules)) return Enumerable.Empty<Transition>();
         var ts = rules.Union(_anyTransitions);
-        return ts.Where(r => r.To != fromTask.Tag && r.CanTransition()); // 排除自身
+        return ts.Where(r => r.To != fromState.Tag && r.CanTransition()); // 排除自身
     }
 }
