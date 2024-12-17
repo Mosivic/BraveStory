@@ -1,7 +1,5 @@
 ﻿namespace Miros.Core;
 
-public class Task : TaskBase<State>{}
-
 
 public class TaskBase<TState> : ITask<TState>
     where TState : State

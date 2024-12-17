@@ -4,11 +4,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class RandomTaskWithTaskBased<TState, THost, TContext, TExecuteArgs>(CompoundStateWithTaskBased state) : Task<TState, THost, TContext, TExecuteArgs>()
-    where TState : State, new()
-    where THost : Node
-    where TContext : Context
-    where TExecuteArgs : ExecuteArgs
+public class RandomTask: TaskBase<CompoundState>
 {
     // 各子任务权重，用于随机选择子任务
     protected virtual float[] RandomWeights { get; set;} = [];
@@ -16,48 +12,48 @@ public class RandomTaskWithTaskBased<TState, THost, TContext, TExecuteArgs>(Comp
     // 当前选择的子任务索引
     protected int CurrentIndex = 0;
 
-    protected TaskBase CurrentTask = null;
+    protected TaskBase<State> CurrentTask = null;
 
-    public override void Enter()
+    public override void Enter(CompoundState state)
     {
-        base.Enter();
-        CurrentIndex = SelectTaskBasedOnWeights();
-        CurrentTask = TaskCreator.GetTask<TState, THost, TContext, TExecuteArgs>(state.SubTaskTypes[CurrentIndex]);
+        base.Enter(state);
+        CurrentIndex = SelectTaskBasedOnWeights(state);
+        CurrentTask = TaskProvider.GetTask(state.SubStates[CurrentIndex]);
         
-        if(IsCurrentCanEnter())
-            CurrentTask.Enter();
+        if(IsCurrentCanEnter(state))
+            CurrentTask.Enter(state);
         else
             state.Status = RunningStatus.Failed;
     }
 
 
-    public override void Exit()
+    public override void Exit(CompoundState state)
     {   
-        base.Exit();
-        CurrentTask.Exit();
+        base.Exit(state);
+        CurrentTask.Exit(state);
     }
 
 
-    public override void Update(double delta)
+    public override void Update(CompoundState state, double delta)
     {
-        base.Update(delta);
-        CurrentTask.Update(delta);
+        base.Update(state, delta);
+        CurrentTask.Update(state, delta);
     }
 
 
-    public override void PhysicsUpdate(double delta)
+    public override void PhysicsUpdate(CompoundState state, double delta)
     {
-        base.PhysicsUpdate(delta);
-        CurrentTask.PhysicsUpdate(delta);
+        base.PhysicsUpdate(state, delta);
+        CurrentTask.PhysicsUpdate(state, delta);
     }
 
 
-    protected bool IsCurrentCanEnter()
+    protected bool IsCurrentCanEnter(CompoundState state)
     {
-        return CurrentTask.CanEnter();
+        return CurrentTask.CanEnter(state);
     }
 
-    protected int SelectTaskBasedOnWeights()
+    protected int SelectTaskBasedOnWeights(CompoundState state)
     {
         if (RandomWeights == null || RandomWeights.Length == 0)
         {
@@ -70,7 +66,7 @@ public class RandomTaskWithTaskBased<TState, THost, TContext, TExecuteArgs>(Comp
 
         int RandomWeightsLength = RandomWeights.Length;
 
-        for (int i = 0; i < state.SubTaskTypes.Length; i++)
+        for (int i = 0; i < state.SubStates.Length; i++)
         {
             if(i >= RandomWeightsLength) // 如果权重数组长度小于子任务数量，则每个子任务权重为1
                 cumulativeWeight += 1;
