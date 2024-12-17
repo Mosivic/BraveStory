@@ -36,7 +36,7 @@ public class StunEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerE
             Executions = [new CustomAttackDamageExecution(13)]
         };
 
-        OwnerAgent.AddTaskFromState(ExecutorType.EffectExecutor, stunEffect); // 添加伤害效果
+        OwnerAgent.AddEffect(stunEffect); // 添加伤害效果
     }
 
     private void OnPhysicsUpdate(double delta)

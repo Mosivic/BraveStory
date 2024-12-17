@@ -72,7 +72,7 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext, MultiLaye
                 Executions = [new DamageExecution()]
             };
 
-            Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);
+            Context.HitAgent.AddEffect(damageEffect);
             Context.IsHit = false;
         }
     }

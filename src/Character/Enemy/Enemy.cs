@@ -40,7 +40,7 @@ public partial class Enemy : Character
 
         // 初始化 Agentor
         Agent.AddAttributeSet(typeof(BoarAttributeSet));
-        Agent.AddTasksFromType<State, Enemy, EnemyContext, MultiLayerExecuteArgs>(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
+        Agent.AddActions<Enemy, EnemyContext, MultiLayerExecuteArgs>(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
             typeof(IdleEnemyActionState), typeof(PatrolEnemyActionState), typeof(DieEnemyActionState),
             typeof(ChargeEnemyActionState), typeof(HurtEnemyActionState), typeof(StunEnemyActionState),
             typeof(StompGroundEnemyActionState)

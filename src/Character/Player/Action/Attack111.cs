@@ -40,7 +40,7 @@ public class Attack111ActionState : ActionState<Player, PlayerContext, MultiLaye
                 Executions = [new CustomAttackDamageExecution(OwnerAgent.Atr("Attack") + 2)]
             };
 
-            Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);
+            Context.HitAgent.AddEffect(damageEffect);
             Context.IsHit = false;
         }
     }

@@ -35,14 +35,6 @@ public class TaskProvider
         return CreateTask(state);
     }
 
-    public static Task<TState, THost, TContext, TExecuteArgs> GetTask<TState, THost, TContext, TExecuteArgs>(Type taskType)
-    where TState : State, new()
-    where THost : Node
-    where TContext : Context
-    where TExecuteArgs : ExecuteArgs
-    {
-        return (Task<TState, THost, TContext, TExecuteArgs>)Activator.CreateInstance(taskType);
-    }
 
     private static TaskBase<State> CreateTask(State state)
     {

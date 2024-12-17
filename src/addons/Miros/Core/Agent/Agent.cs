@@ -22,8 +22,7 @@ public class Agent
     public Node Host { get; private set; }
     public bool Enabled { get; private set; }
     public EventStream EventStream { get; private set; }
-
-    private EffectExecutor _effectExecutor;
+    
 
 
     public void Init(Node host)
@@ -36,8 +35,7 @@ public class Agent
         AttributeSetContainer = new AttributeSetContainer(this);
 
 		// FIXME: 不应该在这里进行初始化
-        
-        _effectExecutor = new EffectExecutor();
+        _executors[ExecutorType.EffectExecutor] = new EffectExecutor() as IExecutor<State>;
         ;
     }
 
@@ -68,71 +66,53 @@ public class Agent
     public void SwitchTaskFromTag(ExecutorType executorType, Tag tag, Context context = null)
     {
         var executor = GetExecutor(executorType);
-        executor.SwitchTaskByTag(tag, context);
+        executor.SwitchStateByTag(tag, context);
     }
 
 
-    public void AddTasksFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] tasks)
-        where TState : State, new()
+    public void AddActions<THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] stateTypes)
         where THost : Node
         where TContext : Context
         where TExecuteArgs : ExecuteArgs
     {
-		foreach (var taskType in tasks)
-			AddTaskFromType<TState, THost, TContext, TExecuteArgs>(executorType, context, taskType);
+        foreach (var _ in stateTypes)
+            AddAction<THost, TContext, TExecuteArgs>(executorType, context);
     }
 
 	
-	public void AddTaskFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type taskType)
-	where TState : State, new()
+	public void AddAction<THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context)
 	where THost : Node
 	where TContext : Context
 	where TExecuteArgs : ExecuteArgs
 	{
-		var task = (Task<TState, THost, TContext, TExecuteArgs>)Activator.CreateInstance(taskType);
-		task.Init(this, Host as THost, context);
+		var state = (ActionState<THost, TContext, TExecuteArgs>)Activator.CreateInstance(typeof(ActionState<THost, TContext, TExecuteArgs>));
+        
+		state.Init(Host as THost, context, null);
+        state.Task = TaskProvider.GetTask(state);
 
 		if (executorType == ExecutorType.MultiLayerExecutor)
-		{
-			PushTaskOnExecutor(executorType, task, task.ExecuteArgs);
-			task.State.OwnerTask = task;
-			task.State.ExecutorType = executorType;
-		}
-		else if (executorType == ExecutorType.EffectExecutor)
-		{
-			PushTaskOnExecutor(executorType, task);
-			task.State.OwnerTask = task;
-			task.State.ExecutorType = executorType;
-		}
+            PushStateOnExecutor(executorType, state);
 	}
     
     
-	public void AddTasksFromState(ExecutorType executorType, State[] states)
-	{
-		foreach (var state in states)
-			AddTaskFromState(executorType, state);
-	}
-
-
-    public void AddTaskFromState(ExecutorType executorType, State state, ExecuteArgs args = null)
+    public void AddEffect(Effect effect)
     {
-        state.OwnerAgent = this;
+        effect.OwnerAgent = this;
+        effect.Task = TaskProvider.GetTask(effect);
+        effect.ExecutorType = ExecutorType.EffectExecutor;
 
-        var task = TaskCreator.GetTask(state);
-        PushTaskOnExecutor(executorType, task);
-
-        task.State.OwnerTask = task;
-        task.State.ExecutorType = executorType;
+        PushStateOnExecutor(ExecutorType.EffectExecutor, effect);
     }
+
     
-    private IExecutor GetExecutor(ExecutorType executorType)
+    private IExecutor<State> GetExecutor(ExecutorType executorType)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
             executor = executorType switch
             {
                 ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
-                ExecutorType.EffectExecutor => new EffectExecutor(),
+                ExecutorType.EffectExecutor => new EffectExecutor() as IExecutor<State>,
                 _ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
             };
             _executors[executorType] = executor;
@@ -140,14 +120,14 @@ public class Agent
         return executor;
     }
 
-    private void PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
+    private void PushStateOnExecutor(ExecutorType executorType, State state)
     {
         var executor = GetExecutor(executorType);
-        executor.AddTask(task, args);
+        executor.AddState(state, null);
     }
 
     
-    public void RemoveTaskByState(ExecutorType executorType, State state)
+    public void RemoveState(ExecutorType executorType, State state)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
@@ -157,7 +137,7 @@ public class Agent
 #endif
         }
 
-        executor.RemoveTask(state.OwnerTask);
+        executor.RemoveState(state);
     }
 
 
@@ -244,8 +224,7 @@ public class Agent
     public Effect[] GetRunningEffects()
     {
         return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
-            .GetRunningTasks()
-            .Select(task => task.State as Effect).ToArray();
+            .GetRunningEffects().ToArray();
     }
 
 
@@ -256,15 +235,13 @@ public class Agent
     {
         if (tags.Empty) return;
         if (!_executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
-        var tasks = executor.GetAllTasks();
+        var effects = (executor as EffectExecutor).GetRunningEffects();
         var removeList = new List<State>();
 
-        foreach (var task in tasks)
+        foreach (var effect in effects)
         {
-            var effectTask = task as EffectTask;
-            var effect = effectTask.State as Effect;
-
             var ownedTags = effect.OwnedTags;
+
             if (!ownedTags.Empty && ownedTags.HasAny(tags))
                 removeList.Add(effect);
 
@@ -273,7 +250,7 @@ public class Agent
                 removeList.Add(effect);
         }
 
-        foreach (var effect in removeList) RemoveTaskByState(ExecutorType.EffectExecutor, effect);
+        foreach (var effect in removeList) RemoveState(ExecutorType.EffectExecutor, effect);
     }
 
 

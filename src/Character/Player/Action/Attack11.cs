@@ -41,7 +41,7 @@ public class Attack11ActionState : ActionState<Player, PlayerContext, MultiLayer
                 Executions = [new CustomAttackDamageExecution(OwnerAgent.Atr("Attack") + 1)]
             };
 
-            Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);
+            Context.HitAgent.AddEffect(damageEffect);
             Context.IsHit = false;
         }
     }
