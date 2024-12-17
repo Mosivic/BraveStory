@@ -5,7 +5,7 @@ namespace Miros.Core;
 public class State
 {
     public virtual Tag Tag { get; set; }
-    public virtual Type TaskType => typeof(TaskBase<State>);
+    public virtual TaskType TaskType { get; set; } = TaskType.Base;
     public int Priority { get; set; } = 0;
     public Agent OwnerAgent { get; set; }
     public Agent SourceAgent { get; set; }

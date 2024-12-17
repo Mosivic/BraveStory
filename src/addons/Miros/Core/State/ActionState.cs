@@ -12,8 +12,6 @@ public class ActionState<THost, TContext, TExecuteArgs> : State
     public TContext Context { get; private set; }
     public virtual TExecuteArgs ExecuteArgs { get; private set; }
 
-    public override Type TaskType => typeof(TaskBase<ActionState<THost, TContext, TExecuteArgs>>);
-
 
     public virtual void Init(THost host, TContext context, TExecuteArgs executeArgs)
     {

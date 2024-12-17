@@ -88,7 +88,7 @@ public class Agent
 		var state = (ActionState<THost, TContext, TExecuteArgs>)Activator.CreateInstance(typeof(ActionState<THost, TContext, TExecuteArgs>));
         
 		state.Init(Host as THost, context, null);
-        state.Task = TaskProvider.GetTask(state);
+        state.Task = TaskProvider.GetTask<TaskBase<State>>(state.TaskType);
 
 		if (executorType == ExecutorType.MultiLayerExecutor)
             PushStateOnExecutor(executorType, state);
@@ -98,7 +98,7 @@ public class Agent
     public void AddEffect(Effect effect)
     {
         effect.OwnerAgent = this;
-        effect.Task = TaskProvider.GetTask(effect);
+        effect.Task = TaskProvider.GetTask<TaskBase<State>>(effect.TaskType);
         effect.ExecutorType = ExecutorType.EffectExecutor;
 
         PushStateOnExecutor(ExecutorType.EffectExecutor, effect);

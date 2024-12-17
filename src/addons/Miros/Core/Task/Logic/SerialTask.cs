@@ -14,14 +14,13 @@ public class SerialTask: TaskBase<CompoundState>
     protected List<TaskBase<State>> Tasks = [];
 
 
-
     public override void TriggerOnAdd(CompoundState state)
     {
         base.TriggerOnAdd(state);
 
         foreach (var subState in state.SubStates)
         {
-            var subTask = TaskProvider.GetTask(subState);
+            var subTask = TaskProvider.GetTask<TaskBase<State>>(subState.TaskType);
             Tasks.Add(subTask);
         }
 

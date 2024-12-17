@@ -23,7 +23,7 @@ public class ParallelTask: TaskBase<CompoundState>
         base.OnAdd(state);
         foreach (var subState in state.SubStates)
         {
-            var subTask = TaskProvider.GetTask(subState);
+            var subTask = TaskProvider.GetTask<TaskBase<State>>(subState.TaskType);
             SubTasks.Add(subTask);
         }
     }

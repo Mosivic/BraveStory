@@ -18,7 +18,7 @@ public class RandomTask: TaskBase<CompoundState>
     {
         base.Enter(state);
         CurrentIndex = SelectTaskBasedOnWeights(state);
-        CurrentTask = TaskProvider.GetTask(state.SubStates[CurrentIndex]);
+        CurrentTask = TaskProvider.GetTask<TaskBase<State>>(state.SubStates[CurrentIndex].TaskType);
         
         if(IsCurrentCanEnter(state))
             CurrentTask.Enter(state);
