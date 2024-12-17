@@ -8,8 +8,8 @@ using Godot;
 
 namespace Miros.Core;
 
-public class SerialTaskWithStateBased<TState, THost, TContext, TExecuteArgs>(CompoundStateWithStateBased state) : Task<TState, THost, TContext, TExecuteArgs>()
-    where TState : State, new()
+public class SerialTaskWithStateBased<TState, THost, TContext, TExecuteArgs> : Task<TState, THost, TContext, TExecuteArgs>
+    where TState : CompoundState, new()
     where THost : Node
     where TContext : Context
     where TExecuteArgs : ExecuteArgs
@@ -19,11 +19,11 @@ public class SerialTaskWithStateBased<TState, THost, TContext, TExecuteArgs>(Com
 
 
 
-    protected override void OnAdd()
+    public override void TriggerOnAdd()
     {
-        base.OnAdd();
+        base.TriggerOnAdd();
 
-        foreach (var subState in state.SubStates)
+        foreach (var subState in State.SubStates)
         {
             var subTask = TaskCreator.GetTask(subState);
             Tasks.Add(subTask);

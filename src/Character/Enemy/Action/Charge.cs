@@ -3,14 +3,14 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class ChargeEnemyAction :  Task<CompoundState, Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag StateTag => Tags.State_Action_Charge;
 
     private float _waitTime = 0.3f;
     private AnimatedSprite2D _smoke;
     private bool _IsCharging = false;
-    
+
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -22,7 +22,7 @@ public class ChargeEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
     protected override void OnEnter()
     {
         Host.PlayAnimation("run");
-
+        
         _waitTime = 1.0f;
         Context.ChargeTimer = 0f;
         Context.IsCharging = true;

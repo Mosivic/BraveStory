@@ -2,7 +2,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class Task<TState, THost, TContext, TExecuteArgs>() : TaskBase(new TState())
+public class Task<TState, THost, TContext, TExecuteArgs> : TaskBase<TState>
     where TState : State, new()
     where THost : Node
     where TContext : Context
