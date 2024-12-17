@@ -3,28 +3,35 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class PatrolEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class PatrolEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     // FIXME：Walk 和 Patrol 是同一个状态，需要合并
-    public override Tag StateTag => Tags.State_Action_Patrol;
+    public override Tag Tag => Tags.State_Action_Patrol;
 
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
             new(Tags.State_Action_Idle, () =>
-                (!Host.IsFloorColliding() && !Host.IsPlayerColliding() && State.RunningTime > 2) ||
+                (!Host.IsFloorColliding() && !Host.IsPlayerColliding() && RunningTime > 2) ||
                 (!Host.IsFloorColliding() && Host.IsPlayerColliding())),
             new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
         ]
     );
 
+    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
 
-    protected override void OnEnter()
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("walk");
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         Patrol(delta);
     }
@@ -38,8 +45,8 @@ public class PatrolEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExec
 
         // 移动逻辑
         var velocity = Host.Velocity;
-        velocity.X = Agent.Atr("WalkSpeed") * -Host.Graphics.Scale.X; // 注意这里加了负号
-        velocity.Y += (float)delta * Agent.Atr("Gravity");
+        velocity.X = OwnerAgent.Atr("WalkSpeed") * -Host.Graphics.Scale.X; // 注意这里加了负号
+        velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
         Host.Velocity = velocity;
         Host.MoveAndSlide();
     }

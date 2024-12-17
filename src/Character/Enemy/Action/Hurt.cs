@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class HurtEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class HurtEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_Hurt;
+    public override Tag Tag => Tags.State_Action_Hurt;
 
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
@@ -15,9 +15,13 @@ public class HurtEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecut
         ]
     );
 
+    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+        EnterFunc += OnEnter;
+    }
 
-
-    protected override void OnEnter()
+    private void OnEnter()
     {
         Context.IsHurt = false;
         Host.PlayAnimation("hurt");

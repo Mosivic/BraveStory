@@ -2,24 +2,32 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class DieEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class DieEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Status_Die;
+    public override Tag Tag => Tags.State_Status_Die;
 
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
-            new(Tags.State_Status_Die, () => Agent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
+            new(Tags.State_Status_Die, () => OwnerAgent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
         ]
     );
 
 
-    protected override void OnEnter()
+    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+    }
+
+    protected void OnEnter()
     {
         Host.PlayAnimation("die");
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    protected void OnPhysicsUpdate(double delta)
     {
         if (Host.IsAnimationFinished()) Host.QueueFree();
     }

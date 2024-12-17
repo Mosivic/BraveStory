@@ -86,57 +86,57 @@ public class TaskBase<TState> : ITask<TState>
 
     protected virtual void OnEnter(TState state)
     {
-        state.EnterFunc?.Invoke(state);
+        state.EnterFunc?.Invoke();
     }
 
     protected virtual void OnExit(TState state)
     {
-        state.ExitFunc?.Invoke(state);
+        state.ExitFunc?.Invoke();
     }
 
     protected virtual void OnUpdate(TState state, double delta)
     {
-        state.UpdateFunc?.Invoke(state, delta);
+        state.UpdateFunc?.Invoke(delta);
     }
 
     protected virtual void OnPhysicsUpdate(TState state, double delta)
     {
-        state.PhysicsUpdateFunc?.Invoke(state, delta);
+        state.PhysicsUpdateFunc?.Invoke(delta);
     }
 
     protected virtual void OnSucceed(TState state)
     {
-        state.SucceedFunc?.Invoke(state);
+        state.SucceedFunc?.Invoke();
     }
 
     protected virtual void OnFailed(TState state)
     {
-        state.FailedFunc?.Invoke(state);
+        state.FailedFunc?.Invoke();
     }
 
     protected virtual bool OnEnterCondition(TState state)
     {
-        return state.EnterCondition?.Invoke(state) ?? true;
+        return state.EnterCondition?.Invoke() ?? true;
     }
 
     protected virtual bool OnExitCondition(TState state)
     {
-        return state.ExitCondition?.Invoke(state) ?? true;
+        return state.ExitCondition?.Invoke() ?? true;
     }
 
     protected virtual bool OnRemoveCondition(TState state)
     {
-        return state.RemoveCondition?.Invoke(state) ?? true;
+        return state.RemoveCondition?.Invoke() ?? true;
     }
 
     protected virtual void OnAdd(TState state)
     {
-        state.AddFunc?.Invoke(state);
+        state.AddFunc?.Invoke();
     }
 
     protected virtual void OnRemove(TState state)
     {
-        state.RemoveFunc?.Invoke(state);
+        state.RemoveFunc?.Invoke();
     }
 
     public virtual void Stack(TState state, bool IsFromSameSource)

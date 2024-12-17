@@ -14,7 +14,7 @@ public enum ExecutorType
 
 public class Agent
 {
-    private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
+    private readonly Dictionary<ExecutorType, IExecutor<State>> _executors = [];
     private TagContainer _ownedTags;
     private AttributeSetContainer AttributeSetContainer { get; set; }
 
@@ -22,6 +22,8 @@ public class Agent
     public Node Host { get; private set; }
     public bool Enabled { get; private set; }
     public EventStream EventStream { get; private set; }
+
+    private EffectExecutor _effectExecutor;
 
 
     public void Init(Node host)
@@ -34,7 +36,8 @@ public class Agent
         AttributeSetContainer = new AttributeSetContainer(this);
 
 		// FIXME: 不应该在这里进行初始化
-        _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
+        
+        _effectExecutor = new EffectExecutor();
         ;
     }
 

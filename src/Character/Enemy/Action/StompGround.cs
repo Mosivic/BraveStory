@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StompGroundEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class StompGroundEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_StompGround;
+    public override Tag Tag => Tags.State_Action_StompGround;
 
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
@@ -14,7 +14,15 @@ public class StompGroundEnemyAction : Task<State, Enemy, EnemyContext, MultiLaye
         ]
     );
 
-    protected override void OnEnter()
+    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("idle"); // 播放跳跃动画
         Context.StompTimer = 0f;
@@ -23,7 +31,7 @@ public class StompGroundEnemyAction : Task<State, Enemy, EnemyContext, MultiLaye
         Host.Velocity = new Vector2(0, -200f);
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         Context.StompTimer += (float)delta;
         Host.MoveAndSlide();
@@ -41,7 +49,7 @@ public class StompGroundEnemyAction : Task<State, Enemy, EnemyContext, MultiLaye
                 var damageEffect = new Effect
                 {
                     Tag = Tags.Effect_Buff,
-                    SourceAgent = Agent,
+                    SourceAgent = OwnerAgent,
                     RemovePolicy = RemovePolicy.WhenExited,
                     DurationPolicy = DurationPolicy.Instant,
                     Executions = [new DamageExecution()]
@@ -57,7 +65,7 @@ public class StompGroundEnemyAction : Task<State, Enemy, EnemyContext, MultiLaye
         }
     }
 
-    protected override void OnExit()
+    private void OnExit()
     {
         Context.IsStomping = false;
         Context.StompTimer = 0f;
