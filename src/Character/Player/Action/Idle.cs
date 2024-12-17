@@ -2,9 +2,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class IdleAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class IdleActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_Idle;
+    public override Tag Tag => Tags.State_Action_Idle;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -16,7 +16,14 @@ public class IdleAction : Task<State, Player, PlayerContext, MultiLayerExecuteAr
         ]
     );
 
-    protected override void OnEnter()
+    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+
+        EnterFunc += OnEnter;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("idle");
         Context.JumpCount = 0;

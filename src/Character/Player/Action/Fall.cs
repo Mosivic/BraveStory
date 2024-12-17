@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class FallAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class FallActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_Fall;
+    public override Tag Tag => Tags.State_Action_Fall;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -15,13 +15,21 @@ public class FallAction : Task<State, Player, PlayerContext, MultiLayerExecuteAr
         ]
     );
 
-    protected override void OnEnter()
+    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("fall");
     }
 
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Host.Velocity;
@@ -29,11 +37,11 @@ public class FallAction : Task<State, Player, PlayerContext, MultiLayerExecuteAr
         // 确保空中移动控制合理
         velocity.X = Mathf.MoveToward(
             velocity.X,
-            direction * Agent.Atr("RunSpeed"),
-            Agent.Atr("AirAcceleration")
+            direction * OwnerAgent.Atr("RunSpeed"),
+            OwnerAgent.Atr("AirAcceleration")
         );
 
-        velocity.Y += (float)delta * Agent.Atr("Gravity");
+        velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
         Host.Velocity = velocity;
 
         Host.UpdateFacing(direction);

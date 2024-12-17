@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class HurtEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class HurtEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag Tag => Tags.State_Action_Hurt;
 

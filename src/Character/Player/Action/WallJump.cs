@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class WallJumpAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class WallJumpActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_WallJump;
+    public override Tag Tag => Tags.State_Action_WallJump;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -13,8 +13,14 @@ public class WallJumpAction : Task<State, Player, PlayerContext, MultiLayerExecu
         ]
     );
 
+    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
 
-    protected override void OnEnter()
+        EnterFunc += OnEnter;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("jump");
         Host.Velocity = new Vector2(Host.Graphics.Scale.X * 400, -320);

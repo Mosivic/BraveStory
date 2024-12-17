@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class WallSlideAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class WallSlideActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_WallSlide;
+    public override Tag Tag => Tags.State_Action_WallSlide;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -16,15 +16,23 @@ public class WallSlideAction : Task<State, Player, PlayerContext, MultiLayerExec
     );
 
 
-    protected override void OnEnter()
+    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("wall_sliding");
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         var velocity = Host.Velocity;
-        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Atr("Gravity"), 600);
+        velocity.Y = Mathf.Min(velocity.Y + (float)delta * OwnerAgent.Atr("Gravity"), 600);
         Host.Velocity = velocity;
 
         Host.UpdateFacing(0);

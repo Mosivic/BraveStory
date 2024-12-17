@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StompGroundEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag Tag => Tags.State_Action_StompGround;
 

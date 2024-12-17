@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class IdleEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class IdleEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag Tag => Tags.State_Action_Idle;
 

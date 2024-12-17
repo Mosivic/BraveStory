@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class ChargeEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag Tag => Tags.State_Action_Charge;
 
@@ -31,7 +31,7 @@ public class ChargeEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteAr
     }
 
 
-    protected void OnEnter()
+    private void OnEnter()
     {
         Host.PlayAnimation("run");
         
@@ -43,7 +43,7 @@ public class ChargeEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteAr
         _smoke.Play("smoke");
 
     }
-    protected void OnAdd()
+    private void OnAdd()
     {
         var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
         _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
@@ -51,7 +51,7 @@ public class ChargeEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteAr
         _smoke.Visible = false;
     }
 
-    protected void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         if (_waitTime > 0)
         {
@@ -77,7 +77,7 @@ public class ChargeEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteAr
         }
     }
 
-    protected void OnExit()
+    private void OnExit()
     {
         Context.IsCharging = false;
         Context.ChargeTimer = 0f;

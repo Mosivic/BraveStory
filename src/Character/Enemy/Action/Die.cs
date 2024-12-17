@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class DieEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class DieEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag Tag => Tags.State_Status_Die;
 
@@ -22,12 +22,12 @@ public class DieEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
         PhysicsUpdateFunc += OnPhysicsUpdate;
     }
 
-    protected void OnEnter()
+    private void OnEnter()
     {
         Host.PlayAnimation("die");
     }
 
-    protected void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         if (Host.IsAnimationFinished()) Host.QueueFree();
     }

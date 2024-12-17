@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class RunActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_Run;
+    public override Tag Tag => Tags.State_Action_Run;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -16,12 +16,20 @@ public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArg
         ]
     );
 
-    protected override void OnEnter()
+    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("run");
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         Move(delta);
     }
@@ -30,11 +38,11 @@ public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArg
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Atr("RunSpeed"), Agent.Atr("FloorAcceleration"));
-        velocity.Y += (float)delta * Agent.Atr("Gravity");
+        velocity.X = Mathf.MoveToward(velocity.X, direction * OwnerAgent.Atr("RunSpeed"), OwnerAgent.Atr("FloorAcceleration"));
+        velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
         Host.Velocity = velocity;
 
-        Host.UpdateFacing(direction); // 使用新方法处理朝向
+        Host.UpdateFacing(direction);
         Host.MoveAndSlide();
     }
 }

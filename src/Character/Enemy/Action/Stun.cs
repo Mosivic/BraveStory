@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StunEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class StunEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     public override Tag Tag => Tags.State_Action_Stun;
 

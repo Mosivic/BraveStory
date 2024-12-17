@@ -3,9 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class SlidingAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class SlidingActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
 {
-    public override Tag StateTag => Tags.State_Action_Sliding;
+    public override Tag Tag => Tags.State_Action_Sliding;
     public override MultiLayerExecuteArgs ExecuteArgs => new(
         Tags.StateLayer_Movement,
         [
@@ -13,13 +13,21 @@ public class SlidingAction : Task<State, Player, PlayerContext, MultiLayerExecut
         ]
     );
 
+    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    {
+        base.Init(host, context, executeArgs);
 
-    protected override void OnEnter()
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+        ExitFunc += OnExit;
+    }
+
+    private void OnEnter()
     {
         Host.PlayAnimation("sliding_start");
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnPhysicsUpdate(double delta)
     {
         if (Host.GetCurrentAnimation() == "sliding_start" && Host.IsAnimationFinished())
             Host.PlayAnimation("sliding_loop");
@@ -28,7 +36,7 @@ public class SlidingAction : Task<State, Player, PlayerContext, MultiLayerExecut
         Slide(delta);
     }
 
-    protected override void OnExit()
+    private void OnExit()
     {
         Host.SetHurtBoxMonitorable(true);
     }
@@ -37,8 +45,8 @@ public class SlidingAction : Task<State, Player, PlayerContext, MultiLayerExecut
     private void Slide(double delta)
     {
         var velocity = Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, 0, Agent.Atr("SlidingDeceleration") * (float)delta);
-        velocity.Y += (float)delta * Agent.Atr("Gravity");
+        velocity.X = Mathf.MoveToward(velocity.X, 0, OwnerAgent.Atr("SlidingDeceleration") * (float)delta);
+        velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
         Host.Velocity = velocity;
         Host.MoveAndSlide();
     }

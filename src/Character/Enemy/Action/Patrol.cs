@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class PatrolEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class PatrolEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
 {
     // FIXME：Walk 和 Patrol 是同一个状态，需要合并
     public override Tag Tag => Tags.State_Action_Patrol;
@@ -36,7 +36,7 @@ public class PatrolEnemyAction : Action<Enemy, EnemyContext, MultiLayerExecuteAr
         Patrol(delta);
     }
 
-    public void Patrol(double delta)
+    private void Patrol(double delta)
     {
         // 检查是否碰到墙壁
         if (Host.IsWallColliding())
