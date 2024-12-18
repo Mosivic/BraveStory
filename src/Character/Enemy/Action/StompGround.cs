@@ -3,48 +3,50 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StompGroundEnemyActionState : ActionState<EnemyContext>
+public class StompGroundEnemyActionState : ActionState
 {
     public override Tag Tag => Tags.State_Action_StompGround;
 
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => Context.StompTimer >= 1.0f),
+        new(Tags.State_Action_Idle, () => ctx.StompTimer >= 1.0f),
     ];
 
-    private Enemy _host;
-    public override void Init(EnemyContext context)
-    {
-        base.Init(context);
-        _host = context.Host;
+    private Enemy host;
+    private EnemyContext ctx;
 
-        EnterFunc += OnEnter;
-        PhysicsUpdateFunc += OnPhysicsUpdate;
+    public override void Init()
+    {
+        ctx = Context as EnemyContext;
+        host = ctx.Host;
+
+        EnterFunc = OnEnter;
+        PhysicsUpdateFunc = OnPhysicsUpdate;
     }
 
     private void OnEnter()
     {
-        _host.PlayAnimation("idle"); // 播放跳跃动画
-        Context.StompTimer = 0f;
-        Context.IsStomping = true;
+        host.PlayAnimation("idle"); // 播放跳跃动画
+        ctx.StompTimer = 0f;
+        ctx.IsStomping = true;
 
-        _host.Velocity = new Vector2(0, -200f);
+        host.Velocity = new Vector2(0, -200f);
     }
 
     private void OnPhysicsUpdate(double delta)
     {
-        Context.StompTimer += (float)delta;
-        _host.MoveAndSlide();
+        ctx.StompTimer += (float)delta;
+        host.MoveAndSlide();
 
-        if (Context.StompTimer >= Context.StompDuration)
+        if (ctx.StompTimer >= ctx.StompDuration)
         {
-            _host.PlayAnimation("StompBox");
-            _host.Velocity = new Vector2(0, 800f); // 设置下砸力
+            host.PlayAnimation("StompBox");
+            host.Velocity = new Vector2(0, 800f); // 设置下砸力
 
             // FIXME: 
             // 1.HItAgent 的获取存在问题
             // 2.HitAgent 需要改为 HitAgent 列表
-            if (Context.HitAgent != null)
+            if (ctx.HitAgent != null)
             {
                 var damageEffect = new Effect
                 {
@@ -55,19 +57,19 @@ public class StompGroundEnemyActionState : ActionState<EnemyContext>
                     Executions = [new DamageExecution()]
                 };
 
-                Context.HitAgent.AddEffect(damageEffect);
+                ctx.HitAgent.AddEffect(damageEffect);
 
-                Context.HitAgent.SwitchTaskFromTag(ExecutorType.MultiLayerExecutor, Tags.State_Action_Jump,
+                ctx.HitAgent.SwitchTaskFromTag(ExecutorType.MultiLayerExecutor, Tags.State_Action_Jump,
                     new MultiLayerSwitchArgs(Tags.StateLayer_Movement));
                 
-                Context.HitAgent = null;
+                ctx.HitAgent = null;
             }
         }
     }
 
     private void OnExit()
     {
-        Context.IsStomping = false;
-        Context.StompTimer = 0f;
+        ctx.IsStomping = false;
+        ctx.StompTimer = 0f;
     }
 }

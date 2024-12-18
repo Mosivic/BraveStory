@@ -3,8 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class JumpActionState : ActionState<PlayerContext>
+public class JumpActionState : ActionState
 {
+    private PlayerContext _ctx;
     private Player _host;
 
     public override Tag Tag => Tags.State_Action_Jump;
@@ -13,21 +14,20 @@ public class JumpActionState : ActionState<PlayerContext>
         new(Tags.State_Action_Fall, () => RunningTime > 0.1f)
     ];
 
-
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
-        EnterFunc += OnEnter;
-        PhysicsUpdateFunc += OnPhysicsUpdate;
+        EnterFunc = OnEnter;
+        PhysicsUpdateFunc = OnPhysicsUpdate;
     }
 
     private void OnEnter()
     {
         _host.PlayAnimation("jump");
         _host.Velocity = new Vector2(_host.Velocity.X, OwnerAgent.Atr("JumpVelocity"));
-        Context.JumpCount++;
+        _ctx.JumpCount++;
     }
 
     private void OnPhysicsUpdate(double delta)

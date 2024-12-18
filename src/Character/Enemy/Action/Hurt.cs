@@ -3,28 +3,30 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class HurtEnemyActionState : ActionState<EnemyContext>
+public class HurtEnemyActionState : ActionState
 {
     public override Tag Tag => Tags.State_Action_Hurt;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => _host.IsAnimationFinished()),
-        new(Tags.State_Action_Hurt, () => Context.IsHurt, TransitionMode.Force, 0, true)
+        new(Tags.State_Action_Idle, () => host.IsAnimationFinished()),
+        new(Tags.State_Action_Hurt, () => ctx.IsHurt, TransitionMode.Force, 0, true)
     ];
 
-    private Enemy _host;
-    public override void Init(EnemyContext context)
-    {
-        base.Init(context);
-        _host = context.Host;
+    private Enemy host;
+    private EnemyContext ctx;
 
-        EnterFunc += OnEnter;
+    public override void Init()
+    {
+        ctx = Context as EnemyContext;
+        host = ctx.Host;
+
+        EnterFunc = OnEnter;
     }
 
     private void OnEnter()
     {
-        Context.IsHurt = false;
-        _host.PlayAnimation("hurt");
+        ctx.IsHurt = false;
+        host.PlayAnimation("hurt");
         // // 方式1：根据玩家位置计算击退方向
         // var playerPos = Host.IsPlayerColliding() ? Host.GetPlayer().GlobalPosition : Vector2.Zero;
         // if (playerPos != Vector2.Zero)

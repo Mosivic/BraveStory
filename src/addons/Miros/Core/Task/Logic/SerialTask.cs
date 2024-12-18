@@ -8,35 +8,38 @@ using Godot;
 
 namespace Miros.Core;
 
-public class SerialTask: TaskBase<CompoundState>
+public class SerialTask: TaskBase<State>
 {
+    protected State CurrentState = null;
     protected int CurrentIndex = 0;
-    protected List<TaskBase<State>> Tasks = [];
-
+    protected int SubStatesCount = 0;
 
     public override void TriggerOnAdd(State state)
     {
         base.TriggerOnAdd(state);
-        var compoundState = state as CompoundState;
-        foreach (var subState in compoundState.SubStates)
+
+        foreach (var subState in state.SubStates)
         {
-            var subTask = TaskProvider.GetTask(subState.TaskType) as TaskBase<State>;
-            Tasks.Add(subTask);
+            var subTask = TaskProvider.GetTask(subState.TaskType);
+            state.Task = subTask;
         }
 
+        SubStatesCount = state.SubStates.Length;
+        if(SubStatesCount > 0)
+            CurrentState = state.SubStates[0];
     }
 
     public override void Enter(State state)
     {
         base.Enter(state);
-        Tasks[CurrentIndex].Enter(state);
+        CurrentState.Task.Enter(state);
     }
 
     public override void Exit(State state)
     {
         base.Exit(state);
 
-        Tasks[CurrentIndex].Exit(state);
+        CurrentState.Task.Exit(state);
     }
 
 
@@ -44,18 +47,18 @@ public class SerialTask: TaskBase<CompoundState>
     {
         base.Update(state, delta);
 
-        if(CurrentIndex < Tasks.Count)
+        if(CurrentIndex < SubStatesCount)
         {
-            var subTask = Tasks[CurrentIndex];
 
-            if(subTask.CanExit(state))
+            if(CurrentState.Task.CanExit(state))
             {
                 CurrentIndex++;
-                subTask.Exit(state);
+                CurrentState = state.SubStates[CurrentIndex];
+                CurrentState.Task.Exit(state);
             }
 
 
-            subTask.Update(state, delta);
+            CurrentState.Task.Update(state, delta);
         }
     }
 
@@ -63,14 +66,14 @@ public class SerialTask: TaskBase<CompoundState>
     {
         base.PhysicsUpdate(state, delta);
 
-        if(CurrentIndex < Tasks.Count)
-            Tasks[CurrentIndex].PhysicsUpdate(state, delta);
+        if(CurrentIndex < SubStatesCount)
+            CurrentState.Task.PhysicsUpdate(state, delta);
         
     }
 
     public override bool CanExit(State state)
     {
-        return CurrentIndex == Tasks.Count;
+        return CurrentIndex == SubStatesCount || SubStatesCount == 0;
     }
 }
 

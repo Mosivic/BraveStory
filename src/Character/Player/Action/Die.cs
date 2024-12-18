@@ -2,8 +2,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class DieActionState : ActionState<PlayerContext>
+public class DieActionState : ActionState
 {
+    private PlayerContext _ctx;
     private Player _host;
 
     public override Tag Tag => Tags.State_Status_Die;
@@ -12,13 +13,13 @@ public class DieActionState : ActionState<PlayerContext>
         new(Tags.State_Status_Die, () => OwnerAgent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
     ];
 
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
-        EnterFunc += OnEnter;
-        PhysicsUpdateFunc += OnPhysicsUpdate;
+        EnterFunc = OnEnter;
+        PhysicsUpdateFunc = OnPhysicsUpdate;
     }
 
     private void OnEnter()

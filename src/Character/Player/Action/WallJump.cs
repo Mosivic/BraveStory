@@ -3,8 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class WallJumpActionState : ActionState<PlayerContext>
+public class WallJumpActionState : ActionState
 {
+    private PlayerContext _ctx;
     public override Tag Tag => Tags.State_Action_WallJump;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
@@ -13,12 +14,12 @@ public class WallJumpActionState : ActionState<PlayerContext>
 
     private Player _host;
 
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
-        EnterFunc += OnEnter;
+        EnterFunc = OnEnter;
     }
 
     private void OnEnter()

@@ -2,9 +2,10 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class Attack11ActionState : ActionState<PlayerContext>
+public class Attack11ActionState : ActionState
 {
     private Player _host;
+    private PlayerContext _ctx;
 
     public override Tag Tag => Tags.State_Action_Attack11;
     public override Tag Layer => Tags.StateLayer_Movement;
@@ -13,14 +14,14 @@ public class Attack11ActionState : ActionState<PlayerContext>
         new(Tags.State_Action_Attack111, () => _host.KeyDownAttack(), TransitionMode.DelayFront)
     ];
 
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
-        EnterFunc += OnEnter;
-        PhysicsUpdateFunc += OnPhysicsUpdate;
-        ExitCondition += OnExitCondition;
+        EnterFunc = OnEnter;
+        PhysicsUpdateFunc = OnPhysicsUpdate;
+        ExitCondition = OnExitCondition;
     }
 
     private void OnEnter()
@@ -30,7 +31,7 @@ public class Attack11ActionState : ActionState<PlayerContext>
 
     private void OnPhysicsUpdate(double delta)
     {
-        if (Context.IsHit && Context.HitAgent != null)
+        if (_ctx.IsHit && _ctx.HitAgent != null)
         {
             var damageEffect = new Effect
             {
@@ -41,8 +42,8 @@ public class Attack11ActionState : ActionState<PlayerContext>
                 Executions = [new CustomAttackDamageExecution(OwnerAgent.Atr("Attack") + 1)]
             };
 
-            Context.HitAgent.AddEffect(damageEffect);
-            Context.IsHit = false;
+            _ctx.HitAgent.AddEffect(damageEffect);
+            _ctx.IsHit = false;
         }
     }
 

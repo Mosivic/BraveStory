@@ -3,41 +3,54 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class ChargeEnemyActionState : ActionState<EnemyContext>
+public class ChargeEnemyActionState : ActionState
 {
     public override Tag Tag => Tags.State_Action_Charge;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override TaskType TaskType => TaskType.Serial;
 
     private float _waitTime = 0.3f;
     private AnimatedSprite2D _smoke;
-    private bool _IsCharging = false;
 
-    public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => Context.ChargeTimer >= Context.ChargeDuration),
-        new(Tags.State_Action_Stun, () => Context.IsStunned)
+        new(Tags.State_Action_Idle, () => ctx.ChargeTimer >= ctx.ChargeDuration),
+        new(Tags.State_Action_Stun, () => ctx.IsStunned)
     ];
 
-    private Enemy _host;
+    private Enemy host;
+    private EnemyContext ctx;
 
-    public override void Init(EnemyContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        ctx = Context as EnemyContext;
+        host = ctx.Host;
 
-        AddFunc += OnAdd;
-        EnterFunc += OnEnter;
-        UpdateFunc += OnPhysicsUpdate;
-        ExitFunc += OnExit;
+        SubStates = [
+            new State
+            {
+                EnterFunc = () => {
+                    GD.Print("Boar : ChargeWait");
+                }
+            },
+            new State
+            {
+                EnterFunc = OnEnter,
+                UpdateFunc = OnPhysicsUpdate,
+                ExitFunc = OnExit
+            }
+        ];
+
+        AddFunc = OnAdd;
     }
 
 
     private void OnEnter()
     {
-        Context.Host.PlayAnimation("run");
+        host.PlayAnimation("run");
         
         _waitTime = 1.0f;
-        Context.ChargeTimer = 0f;
-        Context.IsCharging = true;
+        ctx.ChargeTimer = 0f;
+        ctx.IsCharging = true;
         
         _smoke.Visible = true;
         _smoke.Play("smoke");
@@ -47,7 +60,7 @@ public class ChargeEnemyActionState : ActionState<EnemyContext>
     {
         var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
         _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
-        Context.Host.AddChild(_smoke);
+        host.AddChild(_smoke);
         _smoke.Visible = false;
     }
 
@@ -61,7 +74,7 @@ public class ChargeEnemyActionState : ActionState<EnemyContext>
 
         Charge(delta);
 
-        if (Context.IsHit && Context.HitAgent != null)
+        if (ctx.IsHit && ctx.HitAgent != null)
         {
             var damageEffect = new Effect
             {
@@ -72,15 +85,15 @@ public class ChargeEnemyActionState : ActionState<EnemyContext>
                 Executions = [new DamageExecution()]
             };
 
-            Context.HitAgent.AddEffect(damageEffect);
-            Context.IsHit = false;
+            ctx.HitAgent.AddEffect(damageEffect);
+            ctx.IsHit = false;
         }
     }
 
     private void OnExit()
     {
-        Context.IsCharging = false;
-        Context.ChargeTimer = 0f;
+        ctx.IsCharging = false;
+        ctx.ChargeTimer = 0f;
 
         _smoke.Visible = false;
         _smoke.Stop();
@@ -90,29 +103,29 @@ public class ChargeEnemyActionState : ActionState<EnemyContext>
     private void Charge(double delta)
     {
         // 更新冲刺计时器
-        Context.ChargeTimer += (float)delta;
+        ctx.ChargeTimer += (float)delta;
 
         // 检查是否撞墙
-        if (_host.IsWallColliding())
+        if (host.IsWallColliding())
         {
-            Context.IsStunned = true;
+            ctx.IsStunned = true;
             return;
         }
 
-        var velocity = _host.Velocity;
-        velocity.X = -_host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
+        var velocity = host.Velocity;
+        velocity.X = -host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
         var slowdownThreshold = 0.3f; // 最后0.3秒开始减速
-        if (Context.ChargeTimer >= Context.ChargeDuration - slowdownThreshold)
+        if (ctx.ChargeTimer >= ctx.ChargeDuration - slowdownThreshold)
         {
-            var slowdownFactor = 1.0f - (Context.ChargeTimer - (Context.ChargeDuration - slowdownThreshold)) /
+            var slowdownFactor = 1.0f - (ctx.ChargeTimer - (ctx.ChargeDuration - slowdownThreshold)) /
                 slowdownThreshold;
             velocity.X *= slowdownFactor;
         }
 
         velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
-        _host.Velocity = velocity;
-        _host.MoveAndSlide();
+        host.Velocity = velocity;
+        host.MoveAndSlide();
     }
 }

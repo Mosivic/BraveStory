@@ -4,7 +4,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class RandomTask: TaskBase<CompoundState>
+public class RandomTask: TaskBase<State>
 {
     // 各子任务权重，用于随机选择子任务
     protected virtual float[] RandomWeights { get; set;} = [];
@@ -17,9 +17,8 @@ public class RandomTask: TaskBase<CompoundState>
     public override void Enter(State state)
     {
         base.Enter(state);
-        var compoundState = state as CompoundState;
-        CurrentIndex = SelectTaskBasedOnWeights(compoundState);
-        CurrentTask = TaskProvider.GetTask(compoundState.SubStates[CurrentIndex].TaskType) as TaskBase<State>;
+        CurrentIndex = SelectTaskBasedOnWeights(state);
+        CurrentTask = TaskProvider.GetTask(state.SubStates[CurrentIndex].TaskType) as TaskBase<State>;
         
         if(IsCurrentCanEnter(state))
             CurrentTask.Enter(state);
@@ -56,7 +55,6 @@ public class RandomTask: TaskBase<CompoundState>
 
     protected int SelectTaskBasedOnWeights(State state)
     {
-        var compoundState = state as CompoundState;
         if (RandomWeights == null || RandomWeights.Length == 0)
         {
             return 0; // 默认选择第一个子任务
@@ -68,7 +66,7 @@ public class RandomTask: TaskBase<CompoundState>
 
         int RandomWeightsLength = RandomWeights.Length;
 
-        for (int i = 0; i < compoundState.SubStates.Length; i++)
+        for (int i = 0; i < state.SubStates.Length; i++)
         {
             if(i >= RandomWeightsLength) // 如果权重数组长度小于子任务数量，则每个子任务权重为1
                 cumulativeWeight += 1;

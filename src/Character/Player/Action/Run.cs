@@ -3,8 +3,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class RunActionState : ActionState<PlayerContext>
+public class RunActionState : ActionState
 {
+    private PlayerContext _ctx;
     private Player _host;
 
     public override Tag Tag => Tags.State_Action_Run;
@@ -16,10 +17,10 @@ public class RunActionState : ActionState<PlayerContext>
         new(Tags.State_Action_Sliding, () => _host.KeyDownSliding())
     ];
 
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

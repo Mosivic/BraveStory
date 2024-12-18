@@ -69,25 +69,24 @@ public class Agent
     }
 
 
-    public void AddActions<TContext>(ExecutorType executorType,TContext context, Type[] stateTypes)
-        where TContext : Context
+    public void AddActions(ExecutorType executorType,Context context, Type[] stateTypes)
     {
         foreach (var stateType in stateTypes)
             AddAction(executorType, context, stateType);
     }
 
     
-	public void AddAction<TContext>(ExecutorType executorType,TContext context, Type stateType)
-	where TContext : Context
+	public void AddAction(ExecutorType executorType,Context context, Type stateType)
 	{
-		var state =  (ActionState<TContext>)Activator.CreateInstance(stateType);
+		var state =  (State)Activator.CreateInstance(stateType);
         
-		state.Init(context);
+        state.Context = context;
         state.OwnerAgent = this;
         state.Task = TaskProvider.GetTask(state.TaskType) as TaskBase<State>;
+        state.Init();
 
 		if (executorType == ExecutorType.MultiLayerExecutor)
-            PushStateOnExecutor<TContext>(executorType, state);
+            PushStateOnExecutor(executorType, state);
 	}
     
     
@@ -96,8 +95,8 @@ public class Agent
         effect.OwnerAgent = this;
         effect.Task = TaskProvider.GetTask(effect.TaskType) as EffectTask;
         effect.ExecutorType = ExecutorType.EffectExecutor;
-
-        PushStateOnExecutor<Context>(ExecutorType.EffectExecutor, effect);
+        effect.Init();
+        PushStateOnExecutor(ExecutorType.EffectExecutor, effect);
     }
 
     
@@ -116,11 +115,10 @@ public class Agent
         return executor;
     }
 
-    private void PushStateOnExecutor<TContext>(ExecutorType executorType, State state)
-    where TContext : Context
+    private void PushStateOnExecutor(ExecutorType executorType, State state)
     {
         var executor = GetExecutor(executorType);
-        executor.AddState<TContext>(state);
+        executor.AddState(state);
     }
 
     

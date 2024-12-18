@@ -13,7 +13,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class ParallelTask: TaskBase<CompoundState>
+public class ParallelTask: TaskBase<State>
 {
     protected List<TaskBase<State>> SubTasks = [];
 
@@ -21,8 +21,8 @@ public class ParallelTask: TaskBase<CompoundState>
     protected override void OnAdd(State state)
     {
         base.OnAdd(state);
-        var compoundState = state as CompoundState;
-        foreach (var subState in compoundState.SubStates)
+
+        foreach (var subState in state.SubStates)
         {
             var subTask = TaskProvider.GetTask(subState.TaskType) as TaskBase<State>;
             SubTasks.Add(subTask);
@@ -63,8 +63,7 @@ public class ParallelTask: TaskBase<CompoundState>
 
     public override bool CanExit(State state) 
     {
-        var compoundState = state as CompoundState;
-        return SubTasks.All(subTask => subTask.CanExit(compoundState));
+        return SubTasks.All(subTask => subTask.CanExit(state));
     }
 
 

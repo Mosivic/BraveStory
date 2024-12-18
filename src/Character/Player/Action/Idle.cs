@@ -2,8 +2,9 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class IdleActionState : ActionState<PlayerContext>
+public class IdleActionState : ActionState
 {
+    private PlayerContext _ctx;
     private Player _host;
 
     public override Tag Tag => Tags.State_Action_Idle;
@@ -17,17 +18,17 @@ public class IdleActionState : ActionState<PlayerContext>
         new(Tags.State_Action_Sliding, () => _host.KeyDownSliding())
     ];
 
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
-        EnterFunc += OnEnter;
+        EnterFunc = OnEnter;
     }
 
     private void OnEnter()
     {
         _host.PlayAnimation("idle");
-        Context.JumpCount = 0;
+        _ctx.JumpCount = 0;
     }
 }

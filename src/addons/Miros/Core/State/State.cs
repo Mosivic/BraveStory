@@ -11,6 +11,8 @@ public class State
     public Agent SourceAgent { get; set; }
 
     public ITask Task { get; set; }
+    public Context Context { get; set; }
+    public State[] SubStates { get; set; }
 
     public State SourceState { get; set; }
 
@@ -36,4 +38,6 @@ public class State
 
     public Action<double> UpdateFunc { get; set; }
     public Action<double> PhysicsUpdateFunc { get; set; }
+
+    public virtual void Init(){}
 }
