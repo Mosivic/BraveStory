@@ -21,6 +21,7 @@ public class SerialTask : TaskBase<State>
         {
             var subTask = TaskProvider.GetTask(subState.TaskType);
             subState.Task = subTask;
+            subState.Init();
         }
 
         _subStatesCount = state.SubStates.Length;

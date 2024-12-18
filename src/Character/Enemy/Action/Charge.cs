@@ -28,9 +28,11 @@ public class ChargeEnemyActionState : ActionState
 
         SubStates =
         [
-            new State
+            new DelayState
             {
-                EnterFunc = () => { GD.Print("Boar : ChargeWait"); }
+                DelayTime = 3.0f,
+                EnterFunc = () => { GD.Print("Delay Start"); },
+                ExitFunc = () => { GD.Print("Delay End"); }
             },
             new State
             {
