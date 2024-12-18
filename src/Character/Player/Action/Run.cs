@@ -3,20 +3,23 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class RunActionState : ActionState<Player, PlayerContext>
+public class RunActionState : ActionState<PlayerContext>
 {
+    private Player _host;
+
     public override Tag Tag => Tags.State_Action_Run;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => !Host.KeyDownMove()),
-        new(Tags.State_Action_Jump, () => Host.KeyDownJump()),
-        new(Tags.State_Action_Attack1, () => Host.KeyDownAttack()),
-        new(Tags.State_Action_Sliding, () => Host.KeyDownSliding())
+        new(Tags.State_Action_Idle, () => !_host.KeyDownMove()),
+        new(Tags.State_Action_Jump, () => _host.KeyDownJump()),
+        new(Tags.State_Action_Attack1, () => _host.KeyDownAttack()),
+        new(Tags.State_Action_Sliding, () => _host.KeyDownSliding())
     ];
 
-    public override void Init(Player host, PlayerContext context)
+    public override void Init(PlayerContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
@@ -24,7 +27,7 @@ public class RunActionState : ActionState<Player, PlayerContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("run");
+        _host.PlayAnimation("run");
     }
 
     private void OnPhysicsUpdate(double delta)
@@ -35,12 +38,12 @@ public class RunActionState : ActionState<Player, PlayerContext>
     public void Move(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
-        var velocity = Host.Velocity;
+        var velocity = _host.Velocity;
         velocity.X = Mathf.MoveToward(velocity.X, direction * OwnerAgent.Atr("RunSpeed"), OwnerAgent.Atr("FloorAcceleration"));
         velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
-        Host.Velocity = velocity;
+        _host.Velocity = velocity;
 
-        Host.UpdateFacing(direction);
-        Host.MoveAndSlide();
+        _host.UpdateFacing(direction);
+        _host.MoveAndSlide();
     }
 }

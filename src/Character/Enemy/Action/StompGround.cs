@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext>
+public class StompGroundEnemyActionState : ActionState<EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_StompGround;
 
@@ -12,9 +12,11 @@ public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext>
         new(Tags.State_Action_Idle, () => Context.StompTimer >= 1.0f),
     ];
 
-    public override void Init(Enemy host, EnemyContext context)
+    private Enemy _host;
+    public override void Init(EnemyContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
@@ -22,22 +24,22 @@ public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("idle"); // 播放跳跃动画
+        _host.PlayAnimation("idle"); // 播放跳跃动画
         Context.StompTimer = 0f;
         Context.IsStomping = true;
 
-        Host.Velocity = new Vector2(0, -200f);
+        _host.Velocity = new Vector2(0, -200f);
     }
 
     private void OnPhysicsUpdate(double delta)
     {
         Context.StompTimer += (float)delta;
-        Host.MoveAndSlide();
+        _host.MoveAndSlide();
 
         if (Context.StompTimer >= Context.StompDuration)
         {
-            Host.PlayAnimation("StompBox");
-            Host.Velocity = new Vector2(0, 800f); // 设置下砸力
+            _host.PlayAnimation("StompBox");
+            _host.Velocity = new Vector2(0, 800f); // 设置下砸力
 
             // FIXME: 
             // 1.HItAgent 的获取存在问题

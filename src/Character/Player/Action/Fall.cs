@@ -3,19 +3,22 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class FallActionState : ActionState<Player, PlayerContext>
+public class FallActionState : ActionState<PlayerContext>
 {
+    private Player _host;
+
     public override Tag Tag => Tags.State_Action_Fall;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
-        new(Tags.State_Action_WallSlide, () => Host.IsHandColliding() && Host.IsFootColliding() && !Host.KeyDownMove()),
-        new(Tags.State_Action_Jump, () => Host.KeyDownJump() && Context.JumpCount < Context.MaxJumpCount)
+        new(Tags.State_Action_Idle, () => _host.IsOnFloor()),
+        new(Tags.State_Action_WallSlide, () => _host.IsHandColliding() && _host.IsFootColliding() && !_host.KeyDownMove()),
+        new(Tags.State_Action_Jump, () => _host.KeyDownJump() && Context.JumpCount < Context.MaxJumpCount)
     ];
 
-    public override void Init(Player host, PlayerContext context)
+    public override void Init(PlayerContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
@@ -23,14 +26,14 @@ public class FallActionState : ActionState<Player, PlayerContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("fall");
+        _host.PlayAnimation("fall");
     }
 
 
     private void OnPhysicsUpdate(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
-        var velocity = Host.Velocity;
+        var velocity = _host.Velocity;
 
         // 确保空中移动控制合理
         velocity.X = Mathf.MoveToward(
@@ -40,9 +43,9 @@ public class FallActionState : ActionState<Player, PlayerContext>
         );
 
         velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
-        Host.Velocity = velocity;
+        _host.Velocity = velocity;
 
-        Host.UpdateFacing(direction);
-        Host.MoveAndSlide();
+        _host.UpdateFacing(direction);
+        _host.MoveAndSlide();
     }
 }

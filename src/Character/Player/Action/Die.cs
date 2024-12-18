@@ -2,17 +2,20 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class DieActionState : ActionState<Player, PlayerContext>
+public class DieActionState : ActionState<PlayerContext>
 {
+    private Player _host;
+
     public override Tag Tag => Tags.State_Status_Die;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
         new(Tags.State_Status_Die, () => OwnerAgent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
     ];
 
-    public override void Init(Player host, PlayerContext context)
+    public override void Init(PlayerContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
@@ -20,12 +23,12 @@ public class DieActionState : ActionState<Player, PlayerContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("die");
-        Host.ClearInteractions();
+        _host.PlayAnimation("die");
+        _host.ClearInteractions();
     }
 
     private void OnPhysicsUpdate(double delta)
     {
-        if (RunningTime > 1.0f) Host.QueueFree();
+        if (RunningTime > 1.0f) _host.QueueFree();
     }
 }

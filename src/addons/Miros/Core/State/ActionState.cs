@@ -1,13 +1,11 @@
 using System;
-using Godot;
+
 
 namespace Miros.Core;
 
-public class ActionState<THost, TContext> : State
-    where THost : Node
+public class ActionState<TContext> : State
     where TContext : Context
 {
-    public THost Host { get; private set; }
     public TContext Context { get; private set; }
 
     public virtual Tag Layer { get; set; } 
@@ -18,9 +16,8 @@ public class ActionState<THost, TContext> : State
     
 
 
-    public virtual void Init(THost host, TContext context)
+    public virtual void Init(TContext context)
     {
-        Host = host;
         Context = context;
     }
 }

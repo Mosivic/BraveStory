@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
+public class ChargeEnemyActionState : ActionState<EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_Charge;
 
@@ -17,10 +17,12 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
         new(Tags.State_Action_Stun, () => Context.IsStunned)
     ];
 
+    private Enemy _host;
 
-    public override void Init(Enemy host, EnemyContext context)
+    public override void Init(EnemyContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         AddFunc += OnAdd;
         EnterFunc += OnEnter;
@@ -31,7 +33,7 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("run");
+        Context.Host.PlayAnimation("run");
         
         _waitTime = 1.0f;
         Context.ChargeTimer = 0f;
@@ -45,7 +47,7 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
     {
         var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
         _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
-        Host.AddChild(_smoke);
+        Context.Host.AddChild(_smoke);
         _smoke.Visible = false;
     }
 
@@ -91,14 +93,14 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
         Context.ChargeTimer += (float)delta;
 
         // 检查是否撞墙
-        if (Host.IsWallColliding())
+        if (_host.IsWallColliding())
         {
             Context.IsStunned = true;
             return;
         }
 
-        var velocity = Host.Velocity;
-        velocity.X = -Host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
+        var velocity = _host.Velocity;
+        velocity.X = -_host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
         var slowdownThreshold = 0.3f; // 最后0.3秒开始减速
@@ -110,7 +112,7 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
         }
 
         velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
-        Host.Velocity = velocity;
-        Host.MoveAndSlide();
+        _host.Velocity = velocity;
+        _host.MoveAndSlide();
     }
 }

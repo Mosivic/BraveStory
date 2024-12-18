@@ -3,7 +3,7 @@ namespace Miros.Core;
 public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
     where TState : State
 {
-    public virtual void AddState(TState state)
+    public virtual void AddState<TContext>(TState state) where TContext : Context
     {
         var t = state as TState;
 

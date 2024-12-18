@@ -40,11 +40,11 @@ public class MultiLayerExecutor : ExecutorBase<State>, IExecutor<State>
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public override void AddState(State state)
+    public override void AddState<TContext>(State state)
     {
-        base.AddState(state);
+        base.AddState<TContext>(state);
 
-        var action = state as ActionState<Node, Context>;
+        var action = (ActionState<TContext>)state;
 
         if (!_layers.ContainsKey(action.Layer))
         {

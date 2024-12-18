@@ -5,10 +5,10 @@ namespace Miros.Core;
 
 public class ConditionMachine : ExecutorBase<State>
 {
-    protected readonly Dictionary<Tag, List<State>> RunningStates = new();
-    protected Dictionary<Tag, List<State>> WaitingStates { get; set; } = new();
+    protected readonly Dictionary<Tag, List<State>> RunningStates = [];
+    protected Dictionary<Tag, List<State>> WaitingStates = [];
 
-    public override void AddState(State state)
+    public override void AddState<TContext>(State state)
     {
         var layer = state.Tag;
 

@@ -3,7 +3,7 @@
 public interface IExecutor<TState>
     where TState : State
 {
-    void AddState(TState state);
+    void AddState<TContext>(TState state) where TContext : Context;
     void RemoveState(TState state);
     TState GetNowState(Tag layer);
     TState GetLastState(Tag layer);

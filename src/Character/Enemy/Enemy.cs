@@ -2,8 +2,9 @@ using BraveStory;
 using Godot;
 using Miros.Core;
 
-public class EnemyContext : CharacterContext
+public class EnemyContext(Enemy host) : CharacterContext
 {
+    public Enemy Host { get; } = host;
     public float KnockbackVelocity { get; set; } = 50.0f;
     public bool IsStunned { get; set; } = false;
     public float StunDuration { get; set; } = 1.0f;
@@ -36,11 +37,11 @@ public partial class Enemy : Character
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
-        Context = new EnemyContext();
+        Context = new EnemyContext(this);
 
         // 初始化 Agentor
         Agent.AddAttributeSet(typeof(BoarAttributeSet));
-        Agent.AddActions<Enemy, EnemyContext>(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
+        Agent.AddActions<EnemyContext>(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
             typeof(IdleEnemyActionState), typeof(PatrolEnemyActionState), typeof(DieEnemyActionState),
             typeof(ChargeEnemyActionState), typeof(HurtEnemyActionState), typeof(StunEnemyActionState),
             typeof(StompGroundEnemyActionState)

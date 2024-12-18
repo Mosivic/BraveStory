@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class DieEnemyActionState : ActionState<Enemy, EnemyContext>
+public class DieEnemyActionState : ActionState<EnemyContext>
 {
     public override Tag Tag => Tags.State_Status_Die;
     public override Tag Layer => Tags.StateLayer_Movement;
@@ -10,22 +10,22 @@ public class DieEnemyActionState : ActionState<Enemy, EnemyContext>
         new(Tags.State_Status_Die, () => OwnerAgent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
     ];
 
-
-    public override void Init(Enemy host, EnemyContext context)
+    private Enemy _host;
+    public override void Init(EnemyContext context)
     {
-        base.Init(host, context);
-
+        base.Init(context);
+        _host = context.Host;
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
     }
 
     private void OnEnter()
     {
-        Host.PlayAnimation("die");
+        _host.PlayAnimation("die");
     }
 
     private void OnPhysicsUpdate(double delta)
     {
-        if (Host.IsAnimationFinished()) Host.QueueFree();
+        if (_host.IsAnimationFinished()) _host.QueueFree();
     }
 }

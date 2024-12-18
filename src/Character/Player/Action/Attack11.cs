@@ -2,18 +2,21 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class Attack11ActionState : ActionState<Player, PlayerContext>
+public class Attack11ActionState : ActionState<PlayerContext>
 {
+    private Player _host;
+
     public override Tag Tag => Tags.State_Action_Attack11;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override Transition[] Transitions => [
         new(Tags.State_Action_Idle),
-        new(Tags.State_Action_Attack111, () => Host.KeyDownAttack(), TransitionMode.DelayFront)
+        new(Tags.State_Action_Attack111, () => _host.KeyDownAttack(), TransitionMode.DelayFront)
     ];
 
-    public override void Init(Player host, PlayerContext context)
+    public override void Init(PlayerContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
@@ -22,7 +25,7 @@ public class Attack11ActionState : ActionState<Player, PlayerContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("attack11");
+        _host.PlayAnimation("attack11");
     }
 
     private void OnPhysicsUpdate(double delta)
@@ -45,6 +48,6 @@ public class Attack11ActionState : ActionState<Player, PlayerContext>
 
     private bool OnExitCondition()
     {
-        return Host.IsAnimationFinished();
+        return _host.IsAnimationFinished();
     }
 }

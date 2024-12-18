@@ -2,7 +2,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StunEnemyActionState : ActionState<Enemy, EnemyContext>
+public class StunEnemyActionState : ActionState<EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_Stun;
 
@@ -11,9 +11,11 @@ public class StunEnemyActionState : ActionState<Enemy, EnemyContext>
         new(Tags.State_Action_Idle, () => Context.StunTimer >= Context.StunDuration)
     ];
 
-    public override void Init(Enemy host, EnemyContext context)
+    private Enemy _host;
+    public override void Init(EnemyContext context)
     {
-        base.Init(host, context);
+        base.Init(context);
+        _host = context.Host;
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;
@@ -21,7 +23,7 @@ public class StunEnemyActionState : ActionState<Enemy, EnemyContext>
 
     private void OnEnter()
     {
-        Host.PlayAnimation("idle");
+        _host.PlayAnimation("idle");
         Context.StunTimer = 0.0f;
         Context.IsStunned = false;
 
