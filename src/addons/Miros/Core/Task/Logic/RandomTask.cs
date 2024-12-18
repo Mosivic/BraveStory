@@ -14,11 +14,12 @@ public class RandomTask: TaskBase<CompoundState>
 
     protected TaskBase<State> CurrentTask = null;
 
-    public override void Enter(CompoundState state)
+    public override void Enter(State state)
     {
         base.Enter(state);
-        CurrentIndex = SelectTaskBasedOnWeights(state);
-        CurrentTask = TaskProvider.GetTask<TaskBase<State>>(state.SubStates[CurrentIndex].TaskType);
+        var compoundState = state as CompoundState;
+        CurrentIndex = SelectTaskBasedOnWeights(compoundState);
+        CurrentTask = TaskProvider.GetTask(compoundState.SubStates[CurrentIndex].TaskType) as TaskBase<State>;
         
         if(IsCurrentCanEnter(state))
             CurrentTask.Enter(state);
@@ -27,34 +28,35 @@ public class RandomTask: TaskBase<CompoundState>
     }
 
 
-    public override void Exit(CompoundState state)
+    public override void Exit(State state)
     {   
         base.Exit(state);
         CurrentTask.Exit(state);
     }
 
 
-    public override void Update(CompoundState state, double delta)
+    public override void Update(State state, double delta)
     {
         base.Update(state, delta);
         CurrentTask.Update(state, delta);
     }
 
 
-    public override void PhysicsUpdate(CompoundState state, double delta)
+    public override void PhysicsUpdate(State state, double delta)
     {
         base.PhysicsUpdate(state, delta);
         CurrentTask.PhysicsUpdate(state, delta);
     }
 
 
-    protected bool IsCurrentCanEnter(CompoundState state)
+    protected bool IsCurrentCanEnter(State state)
     {
         return CurrentTask.CanEnter(state);
     }
 
-    protected int SelectTaskBasedOnWeights(CompoundState state)
+    protected int SelectTaskBasedOnWeights(State state)
     {
+        var compoundState = state as CompoundState;
         if (RandomWeights == null || RandomWeights.Length == 0)
         {
             return 0; // 默认选择第一个子任务
@@ -66,7 +68,7 @@ public class RandomTask: TaskBase<CompoundState>
 
         int RandomWeightsLength = RandomWeights.Length;
 
-        for (int i = 0; i < state.SubStates.Length; i++)
+        for (int i = 0; i < compoundState.SubStates.Length; i++)
         {
             if(i >= RandomWeightsLength) // 如果权重数组长度小于子任务数量，则每个子任务权重为1
                 cumulativeWeight += 1;

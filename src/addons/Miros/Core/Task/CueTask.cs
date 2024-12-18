@@ -2,9 +2,10 @@ namespace Miros.Core;
 
 public class CueTask : TaskBase<Cue>
 {
-    public override bool CanEnter(Cue state)
+    public override bool CanEnter(State state)
     {
-        return Triggerable(state.OwnerAgent, state);
+        var cueState = state as Cue;
+        return Triggerable(cueState.OwnerAgent, cueState);
     }
 
     public virtual bool Triggerable(Agent owner, Cue state)

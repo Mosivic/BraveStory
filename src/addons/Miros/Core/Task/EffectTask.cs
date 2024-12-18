@@ -11,9 +11,10 @@ public class EffectTask : TaskBase<Effect>
 
 
 
-    public override void Enter(Effect effect)
+    public override void Enter(State state)
     {
-        base.Enter(effect);
+        base.Enter(state);
+        var effect = state as Effect;
         CaptureAttributesSnapshot(effect);
 
         effect.OwnerAgent.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
@@ -36,21 +37,22 @@ public class EffectTask : TaskBase<Effect>
     }
 
 
-    public override void Update(Effect effect, double delta)
+    public override void Update(State state, double delta)
     {
-        base.Update(effect, delta);
+        base.Update(state, delta);
         _updateHandler?.Tick(delta);
     }
 
 
-    public override void Exit(Effect effect)
+    public override void Exit(State effect)
     {
         base.Exit(effect);
     }
 
 
-    public override void Stack(Effect effect, bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
+    public override void Stack(State state, bool isFromSameSource = false) //调用该方法时已经确保 StackingComponent 存在
     {
+        var effect = state as Effect;
         var stacking = effect.Stacking;
 
         switch (stacking.StackingType)
@@ -79,14 +81,16 @@ public class EffectTask : TaskBase<Effect>
     }
 
 
-    public override bool CanEnter(Effect effect)
+    public override bool CanEnter(State state)
     {
+        var effect = state as Effect;
         return effect.OwnerAgent.HasAll(effect.ApplicationRequiredTags);
     }
 
 
-    public override bool CanExit(Effect effect)
+    public override bool CanExit(State state)
     {
+        var effect = state as Effect;
         if (!effect.OwnerAgent.HasAll(effect.OngoingRequiredTags)) return true;
         if (effect.OwnerAgent.HasAny(effect.ApplicationImmunityTags)) return true;
         return effect.Status != RunningStatus.Running;

@@ -1,15 +1,15 @@
 ﻿namespace Miros.Core;
 
-public interface ITask<TState>
-    where TState : State
+public interface ITask
 {
-    void Enter(TState state);
-    void Exit(TState state);
-    bool CanEnter(TState state);
-    bool CanExit(TState state);
-    void TriggerOnAdd(TState state);
-    void TriggerOnRemove(TState state);
-    void Update(TState state, double delta);
-    void PhysicsUpdate(TState state, double delta);
-    void Stack(TState state,bool IsFromSameSource);
+    void Enter(State state);
+    void Exit(State state);
+    bool CanEnter(State state);
+    bool CanExit(State state);
+    bool CanRemove(State state);
+    void TriggerOnAdd(State state);
+    void TriggerOnRemove(State state);
+    void Update(State state, double delta);
+    void PhysicsUpdate(State state, double delta);
+    void Stack(State state,bool IsFromSameSource);
 }

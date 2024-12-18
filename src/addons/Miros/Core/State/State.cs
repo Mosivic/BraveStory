@@ -10,7 +10,7 @@ public class State
     public Agent OwnerAgent { get; set; }
     public Agent SourceAgent { get; set; }
 
-    public TaskBase<State> Task { get; set; }
+    public ITask Task { get; set; }
 
     public State SourceState { get; set; }
 

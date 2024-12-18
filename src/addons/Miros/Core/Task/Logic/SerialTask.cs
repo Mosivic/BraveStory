@@ -14,25 +14,25 @@ public class SerialTask: TaskBase<CompoundState>
     protected List<TaskBase<State>> Tasks = [];
 
 
-    public override void TriggerOnAdd(CompoundState state)
+    public override void TriggerOnAdd(State state)
     {
         base.TriggerOnAdd(state);
-
-        foreach (var subState in state.SubStates)
+        var compoundState = state as CompoundState;
+        foreach (var subState in compoundState.SubStates)
         {
-            var subTask = TaskProvider.GetTask<TaskBase<State>>(subState.TaskType);
+            var subTask = TaskProvider.GetTask(subState.TaskType) as TaskBase<State>;
             Tasks.Add(subTask);
         }
 
     }
 
-    public override void Enter(CompoundState state)
+    public override void Enter(State state)
     {
         base.Enter(state);
         Tasks[CurrentIndex].Enter(state);
     }
 
-    public override void Exit(CompoundState state)
+    public override void Exit(State state)
     {
         base.Exit(state);
 
@@ -40,7 +40,7 @@ public class SerialTask: TaskBase<CompoundState>
     }
 
 
-    public override void Update(CompoundState state, double delta)
+    public override void Update(State state, double delta)
     {
         base.Update(state, delta);
 
@@ -59,7 +59,7 @@ public class SerialTask: TaskBase<CompoundState>
         }
     }
 
-    public override void PhysicsUpdate(CompoundState state, double delta)
+    public override void PhysicsUpdate(State state, double delta)
     {
         base.PhysicsUpdate(state, delta);
 
@@ -68,7 +68,7 @@ public class SerialTask: TaskBase<CompoundState>
         
     }
 
-    public override bool CanExit(CompoundState state)
+    public override bool CanExit(State state)
     {
         return CurrentIndex == Tasks.Count;
     }

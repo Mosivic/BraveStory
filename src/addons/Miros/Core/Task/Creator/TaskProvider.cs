@@ -15,12 +15,12 @@ public enum TaskType
 
 public class TaskProvider
 {
-    private static readonly Dictionary<TaskType, TaskBase> _taskCache = [];
+    private static readonly Dictionary<TaskType, ITask> _taskCache = [];
 
-    public static TTask GetTask<TTask>(TaskType taskType) where TTask : TaskBase
+    public static ITask GetTask(TaskType taskType)
     {
         if(_taskCache.TryGetValue(taskType, out var task))
-            return (TTask)task;
+            return task;
 
         switch(taskType)
         {
@@ -28,20 +28,20 @@ public class TaskProvider
                 task = new TaskBase<State>();
                 break;
             case TaskType.Effect:
-                task = new EffectTask();
+                task = new EffectTask() as ITask;
                 break;
             case TaskType.Random:
-                task = new RandomTask();
+                task = new RandomTask() as ITask;
                 break;
             case TaskType.Parallel:
-                task = new ParallelTask();
+                task = new ParallelTask() as ITask;
                 break;
             case TaskType.Serial:
-                task = new SerialTask();
+                task = new SerialTask() as ITask;
                 break;
         }
         _taskCache[taskType] = task;
-        return (TTask)task;
+        return task;
     }
 
 

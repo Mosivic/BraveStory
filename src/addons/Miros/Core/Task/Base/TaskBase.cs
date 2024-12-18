@@ -1,10 +1,12 @@
 ﻿namespace Miros.Core;
 
 
-public class TaskBase<TState> : ITask<TState>
+public class TaskBase<TState> : ITask
     where TState : State
 {
-    public virtual void Enter(TState state)
+    public TState State { get;set; }
+
+    public virtual void Enter(State state)
     {
         state.Status = RunningStatus.Running;
         state.RunningTime = 0;
@@ -13,7 +15,7 @@ public class TaskBase<TState> : ITask<TState>
     }
 
 
-    public virtual void Exit(TState state)
+    public virtual void Exit(State state)
     {
         if (state.Status == RunningStatus.Succeed)
             OnSucceed(state);
@@ -24,7 +26,7 @@ public class TaskBase<TState> : ITask<TState>
     }
 
     
-    public virtual bool CanEnter(TState state)
+    public virtual bool CanEnter(State state)
     {
         return OnEnterCondition(state);
     }
@@ -34,7 +36,7 @@ public class TaskBase<TState> : ITask<TState>
     // 1. State.Status 为 RunningStatus.Succeed
     // 2. State.Status 为 RunningStatus.Failed
     // 3. State.ExitCondition 为真
-    public virtual bool CanExit(TState state)
+    public virtual bool CanExit(State state)
     {
         return state.Status == RunningStatus.Failed 
         || state.Status == RunningStatus.Succeed 
@@ -42,22 +44,22 @@ public class TaskBase<TState> : ITask<TState>
     }
 
 
-    public virtual bool CanRemove(TState state)
+    public virtual bool CanRemove(State state)
     {
         return OnRemoveCondition(state);
     }
 
-    public virtual void TriggerOnAdd(TState state)
+    public virtual void TriggerOnAdd(State state)
     {
         OnAdd(state);
     }
 
-    public virtual void TriggerOnRemove(TState state)
+    public virtual void TriggerOnRemove(State state)
     {
         OnRemove(state);
     }
 
-    public virtual void Update(TState state, double delta)
+    public virtual void Update(State state, double delta)
     {
         if (state.Status != RunningStatus.Running) return;
         state.RunningTime += delta;
@@ -65,79 +67,79 @@ public class TaskBase<TState> : ITask<TState>
     }
 
 
-    public virtual void PhysicsUpdate(TState state, double delta)
+    public virtual void PhysicsUpdate(State state, double delta)
     {
         if (state.Status != RunningStatus.Running) return;
         OnPhysicsUpdate(state, delta);
     }
 
-    protected virtual void Succeed(TState state)
+    protected virtual void Succeed(State state)
     {
         OnSucceed(state);
     }
 
 
-    protected virtual void Failed(TState state)
+    protected virtual void Failed(State state)
     {
         OnFailed(state);
     }
 
-    protected virtual void OnEnter(TState state)
+    protected virtual void OnEnter(State state)
     {
         state.EnterFunc?.Invoke();
     }
 
-    protected virtual void OnExit(TState state)
+    protected virtual void OnExit(State state)
     {
         state.ExitFunc?.Invoke();
     }
 
-    protected virtual void OnUpdate(TState state, double delta)
+    protected virtual void OnUpdate(State state, double delta)
     {
         state.UpdateFunc?.Invoke(delta);
     }
 
-    protected virtual void OnPhysicsUpdate(TState state, double delta)
+    protected virtual void OnPhysicsUpdate(State state, double delta)
     {
         state.PhysicsUpdateFunc?.Invoke(delta);
     }
 
-    protected virtual void OnSucceed(TState state)
+    protected virtual void OnSucceed(State state)
     {
         state.SucceedFunc?.Invoke();
     }
 
-    protected virtual void OnFailed(TState state)
+    protected virtual void OnFailed(State state)
     {
         state.FailedFunc?.Invoke();
     }
 
-    protected virtual bool OnEnterCondition(TState state)
+    protected virtual bool OnEnterCondition(State state)
     {
         return state.EnterCondition?.Invoke() ?? true;
     }
 
-    protected virtual bool OnExitCondition(TState state)
+    protected virtual bool OnExitCondition(State state)
     {
         return state.ExitCondition?.Invoke() ?? true;
     }
 
-    protected virtual bool OnRemoveCondition(TState state)
+    protected virtual bool OnRemoveCondition(State state)
     {
         return state.RemoveCondition?.Invoke() ?? true;
     }
 
-    protected virtual void OnAdd(TState state)
+    protected virtual void OnAdd(State state)
     {
         state.AddFunc?.Invoke();
     }
 
-    protected virtual void OnRemove(TState state)
+    protected virtual void OnRemove(State state)
     {
         state.RemoveFunc?.Invoke();
     }
 
-    public virtual void Stack(TState state, bool IsFromSameSource)
+    public virtual void Stack(State state, bool IsFromSameSource)
     {
         
     }

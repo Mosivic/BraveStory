@@ -18,17 +18,18 @@ public class ParallelTask: TaskBase<CompoundState>
     protected List<TaskBase<State>> SubTasks = [];
 
 
-    protected override void OnAdd(CompoundState state)
+    protected override void OnAdd(State state)
     {
         base.OnAdd(state);
-        foreach (var subState in state.SubStates)
+        var compoundState = state as CompoundState;
+        foreach (var subState in compoundState.SubStates)
         {
-            var subTask = TaskProvider.GetTask<TaskBase<State>>(subState.TaskType);
+            var subTask = TaskProvider.GetTask(subState.TaskType) as TaskBase<State>;
             SubTasks.Add(subTask);
         }
     }
 
-    public override void Enter(CompoundState state)
+    public override void Enter(State state)
     {
         base.Enter(state);
         foreach (var subTask in SubTasks)
@@ -36,7 +37,7 @@ public class ParallelTask: TaskBase<CompoundState>
     }
 
 
-    public override void Exit(CompoundState state)
+    public override void Exit(State state)
     {
         base.Exit(state);
         foreach (var subTask in SubTasks)
@@ -44,15 +45,15 @@ public class ParallelTask: TaskBase<CompoundState>
         
     }
 
-    public override void Update(CompoundState state, double delta)
+    public override void Update(State state, double delta)
     {
         base.Update(state, delta);
         foreach (var subTask in SubTasks)
             subTask.Update(state, delta);
-        
+            
     }
 
-    public override void PhysicsUpdate(CompoundState state, double delta)
+    public override void PhysicsUpdate(State state, double delta)
     {
         base.PhysicsUpdate(state, delta);
         foreach (var subTask in SubTasks)
@@ -60,9 +61,10 @@ public class ParallelTask: TaskBase<CompoundState>
     }
 
 
-    public override bool CanExit(CompoundState state) 
+    public override bool CanExit(State state) 
     {
-        return SubTasks.All(subTask => subTask.CanExit(state));
+        var compoundState = state as CompoundState;
+        return SubTasks.All(subTask => subTask.CanExit(compoundState));
     }
 
 
