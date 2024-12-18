@@ -4,15 +4,17 @@ namespace BraveStory;
 
 public class StunEnemyActionState : ActionState
 {
+    private EnemyContext ctx;
+
+    private Enemy host;
     public override Tag Tag => Tags.State_Action_Stun;
 
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => ctx.StunTimer >= ctx.StunDuration)
     ];
-
-    private Enemy host;
-    private EnemyContext ctx;
 
     public override void Init()
     {

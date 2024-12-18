@@ -1,19 +1,20 @@
-using Godot;
 using Miros.Core;
 
 namespace BraveStory;
 
 public class HurtEnemyActionState : ActionState
 {
+    private EnemyContext ctx;
+
+    private Enemy host;
     public override Tag Tag => Tags.State_Action_Hurt;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => host.IsAnimationFinished()),
         new(Tags.State_Action_Hurt, () => ctx.IsHurt, TransitionMode.Force, 0, true)
     ];
-
-    private Enemy host;
-    private EnemyContext ctx;
 
     public override void Init()
     {
@@ -47,5 +48,4 @@ public class HurtEnemyActionState : ActionState
     //     Host.Velocity = velocity;
     //     Host.MoveAndSlide();
     // }
-
 }

@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace Miros.Core;
 
-
 // FIXME: 修复状态转换的逻辑
 public class LayerExecutor
 {
@@ -12,9 +11,9 @@ public class LayerExecutor
     private readonly TransitionContainer _transitionContainer;
 
     private State _currentState;
+    private State _defaultState;
     private State _lastState;
     private State _nextState;
-    private State _defaultState;
 
     private TransitionMode _nextStateTransitionMode;
 
@@ -46,12 +45,12 @@ public class LayerExecutor
     {
         ProcessNextState();
 
-        _currentState.Task.Update(_currentState,delta);
+        _currentState.Task.Update(_currentState, delta);
     }
 
     public void PhysicsUpdate(double delta)
     {
-        _currentState.Task.PhysicsUpdate(_currentState,delta);
+        _currentState.Task.PhysicsUpdate(_currentState, delta);
     }
 
 
@@ -85,7 +84,8 @@ public class LayerExecutor
             var state = _states[t.To];
             if (t.Mode switch
                 {
-                    TransitionMode.Normal => t.CanTransition() && _currentState.Task.CanExit(_currentState) && state.Task.CanEnter(state),
+                    TransitionMode.Normal => t.CanTransition() && _currentState.Task.CanExit(_currentState) &&
+                                             state.Task.CanEnter(state),
                     TransitionMode.Force => t.CanTransition(),
                     TransitionMode.DelayFront => t.CanTransition() && state.Task.CanEnter(state),
                     TransitionMode.DelayBackend => t.CanTransition() && _currentState.Task.CanExit(_currentState),
@@ -101,10 +101,12 @@ public class LayerExecutor
 
     private void SwitchNextState()
     {
-        if (_nextStateTransitionMode == TransitionMode.DelayFront && !_currentState.Task.CanExit(_currentState)) // 等待当前任务满足退出条件
+        if (_nextStateTransitionMode == TransitionMode.DelayFront &&
+            !_currentState.Task.CanExit(_currentState)) // 等待当前任务满足退出条件
             return;
 
-        if (_nextStateTransitionMode == TransitionMode.DelayBackend && !_nextState.Task.CanEnter(_nextState)) // 等待新任务满足进入条件
+        if (_nextStateTransitionMode == TransitionMode.DelayBackend &&
+            !_nextState.Task.CanEnter(_nextState)) // 等待新任务满足进入条件
             return;
 
         _currentState.Task.Exit(_currentState);

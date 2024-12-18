@@ -10,9 +10,12 @@ public class FallActionState : ActionState
 
     public override Tag Tag => Tags.State_Action_Fall;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => _host.IsOnFloor()),
-        new(Tags.State_Action_WallSlide, () => _host.IsHandColliding() && _host.IsFootColliding() && !_host.KeyDownMove()),
+        new(Tags.State_Action_WallSlide,
+            () => _host.IsHandColliding() && _host.IsFootColliding() && !_host.KeyDownMove()),
         new(Tags.State_Action_Jump, () => _host.KeyDownJump() && _ctx.JumpCount < _ctx.MaxJumpCount)
     ];
 

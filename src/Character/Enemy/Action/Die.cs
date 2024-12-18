@@ -4,14 +4,16 @@ namespace BraveStory;
 
 public class DieEnemyActionState : ActionState
 {
-    public override Tag Tag => Tags.State_Status_Die;
-    public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
-        new(Tags.State_Status_Die, () => OwnerAgent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
-    ];
+    private EnemyContext ctx;
 
     private Enemy host;
-    private EnemyContext ctx;
+    public override Tag Tag => Tags.State_Status_Die;
+    public override Tag Layer => Tags.StateLayer_Movement;
+
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Status_Die, () => OwnerAgent.Atr("HP") <= 0, TransitionMode.Normal, 0, true)
+    ];
 
     public override void Init()
     {

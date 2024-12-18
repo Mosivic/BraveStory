@@ -5,14 +5,16 @@ namespace BraveStory;
 
 public class SlidingActionState : ActionState
 {
-    public override Tag Tag => Tags.State_Action_Sliding;
-    public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => _host.IsAnimationFinished())
-    ];
+    private PlayerContext _ctx;
 
     private Player _host;
-    private PlayerContext _ctx;
+    public override Tag Tag => Tags.State_Action_Sliding;
+    public override Tag Layer => Tags.StateLayer_Movement;
+
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Idle, () => _host.IsAnimationFinished())
+    ];
 
     public override void Init()
     {

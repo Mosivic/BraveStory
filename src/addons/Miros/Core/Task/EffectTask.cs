@@ -10,7 +10,6 @@ public class EffectTask : TaskBase<Effect>
     private EffectUpdateHandler _updateHandler;
 
 
-
     public override void Enter(State state)
     {
         base.Enter(state);

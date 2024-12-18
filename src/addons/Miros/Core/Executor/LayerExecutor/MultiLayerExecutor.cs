@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 
 namespace Miros.Core;
 
@@ -24,9 +23,7 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
 
         var switchTaskArgs = switchArgs as MultiLayerSwitchArgs;
         if (_layers.TryGetValue(switchTaskArgs.Layer, out var layerExecutor))
-        {
             layerExecutor.SetNextState(state, switchTaskArgs.Mode);
-        }
     }
 
     public override void Update(double delta)
@@ -55,7 +52,7 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
         if (action.Transitions != null)
             _transitionContainer.AddTransitions(state, action.Transitions);
 
-        if (action.AsDefaultTask) 
+        if (action.AsDefaultTask)
             _layers[action.Layer].SetDefaultState(state);
 
         if (action.AsNextTask)

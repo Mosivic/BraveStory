@@ -36,7 +36,7 @@ public enum RemovePolicy
     WhenSourceTaskRemoved, //任务的 Source Task被移除时移除
     WhenSourceTaskExited, //任务的 Source Task结束时移除（成功或失败）
     WhenSourceTaskFailed, //任务的 Source Task失败时移除
-    WhenSourceTaskSucceed, //任务的 Source Task成功时移除
+    WhenSourceTaskSucceed //任务的 Source Task成功时移除
 }
 
 public enum GrantedAbilityActivationPolicy

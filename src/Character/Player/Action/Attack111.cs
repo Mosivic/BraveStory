@@ -9,7 +9,9 @@ public class Attack111ActionState : ActionState
 
     public override Tag Tag => Tags.State_Action_Attack111;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle)
     ];
 

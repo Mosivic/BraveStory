@@ -10,7 +10,9 @@ public class RunActionState : ActionState
 
     public override Tag Tag => Tags.State_Action_Run;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => !_host.KeyDownMove()),
         new(Tags.State_Action_Jump, () => _host.KeyDownJump()),
         new(Tags.State_Action_Attack1, () => _host.KeyDownAttack()),
@@ -40,7 +42,8 @@ public class RunActionState : ActionState
     {
         var direction = Input.GetAxis("move_left", "move_right");
         var velocity = _host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * OwnerAgent.Atr("RunSpeed"), OwnerAgent.Atr("FloorAcceleration"));
+        velocity.X = Mathf.MoveToward(velocity.X, direction * OwnerAgent.Atr("RunSpeed"),
+            OwnerAgent.Atr("FloorAcceleration"));
         velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
         _host.Velocity = velocity;
 

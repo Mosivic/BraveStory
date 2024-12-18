@@ -9,10 +9,12 @@ public class HurtActionState : ActionState
 
     public override Tag Tag => Tags.State_Action_Hurt;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
-            new(Tags.State_Action_Idle, () => _host.IsAnimationFinished()),
-            new(Tags.State_Action_Hurt, () => _ctx.IsHurt, TransitionMode.Force, 0, true)
-        ];
+
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Idle, () => _host.IsAnimationFinished()),
+        new(Tags.State_Action_Hurt, () => _ctx.IsHurt, TransitionMode.Force, 0, true)
+    ];
 
     public override void Init()
     {

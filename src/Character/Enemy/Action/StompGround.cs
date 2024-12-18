@@ -5,15 +5,17 @@ namespace BraveStory;
 
 public class StompGroundEnemyActionState : ActionState
 {
+    private EnemyContext ctx;
+
+    private Enemy host;
     public override Tag Tag => Tags.State_Action_StompGround;
 
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => ctx.StompTimer >= 1.0f),
-    ];
 
-    private Enemy host;
-    private EnemyContext ctx;
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Idle, () => ctx.StompTimer >= 1.0f)
+    ];
 
     public override void Init()
     {
@@ -61,7 +63,7 @@ public class StompGroundEnemyActionState : ActionState
 
                 ctx.HitAgent.SwitchTaskFromTag(ExecutorType.MultiLayerExecutor, Tags.State_Action_Jump,
                     new MultiLayerSwitchArgs(Tags.StateLayer_Movement));
-                
+
                 ctx.HitAgent = null;
             }
         }

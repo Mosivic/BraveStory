@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 namespace Miros.Core;
@@ -22,7 +21,6 @@ public class Agent
     public Node Host { get; private set; }
     public bool Enabled { get; private set; }
     public EventStream EventStream { get; private set; }
-    
 
 
     public void Init(Node host)
@@ -34,7 +32,7 @@ public class Agent
         _ownedTags = new TagContainer([]);
         AttributeSetContainer = new AttributeSetContainer(this);
 
-		// FIXME: 不应该在这里进行初始化
+        // FIXME: 不应该在这里进行初始化
         _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
     }
 
@@ -69,27 +67,27 @@ public class Agent
     }
 
 
-    public void AddActions(ExecutorType executorType,Context context, Type[] stateTypes)
+    public void AddActions(ExecutorType executorType, Context context, Type[] stateTypes)
     {
         foreach (var stateType in stateTypes)
             AddAction(executorType, context, stateType);
     }
 
-    
-	public void AddAction(ExecutorType executorType,Context context, Type stateType)
-	{
-		var state =  (State)Activator.CreateInstance(stateType);
-        
+
+    public void AddAction(ExecutorType executorType, Context context, Type stateType)
+    {
+        var state = (State)Activator.CreateInstance(stateType);
+
         state.Context = context;
         state.OwnerAgent = this;
         state.Task = TaskProvider.GetTask(state.TaskType);
         state.Init();
 
-		if (executorType == ExecutorType.MultiLayerExecutor)
+        if (executorType == ExecutorType.MultiLayerExecutor)
             PushStateOnExecutor(executorType, state);
-	}
-    
-    
+    }
+
+
     public void AddEffect(Effect effect)
     {
         effect.OwnerAgent = this;
@@ -99,7 +97,7 @@ public class Agent
         PushStateOnExecutor(ExecutorType.EffectExecutor, effect);
     }
 
-    
+
     private IExecutor GetExecutor(ExecutorType executorType)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
@@ -112,6 +110,7 @@ public class Agent
             };
             _executors[executorType] = executor;
         }
+
         return executor;
     }
 
@@ -121,7 +120,7 @@ public class Agent
         executor.AddState(state);
     }
 
-    
+
     public void RemoveState(ExecutorType executorType, State state)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
@@ -275,8 +274,8 @@ public class Agent
     {
         AttributeSetContainer.AddAttributeSet(attrSetType);
     }
-    
-    
+
+
     public AttributeBase GetAttributeBase(Tag attrSetTag, Tag attrTag)
     {
         if (AttributeSetContainer.TryGetAttributeBase(attrSetTag, attrTag, out var value))

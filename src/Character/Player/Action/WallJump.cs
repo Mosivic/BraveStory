@@ -6,13 +6,15 @@ namespace BraveStory;
 public class WallJumpActionState : ActionState
 {
     private PlayerContext _ctx;
-    public override Tag Tag => Tags.State_Action_WallJump;
-    public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
-        new(Tags.State_Action_Fall)
-    ];
 
     private Player _host;
+    public override Tag Tag => Tags.State_Action_WallJump;
+    public override Tag Layer => Tags.StateLayer_Movement;
+
+    public override Transition[] Transitions =>
+    [
+        new(Tags.State_Action_Fall)
+    ];
 
     public override void Init()
     {

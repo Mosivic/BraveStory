@@ -10,7 +10,9 @@ public class JumpActionState : ActionState
 
     public override Tag Tag => Tags.State_Action_Jump;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Fall, () => RunningTime > 0.1f)
     ];
 

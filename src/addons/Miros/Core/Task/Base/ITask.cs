@@ -11,5 +11,5 @@ public interface ITask
     void TriggerOnRemove(State state);
     void Update(State state, double delta);
     void PhysicsUpdate(State state, double delta);
-    void Stack(State state,bool IsFromSameSource);
+    void Stack(State state, bool IsFromSameSource);
 }

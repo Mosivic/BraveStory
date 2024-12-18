@@ -3,35 +3,34 @@ using Miros.Core;
 
 namespace BraveStory;
 
-
 public class ChargeEnemyActionState : ActionState
 {
+    private EnemyContext _ctx;
+
+    private Enemy _host;
+    private AnimatedSprite2D _smoke;
+
+    private float _waitTime = 0.3f;
     public override Tag Tag => Tags.State_Action_Charge;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override TaskType TaskType => TaskType.Serial;
 
-    private float _waitTime = 0.3f;
-    private AnimatedSprite2D _smoke;
-
-    public override Transition[] Transitions => [
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => _ctx.ChargeTimer >= _ctx.ChargeDuration),
         new(Tags.State_Action_Stun, () => _ctx.IsStunned)
     ];
-
-    private Enemy _host;
-    private EnemyContext _ctx;
 
     public override void Init()
     {
         _ctx = Context as EnemyContext;
         _host = _ctx.Host;
 
-        SubStates = [
+        SubStates =
+        [
             new State
             {
-                EnterFunc = () => {
-                    GD.Print("Boar : ChargeWait");
-                }
+                EnterFunc = () => { GD.Print("Boar : ChargeWait"); }
             },
             new State
             {
@@ -48,15 +47,15 @@ public class ChargeEnemyActionState : ActionState
     private void OnEnter()
     {
         _host.PlayAnimation("run");
-        
+
         _waitTime = 1.0f;
         _ctx.ChargeTimer = 0f;
         _ctx.IsCharging = true;
-        
+
         _smoke.Visible = true;
         _smoke.Play("smoke");
-
     }
+
     private void OnAdd()
     {
         var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
@@ -98,7 +97,6 @@ public class ChargeEnemyActionState : ActionState
 
         _smoke.Visible = false;
         _smoke.Stop();
-
     }
 
     private void Charge(double delta)

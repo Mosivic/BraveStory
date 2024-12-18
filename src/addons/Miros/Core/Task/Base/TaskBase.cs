@@ -1,10 +1,9 @@
 ﻿namespace Miros.Core;
 
-
 public class TaskBase<TState> : ITask
     where TState : State
 {
-    public TState State { get;set; }
+    public TState State { get; set; }
 
     public virtual void Enter(State state)
     {
@@ -25,7 +24,7 @@ public class TaskBase<TState> : ITask
         OnExit(state);
     }
 
-    
+
     public virtual bool CanEnter(State state)
     {
         return OnEnterCondition(state);
@@ -38,9 +37,9 @@ public class TaskBase<TState> : ITask
     // 3. State.ExitCondition 为真
     public virtual bool CanExit(State state)
     {
-        return state.Status == RunningStatus.Failed 
-        || state.Status == RunningStatus.Succeed 
-        || OnExitCondition(state);
+        return state.Status == RunningStatus.Failed
+               || state.Status == RunningStatus.Succeed
+               || OnExitCondition(state);
     }
 
 
@@ -71,6 +70,10 @@ public class TaskBase<TState> : ITask
     {
         if (state.Status != RunningStatus.Running) return;
         OnPhysicsUpdate(state, delta);
+    }
+
+    public virtual void Stack(State state, bool IsFromSameSource)
+    {
     }
 
     protected virtual void Succeed(State state)
@@ -137,10 +140,5 @@ public class TaskBase<TState> : ITask
     protected virtual void OnRemove(State state)
     {
         state.RemoveFunc?.Invoke();
-    }
-
-    public virtual void Stack(State state, bool IsFromSameSource)
-    {
-        
     }
 }

@@ -64,7 +64,7 @@ public class Effect : State
 
     public override TaskType TaskType { get; set; } = TaskType.Effect;
 
-    public  DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
+    public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }
     public double Period { get; set; }
 

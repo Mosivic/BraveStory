@@ -4,12 +4,14 @@ namespace BraveStory;
 
 public class Attack11ActionState : ActionState
 {
-    private Player _host;
     private PlayerContext _ctx;
+    private Player _host;
 
     public override Tag Tag => Tags.State_Action_Attack11;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle),
         new(Tags.State_Action_Attack111, () => _host.KeyDownAttack(), TransitionMode.DelayFront)
     ];

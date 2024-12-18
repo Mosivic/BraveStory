@@ -10,5 +10,5 @@ public interface IExecutor
     bool HasStateRunning(State state);
     void Update(double delta);
     void PhysicsUpdate(double delta);
-    void SwitchStateByTag(Tag tag, Context context); 
+    void SwitchStateByTag(Tag tag, Context context);
 }

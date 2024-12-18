@@ -5,25 +5,28 @@ namespace BraveStory;
 
 public class PatrolEnemyActionState : ActionState
 {
+    private EnemyContext ctx;
+
+    private Enemy host;
+
     // FIXME：Walk 和 Patrol 是同一个状态，需要合并
     public override Tag Tag => Tags.State_Action_Patrol;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () =>
             (!host.IsFloorColliding() && !host.IsPlayerColliding() && RunningTime > 2) ||
             (!host.IsFloorColliding() && host.IsPlayerColliding())),
         new(Tags.State_Action_Charge, () => host.IsPlayerColliding())
     ];
 
-    private Enemy host;
-    private EnemyContext ctx;
-
     public override void Init()
     {
         ctx = Context as EnemyContext;
         host = ctx.Host;
-    
-        
+
+
         EnterFunc = OnEnter;
         PhysicsUpdateFunc = OnPhysicsUpdate;
     }

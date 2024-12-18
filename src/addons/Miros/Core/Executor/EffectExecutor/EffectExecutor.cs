@@ -3,16 +3,9 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-
 public class EffectExecutor : ExecutorBase, IExecutor
 {
     private readonly List<Effect> _runningEffects = [];
-
-
-    public List<Effect> GetRunningEffects()
-    {
-        return _runningEffects;
-    }
 
     public override void Update(double delta)
     {
@@ -26,51 +19,12 @@ public class EffectExecutor : ExecutorBase, IExecutor
     public override void SwitchStateByTag(Tag tag, Context context = null)
     {
         if (_states.TryGetValue(tag, out var state))
-        {
             if (state != null)
             {
                 state.Task.Enter(state);
                 _runningEffects.Add(state as Effect);
                 _onRunningEffectTasksIsDirty?.Invoke(this, state as Effect);
             }
-        }
-    }
-
-    private void UpdateTasks()
-    {
-        // Enter
-        foreach (var state in _states.Values)
-        {
-            var effect = state as Effect;
-            if (effect.DurationPolicy == DurationPolicy.Instant)
-            {
-                effect.Task.Enter(effect);
-                effect.Task.Exit(effect);
-            }
-            else
-            {
-                effect.Task.Enter(effect);
-                _runningEffects.Add(effect);
-                _onRunningEffectTasksIsDirty?.Invoke(this, effect);
-            }
-        }
-
-        // Exit
-        foreach (var state in _runningEffects)
-        {
-            if (!state.Task.CanExit(state))
-                continue;
-
-            state.Task.Exit(state);
-            _runningEffects.Remove(state);
-            _onRunningEffectTasksIsDirty?.Invoke(this, state);
-        }
-    }
-
-    private static bool AreTaskCouldStackByAnotherTask(Effect task, Effect otherTask)
-    {
-        return task.Stacking != null && otherTask.Stacking != null &&
-               task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
     public override void AddState(State state)
@@ -111,6 +65,49 @@ public class EffectExecutor : ExecutorBase, IExecutor
         }
     }
 
+
+    public List<Effect> GetRunningEffects()
+    {
+        return _runningEffects;
+    }
+
+    private void UpdateTasks()
+    {
+        // Enter
+        foreach (var state in _states.Values)
+        {
+            var effect = state as Effect;
+            if (effect.DurationPolicy == DurationPolicy.Instant)
+            {
+                effect.Task.Enter(effect);
+                effect.Task.Exit(effect);
+            }
+            else
+            {
+                effect.Task.Enter(effect);
+                _runningEffects.Add(effect);
+                _onRunningEffectTasksIsDirty?.Invoke(this, effect);
+            }
+        }
+
+        // Exit
+        foreach (var state in _runningEffects)
+        {
+            if (!state.Task.CanExit(state))
+                continue;
+
+            state.Task.Exit(state);
+            _runningEffects.Remove(state);
+            _onRunningEffectTasksIsDirty?.Invoke(this, state);
+        }
+    }
+
+    private static bool AreTaskCouldStackByAnotherTask(Effect task, Effect otherTask)
+    {
+        return task.Stacking != null && otherTask.Stacking != null &&
+               task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
+    }
+
     private bool AreFromSameSourceAgent(Effect effect1, Effect effect2)
     {
         if (effect1 == null || effect2 == null)
@@ -132,7 +129,6 @@ public class EffectExecutor : ExecutorBase, IExecutor
     {
         _onRunningEffectTasksIsDirty -= handler;
     }
-
 
     #endregion
 }

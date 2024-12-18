@@ -9,7 +9,9 @@ public class WallSlideActionState : ActionState
     private Player _host;
     public override Tag Tag => Tags.State_Action_WallSlide;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => _host.IsOnFloor()),
         new(Tags.State_Action_Fall, () => !_host.IsFootColliding()),
         new(Tags.State_Action_WallJump, () => _host.KeyDownJump())
