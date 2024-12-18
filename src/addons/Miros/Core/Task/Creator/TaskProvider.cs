@@ -28,16 +28,16 @@ public class TaskProvider
                 task = new TaskBase<State>();
                 break;
             case TaskType.Effect:
-                task = new EffectTask() as ITask;
+                task = new EffectTask();
                 break;
             case TaskType.Random:
-                task = new RandomTask() as ITask;
+                task = new RandomTask();
                 break;
             case TaskType.Parallel:
-                task = new ParallelTask() as ITask;
+                task = new ParallelTask();
                 break;
             case TaskType.Serial:
-                task = new SerialTask() as ITask;
+                task = new SerialTask();
                 break;
         }
         _taskCache[taskType] = task;

@@ -82,7 +82,7 @@ public class Agent
         
         state.Context = context;
         state.OwnerAgent = this;
-        state.Task = TaskProvider.GetTask(state.TaskType) as TaskBase<State>;
+        state.Task = TaskProvider.GetTask(state.TaskType);
         state.Init();
 
 		if (executorType == ExecutorType.MultiLayerExecutor)

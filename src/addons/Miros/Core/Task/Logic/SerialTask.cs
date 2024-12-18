@@ -10,9 +10,10 @@ namespace Miros.Core;
 
 public class SerialTask: TaskBase<State>
 {
-    protected State CurrentState = null;
-    protected int CurrentIndex = 0;
-    protected int SubStatesCount = 0;
+    private State _currentState = null;
+    private int _currentIndex = 0;
+    private int _subStatesCount = 0;
+    private bool _isFinished = false;
 
     public override void TriggerOnAdd(State state)
     {
@@ -21,44 +22,40 @@ public class SerialTask: TaskBase<State>
         foreach (var subState in state.SubStates)
         {
             var subTask = TaskProvider.GetTask(subState.TaskType);
-            state.Task = subTask;
+            subState.Task = subTask;
         }
 
-        SubStatesCount = state.SubStates.Length;
-        if(SubStatesCount > 0)
-            CurrentState = state.SubStates[0];
+        _subStatesCount = state.SubStates.Length;
+        if (_subStatesCount > 0)
+        {
+            _currentState = state.SubStates[_currentIndex];
+            _currentState.Task.Enter(_currentState);
+        }
     }
-
-    public override void Enter(State state)
-    {
-        base.Enter(state);
-        CurrentState.Task.Enter(state);
-    }
-
-    public override void Exit(State state)
-    {
-        base.Exit(state);
-
-        CurrentState.Task.Exit(state);
-    }
-
+    
 
     public override void Update(State state, double delta)
     {
         base.Update(state, delta);
 
-        if(CurrentIndex < SubStatesCount)
+        if(_isFinished == false && _currentIndex < _subStatesCount)
         {
-
-            if(CurrentState.Task.CanExit(state))
+            _currentState.Task.Update(_currentState, delta);
+            
+            if(_currentState.Task.CanExit(_currentState))
             {
-                CurrentIndex++;
-                CurrentState = state.SubStates[CurrentIndex];
-                CurrentState.Task.Exit(state);
+                _currentState.Task.Exit(_currentState);
+                _currentIndex++;
+
+                if (_currentIndex == _subStatesCount)
+                {
+                    _isFinished = true;
+                    return;
+                }
+                    
+                _currentState = state.SubStates[_currentIndex];
+                _currentState.Task.Enter(_currentState);
             }
-
-
-            CurrentState.Task.Update(state, delta);
         }
     }
 
@@ -66,14 +63,14 @@ public class SerialTask: TaskBase<State>
     {
         base.PhysicsUpdate(state, delta);
 
-        if(CurrentIndex < SubStatesCount)
-            CurrentState.Task.PhysicsUpdate(state, delta);
+        if(_isFinished == false && _currentIndex < _subStatesCount)
+            _currentState.Task.PhysicsUpdate(_currentState, delta);
         
     }
 
     public override bool CanExit(State state)
     {
-        return CurrentIndex == SubStatesCount || SubStatesCount == 0;
+        return _currentIndex == _subStatesCount || _subStatesCount == 0;
     }
 }
 

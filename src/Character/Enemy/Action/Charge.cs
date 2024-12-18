@@ -3,6 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
+
 public class ChargeEnemyActionState : ActionState
 {
     public override Tag Tag => Tags.State_Action_Charge;
@@ -13,17 +14,17 @@ public class ChargeEnemyActionState : ActionState
     private AnimatedSprite2D _smoke;
 
     public override Transition[] Transitions => [
-        new(Tags.State_Action_Idle, () => ctx.ChargeTimer >= ctx.ChargeDuration),
-        new(Tags.State_Action_Stun, () => ctx.IsStunned)
+        new(Tags.State_Action_Idle, () => _ctx.ChargeTimer >= _ctx.ChargeDuration),
+        new(Tags.State_Action_Stun, () => _ctx.IsStunned)
     ];
 
-    private Enemy host;
-    private EnemyContext ctx;
+    private Enemy _host;
+    private EnemyContext _ctx;
 
     public override void Init()
     {
-        ctx = Context as EnemyContext;
-        host = ctx.Host;
+        _ctx = Context as EnemyContext;
+        _host = _ctx.Host;
 
         SubStates = [
             new State
@@ -35,7 +36,7 @@ public class ChargeEnemyActionState : ActionState
             new State
             {
                 EnterFunc = OnEnter,
-                UpdateFunc = OnPhysicsUpdate,
+                PhysicsUpdateFunc = OnPhysicsUpdate,
                 ExitFunc = OnExit
             }
         ];
@@ -46,11 +47,11 @@ public class ChargeEnemyActionState : ActionState
 
     private void OnEnter()
     {
-        host.PlayAnimation("run");
+        _host.PlayAnimation("run");
         
         _waitTime = 1.0f;
-        ctx.ChargeTimer = 0f;
-        ctx.IsCharging = true;
+        _ctx.ChargeTimer = 0f;
+        _ctx.IsCharging = true;
         
         _smoke.Visible = true;
         _smoke.Play("smoke");
@@ -60,7 +61,7 @@ public class ChargeEnemyActionState : ActionState
     {
         var smokeEffect = GD.Load<PackedScene>("res://VFX/smoke.tscn");
         _smoke = smokeEffect.Instantiate<AnimatedSprite2D>();
-        host.AddChild(_smoke);
+        _host.AddChild(_smoke);
         _smoke.Visible = false;
     }
 
@@ -74,7 +75,7 @@ public class ChargeEnemyActionState : ActionState
 
         Charge(delta);
 
-        if (ctx.IsHit && ctx.HitAgent != null)
+        if (_ctx.IsHit && _ctx.HitAgent != null)
         {
             var damageEffect = new Effect
             {
@@ -85,15 +86,15 @@ public class ChargeEnemyActionState : ActionState
                 Executions = [new DamageExecution()]
             };
 
-            ctx.HitAgent.AddEffect(damageEffect);
-            ctx.IsHit = false;
+            _ctx.HitAgent.AddEffect(damageEffect);
+            _ctx.IsHit = false;
         }
     }
 
     private void OnExit()
     {
-        ctx.IsCharging = false;
-        ctx.ChargeTimer = 0f;
+        _ctx.IsCharging = false;
+        _ctx.ChargeTimer = 0f;
 
         _smoke.Visible = false;
         _smoke.Stop();
@@ -103,29 +104,29 @@ public class ChargeEnemyActionState : ActionState
     private void Charge(double delta)
     {
         // 更新冲刺计时器
-        ctx.ChargeTimer += (float)delta;
+        _ctx.ChargeTimer += (float)delta;
 
         // 检查是否撞墙
-        if (host.IsWallColliding())
+        if (_host.IsWallColliding())
         {
-            ctx.IsStunned = true;
+            _ctx.IsStunned = true;
             return;
         }
 
-        var velocity = host.Velocity;
-        velocity.X = -host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
+        var velocity = _host.Velocity;
+        velocity.X = -_host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
         var slowdownThreshold = 0.3f; // 最后0.3秒开始减速
-        if (ctx.ChargeTimer >= ctx.ChargeDuration - slowdownThreshold)
+        if (_ctx.ChargeTimer >= _ctx.ChargeDuration - slowdownThreshold)
         {
-            var slowdownFactor = 1.0f - (ctx.ChargeTimer - (ctx.ChargeDuration - slowdownThreshold)) /
+            var slowdownFactor = 1.0f - (_ctx.ChargeTimer - (_ctx.ChargeDuration - slowdownThreshold)) /
                 slowdownThreshold;
             velocity.X *= slowdownFactor;
         }
 
         velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
-        host.Velocity = velocity;
-        host.MoveAndSlide();
+        _host.Velocity = velocity;
+        _host.MoveAndSlide();
     }
 }

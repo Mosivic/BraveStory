@@ -19,7 +19,7 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
         if (!_states.TryGetValue(tag, out var state))
             return;
 
-        if (switchArgs is null || switchArgs is not MultiLayerSwitchArgs)
+        if (switchArgs is not MultiLayerSwitchArgs)
             Console.WriteLine("switchArgs is null or not MultiLayerSwitchArgs");
 
         var switchTaskArgs = switchArgs as MultiLayerSwitchArgs;
@@ -72,13 +72,11 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
 
     public override State GetNowState(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetNowState();
-        return null;
+        return _layers.TryGetValue(layer, out var layer1) ? layer1.GetNowState() : null;
     }
 
     public override State GetLastState(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetLastState();
-        return null;
+        return _layers.TryGetValue(layer, out var layer1) ? layer1.GetLastState() : null;
     }
 }
