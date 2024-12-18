@@ -1,14 +1,13 @@
 ﻿namespace Miros.Core;
 
-public interface IExecutor<TState>
-    where TState : State
+public interface IExecutor
 {
-    void AddState<TContext>(TState state) where TContext : Context;
-    void RemoveState(TState state);
-    TState GetNowState(Tag layer);
-    TState GetLastState(Tag layer);
-    TState[] GetAllStates();
-    bool HasStateRunning(TState state);
+    void AddState<TContext>(State state) where TContext : Context;
+    void RemoveState(State state);
+    State GetNowState(Tag layer);
+    State GetLastState(Tag layer);
+    State[] GetAllStates();
+    bool HasStateRunning(State state);
     void Update(double delta);
     void PhysicsUpdate(double delta);
     void SwitchStateByTag(Tag tag, Context context); 

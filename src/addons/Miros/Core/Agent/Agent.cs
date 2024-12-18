@@ -14,7 +14,7 @@ public enum ExecutorType
 
 public class Agent
 {
-    private readonly Dictionary<ExecutorType, IExecutor<State>> _executors = [];
+    private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
     private TagContainer _ownedTags;
     private AttributeSetContainer AttributeSetContainer { get; set; }
 
@@ -35,8 +35,7 @@ public class Agent
         AttributeSetContainer = new AttributeSetContainer(this);
 
 		// FIXME: 不应该在这里进行初始化
-        _executors[ExecutorType.EffectExecutor] = new EffectExecutor() as IExecutor<State>;
-        ;
+        _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
     }
 
 
@@ -73,17 +72,18 @@ public class Agent
     public void AddActions<TContext>(ExecutorType executorType,TContext context, Type[] stateTypes)
         where TContext : Context
     {
-        foreach (var _ in stateTypes)
-            AddAction(executorType, context);
+        foreach (var stateType in stateTypes)
+            AddAction(executorType, context, stateType);
     }
 
-	
-	public void AddAction<TContext>(ExecutorType executorType,TContext context)
+    
+	public void AddAction<TContext>(ExecutorType executorType,TContext context, Type stateType)
 	where TContext : Context
 	{
-		var state = (ActionState<TContext>)Activator.CreateInstance(typeof(ActionState<TContext>));
+		var state =  (ActionState<TContext>)Activator.CreateInstance(stateType);
         
 		state.Init(context);
+        state.OwnerAgent = this;
         state.Task = TaskProvider.GetTask<TaskBase<State>>(state.TaskType);
 
 		if (executorType == ExecutorType.MultiLayerExecutor)
@@ -101,14 +101,14 @@ public class Agent
     }
 
     
-    private IExecutor<State> GetExecutor(ExecutorType executorType)
+    private IExecutor GetExecutor(ExecutorType executorType)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
             executor = executorType switch
             {
                 ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
-                ExecutorType.EffectExecutor => new EffectExecutor() as IExecutor<State>,
+                ExecutorType.EffectExecutor => new EffectExecutor(),
                 _ => throw new ArgumentOutOfRangeException(nameof(executorType), executorType, null)
             };
             _executors[executorType] = executor;

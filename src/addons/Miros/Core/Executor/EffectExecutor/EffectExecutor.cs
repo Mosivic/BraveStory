@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Miros.Core;
 
 
-public class EffectExecutor : ExecutorBase<Effect>
+public class EffectExecutor : ExecutorBase, IExecutor
 {
     private readonly List<Effect> _runningEffects = [];
 
@@ -30,8 +30,8 @@ public class EffectExecutor : ExecutorBase<Effect>
             if (state != null)
             {
                 state.Task.Enter(state);
-                _runningEffects.Add(state);
-                _onRunningEffectTasksIsDirty?.Invoke(this, state);
+                _runningEffects.Add(state as Effect);
+                _onRunningEffectTasksIsDirty?.Invoke(this, state as Effect);
             }
         }
     }
@@ -73,9 +73,10 @@ public class EffectExecutor : ExecutorBase<Effect>
                task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
-    public override void AddState<TContext>(Effect effect)
+    public override void AddState<TContext>(State state)
     {
         var isAddTask = true;
+        var effect = state as Effect;
 
         foreach (var existingEffect in _runningEffects)
             if (AreTaskCouldStackByAnotherTask(effect, existingEffect))
@@ -98,10 +99,11 @@ public class EffectExecutor : ExecutorBase<Effect>
         if (isAddTask) base.AddState<TContext>(effect);
     }
 
-    public override void RemoveState(Effect effect)
+    public override void RemoveState(State state)
     {
-        base.RemoveState(effect);
+        base.RemoveState(state);
 
+        var effect = state as Effect;
         if (effect.Status == RunningStatus.Running)
         {
             _runningEffects.Remove(effect);

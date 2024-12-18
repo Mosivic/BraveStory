@@ -8,6 +8,7 @@ public class IdleActionState : ActionState<PlayerContext>
 
     public override Tag Tag => Tags.State_Action_Idle;
     public override Tag Layer => Tags.StateLayer_Movement;
+    public override bool AsDefaultTask => true;
     public override Transition[] Transitions => [
         new(Tags.State_Action_Run, () => _host.KeyDownMove()),
         new(Tags.State_Action_Fall, () => !_host.IsOnFloor()),

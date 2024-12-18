@@ -6,7 +6,7 @@ namespace Miros.Core;
 public class ActionState<TContext> : State
     where TContext : Context
 {
-    public TContext Context { get; private set; }
+    protected TContext Context { get; private set; }
 
     public virtual Tag Layer { get; set; } 
     public virtual Transition[] Transitions { get; set; }

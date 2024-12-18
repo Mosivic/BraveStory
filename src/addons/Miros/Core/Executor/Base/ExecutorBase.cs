@@ -1,11 +1,10 @@
 namespace Miros.Core;
 
-public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
-    where TState : State
+public class ExecutorBase : AbsExecutor, IExecutor
 {
-    public virtual void AddState<TContext>(TState state) where TContext : Context
+    public virtual void AddState<TContext>(State state) where TContext : Context
     {
-        var t = state as TState;
+        var t = state as State;
 
         if(t.RemovePolicy != RemovePolicy.None)
             _tempStates.Add(t.Tag, t);
@@ -14,9 +13,9 @@ public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
         t.Task.TriggerOnAdd(t); 
     }
 
-    public virtual void RemoveState(TState state)
+    public virtual void RemoveState(State state)
     {
-        var t = state as TState;
+        var t = state as State;
 
         if (t.RemovePolicy != RemovePolicy.None) // 如果任务有移除策略(非None)，则将任务从临时任务列表中移除
             _tempStates.Remove(t.Tag);
@@ -39,17 +38,17 @@ public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
         return 0;
     }
 
-    public virtual TState GetLastState(Tag layer)
+    public virtual State GetLastState(Tag layer)
     {
         return null;
     }
 
-    public virtual TState GetNowState(Tag layer)
+    public virtual State GetNowState(Tag layer)
     {
         return null;
     }
 
-    public virtual bool HasStateRunning(TState state)
+    public virtual bool HasStateRunning(State state)
     {
         return false;
     }
@@ -64,7 +63,7 @@ public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
         UpdateTempStates();
     }
 
-    public virtual TState[] GetAllStates()
+    public virtual State[] GetAllStates()
     {
         return [.. _states.Values];
     }
@@ -77,7 +76,7 @@ public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
         }
     }
 
-    private void RemoveTempState(TState state)
+    private void RemoveTempState(State state)
     {
         var removePolicy = state.RemovePolicy;
         switch (removePolicy)

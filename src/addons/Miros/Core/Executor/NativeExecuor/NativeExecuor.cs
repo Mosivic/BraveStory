@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class ConditionMachine : ExecutorBase<State>
+public class ConditionMachine : ExecutorBase, IExecutor
 {
     protected readonly Dictionary<Tag, List<State>> RunningStates = [];
     protected Dictionary<Tag, List<State>> WaitingStates = [];

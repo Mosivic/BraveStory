@@ -33,6 +33,7 @@ public class LayerExecutor
     public void SetDefaultState(State state)
     {
         _defaultState = state;
+        _currentState = _defaultState;
     }
 
     public void SetNextState(State state, TransitionMode mode)

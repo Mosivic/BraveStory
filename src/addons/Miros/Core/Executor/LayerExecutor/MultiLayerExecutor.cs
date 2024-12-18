@@ -4,7 +4,7 @@ using Godot;
 
 namespace Miros.Core;
 
-public class MultiLayerExecutor : ExecutorBase<State>, IExecutor<State>
+public class MultiLayerExecutor : ExecutorBase, IExecutor
 {
     private readonly Dictionary<Tag, LayerExecutor> _layers = [];
     private readonly TransitionContainer _transitionContainer = new();
