@@ -2,21 +2,18 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class Attack1ActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
+public class Attack1ActionState : ActionState<Player, PlayerContext>
 {
     public override Tag Tag => Tags.State_Action_Attack1;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle),
+        new(Tags.State_Action_Attack11, () => Host.KeyDownAttack(), TransitionMode.DelayFront)
+    ];
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle),
-            new(Tags.State_Action_Attack11, () => Host.KeyDownAttack(), TransitionMode.DelayFront)
-        ]
-    );
-
-    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Player host, PlayerContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

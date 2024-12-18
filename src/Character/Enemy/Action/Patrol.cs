@@ -3,24 +3,21 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class PatrolEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class PatrolEnemyActionState : ActionState<Enemy, EnemyContext>
 {
     // FIXME：Walk 和 Patrol 是同一个状态，需要合并
     public override Tag Tag => Tags.State_Action_Patrol;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () =>
+            (!Host.IsFloorColliding() && !Host.IsPlayerColliding() && RunningTime > 2) ||
+            (!Host.IsFloorColliding() && Host.IsPlayerColliding())),
+        new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
+    ];
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () =>
-                (!Host.IsFloorColliding() && !Host.IsPlayerColliding() && RunningTime > 2) ||
-                (!Host.IsFloorColliding() && Host.IsPlayerColliding())),
-            new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
-        ]
-    );
-
-    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Enemy host, EnemyContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

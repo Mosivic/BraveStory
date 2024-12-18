@@ -3,21 +3,18 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class HurtEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class HurtEnemyActionState : ActionState<Enemy, EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_Hurt;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, Host.IsAnimationFinished),
+        new(Tags.State_Action_Hurt, () => Context.IsHurt, TransitionMode.Force, 0, true)
+    ];
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, Host.IsAnimationFinished),
-            new(Tags.State_Action_Hurt, () => Context.IsHurt, TransitionMode.Force, 0, true)
-        ]
-    );
-
-    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Enemy host, EnemyContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
         EnterFunc += OnEnter;
     }
 

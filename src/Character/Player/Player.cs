@@ -33,7 +33,7 @@ public partial class Player : Character
         Context = new PlayerContext();
 
         Agent.AddAttributeSet(typeof(PlayerAttributeSet));
-        Agent.AddActions<Player, PlayerContext, MultiLayerExecuteArgs>(ExecutorType.MultiLayerExecutor, Context as PlayerContext, [
+        Agent.AddActions<Player, PlayerContext>(ExecutorType.MultiLayerExecutor, Context as PlayerContext, [
             typeof(IdleActionState), typeof(JumpActionState),typeof(DieActionState), typeof(FallActionState), typeof(HurtActionState),
             typeof(RunActionState), typeof(SlidingActionState), typeof(WallJumpActionState), typeof(WallSlideActionState),
             typeof(Attack1ActionState), typeof(Attack11ActionState), typeof(Attack111ActionState)

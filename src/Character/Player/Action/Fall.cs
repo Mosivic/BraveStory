@@ -3,21 +3,19 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class FallActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
+public class FallActionState : ActionState<Player, PlayerContext>
 {
     public override Tag Tag => Tags.State_Action_Fall;
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
-            new(Tags.State_Action_WallSlide, () => Host.IsHandColliding() && Host.IsFootColliding() && !Host.KeyDownMove()),
-            new(Tags.State_Action_Jump, () => Host.KeyDownJump() && Context.JumpCount < Context.MaxJumpCount)
-        ]
-    );
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
+        new(Tags.State_Action_WallSlide, () => Host.IsHandColliding() && Host.IsFootColliding() && !Host.KeyDownMove()),
+        new(Tags.State_Action_Jump, () => Host.KeyDownJump() && Context.JumpCount < Context.MaxJumpCount)
+    ];
 
-    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Player host, PlayerContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

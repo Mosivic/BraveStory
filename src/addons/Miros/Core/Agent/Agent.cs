@@ -70,24 +70,22 @@ public class Agent
     }
 
 
-    public void AddActions<THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] stateTypes)
+    public void AddActions<THost, TContext>(ExecutorType executorType,TContext context, Type[] stateTypes)
         where THost : Node
         where TContext : Context
-        where TExecuteArgs : ExecuteArgs
     {
         foreach (var _ in stateTypes)
-            AddAction<THost, TContext, TExecuteArgs>(executorType, context);
+            AddAction<THost, TContext>(executorType, context);
     }
 
 	
-	public void AddAction<THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context)
+	public void AddAction<THost, TContext>(ExecutorType executorType,TContext context)
 	where THost : Node
 	where TContext : Context
-	where TExecuteArgs : ExecuteArgs
 	{
-		var state = (ActionState<THost, TContext, TExecuteArgs>)Activator.CreateInstance(typeof(ActionState<THost, TContext, TExecuteArgs>));
+		var state = (ActionState<THost, TContext>)Activator.CreateInstance(typeof(ActionState<THost, TContext>));
         
-		state.Init(Host as THost, context, null);
+		state.Init(Host as THost, context);
         state.Task = TaskProvider.GetTask<TaskBase<State>>(state.TaskType);
 
 		if (executorType == ExecutorType.MultiLayerExecutor)

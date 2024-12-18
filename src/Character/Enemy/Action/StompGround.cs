@@ -3,20 +3,18 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_StompGround;
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Context.StompTimer >= 1.0f),
-        ]
-    );
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => Context.StompTimer >= 1.0f),
+    ];
 
-    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Enemy host, EnemyContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

@@ -3,19 +3,17 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class SlidingActionState : ActionState<Player, PlayerContext, MultiLayerExecuteArgs>
+public class SlidingActionState : ActionState<Player, PlayerContext>
 {
     public override Tag Tag => Tags.State_Action_Sliding;
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Host.IsAnimationFinished())
-        ]
-    );
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => Host.IsAnimationFinished())
+    ];
 
-    public override void Init(Player host, PlayerContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Player host, PlayerContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

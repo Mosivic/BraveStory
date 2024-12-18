@@ -2,20 +2,18 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class StunEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class StunEnemyActionState : ActionState<Enemy, EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_Stun;
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Context.StunTimer >= Context.StunDuration)
-        ]
-    );
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => Context.StunTimer >= Context.StunDuration)
+    ];
 
-    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Enemy host, EnemyContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         EnterFunc += OnEnter;
         PhysicsUpdateFunc += OnPhysicsUpdate;

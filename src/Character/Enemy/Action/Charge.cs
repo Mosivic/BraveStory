@@ -3,7 +3,7 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext>
 {
     public override Tag Tag => Tags.State_Action_Charge;
 
@@ -11,18 +11,16 @@ public class ChargeEnemyActionState : ActionState<Enemy, EnemyContext, MultiLaye
     private AnimatedSprite2D _smoke;
     private bool _IsCharging = false;
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Context.ChargeTimer >= Context.ChargeDuration),
-            new(Tags.State_Action_Stun, () => Context.IsStunned)
-        ]
-    );
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => Context.ChargeTimer >= Context.ChargeDuration),
+        new(Tags.State_Action_Stun, () => Context.IsStunned)
+    ];
 
 
-    public override void Init(Enemy host, EnemyContext context, MultiLayerExecuteArgs executeArgs)
+    public override void Init(Enemy host, EnemyContext context)
     {
-        base.Init(host, context, executeArgs);
+        base.Init(host, context);
 
         AddFunc += OnAdd;
         EnterFunc += OnEnter;
