@@ -2,20 +2,26 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class IdleEnemyAction : Task<State, Enemy, EnemyContext, MultiLayerExecuteArgs>
+public class IdleEnemyActionState : ActionState<EnemyContext>
 {
-    public override Tag StateTag => Tags.State_Action_Idle;
+    public override Tag Tag => Tags.State_Action_Idle;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override bool AsDefaultTask => true;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Patrol, () => !_host.IsPlayerColliding()),
+        new(Tags.State_Action_Charge, () => _host.IsOnFloor() && _host.IsPlayerColliding())
+    ];
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Patrol, () => !Host.IsPlayerColliding()),
-            new(Tags.State_Action_Charge, () => Host.IsPlayerColliding())
-        ]
-    );
-
-    protected override void OnEnter()
+    private Enemy _host;
+    public override void Init(EnemyContext context)
     {
-        Host.PlayAnimation("idle");
+        base.Init(context);
+        _host = context.Host;
+        EnterFunc += OnEnter;
+    }
+
+    private void OnEnter()
+    {
+        _host.PlayAnimation("idle");
     }
 }

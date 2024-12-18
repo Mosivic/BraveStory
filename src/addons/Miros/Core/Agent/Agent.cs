@@ -22,6 +22,7 @@ public class Agent
     public Node Host { get; private set; }
     public bool Enabled { get; private set; }
     public EventStream EventStream { get; private set; }
+    
 
 
     public void Init(Node host)
@@ -35,7 +36,6 @@ public class Agent
 
 		// FIXME: 不应该在这里进行初始化
         _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
-        ;
     }
 
 
@@ -51,7 +51,7 @@ public class Agent
     }
 
 
-    public float Attr(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
+    public float Atr(string attrName, AttributeValueType valueType = AttributeValueType.CurrentValue)
     {
         return AttributeSetContainer.Attribute(attrName, valueType);
     }
@@ -62,62 +62,46 @@ public class Agent
         return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
     }
 
-
-    public void AddTasksFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type[] tasks)
-        where TState : State, new()
-        where THost : Node
-        where TContext : Context
-        where TExecuteArgs : ExecuteArgs
+    public void SwitchTaskFromTag(ExecutorType executorType, Tag tag, Context switchArgs = null)
     {
-		foreach (var taskType in tasks)
-			AddTaskFromType<TState, THost, TContext, TExecuteArgs>(executorType, context, taskType);
+        var executor = GetExecutor(executorType);
+        executor.SwitchStateByTag(tag, switchArgs);
     }
 
-	
-	public void AddTaskFromType<TState, THost, TContext, TExecuteArgs>(ExecutorType executorType,TContext context, Type taskType)
-	where TState : State, new()
-	where THost : Node
+
+    public void AddActions<TContext>(ExecutorType executorType,TContext context, Type[] stateTypes)
+        where TContext : Context
+    {
+        foreach (var stateType in stateTypes)
+            AddAction(executorType, context, stateType);
+    }
+
+    
+	public void AddAction<TContext>(ExecutorType executorType,TContext context, Type stateType)
 	where TContext : Context
-	where TExecuteArgs : ExecuteArgs
 	{
-		var task = (Task<TState, THost, TContext, TExecuteArgs>)Activator.CreateInstance(taskType);
-		task.Init(this, Host as THost, context);
+		var state =  (ActionState<TContext>)Activator.CreateInstance(stateType);
+        
+		state.Init(context);
+        state.OwnerAgent = this;
+        state.Task = TaskProvider.GetTask(state.TaskType) as TaskBase<State>;
 
 		if (executorType == ExecutorType.MultiLayerExecutor)
-		{
-			PushTaskOnExecutor(executorType, task, task.ExecuteArgs);
-			task.State.OwnerTask = task;
-			task.State.ExecutorType = executorType;
-		}
-		else if (executorType == ExecutorType.EffectExecutor)
-		{
-			PushTaskOnExecutor(executorType, task);
-			task.State.OwnerTask = task;
-			task.State.ExecutorType = executorType;
-		}
+            PushStateOnExecutor<TContext>(executorType, state);
 	}
     
     
-	public void AddTasksFromState(ExecutorType executorType, State[] states)
-	{
-		foreach (var state in states)
-			AddTaskFromState(executorType, state);
-	}
-
-
-    public void AddTaskFromState(ExecutorType executorType, State state, ExecuteArgs args = null)
+    public void AddEffect(Effect effect)
     {
-        state.OwnerAgent = this;
+        effect.OwnerAgent = this;
+        effect.Task = TaskProvider.GetTask(effect.TaskType) as EffectTask;
+        effect.ExecutorType = ExecutorType.EffectExecutor;
 
-        var task = TaskCreator.GetTask(state);
-        PushTaskOnExecutor(executorType, task);
-
-        task.State.OwnerTask = task;
-        task.State.ExecutorType = executorType;
+        PushStateOnExecutor<Context>(ExecutorType.EffectExecutor, effect);
     }
-    
 
-    private void PushTaskOnExecutor(ExecutorType executorType, TaskBase task, ExecuteArgs args = null)
+    
+    private IExecutor GetExecutor(ExecutorType executorType)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
@@ -129,12 +113,18 @@ public class Agent
             };
             _executors[executorType] = executor;
         }
+        return executor;
+    }
 
-        executor.AddTask(task, args);
+    private void PushStateOnExecutor<TContext>(ExecutorType executorType, State state)
+    where TContext : Context
+    {
+        var executor = GetExecutor(executorType);
+        executor.AddState<TContext>(state);
     }
 
     
-    public void RemoveTaskByState(ExecutorType executorType, State state)
+    public void RemoveState(ExecutorType executorType, State state)
     {
         if (!_executors.TryGetValue(executorType, out var executor))
         {
@@ -144,7 +134,7 @@ public class Agent
 #endif
         }
 
-        executor.RemoveTask(state.OwnerTask);
+        executor.RemoveState(state);
     }
 
 
@@ -231,8 +221,7 @@ public class Agent
     public Effect[] GetRunningEffects()
     {
         return (_executors[ExecutorType.EffectExecutor] as EffectExecutor)
-            .GetRunningTasks()
-            .Select(task => task.State as Effect).ToArray();
+            .GetRunningEffects().ToArray();
     }
 
 
@@ -243,15 +232,13 @@ public class Agent
     {
         if (tags.Empty) return;
         if (!_executors.TryGetValue(ExecutorType.EffectExecutor, out var executor)) return;
-        var tasks = executor.GetAllTasks();
+        var effects = (executor as EffectExecutor).GetRunningEffects();
         var removeList = new List<State>();
 
-        foreach (var task in tasks)
+        foreach (var effect in effects)
         {
-            var effectTask = task as EffectTask;
-            var effect = effectTask.State as Effect;
-
             var ownedTags = effect.OwnedTags;
+
             if (!ownedTags.Empty && ownedTags.HasAny(tags))
                 removeList.Add(effect);
 
@@ -260,7 +247,7 @@ public class Agent
                 removeList.Add(effect);
         }
 
-        foreach (var effect in removeList) RemoveTaskByState(ExecutorType.EffectExecutor, effect);
+        foreach (var effect in removeList) RemoveState(ExecutorType.EffectExecutor, effect);
     }
 
 

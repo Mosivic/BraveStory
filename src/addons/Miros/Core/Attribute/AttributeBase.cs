@@ -123,9 +123,9 @@ public class AttributeBase
             .Cast<Func<AttributeBase, float, float>>();
     }
 
-    public void RegisterPostBaseValueChange(Action<AttributeBase, float, float> action)
+    public void RegisterPostBaseValueChange(Action<AttributeBase, float, float> actionState)
     {
-        OnPostBaseValueChange += action;
+        OnPostBaseValueChange += actionState;
     }
 
     public void RegisterPreCurrentValueChange(Action<AttributeBase, float> action)
@@ -133,9 +133,9 @@ public class AttributeBase
         OnPreCurrentValueChange += action;
     }
 
-    public void RegisterPostCurrentValueChange(Action<AttributeBase, float, float> action)
+    public void RegisterPostCurrentValueChange(Action<AttributeBase, float, float> actionState)
     {
-        OnPostCurrentValueChange += action;
+        OnPostCurrentValueChange += actionState;
     }
 
     public void UnregisterPreBaseValueChange(Func<AttributeBase, float, float> func)
@@ -145,9 +145,9 @@ public class AttributeBase
             .Cast<Func<AttributeBase, float, float>>();
     }
 
-    public void UnregisterPostBaseValueChange(Action<AttributeBase, float, float> action)
+    public void UnregisterPostBaseValueChange(Action<AttributeBase, float, float> actionState)
     {
-        OnPostBaseValueChange -= action;
+        OnPostBaseValueChange -= actionState;
     }
 
     public void UnregisterPreCurrentValueChange(Action<AttributeBase, float> action)
@@ -155,9 +155,9 @@ public class AttributeBase
         OnPreCurrentValueChange -= action;
     }
 
-    public void UnregisterPostCurrentValueChange(Action<AttributeBase, float, float> action)
+    public void UnregisterPostCurrentValueChange(Action<AttributeBase, float, float> actionState)
     {
-        OnPostCurrentValueChange -= action;
+        OnPostCurrentValueChange -= actionState;
     }
 
     public virtual void Dispose()

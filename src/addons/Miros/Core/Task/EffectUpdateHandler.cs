@@ -93,7 +93,7 @@ public class EffectUpdateHandler
         {
             // 溢出GE生效
             foreach (var overflowEffect in _effect.Stacking.OverflowEffects)
-                _effect.OwnerAgent.AddTaskFromState(ExecutorType.EffectExecutor, overflowEffect);
+                _effect.OwnerAgent.AddEffect(overflowEffect);
 
             if (_effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
             {

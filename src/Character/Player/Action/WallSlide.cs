@@ -3,31 +3,38 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class WallSlideAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class WallSlideActionState : ActionState<PlayerContext>
 {
-    public override Tag StateTag => Tags.State_Action_WallSlide;
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Host.IsOnFloor()),
-            new(Tags.State_Action_Fall, () => !Host.IsFootColliding()),
-            new(Tags.State_Action_WallJump, () => Host.KeyDownJump())
-        ]
-    );
+    private Player _host;
+    public override Tag Tag => Tags.State_Action_WallSlide;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => _host.IsOnFloor()),
+        new(Tags.State_Action_Fall, () => !_host.IsFootColliding()),
+        new(Tags.State_Action_WallJump, () => _host.KeyDownJump())
+    ];
 
-
-    protected override void OnEnter()
+    public override void Init(PlayerContext context)
     {
-        Host.PlayAnimation("wall_sliding");
+        base.Init(context);
+        _host = context.Host;
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnEnter()
     {
-        var velocity = Host.Velocity;
-        velocity.Y = Mathf.Min(velocity.Y + (float)delta * Agent.Attr("Gravity"), 600);
-        Host.Velocity = velocity;
+        _host.PlayAnimation("wall_sliding");
+    }
 
-        Host.UpdateFacing(0);
-        Host.MoveAndSlide();
+    private void OnPhysicsUpdate(double delta)
+    {
+        var velocity = _host.Velocity;
+        velocity.Y = Mathf.Min(velocity.Y + (float)delta * OwnerAgent.Atr("Gravity"), 600);
+        _host.Velocity = velocity;
+
+        _host.UpdateFacing(0);
+        _host.MoveAndSlide();
     }
 }

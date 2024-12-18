@@ -3,39 +3,36 @@ using System.Linq;
 
 namespace Miros.Core;
 
-public class ConditionMachine : ExecutorBase<TaskBase>
+public class ConditionMachine : ExecutorBase, IExecutor
 {
-    protected readonly Dictionary<Tag, List<TaskBase>> RunningTasks = new();
-    protected Dictionary<Tag, List<TaskBase>> WaitingTasks { get; set; } = new();
+    protected readonly Dictionary<Tag, List<State>> RunningStates = [];
+    protected Dictionary<Tag, List<State>> WaitingStates = [];
 
-    public override void AddTask(ITask task, Context context)
+    public override void AddState<TContext>(State state)
     {
-        var conditionTask = task as TaskBase;
-        var layer = conditionTask.Tag;
+        var layer = state.Tag;
 
-        if (!WaitingTasks.ContainsKey(layer))
+        if (!WaitingStates.ContainsKey(layer))
         {
-            WaitingTasks[layer] = [];
-            RunningTasks[layer] = [];
+            WaitingStates[layer] = [];
+            RunningStates[layer] = [];
         }
 
-        var index = WaitingTasks[layer].FindIndex(j => conditionTask.Priority > j.Priority);
-        WaitingTasks[layer].Insert(index + 1, conditionTask);
+        var index = WaitingStates[layer].FindIndex(j => state.Priority > j.Priority);
+        WaitingStates[layer].Insert(index + 1, state);
     }
 
 
-    public override void RemoveTask(ITask task)
+    public override void RemoveState(State state)
     {
-        var conditionTask = task as TaskBase;
-        var layer = conditionTask.Tag;
-        if (WaitingTasks.ContainsKey(layer) && WaitingTasks[layer].Contains(conditionTask))
-            WaitingTasks[layer].Remove(conditionTask);
+        var layer = state.Tag;
+        if (WaitingStates.ContainsKey(layer) && WaitingStates[layer].Contains(state))
+            WaitingStates[layer].Remove(state);
     }
 
-    public override bool HasTaskRunning(ITask task)
+    public override bool HasStateRunning(State state)
     {
-        var conditionTask = task as TaskBase;
-        return RunningTasks[conditionTask.Tag].Contains(conditionTask);
+        return RunningStates[state.Tag].Contains(state);
     }
 
 
@@ -43,46 +40,46 @@ public class ConditionMachine : ExecutorBase<TaskBase>
     {
         WaitingTasksToRunningTasks();
 
-        foreach (var layer in RunningTasks.Keys)
-            for (var i = 0; i < RunningTasks[layer].Count; i++)
+        foreach (var layer in RunningStates.Keys)
+            for (var i = 0; i < RunningStates[layer].Count; i++)
             {
-                var task = RunningTasks[layer][i];
-                if (task.CanExit())
-                    PopRunningTask(layer, task);
+                var state = RunningStates[layer][i];
+                if (state.Task.CanExit(state))
+                    PopRunningTask(layer, state);
                 else
-                    task.Update(delta);
+                    state.Task.Update(state, delta);
             }
     }
 
 
     public override void PhysicsUpdate(double delta)
     {
-        foreach (var layer in RunningTasks.Keys)
-            for (var i = 0; i < RunningTasks[layer].Count; i++)
-                RunningTasks[layer][i].PhysicsUpdate(delta);
+        foreach (var layer in RunningStates.Keys)
+            for (var i = 0; i < RunningStates[layer].Count; i++)
+                RunningStates[layer][i].Task.PhysicsUpdate(RunningStates[layer][i], delta);
     }
 
 
     private void WaitingTasksToRunningTasks()
     {
-        foreach (var layer in WaitingTasks.Keys)
-            for (var i = WaitingTasks[layer].Count - 1; i >= 0; i--)
+        foreach (var layer in WaitingStates.Keys)
+            for (var i = WaitingStates[layer].Count - 1; i >= 0; i--)
             {
-                var task = WaitingTasks[layer][i];
+                var state = WaitingStates[layer][i];
 
-                if (!task.CanEnter())
+                if (!state.Task.CanEnter(state))
                     continue;
 
 
-                var layerRunningTasksCount = RunningTasks[layer].Count;
-                if (layerRunningTasksCount < 3) //限定最大并行数
+                var layerRunningStatesCount = RunningStates[layer].Count;
+                if (layerRunningStatesCount < 3) //限定最大并行数
                 {
-                    PushRunningTask(layer, task);
+                    PushRunningTask(layer, state);
                 }
-                else if (task.Priority > RunningTasks[layer].Last().Priority)
+                else if (state.Priority > RunningStates[layer].Last().Priority)
                 {
-                    PopRunningTask(layer, RunningTasks[layer].Last());
-                    PushRunningTask(layer, task);
+                    PopRunningTask(layer, RunningStates[layer].Last());
+                    PushRunningTask(layer, state);
                 }
                 else
                 {
@@ -92,9 +89,9 @@ public class ConditionMachine : ExecutorBase<TaskBase>
     }
 
 
-    private void PushRunningTask(Tag layer, TaskBase task)
+    private void PushRunningTask(Tag layer, State state)
     {
-        WaitingTasks[layer].Remove(task);
+        WaitingStates[layer].Remove(state);
         // if (task.State.IsStack)
         // {
         // 	var index = RunningTasks[layer].FindIndex(j => j.State.Name == task.State.Name);
@@ -105,19 +102,19 @@ public class ConditionMachine : ExecutorBase<TaskBase>
         // 	}
         // }
 
-        task.Enter();
+        state.Task.Enter(state);
 
-        var highPriorityTask = RunningTasks[layer].FindIndex(j => j.Priority > task.Priority);
-        RunningTasks[layer].Insert(highPriorityTask + 1, task);
+        var highPriorityTask = RunningStates[layer].FindIndex(j => j.Priority > state.Priority);
+        RunningStates[layer].Insert(highPriorityTask + 1, state);
     }
 
 
-    private void PopRunningTask(Tag layer, TaskBase task)
+    private void PopRunningTask(Tag layer, State state)
     {
-        RunningTasks[layer].Remove(task);
-        var index = WaitingTasks[layer].FindIndex(j => task.Priority > j.Priority);
-        WaitingTasks[layer].Insert(index + 1, task);
+        RunningStates[layer].Remove(state);
+        var index = WaitingStates[layer].FindIndex(j => state.Priority > j.Priority);
+        WaitingStates[layer].Insert(index + 1, state);
 
-        task.Exit();
+        state.Task.Exit(state);
     }
 }

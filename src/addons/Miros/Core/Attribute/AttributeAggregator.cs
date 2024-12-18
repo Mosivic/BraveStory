@@ -28,7 +28,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
     ///     刷新修改器缓存
     ///     当游戏效果被添加或移除时触发
     /// </summary>
-    private void RefreshModifierCache(object sender, EffectTask task)
+    private void RefreshModifierCache(object sender, Effect effect)
     {
         // 注销属性变化事件
         foreach (var tuple in _modifierCache)

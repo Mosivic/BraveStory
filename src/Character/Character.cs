@@ -75,7 +75,6 @@ public partial class Character : CharacterBody2D
 
     public void PlayAnimation(string animationName)
     {
-        AnimationPlayer.Play("RESET");
         AnimationPlayer.Play(animationName);
     }
 

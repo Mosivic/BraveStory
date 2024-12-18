@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace Miros.Core;
 
 
-public class EffectExecutor : ExecutorBase<EffectTask>
+public class EffectExecutor : ExecutorBase, IExecutor
 {
-    private readonly List<EffectTask> _runningTasks = [];
+    private readonly List<Effect> _runningEffects = [];
 
 
-    public List<EffectTask> GetRunningTasks()
+    public List<Effect> GetRunningEffects()
     {
-        return _runningTasks;
+        return _runningEffects;
     }
 
     public override void Update(double delta)
@@ -19,104 +19,116 @@ public class EffectExecutor : ExecutorBase<EffectTask>
         base.Update(delta);
         UpdateTasks();
 
-        foreach (var task in _runningTasks) task.Update(delta);
+        foreach (var effect in _runningEffects) effect.Task.Update(effect, delta);
+    }
+
+
+    public override void SwitchStateByTag(Tag tag, Context context = null)
+    {
+        if (_states.TryGetValue(tag, out var state))
+        {
+            if (state != null)
+            {
+                state.Task.Enter(state);
+                _runningEffects.Add(state as Effect);
+                _onRunningEffectTasksIsDirty?.Invoke(this, state as Effect);
+            }
+        }
     }
 
     private void UpdateTasks()
     {
         // Enter
-        foreach (var task in _tasks.Values)
+        foreach (var state in _states.Values)
         {
-            if (task.IsInstant)
+            var effect = state as Effect;
+            if (effect.DurationPolicy == DurationPolicy.Instant)
             {
-                task.Enter();
-                task.Exit();
+                effect.Task.Enter(effect);
+                effect.Task.Exit(effect);
             }
             else
             {
-                task.Enter();
-                _runningTasks.Add(task);
-                _onRunningEffectTasksIsDirty?.Invoke(this, task);
+                effect.Task.Enter(effect);
+                _runningEffects.Add(effect);
+                _onRunningEffectTasksIsDirty?.Invoke(this, effect);
             }
         }
 
         // Exit
-        foreach (var task in _runningTasks)
+        foreach (var state in _runningEffects)
         {
-            if (!task.CanExit())
+            if (!state.Task.CanExit(state))
                 continue;
 
-            task.Exit();
-            _runningTasks.Remove(task);
-            _onRunningEffectTasksIsDirty?.Invoke(this, task);
+            state.Task.Exit(state);
+            _runningEffects.Remove(state);
+            _onRunningEffectTasksIsDirty?.Invoke(this, state);
         }
     }
 
-    private static bool AreTaskCouldStackByAnotherTask(EffectTask task, EffectTask otherTask)
+    private static bool AreTaskCouldStackByAnotherTask(Effect task, Effect otherTask)
     {
         return task.Stacking != null && otherTask.Stacking != null &&
                task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
-    public override void AddTask(ITask task, Context context)
+    public override void AddState<TContext>(State state)
     {
-        var effectTask = task as EffectTask;
         var isAddTask = true;
+        var effect = state as Effect;
 
-        foreach (var existingTask in _runningTasks)
-            if (AreTaskCouldStackByAnotherTask(effectTask, existingTask))
+        foreach (var existingEffect in _runningEffects)
+            if (AreTaskCouldStackByAnotherTask(effect, existingEffect))
             {
                 // 如果Tag相同且来自同一个Agent, 则不添加, 并跳过当前循环
-                if (effectTask.Tag == existingTask.Tag && AreFromSameSourceAgent(effectTask, existingTask))
+                if (effect.Tag == existingEffect.Tag && AreFromSameSourceAgent(effect, existingEffect))
                 {
-                    existingTask.Stack(true);
+                    existingEffect.Task.Stack(existingEffect, true);
                     isAddTask = false;
                     continue;
                 }
 
                 // 如果来自不同Agent, 则根据是否可以叠加来决定是否添加
-                if (AreFromSameSourceAgent(effectTask, existingTask))
-                    existingTask.Stack(true);
+                if (AreFromSameSourceAgent(effect, existingEffect))
+                    existingEffect.Task.Stack(existingEffect, true);
                 else
-                    existingTask.Stack();
+                    existingEffect.Task.Stack(existingEffect, false);
             }
 
-        if (isAddTask) base.AddTask(task, context);
+        if (isAddTask) base.AddState<TContext>(effect);
     }
 
-    public override void RemoveTask(ITask task)
+    public override void RemoveState(State state)
     {
-        base.RemoveTask(task);
+        base.RemoveState(state);
 
-        var effectTask = task as EffectTask;
-        if (effectTask.Status() == RunningStatus.Running)
+        var effect = state as Effect;
+        if (effect.Status == RunningStatus.Running)
         {
-            _runningTasks.Remove(effectTask);
-            _onRunningEffectTasksIsDirty?.Invoke(this, effectTask);
+            _runningEffects.Remove(effect);
+            _onRunningEffectTasksIsDirty?.Invoke(this, effect);
         }
     }
 
-    private bool AreFromSameSourceAgent(EffectTask task1, EffectTask task2)
+    private bool AreFromSameSourceAgent(Effect effect1, Effect effect2)
     {
-        var state1 = task1.State;
-        var state2 = task2.State;
-
-        if (state1 == null || state2 == null)
+        if (effect1 == null || effect2 == null)
             return false;
-        return state1.SourceAgent == state2.SourceAgent;
+        return effect1.SourceAgent == effect2.SourceAgent;
     }
 
 
     #region Event
 
-    private EventHandler<EffectTask> _onRunningEffectTasksIsDirty;
+    private EventHandler<Effect> _onRunningEffectTasksIsDirty;
 
-    public void RegisterOnRunningEffectTasksIsDirty(EventHandler<EffectTask> handler)
+    public void RegisterOnRunningEffectTasksIsDirty(EventHandler<Effect> handler)
     {
         _onRunningEffectTasksIsDirty += handler;
     }
 
-    public void UnregisterOnRunningEffectTasksIsDirty(EventHandler<EffectTask> handler)
+    public void UnregisterOnRunningEffectTasksIsDirty(EventHandler<Effect> handler)
     {
         _onRunningEffectTasksIsDirty -= handler;
     }

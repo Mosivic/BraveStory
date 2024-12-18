@@ -3,25 +3,34 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class RunActionState : ActionState<PlayerContext>
 {
-    public override Tag StateTag => Tags.State_Action_Run;
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => !Host.KeyDownMove()),
-            new(Tags.State_Action_Jump, () => Host.KeyDownJump()),
-            new(Tags.State_Action_Attack1, () => Host.KeyDownAttack()),
-            new(Tags.State_Action_Sliding, () => Host.KeyDownSliding())
-        ]
-    );
+    private Player _host;
 
-    protected override void OnEnter()
+    public override Tag Tag => Tags.State_Action_Run;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => !_host.KeyDownMove()),
+        new(Tags.State_Action_Jump, () => _host.KeyDownJump()),
+        new(Tags.State_Action_Attack1, () => _host.KeyDownAttack()),
+        new(Tags.State_Action_Sliding, () => _host.KeyDownSliding())
+    ];
+
+    public override void Init(PlayerContext context)
     {
-        Host.PlayAnimation("run");
+        base.Init(context);
+        _host = context.Host;
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnEnter()
+    {
+        _host.PlayAnimation("run");
+    }
+
+    private void OnPhysicsUpdate(double delta)
     {
         Move(delta);
     }
@@ -29,12 +38,12 @@ public class RunAction : Task<State, Player, PlayerContext, MultiLayerExecuteArg
     public void Move(double delta)
     {
         var direction = Input.GetAxis("move_left", "move_right");
-        var velocity = Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, direction * Agent.Attr("RunSpeed"), Agent.Attr("FloorAcceleration"));
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
-        Host.Velocity = velocity;
+        var velocity = _host.Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, direction * OwnerAgent.Atr("RunSpeed"), OwnerAgent.Atr("FloorAcceleration"));
+        velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
+        _host.Velocity = velocity;
 
-        Host.UpdateFacing(direction); // 使用新方法处理朝向
-        Host.MoveAndSlide();
+        _host.UpdateFacing(direction);
+        _host.MoveAndSlide();
     }
 }

@@ -12,8 +12,8 @@ public class CustomAttackDamageExecution(float sourceAttack) : Execution
 {
     public override void Execute(Effect effect, out ModifierOption[] modifierOptions)
     {
-        var targetDefense = effect.OwnerAgent.Attr("Defense");
-        var targetHP = effect.OwnerAgent.Attr("HP");
+        var targetDefense = effect.OwnerAgent.Atr("Defense");
+        var targetHP = effect.OwnerAgent.Atr("HP");
 
         var damage = sourceAttack - targetDefense;
         var newHp = targetHP - damage;
@@ -49,9 +49,9 @@ public class DamageExecution : Execution
 
         public DamageData(Effect effect)
         {
-            SourceAttack = effect.SourceAgent.Attr("Attack");
-            TargetDefense = effect.OwnerAgent.Attr("Defense");
-            TargetHP = effect.OwnerAgent.Attr("HP");
+            SourceAttack = effect.SourceAgent.Atr("Attack");
+            TargetDefense = effect.OwnerAgent.Atr("Defense");
+            TargetHP = effect.OwnerAgent.Atr("HP");
         }
     }
 }

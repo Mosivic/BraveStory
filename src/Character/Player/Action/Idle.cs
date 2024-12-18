@@ -2,23 +2,32 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class IdleAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class IdleActionState : ActionState<PlayerContext>
 {
-    public override Tag StateTag => Tags.State_Action_Idle;
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Run, () => Host.KeyDownMove()),
-            new(Tags.State_Action_Fall, () => !Host.IsOnFloor()),
-            new(Tags.State_Action_Jump, () => Host.KeyDownJump()),
-            new(Tags.State_Action_Attack1, () => Host.KeyDownAttack()),
-            new(Tags.State_Action_Sliding, () => Host.KeyDownSliding())
-        ]
-    );
+    private Player _host;
 
-    protected override void OnEnter()
+    public override Tag Tag => Tags.State_Action_Idle;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override bool AsDefaultTask => true;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Run, () => _host.KeyDownMove()),
+        new(Tags.State_Action_Fall, () => !_host.IsOnFloor()),
+        new(Tags.State_Action_Jump, () => _host.KeyDownJump()),
+        new(Tags.State_Action_Attack1, () => _host.KeyDownAttack()),
+        new(Tags.State_Action_Sliding, () => _host.KeyDownSliding())
+    ];
+
+    public override void Init(PlayerContext context)
     {
-        Host.PlayAnimation("idle");
+        base.Init(context);
+        _host = context.Host;
+
+        EnterFunc += OnEnter;
+    }
+
+    private void OnEnter()
+    {
+        _host.PlayAnimation("idle");
         Context.JumpCount = 0;
     }
 }

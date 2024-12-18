@@ -3,43 +3,52 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class SlidingAction : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class SlidingActionState : ActionState<PlayerContext>
 {
-    public override Tag StateTag => Tags.State_Action_Sliding;
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle, () => Host.IsAnimationFinished())
-        ]
-    );
+    public override Tag Tag => Tags.State_Action_Sliding;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle, () => _host.IsAnimationFinished())
+    ];
 
+    private Player _host;
 
-    protected override void OnEnter()
+    public override void Init(PlayerContext context)
     {
-        Host.PlayAnimation("sliding_start");
+        base.Init(context);
+        _host = context.Host;
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+        ExitFunc += OnExit;
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnEnter()
     {
-        if (Host.GetCurrentAnimation() == "sliding_start" && Host.IsAnimationFinished())
-            Host.PlayAnimation("sliding_loop");
-        else if (Host.GetCurrentAnimation() == "sliding_loop" && Host.IsAnimationFinished())
-            Host.PlayAnimation("sliding_end");
+        _host.PlayAnimation("sliding_start");
+    }
+
+    private void OnPhysicsUpdate(double delta)
+    {
+        if (_host.GetCurrentAnimation() == "sliding_start" && _host.IsAnimationFinished())
+            _host.PlayAnimation("sliding_loop");
+        else if (_host.GetCurrentAnimation() == "sliding_loop" && _host.IsAnimationFinished())
+            _host.PlayAnimation("sliding_end");
         Slide(delta);
     }
 
-    protected override void OnExit()
+    private void OnExit()
     {
-        Host.SetHurtBoxMonitorable(true);
+        _host.SetHurtBoxMonitorable(true);
     }
 
 
     private void Slide(double delta)
     {
-        var velocity = Host.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, 0, Agent.Attr("SlidingDeceleration") * (float)delta);
-        velocity.Y += (float)delta * Agent.Attr("Gravity");
-        Host.Velocity = velocity;
-        Host.MoveAndSlide();
+        var velocity = _host.Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, 0, OwnerAgent.Atr("SlidingDeceleration") * (float)delta);
+        velocity.Y += (float)delta * OwnerAgent.Atr("Gravity");
+        _host.Velocity = velocity;
+        _host.MoveAndSlide();
     }
 }

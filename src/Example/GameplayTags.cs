@@ -58,6 +58,8 @@ namespace Miros.Core
 
         public static Tag State_Action_Charge { get; } = TagManager.RequestTag("State.Action.Charge");
 
+        public static Tag State_Action_StompGround { get; } = TagManager.RequestTag("State.Action.StompGround");
+
         public static Tag State_Action_Sliding { get; } = TagManager.RequestTag("State.Action.Sliding");
 
         public static Tag State_Action_Attack1 { get; } = TagManager.RequestTag("State.Action.Attack1");

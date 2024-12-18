@@ -2,8 +2,9 @@ using BraveStory;
 using Godot;
 using Miros.Core;
 
-public class EnemyContext : CharacterContext
+public class EnemyContext(Enemy host) : CharacterContext
 {
+    public Enemy Host { get; } = host;
     public float KnockbackVelocity { get; set; } = 50.0f;
     public bool IsStunned { get; set; } = false;
     public float StunDuration { get; set; } = 1.0f;
@@ -11,6 +12,9 @@ public class EnemyContext : CharacterContext
     public float ChargeDuration { get; set; } = 0.5f; // 冲刺持续时间
     public float ChargeTimer { get; set; } = 0f; // 冲刺计时器
     public bool IsCharging { get; set; } = false; // 是否正在冲刺
+    public bool IsStomping { get; set; } = false; // 是否正在踩踏
+    public float StompDuration { get; set; } = 0.3f; // 踩踏持续时间
+    public float StompTimer { get; set; } = 0f; // 踩踏计时器
 }
 
 public partial class Enemy : Character
@@ -33,13 +37,14 @@ public partial class Enemy : Character
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
-        Context = new EnemyContext();
+        Context = new EnemyContext(this);
 
         // 初始化 Agentor
         Agent.AddAttributeSet(typeof(BoarAttributeSet));
-        Agent.AddTasksFromType<State, Enemy, EnemyContext, MultiLayerExecuteArgs>(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
-            typeof(IdleEnemyAction), typeof(PatrolEnemyAction), typeof(DieEnemyAction),
-            typeof(ChargeEnemyAction), typeof(HurtEnemyAction), typeof(StunEnemyAction)
+        Agent.AddActions<EnemyContext>(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
+            typeof(IdleEnemyActionState), typeof(PatrolEnemyActionState), typeof(DieEnemyActionState),
+            typeof(ChargeEnemyActionState), typeof(HurtEnemyActionState), typeof(StunEnemyActionState),
+            typeof(StompGroundEnemyActionState)
         ]);
 
         var hp = Agent.GetAttributeBase("HP");

@@ -2,44 +2,51 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class Attack111Action : Task<State, Player, PlayerContext, MultiLayerExecuteArgs>
+public class Attack111ActionState : ActionState<PlayerContext>
 {
-    public override Tag StateTag => Tags.State_Action_Attack111;
+    private Player _host;
 
-    public override MultiLayerExecuteArgs ExecuteArgs => new(
-        Tags.StateLayer_Movement,
-        [
-            new(Tags.State_Action_Idle)
-        ]
-    );
+    public override Tag Tag => Tags.State_Action_Attack111;
+    public override Tag Layer => Tags.StateLayer_Movement;
+    public override Transition[] Transitions => [
+        new(Tags.State_Action_Idle)
+    ];
 
-
-
-    protected override void OnEnter()
+    public override void Init(PlayerContext context)
     {
-        Host.PlayAnimation("attack111");
+        base.Init(context);
+        _host = context.Host;
+
+        EnterFunc += OnEnter;
+        PhysicsUpdateFunc += OnPhysicsUpdate;
+        ExitCondition += OnExitCondition;
     }
 
-    protected override void OnPhysicsUpdate(double delta)
+    private void OnEnter()
+    {
+        _host.PlayAnimation("attack111");
+    }
+
+    private void OnPhysicsUpdate(double delta)
     {
         if (Context.IsHit && Context.HitAgent != null)
         {
             var damageEffect = new Effect
             {
                 Tag = Tags.Effect_Buff,
-                SourceAgent = Agent,
+                SourceAgent = OwnerAgent,
                 RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
-                Executions = [new CustomAttackDamageExecution(Agent.Attr("Attack") + 2)]
+                Executions = [new CustomAttackDamageExecution(OwnerAgent.Atr("Attack") + 2)]
             };
 
-            Context.HitAgent.AddTaskFromState(ExecutorType.EffectExecutor, damageEffect);
+            Context.HitAgent.AddEffect(damageEffect);
             Context.IsHit = false;
         }
     }
 
-    protected override bool OnExitCondition()
+    private bool OnExitCondition()
     {
-        return Host.IsAnimationFinished();
+        return _host.IsAnimationFinished();
     }
 }

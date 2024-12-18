@@ -2,9 +2,8 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public abstract class AbsExecutor<TTask>
-    where TTask : TaskBase
+public abstract class AbsExecutor
 {
-    protected readonly Dictionary<Tag, TTask> _tasks = []; // 所有任务(包括临时任务)
-    protected readonly Dictionary<Tag, TTask> _tempTasks = []; // 临时任务
+    protected readonly Dictionary<Tag, State> _states = []; // 所有状态(包括临时状态)
+    protected readonly Dictionary<Tag, State> _tempStates = []; // 临时状态
 }

@@ -1,49 +1,54 @@
 namespace Miros.Core;
 
-public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
-    where TTask : TaskBase
+public class ExecutorBase : AbsExecutor, IExecutor
 {
-    public virtual void AddTask(ITask task, Context context)
+    public virtual void AddState<TContext>(State state) where TContext : Context
     {
-        var t = task as TTask;
+        var t = state as State;
 
         if(t.RemovePolicy != RemovePolicy.None)
-            _tempTasks.Add(t.Tag, t);
+            _tempStates.Add(t.Tag, t);
 
-        _tasks.Add(t.Tag, t);
-        t.TriggerOnAdd(); 
+        _states.Add(t.Tag, t);
+        t.Task.TriggerOnAdd(t); 
     }
 
-    public virtual void RemoveTask(ITask task)
+    public virtual void RemoveState(State state)
     {
-        var t = task as TTask;
+        var t = state as State;
 
         if (t.RemovePolicy != RemovePolicy.None) // 如果任务有移除策略(非None)，则将任务从临时任务列表中移除
-            _tempTasks.Remove(t.Tag);
+            _tempStates.Remove(t.Tag);
 
-        if (t.Status() == RunningStatus.Running) // 如果任务正在运行，则调用Exit方法
-            t.Exit();
+        if (t.Status == RunningStatus.Running) // 如果任务正在运行，则调用Exit方法
+            t.Task.Exit(t);
 
-        _tasks.Remove(t.Tag);
-        t.TriggerOnRemove(); 
+        _states.Remove(t.Tag);
+        t.Task.TriggerOnRemove(t); 
     }
 
-    public virtual double GetCurrentTaskTime(Tag layer)
+
+    public virtual void SwitchStateByTag(Tag tag, Context switchArgs)
+    {
+        return;
+    }
+
+    public virtual double GetCurrentStateTime(Tag layer)
     {
         return 0;
     }
 
-    public virtual ITask GetLastTask(Tag layer)
+    public virtual State GetLastState(Tag layer)
     {
         return null;
     }
 
-    public virtual ITask GetNowTask(Tag layer)
+    public virtual State GetNowState(Tag layer)
     {
         return null;
     }
 
-    public virtual bool HasTaskRunning(ITask task)
+    public virtual bool HasStateRunning(State state)
     {
         return false;
     }
@@ -55,69 +60,70 @@ public class ExecutorBase<TTask> : AbsExecutor<TTask>, IExecutor
 
     public virtual void Update(double delta)
     {
-        UpdateTempTasks();
+        UpdateTempStates();
     }
 
-    public virtual ITask[] GetAllTasks()
+    public virtual State[] GetAllStates()
     {
-        return [.. _tasks.Values];
+        return [.. _states.Values];
     }
 
-    private void UpdateTempTasks()
+    private void UpdateTempStates()
     {
-        foreach (var task in _tempTasks.Values)
+        foreach (var state in _tempStates.Values)
         {
-            RemoveTempTask(task);
+            RemoveTempState(state);
         }
     }
 
-    private void RemoveTempTask(TTask task)
+    private void RemoveTempState(State state)
     {
-        var removePolicy = task.RemovePolicy;
+        var removePolicy = state.RemovePolicy;
         switch (removePolicy)
         {
             case RemovePolicy.Condition:
-                if (task.CanRemove())
-                    RemoveTask(task);
+                if (state.Task.CanRemove(state))
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenFailed:
-                if (task.Status() == RunningStatus.Failed)
-                    RemoveTask(task);
+                if (state.Status == RunningStatus.Failed)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenSucceed:
-                if (task.Status() == RunningStatus.Succeed)
-                    RemoveTask(task);
+                if (state.Status == RunningStatus.Succeed)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenEnterFailed:
-                if (task.CanEnter() == false)
-                    RemoveTask(task);
+                if (state.Task.CanEnter(state) == false)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenExited:
-                if (task.Status() == RunningStatus.Succeed 
-                || task.Status() == RunningStatus.Failed)
-                    RemoveTask(task);
+                if (state.Status == RunningStatus.Succeed 
+                || state.Status == RunningStatus.Failed)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenSourceAgentNull:
-                if (!task.IsSourceValid)
-                    RemoveTask(task);
+                if (state.SourceAgent == null)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenSourceTaskRemoved:
-                if (task.SourceTaskStatus() == RunningStatus.Removed)
-                    RemoveTask(task);
+                if (state.SourceState.Status == RunningStatus.Removed)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenSourceTaskExited:
-                if (task.SourceTaskStatus() == RunningStatus.Succeed 
-                || task.SourceTaskStatus() == RunningStatus.Failed)
-                    RemoveTask(task);
+                if (state.SourceState.Status == RunningStatus.Succeed 
+                || state.SourceState.Status == RunningStatus.Failed)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenSourceTaskFailed:
-                if (task.SourceTaskStatus() == RunningStatus.Failed)
-                    RemoveTask(task);
+                if (state.SourceState.Status == RunningStatus.Failed)
+                    RemoveState(state);
                 break;
             case RemovePolicy.WhenSourceTaskSucceed:
-                if (task.SourceTaskStatus() == RunningStatus.Succeed)
-                    RemoveTask(task);
+                if (state.SourceState.Status == RunningStatus.Succeed)
+                    RemoveState(state);
                 break;
         }
     }
+
 }
