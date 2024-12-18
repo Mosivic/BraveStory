@@ -8,7 +8,7 @@ public class ConditionMachine : ExecutorBase<State>
     protected readonly Dictionary<Tag, List<State>> RunningStates = new();
     protected Dictionary<Tag, List<State>> WaitingStates { get; set; } = new();
 
-    public override void AddState(State state, Context context)
+    public override void AddState(State state)
     {
         var layer = state.Tag;
 

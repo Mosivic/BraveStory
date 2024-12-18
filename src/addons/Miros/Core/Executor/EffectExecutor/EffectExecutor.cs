@@ -73,7 +73,7 @@ public class EffectExecutor : ExecutorBase<Effect>
                task.Stacking?.GroupTag == otherTask.Stacking?.GroupTag;
     }
 
-    public override void AddState(Effect effect, Context context)
+    public override void AddState(Effect effect)
     {
         var isAddTask = true;
 
@@ -95,7 +95,7 @@ public class EffectExecutor : ExecutorBase<Effect>
                     existingEffect.Task.Stack(existingEffect, false);
             }
 
-        if (isAddTask) base.AddState(effect, context);
+        if (isAddTask) base.AddState(effect);
     }
 
     public override void RemoveState(Effect effect)

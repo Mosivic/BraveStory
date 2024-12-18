@@ -63,10 +63,10 @@ public class Agent
         return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
     }
 
-    public void SwitchTaskFromTag(ExecutorType executorType, Tag tag, Context context = null)
+    public void SwitchTaskFromTag(ExecutorType executorType, Tag tag, Context switchArgs = null)
     {
         var executor = GetExecutor(executorType);
-        executor.SwitchStateByTag(tag, context);
+        executor.SwitchStateByTag(tag, switchArgs);
     }
 
 
@@ -121,7 +121,7 @@ public class Agent
     private void PushStateOnExecutor(ExecutorType executorType, State state)
     {
         var executor = GetExecutor(executorType);
-        executor.AddState(state, null);
+        executor.AddState(state);
     }
 
     

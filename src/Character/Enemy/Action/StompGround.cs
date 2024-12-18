@@ -56,7 +56,7 @@ public class StompGroundEnemyActionState : ActionState<Enemy, EnemyContext>
                 Context.HitAgent.AddEffect(damageEffect);
 
                 Context.HitAgent.SwitchTaskFromTag(ExecutorType.MultiLayerExecutor, Tags.State_Action_Jump,
-                    new MultiLayerSwitchTaskArgs(Tags.StateLayer_Movement));
+                    new MultiLayerSwitchArgs(Tags.StateLayer_Movement));
                 
                 Context.HitAgent = null;
             }

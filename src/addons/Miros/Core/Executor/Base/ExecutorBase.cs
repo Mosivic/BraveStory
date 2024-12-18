@@ -3,7 +3,7 @@ namespace Miros.Core;
 public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
     where TState : State
 {
-    public virtual void AddState(TState state, Context context)
+    public virtual void AddState(TState state)
     {
         var t = state as TState;
 
@@ -29,7 +29,7 @@ public class ExecutorBase<TState> : AbsExecutor<TState>, IExecutor<TState>
     }
 
 
-    public virtual void SwitchStateByTag(Tag tag, Context context)
+    public virtual void SwitchStateByTag(Tag tag, Context switchArgs)
     {
         return;
     }

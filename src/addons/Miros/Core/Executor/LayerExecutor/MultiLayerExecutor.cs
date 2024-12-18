@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace Miros.Core;
 
@@ -13,15 +14,15 @@ public class MultiLayerExecutor : ExecutorBase<State>, IExecutor<State>
         return state.Status == RunningStatus.Running;
     }
 
-    public override void SwitchStateByTag(Tag tag, Context context)
+    public override void SwitchStateByTag(Tag tag, Context switchArgs)
     {
         if (!_states.TryGetValue(tag, out var state))
             return;
 
-        if (context is null || context is not MultiLayerSwitchTaskArgs)
-            Console.WriteLine("context is null or not MultiLayerSwitchTaskArgs");
+        if (switchArgs is null || switchArgs is not MultiLayerSwitchArgs)
+            Console.WriteLine("switchArgs is null or not MultiLayerSwitchArgs");
 
-        var switchTaskArgs = context as MultiLayerSwitchTaskArgs;
+        var switchTaskArgs = switchArgs as MultiLayerSwitchArgs;
         if (_layers.TryGetValue(switchTaskArgs.Layer, out var layerExecutor))
         {
             layerExecutor.SetNextState(state, switchTaskArgs.Mode);
@@ -39,26 +40,26 @@ public class MultiLayerExecutor : ExecutorBase<State>, IExecutor<State>
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public override void AddState(State state, Context context)
+    public override void AddState(State state)
     {
-        base.AddState(state, context);
+        base.AddState(state);
 
-        var fsmContext = context as MultiLayerExecuteArgs;
+        var action = state as ActionState<Node, Context>;
 
-        if (!_layers.ContainsKey(fsmContext.Layer))
+        if (!_layers.ContainsKey(action.Layer))
         {
-            _layers[fsmContext.Layer] = new LayerExecutor(fsmContext.Layer, _transitionContainer, _states);
-            _layers[fsmContext.Layer].SetDefaultState(state); //将第一个任务设置为默认任务，以免忘记设置默认任务
+            _layers[action.Layer] = new LayerExecutor(action.Layer, _transitionContainer, _states);
+            _layers[action.Layer].SetDefaultState(state); //将第一个任务设置为默认任务，以免忘记设置默认任务
         }
 
-        if (fsmContext.Transitions != null)
-            _transitionContainer.AddTransitions(state, fsmContext.Transitions);
+        if (action.Transitions != null)
+            _transitionContainer.AddTransitions(state, action.Transitions);
 
-        if (fsmContext.AsDefaultTask) 
-            _layers[fsmContext.Layer].SetDefaultState(state);
+        if (action.AsDefaultTask) 
+            _layers[action.Layer].SetDefaultState(state);
 
-        if (fsmContext.AsNextTask)
-            _layers[fsmContext.Layer].SetNextState(state, fsmContext.AsNextTaskTransitionMode);
+        if (action.AsNextTask)
+            _layers[action.Layer].SetNextState(state, action.AsNextTaskTransitionMode);
     }
 
     public override void RemoveState(State state)
