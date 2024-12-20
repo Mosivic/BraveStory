@@ -30,16 +30,22 @@ public class ChargeEnemyActionState : ActionState
         [
             new DelayState
             {
-                DelayTime = 3.0f,
-                EnterFunc = () => { GD.Print("Delay Start"); },
-                ExitFunc = () => { GD.Print("Delay End"); }
+                DelayTime = 1.0f,
+                EnterFunc = () => { GD.Print("Pre-Cast Delay Start"); },
+                ExitFunc = () => { GD.Print("Pre-Cast Delay End"); }
             },
             new State
             {
                 EnterFunc = OnEnter,
                 PhysicsUpdateFunc = OnPhysicsUpdate,
                 ExitFunc = OnExit
-            }
+            },
+            new DelayState
+            {
+                DelayTime = 1.0f,
+                EnterFunc = () => { GD.Print("Post-Cast Delay Start"); },
+                ExitFunc = () => { GD.Print("Post-Cast Delay End"); }
+            },
         ];
 
         AddFunc = OnAdd;
