@@ -21,9 +21,19 @@ public class TaskBase<TState> : ITask
         else if (state.Status == RunningStatus.Failed)
             OnFailed(state);
 
+        state.Status = RunningStatus.None;
         OnExit(state);
     }
 
+    public virtual void Pause(State state)
+    {
+        state.Status = RunningStatus.Paused;
+    }
+
+    public virtual void Resume(State state)
+    {
+        state.Status = RunningStatus.Running;
+    }
 
     public virtual bool CanEnter(State state)
     {

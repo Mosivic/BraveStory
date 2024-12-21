@@ -15,7 +15,8 @@ public enum RunningStatus
     Running,     //运行中
     Succeed,     //成功
     Failed,      //失败
-    Removed      //移除
+    Removed,     //移除
+    Paused       //暂停
 }
 
 // 打断策略，目前只对 MultiLayerExecutor 有效

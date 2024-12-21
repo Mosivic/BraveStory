@@ -4,6 +4,8 @@ public interface ITask
 {
     void Enter(State state);
     void Exit(State state);
+    void Pause(State state);
+    void Resume(State state);
     bool CanEnter(State state);
     bool CanExit(State state);
     bool CanRemove(State state);
