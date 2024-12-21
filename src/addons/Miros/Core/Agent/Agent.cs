@@ -92,7 +92,6 @@ public class Agent
     {
         effect.OwnerAgent = this;
         effect.Task = TaskProvider.GetTask(effect.TaskType) as EffectTask;
-        effect.ExecutorType = ExecutorType.EffectExecutor;
         effect.Init();
         PushStateOnExecutor(ExecutorType.EffectExecutor, effect);
     }

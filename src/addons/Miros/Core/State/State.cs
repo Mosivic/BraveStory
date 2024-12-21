@@ -16,12 +16,10 @@ public class State
 
     public State SourceState { get; set; }
 
-    // TODO：使用 State 内部的 Executor 类型来取代 Agent 中的管理
-    public ExecutorType ExecutorType { get; set; } = ExecutorType.MultiLayerExecutor;
-
-    public RunningStatus Status { get; set; } = RunningStatus.Null;
+    public RunningStatus Status { get; set; } = RunningStatus.None;
     public bool IsActive => Status == RunningStatus.Running;
     public RemovePolicy RemovePolicy { get; set; } = RemovePolicy.None; // 默认不移除
+    public InterruptPolicy InterruptPolicy {get;set;} = InterruptPolicy.None;
     public double RunningTime { get; set; } = 0;
 
     public Func<bool> EnterCondition { get; set; }
