@@ -102,20 +102,20 @@ public class ExecutorBase : AbsExecutor, IExecutor
                 if (state.SourceAgent == null)
                     RemoveState(state);
                 break;
-            case RemovePolicy.WhenSourceTaskRemoved:
+            case RemovePolicy.WhenSourceStateRemoved:
                 if (state.SourceState.Status == RunningStatus.Removed)
                     RemoveState(state);
                 break;
-            case RemovePolicy.WhenSourceTaskExited:
+            case RemovePolicy.WhenSourceStateExited:
                 if (state.SourceState.Status == RunningStatus.Succeed
                     || state.SourceState.Status == RunningStatus.Failed)
                     RemoveState(state);
                 break;
-            case RemovePolicy.WhenSourceTaskFailed:
+            case RemovePolicy.WhenSourceStateFailed:
                 if (state.SourceState.Status == RunningStatus.Failed)
                     RemoveState(state);
                 break;
-            case RemovePolicy.WhenSourceTaskSucceed:
+            case RemovePolicy.WhenSourceStateSucceed:
                 if (state.SourceState.Status == RunningStatus.Succeed)
                     RemoveState(state);
                 break;
