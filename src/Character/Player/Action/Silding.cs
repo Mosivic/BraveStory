@@ -3,24 +3,27 @@ using Miros.Core;
 
 namespace BraveStory;
 
-public class SlidingActionState : ActionState<PlayerContext>
+public class SlidingActionState : ActionState
 {
+    private PlayerContext _ctx;
+
+    private Player _host;
     public override Tag Tag => Tags.State_Action_Sliding;
     public override Tag Layer => Tags.StateLayer_Movement;
-    public override Transition[] Transitions => [
+
+    public override Transition[] Transitions =>
+    [
         new(Tags.State_Action_Idle, () => _host.IsAnimationFinished())
     ];
 
-    private Player _host;
-
-    public override void Init(PlayerContext context)
+    public override void Init()
     {
-        base.Init(context);
-        _host = context.Host;
+        _ctx = Context as PlayerContext;
+        _host = _ctx.Host;
 
-        EnterFunc += OnEnter;
-        PhysicsUpdateFunc += OnPhysicsUpdate;
-        ExitFunc += OnExit;
+        EnterFunc = OnEnter;
+        PhysicsUpdateFunc = OnPhysicsUpdate;
+        ExitFunc = OnExit;
     }
 
     private void OnEnter()

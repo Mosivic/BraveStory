@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Godot;
 
 namespace Miros.Core;
 
 public class MultiLayerExecutor : ExecutorBase, IExecutor
 {
     private readonly Dictionary<Tag, LayerExecutor> _layers = [];
+    private readonly Dictionary<Tag, Dictionary<Tag, State>> _layerStates = [];
     private readonly TransitionContainer _transitionContainer = new();
 
     public override bool HasStateRunning(State state)
@@ -19,14 +19,12 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
         if (!_states.TryGetValue(tag, out var state))
             return;
 
-        if (switchArgs is null || switchArgs is not MultiLayerSwitchArgs)
+        if (switchArgs is not MultiLayerSwitchArgs)
             Console.WriteLine("switchArgs is null or not MultiLayerSwitchArgs");
 
         var switchTaskArgs = switchArgs as MultiLayerSwitchArgs;
         if (_layers.TryGetValue(switchTaskArgs.Layer, out var layerExecutor))
-        {
             layerExecutor.SetNextState(state, switchTaskArgs.Mode);
-        }
     }
 
     public override void Update(double delta)
@@ -40,22 +38,27 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
         foreach (var key in _layers.Keys) _layers[key].PhysicsUpdate(delta);
     }
 
-    public override void AddState<TContext>(State state)
+    public override void AddState(State state)
     {
-        base.AddState<TContext>(state);
+        base.AddState(state);
 
-        var action = (ActionState<TContext>)state;
+        var action = (ActionState)state;
 
-        if (!_layers.ContainsKey(action.Layer))
+        if (!_layerStates.ContainsKey(action.Layer))
         {
-            _layers[action.Layer] = new LayerExecutor(action.Layer, _transitionContainer, _states);
+            _layerStates[action.Layer] = [];
+            _layers[action.Layer] = new LayerExecutor(action.Layer, _transitionContainer, _layerStates[action.Layer]);
+            
             _layers[action.Layer].SetDefaultState(state); //将第一个任务设置为默认任务，以免忘记设置默认任务
+            _layers[action.Layer].SetCurrentState(state);
         }
+
+        _layerStates[action.Layer][action.Tag] = state;
 
         if (action.Transitions != null)
             _transitionContainer.AddTransitions(state, action.Transitions);
 
-        if (action.AsDefaultTask) 
+        if (action.AsDefaultTask)
             _layers[action.Layer].SetDefaultState(state);
 
         if (action.AsNextTask)
@@ -72,13 +75,11 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
 
     public override State GetNowState(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetNowState();
-        return null;
+        return _layers.TryGetValue(layer, out var layer1) ? layer1.GetNowState() : null;
     }
 
     public override State GetLastState(Tag layer)
     {
-        if (_layers.ContainsKey(layer)) return _layers[layer].GetLastState();
-        return null;
+        return _layers.TryGetValue(layer, out var layer1) ? layer1.GetLastState() : null;
     }
 }

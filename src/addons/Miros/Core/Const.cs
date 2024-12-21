@@ -11,11 +11,20 @@ public enum CompareType
 
 public enum RunningStatus
 {
-    Null, //未运行
-    Running, //运行中
-    Succeed, //成功
-    Failed, //失败
-    Removed //移除
+    None,        //未运行
+    Running,     //运行中
+    Succeed,     //成功
+    Failed,      //失败
+    Removed,     //移除
+    Paused       //暂停
+}
+
+// 打断策略，目前只对 MultiLayerExecutor 有效
+public enum InterruptPolicy
+{
+    None,   //正常，被打断后结束任务，执行下一任务
+    Fixed,  //固定，不可被打断，只有执行完成后
+    Fallback//回退，被当断后任务暂停，等待下一任务结束后恢复运行
 }
 
 public enum StateStackType
@@ -33,10 +42,10 @@ public enum RemovePolicy
     WhenEnterFailed, //任务进入失败时移除
     WhenExited, //任务结束时移除（成功或失败）
     WhenSourceAgentNull, //任务的 Source Agent为空时移除
-    WhenSourceTaskRemoved, //任务的 Source Task被移除时移除
-    WhenSourceTaskExited, //任务的 Source Task结束时移除（成功或失败）
-    WhenSourceTaskFailed, //任务的 Source Task失败时移除
-    WhenSourceTaskSucceed, //任务的 Source Task成功时移除
+    WhenSourceStateRemoved, //任务的 Source Task被移除时移除
+    WhenSourceStateExited, //任务的 Source Task结束时移除（成功或失败）
+    WhenSourceStateFailed, //任务的 Source Task失败时移除
+    WhenSourceStateSucceed //任务的 Source Task成功时移除
 }
 
 public enum GrantedAbilityActivationPolicy

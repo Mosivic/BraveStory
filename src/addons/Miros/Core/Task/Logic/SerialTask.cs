@@ -3,40 +3,33 @@
     注意⚠️：
     1. 因为结束条件固定为所有子任务顺序执行完毕，所以 ExitConditionFunc 无效
 */
-using System.Collections.Generic;
-using Godot;
 
 namespace Miros.Core;
 
-public class SerialTask: TaskBase<CompoundState>
+public class SerialTask : TaskBase<State>
 {
-    protected int CurrentIndex = 0;
-    protected List<TaskBase<State>> Tasks = [];
-
+    private int _currentIndex;
+    private State _currentState;
+    private bool _isFinished;
+    private int _subStatesCount;
 
     public override void TriggerOnAdd(State state)
     {
         base.TriggerOnAdd(state);
-        var compoundState = state as CompoundState;
-        foreach (var subState in compoundState.SubStates)
+
+        foreach (var subState in state.SubStates)
         {
-            var subTask = TaskProvider.GetTask(subState.TaskType) as TaskBase<State>;
-            Tasks.Add(subTask);
+            var subTask = TaskProvider.GetTask(subState.TaskType);
+            subState.Task = subTask;
+            subState.Init();
         }
 
-    }
-
-    public override void Enter(State state)
-    {
-        base.Enter(state);
-        Tasks[CurrentIndex].Enter(state);
-    }
-
-    public override void Exit(State state)
-    {
-        base.Exit(state);
-
-        Tasks[CurrentIndex].Exit(state);
+        _subStatesCount = state.SubStates.Length;
+        if (_subStatesCount > 0)
+        {
+            _currentState = state.SubStates[_currentIndex];
+            _currentState.Task.Enter(_currentState);
+        }
     }
 
 
@@ -44,18 +37,24 @@ public class SerialTask: TaskBase<CompoundState>
     {
         base.Update(state, delta);
 
-        if(CurrentIndex < Tasks.Count)
+        if (_isFinished == false && _currentIndex < _subStatesCount)
         {
-            var subTask = Tasks[CurrentIndex];
+            _currentState.Task.Update(_currentState, delta);
 
-            if(subTask.CanExit(state))
+            if (_currentState.Task.CanExit(_currentState))
             {
-                CurrentIndex++;
-                subTask.Exit(state);
+                _currentState.Task.Exit(_currentState);
+                _currentIndex++;
+
+                if (_currentIndex == _subStatesCount)
+                {
+                    _isFinished = true;
+                    return;
+                }
+
+                _currentState = state.SubStates[_currentIndex];
+                _currentState.Task.Enter(_currentState);
             }
-
-
-            subTask.Update(state, delta);
         }
     }
 
@@ -63,14 +62,12 @@ public class SerialTask: TaskBase<CompoundState>
     {
         base.PhysicsUpdate(state, delta);
 
-        if(CurrentIndex < Tasks.Count)
-            Tasks[CurrentIndex].PhysicsUpdate(state, delta);
-        
+        if (_isFinished == false && _currentIndex < _subStatesCount)
+            _currentState.Task.PhysicsUpdate(_currentState, delta);
     }
 
     public override bool CanExit(State state)
     {
-        return CurrentIndex == Tasks.Count;
+        return _currentIndex == _subStatesCount || _subStatesCount == 0;
     }
 }
-

@@ -7,7 +7,6 @@ public class DamageSlice(float damage) : EventStreamArgs("Damage")
     public float Damage { get; } = damage;
 }
 
-
 public class CustomAttackDamageExecution(float sourceAttack) : Execution
 {
     public override void Execute(Effect effect, out ModifierOption[] modifierOptions)

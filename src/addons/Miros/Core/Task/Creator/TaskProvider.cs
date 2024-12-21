@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Godot;
+﻿using System.Collections.Generic;
 
 namespace Miros.Core;
 
@@ -10,7 +8,7 @@ public enum TaskType
     Effect,
     Random,
     Parallel,
-    Serial,
+    Serial
 }
 
 public class TaskProvider
@@ -19,27 +17,28 @@ public class TaskProvider
 
     public static ITask GetTask(TaskType taskType)
     {
-        if(_taskCache.TryGetValue(taskType, out var task))
+        if (_taskCache.TryGetValue(taskType, out var task))
             return task;
 
-        switch(taskType)
+        switch (taskType)
         {
             case TaskType.Base:
                 task = new TaskBase<State>();
                 break;
             case TaskType.Effect:
-                task = new EffectTask() as ITask;
+                task = new EffectTask();
                 break;
             case TaskType.Random:
-                task = new RandomTask() as ITask;
+                task = new RandomTask();
                 break;
             case TaskType.Parallel:
-                task = new ParallelTask() as ITask;
+                task = new ParallelTask();
                 break;
             case TaskType.Serial:
-                task = new SerialTask() as ITask;
+                task = new SerialTask();
                 break;
         }
+
         _taskCache[taskType] = task;
         return task;
     }
@@ -49,14 +48,13 @@ public class TaskProvider
     // {
     //     return CreateTask<TTask>(taskType);
     // }
-    
+
 
     // private static TaskBase<State> GetTask(State state)
     // {
     //     return CreateTask(state);
     // }
-    
-    
+
 
     // private static TaskBase<State> CreateTask(State state)
     // {
@@ -64,6 +62,4 @@ public class TaskProvider
     //     var task = (TaskBase<State>)Activator.CreateInstance(taskType, state);
     //     return task;
     // }
-
-
 }

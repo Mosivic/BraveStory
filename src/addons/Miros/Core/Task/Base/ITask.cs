@@ -4,6 +4,8 @@ public interface ITask
 {
     void Enter(State state);
     void Exit(State state);
+    void Pause(State state);
+    void Resume(State state);
     bool CanEnter(State state);
     bool CanExit(State state);
     bool CanRemove(State state);
@@ -11,5 +13,5 @@ public interface ITask
     void TriggerOnRemove(State state);
     void Update(State state, double delta);
     void PhysicsUpdate(State state, double delta);
-    void Stack(State state,bool IsFromSameSource);
+    void Stack(State state, bool IsFromSameSource);
 }

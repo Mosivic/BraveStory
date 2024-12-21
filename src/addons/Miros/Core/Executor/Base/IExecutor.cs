@@ -2,7 +2,7 @@
 
 public interface IExecutor
 {
-    void AddState<TContext>(State state) where TContext : Context;
+    void AddState(State state);
     void RemoveState(State state);
     State GetNowState(Tag layer);
     State GetLastState(Tag layer);
@@ -10,5 +10,5 @@ public interface IExecutor
     bool HasStateRunning(State state);
     void Update(double delta);
     void PhysicsUpdate(double delta);
-    void SwitchStateByTag(Tag tag, Context context); 
+    void SwitchStateByTag(Tag tag, Context context);
 }
