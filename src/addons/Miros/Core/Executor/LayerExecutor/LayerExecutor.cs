@@ -155,10 +155,10 @@ public class LayerExecutor
         {
             _currentState.Task.Pause(_currentState);
 
-            if(_nextState.Status == RunningStatus.None)
-                _nextState.Task.Enter(_nextState);
-            else if(_nextState.Status == RunningStatus.Paused)
+            if(_nextState.Status == RunningStatus.Paused)
                 _nextState.Task.Resume(_nextState);
+            else
+                _nextState.Task.Enter(_nextState);
             
 
             _currentState = _nextState;
@@ -167,11 +167,11 @@ public class LayerExecutor
         else
         {
             _currentState.Task.Exit(_currentState);
-            
-            if(_nextState.Status == RunningStatus.None)
-                _nextState.Task.Enter(_nextState);
-            else if(_nextState.Status == RunningStatus.Paused)
+
+            if(_nextState.Status == RunningStatus.Paused)
                 _nextState.Task.Resume(_nextState);
+            else
+                _nextState.Task.Enter(_nextState);
 
             _currentState = _nextState;
             _nextState = null;

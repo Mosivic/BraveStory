@@ -21,7 +21,6 @@ public class TaskBase<TState> : ITask
         else if (state.Status == RunningStatus.Failed)
             OnFailed(state);
 
-        state.Status = RunningStatus.None;
         OnExit(state);
     }
 
