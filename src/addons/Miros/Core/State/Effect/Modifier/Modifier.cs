@@ -38,4 +38,5 @@ public class Modifier
     {
         return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;
     }
+
 }
