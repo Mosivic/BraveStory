@@ -10,14 +10,14 @@ public class ChargeEnemyActionState : ActionState
     private Enemy _host;
     private AnimatedSprite2D _smoke;
 
-    private float _waitTime = 0.3f;
     public override Tag Tag => Tags.State_Action_Charge;
     public override Tag Layer => Tags.StateLayer_Movement;
     public override TaskType TaskType => TaskType.Serial;
 
+
     public override Transition[] Transitions =>
     [
-        new(Tags.State_Action_Idle, () => _ctx.ChargeTimer >= _ctx.ChargeDuration),
+        new(Tags.State_Action_Idle, () => Status == RunningStatus.Succeed),
         new(Tags.State_Action_Stun, () => _ctx.IsStunned)
     ];
 
@@ -25,44 +25,40 @@ public class ChargeEnemyActionState : ActionState
     {
         _ctx = Context as EnemyContext;
         _host = _ctx.Host;
-
+        
+        
+        // 顺序执行以下状态：前摇 0.6f -> 冲击 1.0f -> 后摇 0.3f
         SubStates =
         [
-            new DelayState
+            new DurationState
             {
-                DelayTime = 1.0f,
-                EnterFunc = () => { GD.Print("Pre-Cast Delay Start"); },
-                ExitFunc = () => { GD.Print("Pre-Cast Delay End"); }
+                Duration = 0.6f,
+                EnterFunc = () => { 
+                    _smoke.Visible = true;
+                    _smoke.Play("smoke");
+                },
+                ExitFunc = ()=>{
+                    _smoke.Visible = false;
+                    _smoke.Stop();
+                }
             },
-            new State
+            new DurationState
             {
-                EnterFunc = OnEnter,
+                Duration = 1.0f,
+                EnterFunc = ()=> _host.PlayAnimation("run"),
                 PhysicsUpdateFunc = OnPhysicsUpdate,
-                ExitFunc = OnExit
             },
-            new DelayState
+            new DurationState
             {
-                DelayTime = 1.0f,
-                EnterFunc = () => { GD.Print("Post-Cast Delay Start"); },
-                ExitFunc = () => { GD.Print("Post-Cast Delay End"); }
+                Duration = 0.3f,
+                EnterFunc = ()=> _host.PlayAnimation("idle"),
             },
         ];
 
         AddFunc = OnAdd;
+        ExitFunc = OnExit;
     }
 
-
-    private void OnEnter()
-    {
-        _host.PlayAnimation("run");
-
-        _waitTime = 1.0f;
-        _ctx.ChargeTimer = 0f;
-        _ctx.IsCharging = true;
-
-        _smoke.Visible = true;
-        _smoke.Play("smoke");
-    }
 
     private void OnAdd()
     {
@@ -72,14 +68,14 @@ public class ChargeEnemyActionState : ActionState
         _smoke.Visible = false;
     }
 
+    private void  OnExit()
+    {
+        _smoke.Visible = false;
+        _smoke.Stop();
+    }
+
     private void OnPhysicsUpdate(double delta)
     {
-        if (_waitTime > 0)
-        {
-            _waitTime -= (float)delta;
-            return;
-        }
-
         Charge(delta);
 
         if (_ctx.IsHit && _ctx.HitAgent != null)
@@ -98,20 +94,9 @@ public class ChargeEnemyActionState : ActionState
         }
     }
 
-    private void OnExit()
-    {
-        _ctx.IsCharging = false;
-        _ctx.ChargeTimer = 0f;
-
-        _smoke.Visible = false;
-        _smoke.Stop();
-    }
 
     private void Charge(double delta)
     {
-        // 更新冲刺计时器
-        _ctx.ChargeTimer += (float)delta;
-
         // 检查是否撞墙
         if (_host.IsWallColliding())
         {
@@ -123,10 +108,10 @@ public class ChargeEnemyActionState : ActionState
         velocity.X = -_host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
-        var slowdownThreshold = 0.3f; // 最后0.3秒开始减速
-        if (_ctx.ChargeTimer >= _ctx.ChargeDuration - slowdownThreshold)
+        var slowdownThreshold = 0.6f; // 最后0.3秒开始减速
+        if (RunningTime >=  slowdownThreshold)
         {
-            var slowdownFactor = 1.0f - (_ctx.ChargeTimer - (_ctx.ChargeDuration - slowdownThreshold)) /
+            var slowdownFactor = (float)(RunningTime - slowdownThreshold) /
                 slowdownThreshold;
             velocity.X *= slowdownFactor;
         }

@@ -1,8 +1,8 @@
 namespace Miros.Core;
 
-public class DelayState : State
+public class DurationState : State
 {
-    public virtual double DelayTime { get; set; }
+    public required double Duration { get; set; }
 
     public override void Init()
     {
@@ -11,6 +11,6 @@ public class DelayState : State
 
     private bool OnExitCondition()
     {
-        return RunningTime >= DelayTime;
+        return RunningTime >= Duration;
     }
 }
