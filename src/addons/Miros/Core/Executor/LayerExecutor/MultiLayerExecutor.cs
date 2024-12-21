@@ -6,6 +6,7 @@ namespace Miros.Core;
 public class MultiLayerExecutor : ExecutorBase, IExecutor
 {
     private readonly Dictionary<Tag, LayerExecutor> _layers = [];
+    private readonly Dictionary<Tag, Dictionary<Tag, State>> _layerStates = [];
     private readonly TransitionContainer _transitionContainer = new();
 
     public override bool HasStateRunning(State state)
@@ -43,11 +44,16 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
 
         var action = (ActionState)state;
 
-        if (!_layers.ContainsKey(action.Layer))
+        if (!_layerStates.ContainsKey(action.Layer))
         {
-            _layers[action.Layer] = new LayerExecutor(action.Layer, _transitionContainer, _states);
+            _layerStates[action.Layer] = [];
+            _layers[action.Layer] = new LayerExecutor(action.Layer, _transitionContainer, _layerStates[action.Layer]);
+            
             _layers[action.Layer].SetDefaultState(state); //将第一个任务设置为默认任务，以免忘记设置默认任务
+            _layers[action.Layer].SetCurrentState(state);
         }
+
+        _layerStates[action.Layer][action.Tag] = state;
 
         if (action.Transitions != null)
             _transitionContainer.AddTransitions(state, action.Transitions);

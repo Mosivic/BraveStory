@@ -29,10 +29,14 @@ public class LayerExecutor
     public Tag Layer { get; }
 
 
+    public void SetCurrentState(State state)
+    {
+        _currentState = state;
+    }
+
     public void SetDefaultState(State state)
     {
         _defaultState = state;
-        _currentState = _defaultState;
     }
 
     public void SetNextState(State state, TransitionMode mode)
@@ -45,12 +49,12 @@ public class LayerExecutor
     {
         ProcessNextState();
 
-        _currentState.Task.Update(_currentState, delta);
+        _currentState?.Task.Update(_currentState, delta);
     }
 
     public void PhysicsUpdate(double delta)
     {
-        _currentState.Task.PhysicsUpdate(_currentState, delta);
+        _currentState?.Task.PhysicsUpdate(_currentState, delta);
     }
 
 
