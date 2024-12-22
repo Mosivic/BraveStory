@@ -7,6 +7,7 @@ public class DamageGrabber : Grabber
     protected override Tag AttributeSetTag {get;set;}
     protected override Tag AttributeTag {get;set;} = Tags.Attribute_HP;
     protected override ModifierOperation Operation {get;set;} = ModifierOperation.Minus;
+    protected override GrabType GrabType {get;set;} = GrabType.Source;
 
     public override void Rewrite(Effect effect, Modifier modifier)
     {

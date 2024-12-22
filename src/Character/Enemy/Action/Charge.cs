@@ -34,6 +34,7 @@ public class ChargeEnemyActionState : ActionState
             {
                 Duration = 0.6f,
                 EnterFunc = () => { 
+                    _host.PlayAnimation("idle");
                     _smoke.Visible = true;
                     _smoke.Play("smoke");
                 },
@@ -105,13 +106,13 @@ public class ChargeEnemyActionState : ActionState
         }
 
         var velocity = _host.Velocity;
-        velocity.X = -_host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 2.0f; // 使用当前朝向决定冲刺方向
+        velocity.X = -_host.Graphics.Scale.X * OwnerAgent.Atr("RunSpeed") * 3.0f; // 使用当前朝向决定冲刺方向
 
         // 在冲刺即将结束时减速
         var slowdownThreshold = 0.6f; // 最后0.3秒开始减速
         if (RunningTime >=  slowdownThreshold)
         {
-            var slowdownFactor = (float)(RunningTime - slowdownThreshold) /
+            var slowdownFactor = (float)(RunningTime *2  - slowdownThreshold) /
                 slowdownThreshold;
             velocity.X *= slowdownFactor;
         }
