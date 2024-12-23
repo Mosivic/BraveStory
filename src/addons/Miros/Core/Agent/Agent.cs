@@ -209,6 +209,8 @@ public class Agent
                 throw new ArgumentOutOfRangeException();
         }
 
+        // Trigger Grabber
+
         AttributeSetContainer.Sets[modifier.AttributeSetTag]
             .ChangeAttributeBase(modifier.AttributeTag, baseValue);
     }

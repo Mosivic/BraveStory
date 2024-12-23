@@ -2,10 +2,10 @@ using Miros.Core;
 
 public abstract class Grabber
 {
-    protected  abstract Tag AttributeSetTag {get;set;}
-    protected  abstract Tag AttributeTag{get;set;}
-    protected  abstract ModifierOperation Operation{get;set;}
-    protected abstract GrabType GrabType {get;set;}
+    public  abstract Tag AttributeSetTag {get; protected set;}
+    public  abstract Tag AttributeTag{get; protected set;}
+    public  abstract ModifierOperation Operation{get;protected set;}
+    public  abstract GrabType GrabType {get;protected set;}
 
     public Grabber(){}
 

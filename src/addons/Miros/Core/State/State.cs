@@ -17,7 +17,6 @@ public class State
     public State SourceState { get; set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.None;
-    public bool IsActive => Status == RunningStatus.Running;
     public RemovePolicy RemovePolicy { get; set; } = RemovePolicy.None; // 默认不移除
     public InterruptPolicy InterruptPolicy {get;set;} = InterruptPolicy.None;
     public double RunningTime { get; set; } = 0;
