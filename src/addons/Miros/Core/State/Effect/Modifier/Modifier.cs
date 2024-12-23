@@ -1,11 +1,6 @@
 ﻿namespace Miros.Core;
 
 
-public interface ICalculator
-{
-    float Calculate(Effect effect);
-}
-
 public enum ModifierMagnitudeType
 {
     ScalableFloat,
@@ -20,7 +15,7 @@ public struct ModifierMagnitude
     public ModifierMagnitudeType Type { get; set; }
 }
 
-public class Modifier:ICalculator
+public class Modifier
 {
     public ModifierMagnitudeCalculation MMC; // 幅度计算
 
@@ -49,7 +44,7 @@ public class Modifier:ICalculator
     public float Magnitude { get; set; }
     public ModifierOperation Operation { get; set; }
 
-    public float Calculate(Effect effect)
+    public float CalculateMagnitude(Effect effect)
     {
         return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;
     }

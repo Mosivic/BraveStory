@@ -14,9 +14,7 @@ public struct ModifierOption(
     public ModifierMagnitudeCalculation MMC { get; set; } = mmc;
 }
 
-public abstract class Execution:ICalculator
+public abstract class Execution
 {
     public abstract void Execute(Effect effect, out ModifierOption[] modifierOptions);
-
-    public abstract float Calculate(Effect effect);
 }

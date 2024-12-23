@@ -186,7 +186,7 @@ public class Agent
                 $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
                 $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeBase.CalculateMode}");
 
-        var magnitude = modifier.Calculate(effect);
+        var magnitude = modifier.CalculateMagnitude(effect);
         var baseValue = attributeBase.BaseValue;
         switch (modifier.Operation)
         {
