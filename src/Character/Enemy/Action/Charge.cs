@@ -87,7 +87,7 @@ public class ChargeEnemyActionState : ActionState
                 SourceAgent = OwnerAgent,
                 RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
-                Executions = [new DamageExecution()]
+                Modifiers = [new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack"), ModifierOperation.Minus, new DamageMMC())]
             };
 
             _ctx.HitAgent.AddEffect(damageEffect);

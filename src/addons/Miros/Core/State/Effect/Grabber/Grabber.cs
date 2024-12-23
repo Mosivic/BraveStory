@@ -1,6 +1,6 @@
 using Miros.Core;
 
-public abstract class Grabber
+public abstract class Grabber:ICalculator
 {
     public  abstract Tag AttributeSetTag {get; protected set;}
     public  abstract Tag AttributeTag{get; protected set;}
@@ -21,5 +21,5 @@ public abstract class Grabber
         return modifier.AttributeSetTag == AttributeSetTag && modifier.AttributeTag == AttributeTag && modifier.Operation == Operation;
     }
 
-    public abstract void Rewrite(Effect effect,Modifier modifier);
+    public abstract float Calculate(Effect effect);
 }

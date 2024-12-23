@@ -37,7 +37,7 @@ public class StunEnemyActionState : ActionState
             SourceAgent = OwnerAgent,
             RemovePolicy = RemovePolicy.WhenExited,
             DurationPolicy = DurationPolicy.Instant,
-            Executions = [new CustomAttackDamageExecution(13)]
+            Modifiers = [new Modifier(Tags.Attribute_HP, 5, ModifierOperation.Minus, null)] // 固定伤害
         };
 
         OwnerAgent.AddEffect(stunEffect); // 添加伤害效果

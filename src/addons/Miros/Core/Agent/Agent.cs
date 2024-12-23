@@ -144,24 +144,24 @@ public class Agent
         foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
     }
 
-    public void ApplyExecWithInstant(Effect effect)
-    {
-        if (effect.Executions == null) return;
+    // public void ApplyExecWithInstant(Effect effect)
+    // {
+    //     if (effect.Executions == null) return;
 
-        foreach (var execution in effect.Executions)
-        {
-            execution.Execute(effect, out var modifierOptions);
+    //     foreach (var execution in effect.Executions)
+    //     {
+    //         execution.Execute(effect, out var modifierOptions);
 
-            foreach (var modifierOption in modifierOptions)
-            {
-                var attribute = GetAttributeBase(modifierOption.AttributeName, modifierOption.AttributeSetName);
-                var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
-                    modifierOption.Magnitude, modifierOption.Operation, modifierOption.MMC);
+    //         foreach (var modifierOption in modifierOptions)
+    //         {
+    //             var attribute = GetAttributeBase(modifierOption.AttributeName, modifierOption.AttributeSetName);
+    //             var modifier = new Modifier(attribute.AttributeSetTag, attribute.AttributeTag,
+    //                 modifierOption.Magnitude, modifierOption.Operation, modifierOption.MMC);
 
-                ApplyModifier(effect, modifier, attribute);
-            }
-        }
-    }
+    //             ApplyModifier(effect, modifier, attribute);
+    //         }
+    //     }
+    // }
 
     public void ApplyModWithInstant(Effect effect)
     {
@@ -186,7 +186,7 @@ public class Agent
                 $"[EX] Instant GameplayEffect Can Only Modify Stacking Mode Attribute! " +
                 $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeBase.CalculateMode}");
 
-        var magnitude = modifier.CalculateMagnitude(effect);
+        var magnitude = modifier.Calculate(effect);
         var baseValue = attributeBase.BaseValue;
         switch (modifier.Operation)
         {

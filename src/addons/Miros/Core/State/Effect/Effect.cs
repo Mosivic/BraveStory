@@ -68,7 +68,6 @@ public class Effect : State
     public double Duration { get; set; }
     public double Period { get; set; }
 
-    public Execution[] Executions { get; set; }
     public Modifier[] Modifiers { get; set; }
     public Grabber[] Grabbers { get; set; }
 

@@ -22,8 +22,7 @@ public class EffectTask : TaskBase<Effect>
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
             effect.OwnerAgent.ApplyModWithInstant(effect);
-            effect.OwnerAgent.ApplyExecWithInstant(effect);
-
+            
             effect.Status = RunningStatus.Succeed;
         }
         else if (effect.DurationPolicy == DurationPolicy.Infinite)
