@@ -70,6 +70,7 @@ public class Effect : State
 
     public Execution[] Executions { get; set; }
     public Modifier[] Modifiers { get; set; }
+    public Grabber[] Grabbers { get; set; }
 
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
     public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }

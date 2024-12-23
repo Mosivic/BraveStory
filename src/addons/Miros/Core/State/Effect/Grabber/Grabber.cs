@@ -5,6 +5,7 @@ public abstract class Grabber
     protected  abstract Tag AttributeSetTag {get;set;}
     protected  abstract Tag AttributeTag{get;set;}
     protected  abstract ModifierOperation Operation{get;set;}
+    protected abstract GrabType GrabType {get;set;}
 
     public Grabber(){}
 
