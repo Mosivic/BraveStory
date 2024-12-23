@@ -159,9 +159,28 @@ public class AttributeSetContainer(Agent owner)
 
     public bool TryGetAttributeBase(Tag attrSetTag, Tag attrTag, out AttributeBase attr)
     {
-        if (Sets.TryGetValue(attrSetTag, out var set))
-            if (set.TryGetAttribute(attrTag.ShortName, out attr))
+        if (attrSetTag == Tags.Default)
+        {
+            if (TryGetAttributeBase(attrTag, out attr))
                 return true;
+        }
+        else
+        {
+            if (Sets.TryGetValue(attrSetTag, out var set))
+                if (set.TryGetAttribute(attrTag.ShortName, out attr))
+                    return true;
+        }
+
+        attr = null;
+        return false;
+    }
+    
+    public bool TryGetAttributeBase(Tag attrTag, out AttributeBase attr)
+    {
+        foreach (var attrSet in Sets.Values)
+            if (attrSet.TryGetAttribute(attrTag, out attr))
+                return true;
+        
         attr = null;
         return false;
     }

@@ -210,9 +210,10 @@ public class Agent
         }
 
         // Trigger Grabber
-
-        AttributeSetContainer.Sets[modifier.AttributeSetTag]
-            .ChangeAttributeBase(modifier.AttributeTag, baseValue);
+        
+        attributeBase.SetBaseValue(baseValue);
+        // AttributeSetContainer.Sets[modifier.AttributeSetTag]
+        //     .ChangeAttributeBase(modifier.AttributeTag, baseValue);
     }
 
 
