@@ -22,7 +22,7 @@ public class EffectTask : TaskBase<Effect>
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
             effect.OwnerAgent.ApplyModWithInstant(effect);
-            
+
             effect.Status = RunningStatus.Succeed;
         }
         else if (effect.DurationPolicy == DurationPolicy.Infinite)
@@ -102,41 +102,4 @@ public class EffectTask : TaskBase<Effect>
             ? effect.SnapshotSourceAttributes
             : effect.OwnerAgent.DataSnapshot();
     }
-
-
-    // #region GrantedAbility
-    // private void TryActivateGrantedAbilities()
-    // {
-    //     foreach (var grantedAbility in effect.GrantedAbility)
-    //     {
-    //         if (grantedAbility.ActivationPolicy == GrantedAbilityActivationPolicy.SyncWithEffect)
-    //         {
-    //             effect.Owner.TryActivateAbility(grantedAbility.AbilityName);
-    //         }
-    //     }
-    // }
-
-    // private void TryDeactivateGrantedAbilities()
-    // {
-    //     foreach (var grantedAbility in effect.GrantedAbility)
-    //     {
-    //         if (grantedAbility.DeactivationPolicy == GrantedAbilityDeactivationPolicy.SyncWithEffect)
-    //         {
-    //             effect.Owner.TryEndAbility(grantedAbility.AbilityName);
-    //         }
-    //     }
-    // }
-
-    // private void TryRemoveGrantedAbilities()
-    // {
-    //     foreach (var grantedAbility in effect.GrantedAbility)
-    //     {
-    //         if (grantedAbility.RemovePolicy == GrantedAbilityRemovePolicy.SyncWithEffect)
-    //         {
-    //             effect.Owner.TryCancelAbility(grantedAbility.AbilityName);
-    //             effect.Owner.RemoveAbility(grantedAbility.AbilityName);
-    //         }
-    //     }
-    // }
-    // #endregion
 }
