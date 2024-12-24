@@ -162,7 +162,7 @@ public class Agent
     //         }
     //     }
     // }
-
+    
     public void ApplyModWithInstant(Effect effect)
     {
         if (effect.Modifiers == null) return;

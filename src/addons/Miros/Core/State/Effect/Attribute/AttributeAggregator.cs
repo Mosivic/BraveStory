@@ -27,6 +27,15 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         owner.GetEffectExecutor()?.UnregisterOnRunningEffectTasksIsDirty(RefreshGrabberCache);
     }
 
+    public void ApplyGrabber(Modifier modifier)
+    {
+        foreach (var tuple in _grabberCache)
+        {
+            var effect = tuple.Item1;
+            var grabber = tuple.Item2;
+            grabber.Rewrite(effect, modifier);
+        }
+    }
 
     private void RefreshGrabberCache(object sender, Effect effect)
     {
