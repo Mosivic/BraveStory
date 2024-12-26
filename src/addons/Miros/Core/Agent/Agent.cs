@@ -31,9 +31,6 @@ public class Agent
 
         _ownedTags = new TagContainer([]);
         AttributeSetContainer = new AttributeSetContainer(this);
-
-        // FIXME: 不应该在这里进行初始化
-        _executors[ExecutorType.EffectExecutor] = new EffectExecutor();
     }
 
 
