@@ -28,7 +28,7 @@ public class Agent
         Enabled = true;
         Host = host;
         EventStream = new EventStream();
-
+ 
         _ownedTags = new TagContainer([]);
         AttributeSetContainer = new AttributeSetContainer(this);
     }
@@ -221,9 +221,6 @@ public class Agent
     }
 
 
-    /// <summary>
-    ///     移除所有包含指定标签的Effect
-    /// </summary>
     public void RemoveEffectWithAnyTags(TagSet tags)
     {
         if (tags.Empty) return;
