@@ -25,20 +25,22 @@ public class ChargeEnemyActionState : ActionState
     {
         _ctx = Context as EnemyContext;
         _host = _ctx.Host;
-        
-        
+
+
         // 顺序执行以下状态：前摇 0.6f -> 冲击 1.0f -> 后摇 0.3f
         SubStates =
         [
             new DurationState
             {
                 Duration = 0.6f,
-                EnterFunc = () => { 
+                EnterFunc = () =>
+                {
                     _host.PlayAnimation("idle");
                     _smoke.Visible = true;
                     _smoke.Play("smoke");
                 },
-                ExitFunc = ()=>{
+                ExitFunc = () =>
+                {
                     _smoke.Visible = false;
                     _smoke.Stop();
                 }
@@ -46,14 +48,14 @@ public class ChargeEnemyActionState : ActionState
             new DurationState
             {
                 Duration = 1.0f,
-                EnterFunc = ()=> _host.PlayAnimation("run"),
-                PhysicsUpdateFunc = OnPhysicsUpdate,
+                EnterFunc = () => _host.PlayAnimation("run"),
+                PhysicsUpdateFunc = OnPhysicsUpdate
             },
             new DurationState
             {
                 Duration = 0.3f,
-                EnterFunc = ()=> _host.PlayAnimation("idle"),
-            },
+                EnterFunc = () => _host.PlayAnimation("idle")
+            }
         ];
 
         AddFunc = OnAdd;
@@ -69,7 +71,7 @@ public class ChargeEnemyActionState : ActionState
         _smoke.Visible = false;
     }
 
-    private void  OnExit()
+    private void OnExit()
     {
         _smoke.Visible = false;
         _smoke.Stop();
@@ -87,7 +89,10 @@ public class ChargeEnemyActionState : ActionState
                 SourceAgent = OwnerAgent,
                 RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
-                Modifiers = [new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack"), ModifierOperation.Minus, new DamageMMC())]
+                Modifiers =
+                [
+                    new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack"), ModifierOperation.Minus, new DamageMMC())
+                ]
             };
 
             _ctx.HitAgent.AddEffect(damageEffect);
@@ -110,10 +115,10 @@ public class ChargeEnemyActionState : ActionState
 
         // 在冲刺即将结束时减速
         var slowdownThreshold = 0.6f; // 最后0.3秒开始减速
-        if (RunningTime >=  slowdownThreshold)
+        if (RunningTime >= slowdownThreshold)
         {
-            var slowdownFactor = (float)(RunningTime *2  - slowdownThreshold) /
-                slowdownThreshold;
+            var slowdownFactor = (float)(RunningTime * 2 - slowdownThreshold) /
+                                 slowdownThreshold;
             velocity.X *= slowdownFactor;
         }
 

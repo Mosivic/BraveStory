@@ -56,7 +56,11 @@ public class StompGroundEnemyActionState : ActionState
                     SourceAgent = OwnerAgent,
                     RemovePolicy = RemovePolicy.WhenExited,
                     DurationPolicy = DurationPolicy.Instant,
-                    Modifiers = [new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack"), ModifierOperation.Minus, new DamageMMC())]
+                    Modifiers =
+                    [
+                        new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack"), ModifierOperation.Minus,
+                            new DamageMMC())
+                    ]
                 };
 
                 ctx.HitAgent.AddEffect(damageEffect);

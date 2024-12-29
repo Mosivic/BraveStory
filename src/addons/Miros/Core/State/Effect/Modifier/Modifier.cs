@@ -1,6 +1,5 @@
 ﻿namespace Miros.Core;
 
-
 public enum ModifierMagnitudeType
 {
     ScalableFloat,
@@ -32,7 +31,7 @@ public class Modifier
 
     public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation,
         ModifierMagnitudeCalculation mmc, bool canGrab = true)
-    {   
+    {
         AttributeSetTag = attributeSetTag;
         AttributeTag = attributeTag;
         Magnitude = magnitude;
@@ -46,11 +45,10 @@ public class Modifier
     public float Magnitude { get; set; }
     public ModifierOperation Operation { get; set; }
 
-    public bool CanGrab {get;set;} = true;
+    public bool CanGrab { get; set; } = true;
 
     public float CalculateMagnitude(Effect effect)
     {
         return MMC?.CalculateMagnitude(effect, Magnitude) ?? Magnitude;
     }
-
 }

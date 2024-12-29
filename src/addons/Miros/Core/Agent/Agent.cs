@@ -28,7 +28,7 @@ public class Agent
         Enabled = true;
         Host = host;
         EventStream = new EventStream();
- 
+
         _ownedTags = new TagContainer([]);
         AttributeSetContainer = new AttributeSetContainer(this);
     }
@@ -159,7 +159,7 @@ public class Agent
     //         }
     //     }
     // }
-    
+
     public void ApplyModWithInstant(Effect effect)
     {
         if (effect.Modifiers == null) return;
@@ -207,7 +207,7 @@ public class Agent
         }
 
         // Trigger Grabber
-        
+
         attributeBase.SetBaseValue(baseValue);
         // AttributeSetContainer.Sets[modifier.AttributeSetTag]
         //     .ChangeAttributeBase(modifier.AttributeTag, baseValue);

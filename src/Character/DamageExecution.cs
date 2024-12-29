@@ -7,7 +7,6 @@ public class DamageSlice(float damage) : EventStreamArgs("Damage")
     public float Damage { get; } = damage;
 }
 
-
 public class DamageMMC : ModifierMagnitudeCalculation
 {
     public override float CalculateMagnitude(Effect effect, float magnitude)

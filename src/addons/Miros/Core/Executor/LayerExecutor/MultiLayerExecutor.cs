@@ -48,7 +48,7 @@ public class MultiLayerExecutor : ExecutorBase, IExecutor
         {
             _layerStates[action.Layer] = [];
             _layers[action.Layer] = new LayerExecutor(action.Layer, _transitionContainer, _layerStates[action.Layer]);
-            
+
             _layers[action.Layer].SetDefaultState(state); //将第一个任务设置为默认任务，以免忘记设置默认任务
             _layers[action.Layer].SetCurrentState(state);
         }

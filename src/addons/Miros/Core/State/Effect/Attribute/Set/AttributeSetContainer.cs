@@ -174,13 +174,13 @@ public class AttributeSetContainer(Agent owner)
         attr = null;
         return false;
     }
-    
+
     public bool TryGetAttributeBase(Tag attrTag, out AttributeBase attr)
     {
         foreach (var attrSet in Sets.Values)
             if (attrSet.TryGetAttribute(attrTag, out attr))
                 return true;
-        
+
         attr = null;
         return false;
     }

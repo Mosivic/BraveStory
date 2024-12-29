@@ -34,9 +34,8 @@ public abstract class AttributeSet
     {
         GetAttributeBase(attributeSign)?.SetBaseValue(value);
     }
-    
-    
-    
+
+
     public bool TryGetAttribute(Tag attrTag, out AttributeBase attribute)
     {
         foreach (var attr in Attributes)

@@ -6,8 +6,8 @@ namespace Miros.Core;
 public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
     private readonly AttributeBase _attribute = attribute;
-    private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
     private readonly List<Tuple<Effect, Grabber>> _grabberCache = [];
+    private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
 
     public void OnEnable()
     {
@@ -43,11 +43,9 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 
         var effects = owner.GetRunningEffects();
         foreach (var ge in effects)
-            foreach (var grabber in ge.Grabbers)
-                if (grabber.AttributeTag == _attribute.AttributeTag)
-                {
-                    _grabberCache.Add(new Tuple<Effect, Grabber>(ge, grabber));
-                }
+        foreach (var grabber in ge.Grabbers)
+            if (grabber.AttributeTag == _attribute.AttributeTag)
+                _grabberCache.Add(new Tuple<Effect, Grabber>(ge, grabber));
 
         UpdateCurrentValueWhenGrabberIsDirty();
     }
@@ -66,12 +64,12 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 
         var effects = owner.GetRunningEffects(); // 获取所有正在运行的 Effect
         foreach (var ge in effects)
-            foreach (var modifier in ge.Modifiers)
-                if (modifier.AttributeTag == _attribute.AttributeTag)
-                {
-                    _modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
-                    TryRegisterAttributeChangedListen(ge, modifier);
-                }
+        foreach (var modifier in ge.Modifiers)
+            if (modifier.AttributeTag == _attribute.AttributeTag)
+            {
+                _modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
+                TryRegisterAttributeChangedListen(ge, modifier);
+            }
 
         UpdateCurrentValueWhenModifierIsDirty();
     }

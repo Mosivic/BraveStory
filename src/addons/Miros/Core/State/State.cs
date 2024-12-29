@@ -18,7 +18,7 @@ public class State
 
     public RunningStatus Status { get; set; } = RunningStatus.None;
     public RemovePolicy RemovePolicy { get; set; } = RemovePolicy.None; // 默认不移除
-    public InterruptPolicy InterruptPolicy {get;set;} = InterruptPolicy.None;
+    public InterruptPolicy InterruptPolicy { get; set; } = InterruptPolicy.None;
     public double RunningTime { get; set; } = 0;
 
     public Func<bool> EnterCondition { get; set; }
