@@ -36,13 +36,15 @@ public class Agent
 
     public void Process(double delta)
     {
-        if (Enabled) Update(delta);
+        if (Enabled) 
+            Update(delta);
     }
 
 
     public void PhysicsProcess(double delta)
     {
-        if (Enabled) PhysicsUpdate(delta);
+        if (Enabled) 
+            PhysicsUpdate(delta);
     }
 
 
