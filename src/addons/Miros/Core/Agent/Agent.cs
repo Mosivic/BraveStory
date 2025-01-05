@@ -47,9 +47,9 @@ public class Agent
         return AttributeSetContainer.Attribute(attrName, valueType);
     }
 
-    public void AddState(State state, Type stateType = null, Context context = null)
+    public void AddState(State state, Context context = null)
     {
-        StateDispatcher.AddState(state, stateType, context);
+        StateDispatcher.AddState(state, context);
     }
 
 
