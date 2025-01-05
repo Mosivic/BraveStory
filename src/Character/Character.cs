@@ -28,7 +28,7 @@ public partial class Character : CharacterBody2D
         Sprite = Graphics.GetNode<Sprite2D>("Sprite2D");
         AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
 
-        // 处理击中事件 
+        // 处理击中事件
         HitBox = Graphics.GetNode<HitBox>("HitBox");
         HitBox.OnHit += HandleHit;
 
@@ -61,16 +61,7 @@ public partial class Character : CharacterBody2D
 
     public bool IsAnimationFinished()
     {
-        return !AnimationPlayer.IsPlaying() && AnimationPlayer.GetQueue().Length == 0;
-    }
-
-    private void HandleDamage(object sender, DamageSlice e)
-    {
-        var damageNumberScene = GD.Load<PackedScene>("res://Character/DamageNumber.tscn");
-        var damageNumber = damageNumberScene.Instantiate<DamageNumber>();
-        AddChild(damageNumber);
-
-        damageNumber.SetDamage((int)e.Damage);
+        return !AnimationPlayer.IsPlaying();
     }
 
     public void PlayAnimation(string animationName)
@@ -81,6 +72,7 @@ public partial class Character : CharacterBody2D
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
         Context.IsHurt = true;
+
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)

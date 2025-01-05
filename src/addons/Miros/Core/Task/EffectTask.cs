@@ -16,12 +16,12 @@ public class EffectTask : TaskBase<Effect>
         var effect = state as Effect;
         CaptureAttributesSnapshot(effect);
 
-        effect.OwnerAgent.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
+        effect.RemoveEffectWithAnyTags(effect.RemoveEffectsWithTags);
 
 
         if (effect.DurationPolicy == DurationPolicy.Instant)
         {
-            effect.OwnerAgent.ApplyModWithInstant(effect);
+            effect.ApplyModWithInstant();
 
             effect.Status = RunningStatus.Succeed;
         }

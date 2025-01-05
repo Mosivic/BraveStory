@@ -11,6 +11,7 @@ public class State
     public Agent SourceAgent { get; set; }
 
     public ITask Task { get; set; }
+    public IExecutor Executor { get; set; }
     public Context Context { get; set; }
     public State[] SubStates { get; set; }
 
