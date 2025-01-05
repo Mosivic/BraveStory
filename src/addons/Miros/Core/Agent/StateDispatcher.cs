@@ -46,7 +46,7 @@ public class StateDispatcher(Agent ownerAgent)
     }
 
 
-    public void SwitchTaskFromTag(Tag tag, Context switchArgs = null)
+    public void SwitchTaskByTag(Tag tag, Context switchArgs = null)
     {
         var executor = _executors[ExecutorType.EffectExecutor];
         executor.SwitchStateByTag(tag, switchArgs);

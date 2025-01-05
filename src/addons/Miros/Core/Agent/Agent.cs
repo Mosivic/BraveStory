@@ -52,6 +52,13 @@ public class Agent
         StateDispatcher.AddState(state, context);
     }
 
+    
+    public void SwitchTaskByTag(Tag tag, Context switchArgs = null)
+    {
+        StateDispatcher.SwitchTaskByTag(tag, switchArgs);
+    }
+    
+
 
     #region Tag Check
 

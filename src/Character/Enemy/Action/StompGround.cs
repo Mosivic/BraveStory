@@ -64,10 +64,7 @@ public class StompGroundEnemyActionState : ActionState
                 };
 
                 ctx.HitAgent.AddState(damageEffect);
-
-                ctx.HitAgent.SwitchTaskFromTag(ExecutorType.MultiLayerExecutor, Tags.State_Action_Jump,
-                    new MultiLayerSwitchArgs(Tags.StateLayer_Movement));
-
+                ctx.HitAgent.SwitchTaskByTag(Tags.State_Action_Jump,new MultiLayerSwitchArgs(Tags.StateLayer_Movement));
                 ctx.HitAgent = null;
             }
         }
