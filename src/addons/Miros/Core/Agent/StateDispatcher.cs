@@ -28,9 +28,21 @@ public class StateDispatcher(Agent ownerAgent)
         foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
     }
 
-    public EffectExecutor GetEffectExecutor()
+
+    public void AddState(State state, Context context = null)
     {
-        return _executors[ExecutorType.EffectExecutor] as EffectExecutor;
+        switch (state.StateType)
+        {
+            case StateType.Effect:
+                AddEffect(state as Effect);
+                break;
+            case StateType.Action:
+                AddAction(context, state.GetType());
+                break;
+            case StateType.State:
+                PushStateOnExecutor(state);
+                break;
+        }
     }
 
 
@@ -66,7 +78,7 @@ public class StateDispatcher(Agent ownerAgent)
         effect.OwnerAgent = _ownerAgent;
         effect.Task = TaskProvider.GetTask(effect.TaskType) as EffectTask;
         effect.Init();
-        
+
         PushStateOnExecutor(effect);
     }
 

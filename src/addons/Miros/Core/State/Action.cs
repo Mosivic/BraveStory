@@ -7,4 +7,6 @@ public class ActionState : State
     public virtual bool AsDefaultTask { get; set; } = false;
     public virtual bool AsNextTask { get; set; } = false;
     public virtual TransitionMode AsNextTaskTransitionMode { get; set; }
+
+    public override StateType StateType { get; set; } = StateType.Action;
 }

@@ -95,7 +95,7 @@ public class ChargeEnemyActionState : ActionState
                 ]
             };
 
-            _ctx.HitAgent.AddEffect(damageEffect);
+            _ctx.HitAgent.AddState(damageEffect);
             _ctx.IsHit = false;
         }
     }

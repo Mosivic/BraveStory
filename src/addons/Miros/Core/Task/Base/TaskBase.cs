@@ -4,7 +4,6 @@ public class TaskBase<TState> : ITask
     where TState : State
 {
     public TState State { get; set; }
-    public Agent Agent { get; set; }
 
     public virtual void Enter(State state)
     {

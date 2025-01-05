@@ -35,15 +35,17 @@ public partial class Enemy : Character
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
-        Context = new EnemyContext(this);
+        Context = new EnemyContext(this) as EnemyContext;
 
         // 初始化 Agentor
         Agent.AddAttributeSet(typeof(BoarAttributeSet));
-        Agent.AddActions(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
-            typeof(IdleEnemyActionState), typeof(PatrolEnemyActionState), typeof(DieEnemyActionState),
-            typeof(ChargeEnemyActionState), typeof(HurtEnemyActionState), typeof(StunEnemyActionState),
-            typeof(StompGroundEnemyActionState)
-        ]);
+        Agent.AddState(new IdleEnemyActionState(), Context);
+        Agent.AddState(new PatrolEnemyActionState(), Context);
+        Agent.AddState(new DieEnemyActionState(), Context);
+        Agent.AddState(new ChargeEnemyActionState(), Context);
+        Agent.AddState(new HurtEnemyActionState(), Context);
+        Agent.AddState(new StunEnemyActionState(), Context);
+        Agent.AddState(new StompGroundEnemyActionState(), Context);
 
         var hp = Agent.GetAttributeBase("HP");
         hp.SetMaxValue(hp.CurrentValue);

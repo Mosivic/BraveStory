@@ -5,7 +5,6 @@ using Godot;
 namespace Miros.Core;
 
 
-
 public class Agent
 {
     private TagContainer OwnedTags;
@@ -48,7 +47,10 @@ public class Agent
         return AttributeSetContainer.Attribute(attrName, valueType);
     }
 
-
+    public void AddState(State state, Type stateType = null, Context context = null)
+    {
+        StateDispatcher.AddState(state, stateType, context);
+    }
 
 
     #region Tag Check

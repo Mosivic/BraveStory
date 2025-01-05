@@ -35,7 +35,7 @@ public class EffectUpdateHandler
 
     private void OnPeriodOver()
     {
-        _effect.OwnerAgent.ApplyModWithInstant(_effect);
+        _effect.ApplyModWithInstant();
 
         _periodTimer.Start();
     }
@@ -92,7 +92,7 @@ public class EffectUpdateHandler
         {
             // 溢出GE生效
             foreach (var overflowEffect in _effect.Stacking.OverflowEffects)
-                _effect.OwnerAgent.AddEffect(overflowEffect);
+                _effect.OwnerAgent.AddState(overflowEffect);
 
             if (_effect.Stacking.DurationRefreshPolicy == DurationRefreshPolicy.RefreshOnSuccessfulApplication)
             {

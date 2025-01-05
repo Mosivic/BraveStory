@@ -40,7 +40,7 @@ public class StunEnemyActionState : ActionState
             Modifiers = [new Modifier(Tags.Attribute_HP, 5, ModifierOperation.Minus, null)] // 固定伤害
         };
 
-        OwnerAgent.AddEffect(stunEffect); // 添加伤害效果
+        OwnerAgent.AddState(stunEffect); // 添加伤害效果
     }
 
     private void OnPhysicsUpdate(double delta)

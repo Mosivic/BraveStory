@@ -47,7 +47,7 @@ public class Attack111ActionState : ActionState
                 ]
             };
 
-            _ctx.HitAgent.AddEffect(damageEffect);
+            _ctx.HitAgent.AddState(damageEffect);
             _ctx.IsHit = false;
         }
     }

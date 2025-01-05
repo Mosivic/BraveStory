@@ -34,13 +34,18 @@ public partial class Player : Character
         Context = new PlayerContext(this);
 
         Agent.AddAttributeSet(typeof(PlayerAttributeSet));
-        Agent.AddActions(ExecutorType.MultiLayerExecutor, Context as PlayerContext, [
-            typeof(IdleActionState), typeof(JumpActionState), typeof(DieActionState), typeof(FallActionState),
-            typeof(HurtActionState),
-            typeof(RunActionState), typeof(SlidingActionState), typeof(WallJumpActionState),
-            typeof(WallSlideActionState),
-            typeof(Attack1ActionState), typeof(Attack11ActionState), typeof(Attack111ActionState)
-        ]);
+        Agent.AddState(new IdleActionState(), Context);
+        Agent.AddState(new JumpActionState(), Context);
+        Agent.AddState(new DieActionState(), Context);
+        Agent.AddState(new FallActionState(), Context);
+        Agent.AddState(new HurtActionState(), Context);
+        Agent.AddState(new RunActionState(), Context);
+        Agent.AddState(new SlidingActionState(), Context);
+        Agent.AddState(new WallJumpActionState(), Context);
+        Agent.AddState(new WallSlideActionState(), Context);
+        Agent.AddState(new Attack1ActionState(), Context);
+        Agent.AddState(new Attack11ActionState(), Context);
+        Agent.AddState(new Attack111ActionState(), Context);
 
 
         var hp = Agent.GetAttributeBase("HP");

@@ -63,6 +63,7 @@ public class Effect : State
     public TagSet RemoveEffectsWithTags;
 
     public override TaskType TaskType { get; set; } = TaskType.Effect;
+    public override StateType StateType { get; set; } = StateType.Effect;
     public new EffectExecutor Executor { get; set; }
     public DurationPolicy DurationPolicy { get; set; } = DurationPolicy.Instant;
     public double Duration { get; set; }
