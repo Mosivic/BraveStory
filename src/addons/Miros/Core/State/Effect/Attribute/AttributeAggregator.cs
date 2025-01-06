@@ -6,7 +6,7 @@ namespace Miros.Core;
 public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
     private readonly AttributeBase _attribute = attribute;
-    private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
+    private readonly Dictionary<Modifier, Effect> _modifierCache = [];
     private EffectExecutor _effectExecutor;
 
 
@@ -36,8 +36,8 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
     private void RefreshModifierCache(object sender, Effect effect)
     {
         // 注销属性变化事件
-        foreach (var tuple in _modifierCache)
-            TryUnregisterAttributeChangedListen(tuple.Item1, tuple.Item2);
+        foreach (var keyValuePair in _modifierCache)
+            TryUnregisterAttributeChangedListen(keyValuePair.Value, keyValuePair.Key);
         _modifierCache.Clear();
 
         var effects = effect.Executor.GetRunningEffects();
@@ -45,7 +45,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         foreach (var modifier in ge.Modifiers)
             if (modifier.AttributeTag == _attribute.AttributeTag)
             {
-                _modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
+                _modifierCache.Add(modifier, ge);
                 TryRegisterAttributeChangedListen(ge, modifier);
             }
 
@@ -63,10 +63,10 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             case CalculateMode.Stacking:
             {
                 var newValue = _attribute.BaseValue;
-                foreach (var tuple in _modifierCache)
+                foreach (var keyValuePair in _modifierCache)
                 {
-                    var effect = tuple.Item1;
-                    var modifier = tuple.Item2;
+                    var effect = keyValuePair.Value;
+                    var modifier = keyValuePair.Key;
                     var magnitude = modifier.CalculateMagnitude(effect);
 
                     if (!_attribute.IsSupportOperation(modifier.Operation))
@@ -100,10 +100,10 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             {
                 var hasOverride = false;
                 var min = float.MaxValue;
-                foreach (var tuple in _modifierCache)
+                foreach (var keyValuePair in _modifierCache)
                 {
-                    var effect = tuple.Item1;
-                    var modifier = tuple.Item2;
+                    var effect = keyValuePair.Value;
+                    var modifier = keyValuePair.Key;
 
                     if (!_attribute.IsSupportOperation(modifier.Operation))
                         throw new InvalidOperationException("Unsupported operation.");
@@ -122,10 +122,10 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             {
                 var hasOverride = false;
                 var max = float.MinValue;
-                foreach (var tuple in _modifierCache)
+                foreach (var keyValuePair in _modifierCache)
                 {
-                    var effect = tuple.Item1;
-                    var modifier = tuple.Item2;
+                    var effect = keyValuePair.Value;
+                    var modifier = keyValuePair.Key;
 
                     if (!_attribute.IsSupportOperation(modifier.Operation))
                         throw new InvalidOperationException("Unsupported operation.");
@@ -235,10 +235,10 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
     private void OnAttributeChanged(AttributeBase attribute, float oldValue, float newValue)
     {
         if (_modifierCache.Count == 0) return;
-        foreach (var tuple in _modifierCache)
+        foreach (var keyValuePair in _modifierCache)
         {
-            var effect = tuple.Item1;
-            var modifier = tuple.Item2;
+            var effect = keyValuePair.Value;
+            var modifier = keyValuePair.Key;
             if (modifier.MMC is AttributeBasedModCalculation mmc &&
                 mmc.captureType == AttributeBasedModCalculation.AttributeCaptureType.Track &&
                 attribute.AttributeTag == mmc.attributeBasedTag)
