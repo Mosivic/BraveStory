@@ -38,16 +38,16 @@ public class EffectExecutor : ExecutorBase, IExecutor
                 // 如果Tag相同且来自同一个Agent, 则不添加, 并跳过当前循环
                 if (effect.Tag == existingEffect.Tag && AreFromSameSourceAgent(effect, existingEffect))
                 {
-                    existingEffect.Task.Stack(existingEffect, true);
+                    existingEffect.Stack(true);
                     isAddTask = false;
                     continue;
                 }
 
                 // 如果来自不同Agent, 则根据是否可以叠加来决定是否添加
                 if (AreFromSameSourceAgent(effect, existingEffect))
-                    existingEffect.Task.Stack(existingEffect, true);
+                    existingEffect.Stack(true);
                 else
-                    existingEffect.Task.Stack(existingEffect, false);
+                    existingEffect.Stack(false);
             }
 
         if (isAddTask) base.AddState(effect);
