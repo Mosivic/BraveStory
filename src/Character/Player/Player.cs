@@ -33,7 +33,7 @@ public partial class Player : Character
 
         Context = new PlayerContext(this);
 
-        Agent.AddAttributeSet(typeof(PlayerAttributeSet));
+        
         Agent.AddState(new IdleActionState(), Context);
         Agent.AddState(new JumpActionState(), Context);
         Agent.AddState(new DieActionState(), Context);
@@ -47,7 +47,8 @@ public partial class Player : Character
         Agent.AddState(new Attack11ActionState(), Context);
         Agent.AddState(new Attack111ActionState(), Context);
 
-
+        Agent.AddAttributeSet(typeof(PlayerAttributeSet));
+        
         var hp = Agent.GetAttributeBase("HP");
         hp.SetMaxValue(hp.CurrentValue);
         hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);

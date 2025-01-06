@@ -37,8 +37,7 @@ public partial class Enemy : Character
 
         Context = new EnemyContext(this);
 
-        // 初始化 Agentor
-        Agent.AddAttributeSet(typeof(BoarAttributeSet));
+        // 初始化 Agent
         Agent.AddState(new IdleEnemyActionState(), Context);
         Agent.AddState(new PatrolEnemyActionState(), Context);
         Agent.AddState(new DieEnemyActionState(), Context);
@@ -46,7 +45,8 @@ public partial class Enemy : Character
         Agent.AddState(new HurtEnemyActionState(), Context);
         Agent.AddState(new StunEnemyActionState(), Context);
         Agent.AddState(new StompGroundEnemyActionState(), Context);
-
+        
+        Agent.AddAttributeSet(typeof(BoarAttributeSet));
         var hp = Agent.GetAttributeBase("HP");
         hp.SetMaxValue(hp.CurrentValue);
         hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);

@@ -46,18 +46,23 @@ public class Agent
         return AttributeSetContainer.Attribute(attrName, valueType);
     }
 
+    public IExecutor GetExecutor(ExecutorType executorType)
+    {
+        return StateDispatcher.GetExecutor(executorType);
+    }
+
     public void AddState(State state, Context context = null)
     {
         StateDispatcher.AddState(state, context);
     }
 
 
-    public void SwitchTaskByTag(Tag tag, Context switchArgs = null)
+    public void SwitchTaskByTag(ExecutorType executorType, Tag tag, Context switchArgs = null)
     {
-        StateDispatcher.SwitchTaskByTag(tag, switchArgs);
+        StateDispatcher.SwitchTaskByTag(executorType, tag, switchArgs);
     }
 
-    
+
 
     #region Tag Check
 

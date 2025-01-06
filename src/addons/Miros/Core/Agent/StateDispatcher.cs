@@ -7,25 +7,25 @@ public enum ExecutorType
 {
     MultiLayerExecutor,
     EffectExecutor,
-    NativeExecutor
+    CommonExecutor
 }
 
-public class StateDispatcher(Agent ownerAgent)
+public class StateDispatcher(Agent owner)
 {
     private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-    private readonly Agent _ownerAgent = ownerAgent;
-
+    
 
     public void Update(double delta)
     {
         foreach (var executor in _executors.Values) executor.Update(delta);
     }
 
+
     public void PhysicsUpdate(double delta)
     {
         foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
     }
-
+    
 
     public IExecutor GetExecutor(ExecutorType executorType)
     {
@@ -34,8 +34,25 @@ public class StateDispatcher(Agent ownerAgent)
             return executor;
         }
 
-        throw new Exception($"Executor {executorType} not found");
+        switch (executorType)
+        {
+            case ExecutorType.MultiLayerExecutor:
+                executor = new MultiLayerExecutor();
+                break;
+            case ExecutorType.EffectExecutor:
+                executor = new EffectExecutor();
+                break;
+            case ExecutorType.CommonExecutor:
+                executor = new CommonExecutor();
+                break;
+            default:
+                throw new Exception($"Executor {executorType} not found");
+        }
+
+        _executors[executorType] = executor;
+        return executor;
     }
+
 
     public void AddState(State state, Context context = null)
     {
@@ -48,45 +65,45 @@ public class StateDispatcher(Agent ownerAgent)
                 AddAction(context, state.GetType());
                 break;
             case StateType.State:
-                PushStateOnExecutor(state);
+                state.Executor.AddState(state);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
 
-    public void SwitchTaskByTag(Tag tag, Context switchArgs = null)
+    public void SwitchTaskByTag(ExecutorType executorType, Tag tag, Context switchArgs = null)
     {
-        var executor = _executors[ExecutorType.EffectExecutor];
+        var executor = GetExecutor(executorType);
         executor.SwitchStateByTag(tag, switchArgs);
     }
 
 
-    public void AddAction(Context context, Type stateType)
+    private void AddAction(Context context, Type stateType)
     {
         var state = (State)Activator.CreateInstance(stateType);
 
+        state.Executor = GetExecutor(ExecutorType.MultiLayerExecutor) as MultiLayerExecutor;
         state.Context = context;
-        state.OwnerAgent = _ownerAgent;
+        state.OwnerAgent = owner;
         state.Task = TaskProvider.GetTask(state.TaskType);
         state.Init();
 
-        PushStateOnExecutor(state);
+        state.Executor.AddState(state);
     }
 
 
-    public void AddEffect(Effect effect)
+    private void AddEffect(Effect effect)
     {
-        effect.OwnerAgent = _ownerAgent;
+        effect.Executor = GetExecutor(ExecutorType.EffectExecutor) as EffectExecutor;
+        effect.OwnerAgent = owner;
         effect.Task = TaskProvider.GetTask(effect.TaskType) as EffectTask;
         effect.Init();
 
-        PushStateOnExecutor(effect);
+        effect.Executor.AddState(effect);
     }
 
 
-    private static void PushStateOnExecutor(State state)
-    {
-        var executor = state.Executor;
-        executor.AddState(state);
-    }
+
 }
