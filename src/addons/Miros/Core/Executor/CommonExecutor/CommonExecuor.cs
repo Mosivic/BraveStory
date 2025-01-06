@@ -44,10 +44,10 @@ public class CommonExecutor : ExecutorBase, IExecutor
             for (var i = 0; i < RunningStates[layer].Count; i++)
             {
                 var state = RunningStates[layer][i];
-                if (state.Task.CanExit(state))
+                if (state.CanExit())
                     PopRunningTask(layer, state);
                 else
-                    state.Task.Update(state, delta);
+                    state.Update(delta);
             }
     }
 
@@ -56,7 +56,7 @@ public class CommonExecutor : ExecutorBase, IExecutor
     {
         foreach (var layer in RunningStates.Keys)
             for (var i = 0; i < RunningStates[layer].Count; i++)
-                RunningStates[layer][i].Task.PhysicsUpdate(RunningStates[layer][i], delta);
+                RunningStates[layer][i].PhysicsUpdate(delta);
     }
 
 
@@ -67,7 +67,7 @@ public class CommonExecutor : ExecutorBase, IExecutor
             {
                 var state = WaitingStates[layer][i];
 
-                if (!state.Task.CanEnter(state))
+                if (!state.CanEnter())
                     continue;
 
 
@@ -102,7 +102,7 @@ public class CommonExecutor : ExecutorBase, IExecutor
         // 	}
         // }
 
-        state.Task.Enter(state);
+        state.Enter();
 
         var highPriorityTask = RunningStates[layer].FindIndex(j => j.Priority > state.Priority);
         RunningStates[layer].Insert(highPriorityTask + 1, state);
@@ -115,6 +115,6 @@ public class CommonExecutor : ExecutorBase, IExecutor
         var index = WaitingStates[layer].FindIndex(j => state.Priority > j.Priority);
         WaitingStates[layer].Insert(index + 1, state);
 
-        state.Task.Exit(state);
+        state.Exit();
     }
 }

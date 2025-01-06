@@ -21,7 +21,7 @@ public class EffectExecutor : ExecutorBase, IExecutor
         if (_states.TryGetValue(tag, out var state))
             if (state != null)
             {
-                state.Task.Enter(state);
+                state.Enter();
                 _runningEffects.Add(state as Effect);
                 _onRunningEffectTasksIsDirty?.Invoke(this, state as Effect);
             }
@@ -93,10 +93,10 @@ public class EffectExecutor : ExecutorBase, IExecutor
         // Exit
         foreach (var state in _runningEffects)
         {
-            if (!state.Task.CanExit(state))
+            if (!state.CanExit())
                 continue;
 
-            state.Task.Exit(state);
+            state.Exit();
             _runningEffects.Remove(state);
             _onRunningEffectTasksIsDirty?.Invoke(this, state);
         }

@@ -78,7 +78,7 @@ public class ExecutorBase : AbsExecutor, IExecutor
         switch (removePolicy)
         {
             case RemovePolicy.Condition:
-                if (state.Task.CanRemove(state))
+                if (state.CanRemove())
                     RemoveState(state);
                 break;
             case RemovePolicy.WhenFailed:
@@ -90,7 +90,7 @@ public class ExecutorBase : AbsExecutor, IExecutor
                     RemoveState(state);
                 break;
             case RemovePolicy.WhenEnterFailed:
-                if (state.Task.CanEnter(state) == false)
+                if (state.CanEnter() == false)
                     RemoveState(state);
                 break;
             case RemovePolicy.WhenExited:
