@@ -8,6 +8,7 @@ public class AttributeAggregator(AttributeBase attribute)
     private readonly AttributeBase _attribute = attribute;
     private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
 
+
     public void OnEnable()
     {
         // 注册基础值变化事件
@@ -220,6 +221,7 @@ public class AttributeAggregator(AttributeBase attribute)
             }
         }
     }
+
 
     /// <summary>
     ///     属性变化事件

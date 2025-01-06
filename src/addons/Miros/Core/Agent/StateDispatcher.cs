@@ -51,13 +51,6 @@ public class StateDispatcher(Agent ownerAgent)
     }
 
 
-    public void AddActions(Context context, Type[] stateTypes)
-    {
-        foreach (var stateType in stateTypes)
-            AddAction(context, stateType);
-    }
-
-
     public void AddAction(Context context, Type stateType)
     {
         var state = (State)Activator.CreateInstance(stateType);
@@ -81,7 +74,7 @@ public class StateDispatcher(Agent ownerAgent)
     }
 
 
-    private void PushStateOnExecutor(State state)
+    private static void PushStateOnExecutor(State state)
     {
         var executor = state.Executor;
         executor.AddState(state);
