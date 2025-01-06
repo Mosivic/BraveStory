@@ -12,7 +12,7 @@ public enum StateType
 public class State
 {
     public virtual Tag Tag { get; set; }
-    
+
     public virtual TaskType TaskType { get; set; } = TaskType.Base;
     public virtual StateType StateType { get; set; } = StateType.State;
 
@@ -48,5 +48,7 @@ public class State
     public Action<double> UpdateFunc { get; set; }
     public Action<double> PhysicsUpdateFunc { get; set; }
 
-    public virtual void Init(){}
+    public virtual void Init()
+    {
+    }
 }

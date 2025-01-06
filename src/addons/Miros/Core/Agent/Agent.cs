@@ -4,7 +4,6 @@ using Godot;
 
 namespace Miros.Core;
 
-
 public class Agent
 {
     private TagContainer OwnedTags;
@@ -30,14 +29,14 @@ public class Agent
 
     public void Process(double delta)
     {
-        if (Enabled) 
+        if (Enabled)
             StateDispatcher.Update(delta);
     }
 
 
     public void PhysicsProcess(double delta)
     {
-        if (Enabled) 
+        if (Enabled)
             StateDispatcher.PhysicsUpdate(delta);
     }
 
@@ -52,12 +51,11 @@ public class Agent
         StateDispatcher.AddState(state, context);
     }
 
-    
+
     public void SwitchTaskByTag(Tag tag, Context switchArgs = null)
     {
         StateDispatcher.SwitchTaskByTag(tag, switchArgs);
     }
-    
 
 
     #region Tag Check

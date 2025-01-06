@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Miros.Core;
 
@@ -59,14 +58,12 @@ public static class EffectExtensions
     }
 
 
-
     public static void RemoveEffectWithAllTags(this Effect effect, TagSet tags)
     {
         if (tags.Empty || effect.Executor == null) return;
 
         if (effect.OwnedTags.HasAll(tags))
             effect.Executor.RemoveState(effect);
-
     }
 
 
@@ -77,6 +74,4 @@ public static class EffectExtensions
         if (effect.OwnedTags.HasAny(tags))
             effect.Executor.RemoveState(effect);
     }
-
-
 }

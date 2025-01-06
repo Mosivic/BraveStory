@@ -35,7 +35,7 @@ public partial class Enemy : Character
         // 设置初始朝向为左边
         Graphics.Scale = new Vector2(-1, 1);
 
-        Context = new EnemyContext(this) as EnemyContext;
+        Context = new EnemyContext(this);
 
         // 初始化 Agentor
         Agent.AddAttributeSet(typeof(BoarAttributeSet));

@@ -25,7 +25,6 @@ public class AttributeAggregator(AttributeBase attribute)
     }
 
 
-
     /// <summary>
     ///     刷新修改器缓存
     ///     当游戏效果被添加或移除时触发

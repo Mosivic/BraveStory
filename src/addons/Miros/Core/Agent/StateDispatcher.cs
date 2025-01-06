@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Godot;
-
 
 namespace Miros.Core;
 
@@ -14,8 +12,8 @@ public enum ExecutorType
 
 public class StateDispatcher(Agent ownerAgent)
 {
-    private readonly Agent _ownerAgent = ownerAgent;
     private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
+    private readonly Agent _ownerAgent = ownerAgent;
 
 
     public void Update(double delta)
@@ -59,7 +57,7 @@ public class StateDispatcher(Agent ownerAgent)
             AddAction(context, stateType);
     }
 
-    
+
     public void AddAction(Context context, Type stateType)
     {
         var state = (State)Activator.CreateInstance(stateType);
@@ -88,5 +86,4 @@ public class StateDispatcher(Agent ownerAgent)
         var executor = state.Executor;
         executor.AddState(state);
     }
-
 }

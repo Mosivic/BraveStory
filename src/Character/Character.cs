@@ -72,7 +72,6 @@ public partial class Character : CharacterBody2D
     protected virtual void HandleHurt(object sender, HurtEventArgs e)
     {
         Context.IsHurt = true;
-
     }
 
     protected virtual void HandleHit(object sender, HitEventArgs e)
