@@ -35,6 +35,20 @@ public abstract class AttributeSet
         GetAttributeBase(attributeSign)?.SetBaseValue(value);
     }
 
+
+    public bool TryGetAttribute(Tag attrTag, out AttributeBase attribute)
+    {
+        foreach (var attr in Attributes)
+            if (attr.AttributeTag == attrTag)
+            {
+                attribute = attr;
+                return true;
+            }
+
+        attribute = null;
+        return false;
+    }
+
     public bool TryGetAttribute(string attrName, out AttributeBase attribute)
     {
         foreach (var attr in Attributes)

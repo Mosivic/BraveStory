@@ -11,23 +11,29 @@ public enum CompareType
 
 public enum RunningStatus
 {
-    None,        //未运行
-    Running,     //运行中
-    Succeed,     //成功
-    Failed,      //失败
-    Removed,     //移除
-    Paused       //暂停
+    None, //未运行
+    Running, //运行中
+    Succeed, //成功
+    Failed, //失败
+    Removed, //移除
+    Paused //暂停
 }
 
 // 打断策略，目前只对 MultiLayerExecutor 有效
 public enum InterruptPolicy
 {
-    None,   //正常，被打断后结束任务，执行下一任务
-    Fixed,  //固定，不可被打断，只有执行完成后
-    Fallback//回退，被当断后任务暂停，等待下一任务结束后恢复运行
+    None, //正常，被打断后结束任务，执行下一任务
+    Fixed, //固定，不可被打断，只有执行完成后
+    Fallback //回退，被当断后任务暂停，等待下一任务结束后恢复运行
 }
 
-public enum StateStackType
+public enum GrabType
+{
+    Source,
+    Target
+}
+
+public enum StackType
 {
     Source, //对Buff Source 限制层数
     Target //对Buff Target 限制层数

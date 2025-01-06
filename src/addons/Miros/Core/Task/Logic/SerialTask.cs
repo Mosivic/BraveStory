@@ -25,6 +25,15 @@ public class SerialTask : TaskBase<State>
         }
 
         _subStatesCount = state.SubStates.Length;
+    }
+
+    public override void Enter(State state)
+    {
+        base.Enter(state);
+
+        _currentIndex = 0;
+        _isFinished = false;
+
         if (_subStatesCount > 0)
         {
             _currentState = state.SubStates[_currentIndex];
@@ -49,6 +58,7 @@ public class SerialTask : TaskBase<State>
                 if (_currentIndex == _subStatesCount)
                 {
                     _isFinished = true;
+                    state.Status = RunningStatus.Succeed;
                     return;
                 }
 

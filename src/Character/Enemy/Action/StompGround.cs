@@ -56,14 +56,16 @@ public class StompGroundEnemyActionState : ActionState
                     SourceAgent = OwnerAgent,
                     RemovePolicy = RemovePolicy.WhenExited,
                     DurationPolicy = DurationPolicy.Instant,
-                    Executions = [new DamageExecution()]
+                    Modifiers =
+                    [
+                        new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack"), ModifierOperation.Minus,
+                            new DamageMMC())
+                    ]
                 };
 
-                ctx.HitAgent.AddEffect(damageEffect);
-
-                ctx.HitAgent.SwitchTaskFromTag(ExecutorType.MultiLayerExecutor, Tags.State_Action_Jump,
+                ctx.HitAgent.AddState(damageEffect);
+                ctx.HitAgent.SwitchTaskByTag(ExecutorType.EffectExecutor, Tags.State_Action_Jump,
                     new MultiLayerSwitchArgs(Tags.StateLayer_Movement));
-
                 ctx.HitAgent = null;
             }
         }

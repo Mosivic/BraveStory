@@ -2,24 +2,35 @@
 
 namespace Miros.Core;
 
+public enum StateType
+{
+    State,
+    Effect,
+    Action
+}
+
 public class State
 {
     public virtual Tag Tag { get; set; }
+
     public virtual TaskType TaskType { get; set; } = TaskType.Base;
+    public virtual StateType StateType { get; set; } = StateType.State;
+
     public int Priority { get; set; } = 0;
     public Agent OwnerAgent { get; set; }
     public Agent SourceAgent { get; set; }
 
     public ITask Task { get; set; }
+    public IExecutor Executor { get; set; }
+
     public Context Context { get; set; }
     public State[] SubStates { get; set; }
 
     public State SourceState { get; set; }
 
     public RunningStatus Status { get; set; } = RunningStatus.None;
-    public bool IsActive => Status == RunningStatus.Running;
     public RemovePolicy RemovePolicy { get; set; } = RemovePolicy.None; // 默认不移除
-    public InterruptPolicy InterruptPolicy {get;set;} = InterruptPolicy.None;
+    public InterruptPolicy InterruptPolicy { get; set; } = InterruptPolicy.None;
     public double RunningTime { get; set; } = 0;
 
     public Func<bool> EnterCondition { get; set; }

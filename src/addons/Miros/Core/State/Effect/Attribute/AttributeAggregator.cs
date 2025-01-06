@@ -7,22 +7,27 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
     private readonly AttributeBase _attribute = attribute;
     private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
+    private EffectExecutor _effectExecutor;
+
 
     public void OnEnable()
     {
+        _effectExecutor = owner.GetExecutor(ExecutorType.EffectExecutor) as EffectExecutor;
         // 注册基础值变化事件
         _attribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueChanged);
         // 注册游戏效果容器变化事件
-        owner.GetEffectExecutor()?.RegisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
+        _effectExecutor.RegisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
     }
 
     public void OnDisable()
     {
+
         // 注销基础值变化事件
         _attribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueChanged);
         // 注销游戏效果容器变化事件
-        owner.GetEffectExecutor()?.UnregisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
+        _effectExecutor.UnregisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
     }
+
 
     /// <summary>
     ///     刷新修改器缓存
@@ -35,15 +40,14 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             TryUnregisterAttributeChangedListen(tuple.Item1, tuple.Item2);
         _modifierCache.Clear();
 
-        var effects = owner.GetRunningEffects(); // 获取所有正在运行的 Effect
+        var effects = effect.Executor.GetRunningEffects();
         foreach (var ge in effects)
-            if (ge.IsActive)
-                foreach (var modifier in ge.Modifiers)
-                    if (modifier.AttributeTag == _attribute.AttributeTag)
-                    {
-                        _modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
-                        TryRegisterAttributeChangedListen(ge, modifier);
-                    }
+        foreach (var modifier in ge.Modifiers)
+            if (modifier.AttributeTag == _attribute.AttributeTag)
+            {
+                _modifierCache.Add(new Tuple<Effect, Modifier>(ge, modifier));
+                TryRegisterAttributeChangedListen(ge, modifier);
+            }
 
         UpdateCurrentValueWhenModifierIsDirty();
     }
@@ -164,6 +168,12 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         _attribute.SetCurrentValue(newValue);
     }
 
+    private void UpdateCurrentValueWhenGrabberIsDirty()
+    {
+        // var newValue = CalculateNewValue();
+        // _attribute.SetCurrentValue(newValue);
+    }
+
 
     /// <summary>
     ///     尝试注销属性变化事件
@@ -214,6 +224,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             }
         }
     }
+
 
     /// <summary>
     ///     属性变化事件

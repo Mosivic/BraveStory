@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,7 +64,7 @@ public class LayerExecutor
             _currentState = _defaultState;
             return;
         }
-    
+
         if (_nextState != null)
         {
             SwitchNextState();
@@ -99,7 +98,7 @@ public class LayerExecutor
             switch (t.Mode)
             {
                 // 正常模式, 切换需要满足：1. 当前任务可以退出 2. 新任务可以进入 3.切换条件为真
-                case TransitionMode.Normal: 
+                case TransitionMode.Normal:
                     if (t.CanTransition() && _currentState.Task.CanExit(_currentState) &&
                         maybeState.Task.CanEnter(maybeState))
                     {
@@ -107,6 +106,7 @@ public class LayerExecutor
                         _nextStateTransitionMode = t.Mode;
                         return;
                     }
+
                     break;
                 // 强制模式, 切换需要满足：1. 切换条件为真
                 case TransitionMode.Force:
@@ -116,6 +116,7 @@ public class LayerExecutor
                         _nextStateTransitionMode = t.Mode;
                         return;
                     }
+
                     break;
                 // 延迟前模式, 切换需要满足：1. 切换条件为真 2. 新任务可以进入
                 case TransitionMode.DelayFront:
@@ -125,6 +126,7 @@ public class LayerExecutor
                         _nextStateTransitionMode = t.Mode;
                         return;
                     }
+
                     break;
                 // 延迟后模式, 切换需要满足：1. 切换条件为真 2. 当前任务可以退出
                 case TransitionMode.DelayBackend:
@@ -134,6 +136,7 @@ public class LayerExecutor
                         _nextStateTransitionMode = t.Mode;
                         return;
                     }
+
                     break;
             }
         }
@@ -155,11 +158,11 @@ public class LayerExecutor
         {
             _currentState.Task.Pause(_currentState);
 
-            if(_nextState.Status == RunningStatus.Paused)
+            if (_nextState.Status == RunningStatus.Paused)
                 _nextState.Task.Resume(_nextState);
             else
                 _nextState.Task.Enter(_nextState);
-            
+
 
             _currentState = _nextState;
             _nextState = _lastState;
@@ -168,7 +171,7 @@ public class LayerExecutor
         {
             _currentState.Task.Exit(_currentState);
 
-            if(_nextState.Status == RunningStatus.Paused)
+            if (_nextState.Status == RunningStatus.Paused)
                 _nextState.Task.Resume(_nextState);
             else
                 _nextState.Task.Enter(_nextState);

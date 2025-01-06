@@ -9,9 +9,7 @@ public class EnemyContext(Enemy host) : CharacterContext
     public bool IsStunned { get; set; } = false;
     public float StunDuration { get; set; } = 1.0f;
     public float StunTimer { get; set; } = 0.0f;
-    public float ChargeDuration { get; set; } = 0.5f; // 冲刺持续时间
-    public float ChargeTimer { get; set; } = 0f; // 冲刺计时器
-    public bool IsCharging { get; set; } = false; // 是否正在冲刺
+
     public bool IsStomping { get; set; } = false; // 是否正在踩踏
     public float StompDuration { get; set; } = 0.3f; // 踩踏持续时间
     public float StompTimer { get; set; } = 0f; // 踩踏计时器
@@ -39,14 +37,16 @@ public partial class Enemy : Character
 
         Context = new EnemyContext(this);
 
-        // 初始化 Agentor
+        // 初始化 Agent
+        Agent.AddState(new IdleEnemyActionState(), Context);
+        Agent.AddState(new PatrolEnemyActionState(), Context);
+        Agent.AddState(new DieEnemyActionState(), Context);
+        Agent.AddState(new ChargeEnemyActionState(), Context);
+        Agent.AddState(new HurtEnemyActionState(), Context);
+        Agent.AddState(new StunEnemyActionState(), Context);
+        Agent.AddState(new StompGroundEnemyActionState(), Context);
+        
         Agent.AddAttributeSet(typeof(BoarAttributeSet));
-        Agent.AddActions(ExecutorType.MultiLayerExecutor, Context as EnemyContext, [
-            typeof(IdleEnemyActionState), typeof(PatrolEnemyActionState), typeof(DieEnemyActionState),
-            typeof(ChargeEnemyActionState), typeof(HurtEnemyActionState), typeof(StunEnemyActionState),
-            typeof(StompGroundEnemyActionState)
-        ]);
-
         var hp = Agent.GetAttributeBase("HP");
         hp.SetMaxValue(hp.CurrentValue);
         hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);

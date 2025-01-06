@@ -52,7 +52,7 @@ public class Buff : State
     public int StackCurrentCount { get; set; } = 1;
     public Dictionary<object, int> StackSourceCountDict { get; set; }
     public bool IsStack { get; init; } = false;
-    public StateStackType StackType { get; init; } = StateStackType.Target;
+    public StackType StackType { get; init; } = StackType.Target;
 
     // Stacking
     public bool StackIsRefreshDuration { get; init; } = false;

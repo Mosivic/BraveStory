@@ -41,10 +41,14 @@ public class Attack11ActionState : ActionState
                 SourceAgent = OwnerAgent,
                 RemovePolicy = RemovePolicy.WhenExited,
                 DurationPolicy = DurationPolicy.Instant,
-                Executions = [new CustomAttackDamageExecution(OwnerAgent.Atr("Attack") + 1)]
+                Modifiers =
+                [
+                    new Modifier(Tags.Attribute_HP, OwnerAgent.Atr("Attack") + 1, ModifierOperation.Minus,
+                        new DamageMMC())
+                ]
             };
 
-            _ctx.HitAgent.AddEffect(damageEffect);
+            _ctx.HitAgent.AddState(damageEffect);
             _ctx.IsHit = false;
         }
     }
