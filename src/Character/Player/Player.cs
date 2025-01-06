@@ -80,6 +80,7 @@ public partial class Player : Character
         }
     }
 
+    
 
     public void UpdateFacing(float direction)
     {

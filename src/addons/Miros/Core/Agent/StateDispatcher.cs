@@ -27,6 +27,16 @@ public class StateDispatcher(Agent ownerAgent)
     }
 
 
+    public IExecutor GetExecutor(ExecutorType executorType)
+    {
+        if (_executors.TryGetValue(executorType, out var executor))
+        {
+            return executor;
+        }
+
+        throw new Exception($"Executor {executorType} not found");
+    }
+
     public void AddState(State state, Context context = null)
     {
         switch (state.StateType)

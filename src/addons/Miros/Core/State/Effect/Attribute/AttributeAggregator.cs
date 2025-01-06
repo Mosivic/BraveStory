@@ -3,26 +3,29 @@ using System.Collections.Generic;
 
 namespace Miros.Core;
 
-public class AttributeAggregator(AttributeBase attribute)
+public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
     private readonly AttributeBase _attribute = attribute;
     private readonly List<Tuple<Effect, Modifier>> _modifierCache = [];
+    private EffectExecutor _effectExecutor;
 
 
     public void OnEnable()
     {
+        _effectExecutor = owner.GetExecutor(ExecutorType.EffectExecutor) as EffectExecutor;
         // 注册基础值变化事件
         _attribute.RegisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueChanged);
         // 注册游戏效果容器变化事件
-        owner.GetEffectExecutor()?.RegisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
+        _effectExecutor.RegisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
     }
 
     public void OnDisable()
     {
+
         // 注销基础值变化事件
         _attribute.UnregisterPostBaseValueChange(UpdateCurrentValueWhenBaseValueChanged);
         // 注销游戏效果容器变化事件
-        owner.GetEffectExecutor()?.UnregisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
+        _effectExecutor.UnregisterOnRunningEffectTasksIsDirty(RefreshModifierCache);
     }
 
 

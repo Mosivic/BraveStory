@@ -87,7 +87,7 @@ public class AttributeSetContainer(Agent owner)
 
             if (!_attributeAggregators.ContainsKey(attr))
             {
-                var attrAggt = new AttributeAggregator(attr);
+                var attrAggt = new AttributeAggregator(attr, owner);
                 attrAggt.OnEnable();
                 _attributeAggregators.Add(attr, attrAggt);
             }
