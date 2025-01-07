@@ -63,7 +63,6 @@ public class Agent
     }
 
 
-
     #region Tag Check
 
     public bool HasTag(Tag gameplayTag)

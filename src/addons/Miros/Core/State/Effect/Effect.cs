@@ -70,8 +70,6 @@ public class Effect : State
     public double Period { get; set; }
 
     public Modifier[] Modifiers { get; set; }
-    public Grabber[] Grabbers { get; set; }
-
     public Dictionary<Tag, float> SnapshotSourceAttributes { get; set; }
     public Dictionary<Tag, float> SnapshotTargetAttributes { get; set; }
 

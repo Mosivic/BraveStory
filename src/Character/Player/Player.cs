@@ -33,7 +33,7 @@ public partial class Player : Character
 
         Context = new PlayerContext(this);
 
-        
+
         Agent.AddState(new IdleActionState(), Context);
         Agent.AddState(new JumpActionState(), Context);
         Agent.AddState(new DieActionState(), Context);
@@ -48,7 +48,7 @@ public partial class Player : Character
         Agent.AddState(new Attack111ActionState(), Context);
 
         Agent.AddAttributeSet(typeof(PlayerAttributeSet));
-        
+
         var hp = Agent.GetAttributeBase("HP");
         hp.SetMaxValue(hp.CurrentValue);
         hp.RegisterPostCurrentValueChange(StatsPanel.OnUpdateHealthBar);
@@ -81,7 +81,6 @@ public partial class Player : Character
         }
     }
 
-    
 
     public void UpdateFacing(float direction)
     {

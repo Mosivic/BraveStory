@@ -21,9 +21,9 @@ public class EffectExecutor : ExecutorBase, IExecutor
         if (_states.TryGetValue(tag, out var state))
             if (state != null)
             {
-                state.Task.Enter(state);
+                state.Enter();
                 _runningEffects.Add(state as Effect);
-                _onRunningEffectTasksIsDirty?.Invoke(this, state as Effect);
+                _onRunningEffectTasksIsDirty?.Invoke(state as Effect, true);
             }
     }
 
@@ -38,16 +38,16 @@ public class EffectExecutor : ExecutorBase, IExecutor
                 // 如果Tag相同且来自同一个Agent, 则不添加, 并跳过当前循环
                 if (effect.Tag == existingEffect.Tag && AreFromSameSourceAgent(effect, existingEffect))
                 {
-                    existingEffect.Task.Stack(existingEffect, true);
+                    existingEffect.Stack(true);
                     isAddTask = false;
                     continue;
                 }
 
                 // 如果来自不同Agent, 则根据是否可以叠加来决定是否添加
                 if (AreFromSameSourceAgent(effect, existingEffect))
-                    existingEffect.Task.Stack(existingEffect, true);
+                    existingEffect.Stack(true);
                 else
-                    existingEffect.Task.Stack(existingEffect, false);
+                    existingEffect.Stack(false);
             }
 
         if (isAddTask) base.AddState(effect);
@@ -61,7 +61,7 @@ public class EffectExecutor : ExecutorBase, IExecutor
         if (effect.Status == RunningStatus.Running)
         {
             _runningEffects.Remove(effect);
-            _onRunningEffectTasksIsDirty?.Invoke(this, effect);
+            _onRunningEffectTasksIsDirty?.Invoke(effect, false);
         }
     }
 
@@ -86,19 +86,19 @@ public class EffectExecutor : ExecutorBase, IExecutor
             {
                 effect.Task.Enter(effect);
                 _runningEffects.Add(effect);
-                _onRunningEffectTasksIsDirty?.Invoke(this, effect);
+                _onRunningEffectTasksIsDirty?.Invoke(effect, true);
             }
         }
 
         // Exit
         foreach (var state in _runningEffects)
         {
-            if (!state.Task.CanExit(state))
+            if (!state.CanExit())
                 continue;
 
-            state.Task.Exit(state);
+            state.Exit();
             _runningEffects.Remove(state);
-            _onRunningEffectTasksIsDirty?.Invoke(this, state);
+            _onRunningEffectTasksIsDirty?.Invoke(state, false);
         }
     }
 
@@ -118,14 +118,14 @@ public class EffectExecutor : ExecutorBase, IExecutor
 
     #region Event
 
-    private EventHandler<Effect> _onRunningEffectTasksIsDirty;
+    private Action<Effect, bool> _onRunningEffectTasksIsDirty;
 
-    public void RegisterOnRunningEffectTasksIsDirty(EventHandler<Effect> handler)
+    public void RegisterOnRunningEffectTasksIsDirty(Action<Effect, bool> handler)
     {
         _onRunningEffectTasksIsDirty += handler;
     }
 
-    public void UnregisterOnRunningEffectTasksIsDirty(EventHandler<Effect> handler)
+    public void UnregisterOnRunningEffectTasksIsDirty(Action<Effect, bool> handler)
     {
         _onRunningEffectTasksIsDirty -= handler;
     }
