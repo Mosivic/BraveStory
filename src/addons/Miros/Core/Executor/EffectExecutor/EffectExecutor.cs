@@ -23,7 +23,7 @@ public class EffectExecutor : ExecutorBase, IExecutor
             {
                 state.Enter();
                 _runningEffects.Add(state as Effect);
-                _onRunningEffectTasksIsDirty?.Invoke(this, state as Effect);
+                _onRunningEffectTasksIsDirty?.Invoke(state as Effect, true);
             }
     }
 
@@ -61,7 +61,7 @@ public class EffectExecutor : ExecutorBase, IExecutor
         if (effect.Status == RunningStatus.Running)
         {
             _runningEffects.Remove(effect);
-            _onRunningEffectTasksIsDirty?.Invoke(this, effect);
+            _onRunningEffectTasksIsDirty?.Invoke(effect, false);
         }
     }
 
@@ -86,7 +86,7 @@ public class EffectExecutor : ExecutorBase, IExecutor
             {
                 effect.Task.Enter(effect);
                 _runningEffects.Add(effect);
-                _onRunningEffectTasksIsDirty?.Invoke(this, effect);
+                _onRunningEffectTasksIsDirty?.Invoke(effect, true);
             }
         }
 
@@ -98,7 +98,7 @@ public class EffectExecutor : ExecutorBase, IExecutor
 
             state.Exit();
             _runningEffects.Remove(state);
-            _onRunningEffectTasksIsDirty?.Invoke(this, state);
+            _onRunningEffectTasksIsDirty?.Invoke(state, false);
         }
     }
 
@@ -118,14 +118,14 @@ public class EffectExecutor : ExecutorBase, IExecutor
 
     #region Event
 
-    private EventHandler<Effect> _onRunningEffectTasksIsDirty;
+    private Action<Effect, bool> _onRunningEffectTasksIsDirty;
 
-    public void RegisterOnRunningEffectTasksIsDirty(EventHandler<Effect> handler)
+    public void RegisterOnRunningEffectTasksIsDirty(Action<Effect, bool> handler)
     {
         _onRunningEffectTasksIsDirty += handler;
     }
 
-    public void UnregisterOnRunningEffectTasksIsDirty(EventHandler<Effect> handler)
+    public void UnregisterOnRunningEffectTasksIsDirty(Action<Effect, bool> handler)
     {
         _onRunningEffectTasksIsDirty -= handler;
     }

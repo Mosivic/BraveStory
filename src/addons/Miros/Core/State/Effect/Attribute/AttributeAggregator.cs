@@ -33,24 +33,28 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
     ///     刷新修改器缓存
     ///     当游戏效果被添加或移除时触发
     /// </summary>
-    private void RefreshModifierCache(object sender, Effect effect)
+    private void RefreshModifierCache(Effect effect, bool isAdd)
     {
-        // 注销属性变化事件
-        foreach (var keyValuePair in _modifierCache)
-            TryUnregisterAttributeChangedListen(keyValuePair.Value, keyValuePair.Key);
-        _modifierCache.Clear();
-
-        var effects = effect.Executor.GetRunningEffects();
-        foreach (var ge in effects)
-        foreach (var modifier in ge.Modifiers)
-            if (modifier.AttributeTag == _attribute.AttributeTag)
-            {
-                _modifierCache.Add(modifier, ge);
-                TryRegisterAttributeChangedListen(ge, modifier);
-            }
+        if (isAdd)
+        {
+            foreach (var modifier in effect.Modifiers)
+                if (modifier.AttributeTag == _attribute.AttributeTag)
+                {
+                    _modifierCache.Add(modifier, effect);
+                    TryRegisterAttributeChangedListen(effect, modifier);
+                }
+        }
+        else
+        {
+            foreach (var keyValuePair in _modifierCache)
+                TryUnregisterAttributeChangedListen(keyValuePair.Value, keyValuePair.Key);
+            _modifierCache.Clear();
+        }
 
         UpdateCurrentValueWhenModifierIsDirty();
     }
+
+
 
     /// <summary>
     ///     计算新值
