@@ -88,7 +88,7 @@ public class AttributeSetContainer(Agent owner)
             if (!_attributeAggregators.ContainsKey(attr))
             {
                 var attrAggt = new AttributeAggregator(attr, owner);
-                attrAggt.OnEnable();
+                attrAggt.Enable();
                 _attributeAggregators.Add(attr, attrAggt);
             }
         }
@@ -100,7 +100,15 @@ public class AttributeSetContainer(Agent owner)
     {
         var setTag = AttributeSetTypeMap[typeof(T)];
         var attrSet = Sets[setTag];
-        foreach (var tag in attrSet.AttributeTags) _attributeAggregators.Remove(attrSet.GetAttributeBase(tag));
+        foreach (var tag in attrSet.AttributeTags) 
+        {
+            var attr = attrSet.GetAttributeBase(tag);
+            if(_attributeAggregators.ContainsKey(attr))
+                _attributeAggregators[attr].Disable();
+
+            _attributeAggregators.Remove(attr);
+        }
+        
 
         Sets.Remove(setTag);
     }
