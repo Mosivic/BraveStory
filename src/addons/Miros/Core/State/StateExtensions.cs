@@ -2,7 +2,6 @@ namespace Miros.Core;
 
 public static class StateExtensions
 {
-
     public static void Enter(this State state)
     {
         state.Task.Enter(state);
@@ -52,5 +51,4 @@ public static class StateExtensions
     {
         state.Task.Stack(state, IsFromSameSource);
     }
-
 }

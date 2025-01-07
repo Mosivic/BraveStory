@@ -7,7 +7,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
     private readonly AttributeBase _attribute = attribute;
     private readonly Dictionary<Modifier, Effect> _dirctModifierCache = [];
-    private readonly Dictionary<Modifier,Effect> _postModifierCache = [];
+    private readonly Dictionary<Modifier, Effect> _postModifierCache = [];
     private EffectExecutor _effectExecutor;
 
 
@@ -40,14 +40,14 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             foreach (var modifier in effect.Modifiers)
                 if (modifier.AttributeTag == _attribute.AttributeTag)
                 {
-                    if(modifier.Type == ModifierType.Direct)
+                    if (modifier.Type == ModifierType.Direct)
                     {
                         _dirctModifierCache.Add(modifier, effect);
                         TryRegisterAttributeChangedListen(effect, modifier);
                     }
-                    else if(modifier.Type == ModifierType.Post)
+                    else if (modifier.Type == ModifierType.Post)
                     {
-                        _postModifierCache.Add(modifier,effect);
+                        _postModifierCache.Add(modifier, effect);
                     }
                 }
         }
@@ -63,7 +63,6 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         UpdateCurrentValueWhenModifierIsDirty();
     }
 
-    
 
     /// <summary>
     ///     计算新值
@@ -139,46 +138,29 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         }
     }
 
-   // 作用是计算直接修改器和后置修改器对基础值的影响
+    // 作用是计算直接修改器和后置修改器对基础值的影响
     private float CaculateModifierValue(float baseValue, Effect effect, Modifier directModifier)
     {
         var directMagnitude = directModifier.CalculateMagnitude(effect);
-        var newValue = ApplyOperation(directModifier.Operation, baseValue, directMagnitude);
+        var newValue = Utils.ApplyOperation(directModifier.Operation, baseValue, directMagnitude);
 
         foreach (var keyValuePair in _postModifierCache)
         {
             var postModifier = keyValuePair.Key;
             var postEffect = keyValuePair.Value;
 
-            if(postModifier.Operation == directModifier.Operation)
+            if (postModifier.Operation == directModifier.Operation)
             {
                 var postMagnitude = postModifier.CalculateMagnitude(postEffect);
-                newValue = ApplyOperation(postModifier.PostOperation, newValue, postMagnitude);
+                newValue = Utils.ApplyOperation(postModifier.PostOperation, newValue, postMagnitude);
             }
         }
 
         return newValue;
     }
 
-    
-    private static float ApplyOperation(ModifierOperation operation,float oldValue, float newValue)
-    {
-        switch (operation)
-        {
-            case ModifierOperation.Add:
-                return oldValue + newValue;
-            case ModifierOperation.Minus:
-                return oldValue - newValue;
-            case ModifierOperation.Multiply:
-                return oldValue * newValue;
-            case ModifierOperation.Divide:
-                return oldValue / newValue;
-            case ModifierOperation.Override:
-                return newValue;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
+
+
 
     /// <summary>
     ///     当基础值变化时更新当前值

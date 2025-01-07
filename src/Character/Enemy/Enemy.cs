@@ -45,7 +45,7 @@ public partial class Enemy : Character
         Agent.AddState(new HurtEnemyActionState(), Context);
         Agent.AddState(new StunEnemyActionState(), Context);
         Agent.AddState(new StompGroundEnemyActionState(), Context);
-        
+
         Agent.AddAttributeSet(typeof(BoarAttributeSet));
         var hp = Agent.GetAttributeBase("HP");
         hp.SetMaxValue(hp.CurrentValue);

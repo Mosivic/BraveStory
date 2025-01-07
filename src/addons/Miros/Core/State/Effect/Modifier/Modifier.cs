@@ -12,7 +12,7 @@ public enum ModifierMagnitudeType
 public enum ModifierType
 {
     Direct,
-    Post,
+    Post
 }
 
 public struct ModifierMagnitude
@@ -27,7 +27,7 @@ public class Modifier
 
 
     public Modifier(Tag attributeTag, float magnitude, ModifierOperation operation,
-        ModifierMagnitudeCalculation mmc,ModifierType type = ModifierType.Direct)
+        ModifierMagnitudeCalculation mmc, ModifierType type = ModifierType.Direct)
     {
         AttributeTag = attributeTag;
         Magnitude = magnitude;
@@ -37,7 +37,7 @@ public class Modifier
     }
 
     public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation,
-        ModifierMagnitudeCalculation mmc,ModifierType type = ModifierType.Direct)
+        ModifierMagnitudeCalculation mmc, ModifierType type = ModifierType.Direct)
     {
         AttributeSetTag = attributeSetTag;
         AttributeTag = attributeTag;
@@ -52,7 +52,7 @@ public class Modifier
     public Tag AttributeTag { get; set; } = Tags.Default;
     public float Magnitude { get; set; }
     public ModifierOperation Operation { get; set; }
-    public ModifierOperation PostOperation { get; set; } 
+    public ModifierOperation PostOperation { get; set; }
 
 
     public float CalculateMagnitude(Effect effect)

@@ -27,7 +27,6 @@ public enum InterruptPolicy
     Fallback //回退，被当断后任务暂停，等待下一任务结束后恢复运行
 }
 
-
 public enum StackType
 {
     Source, //对Buff Source 限制层数
@@ -206,3 +205,4 @@ public enum RunningCompletePolicy
     Remove, //移除
     Keep //保持
 }
+

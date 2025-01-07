@@ -100,15 +100,15 @@ public class AttributeSetContainer(Agent owner)
     {
         var setTag = AttributeSetTypeMap[typeof(T)];
         var attrSet = Sets[setTag];
-        foreach (var tag in attrSet.AttributeTags) 
+        foreach (var tag in attrSet.AttributeTags)
         {
             var attr = attrSet.GetAttributeBase(tag);
-            if(_attributeAggregators.ContainsKey(attr))
+            if (_attributeAggregators.ContainsKey(attr))
                 _attributeAggregators[attr].Disable();
 
             _attributeAggregators.Remove(attr);
         }
-        
+
 
         Sets.Remove(setTag);
     }

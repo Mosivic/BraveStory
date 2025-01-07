@@ -28,34 +28,14 @@ public static class EffectExtensions
                 $"But {modifier.AttributeSetTag}.{modifier.AttributeTag} is {attributeBase.CalculateMode}");
 
         var magnitude = modifier.CalculateMagnitude(effect);
-        var baseValue = attributeBase.BaseValue;
-        switch (modifier.Operation)
-        {
-            case ModifierOperation.Add:
-                baseValue += magnitude;
-                break;
-            case ModifierOperation.Minus:
-                baseValue -= magnitude;
-                break;
-            case ModifierOperation.Multiply:
-                baseValue *= magnitude;
-                break;
-            case ModifierOperation.Divide:
-                baseValue /= magnitude;
-                break;
-            case ModifierOperation.Override:
-                baseValue = magnitude;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        var newValue = Utils.ApplyOperation(modifier.Operation,attributeBase.BaseValue,magnitude);
 
-        // Trigger Grabber
-
-        attributeBase.SetBaseValue(baseValue);
+        attributeBase.SetBaseValue(newValue);
         // AttributeSetContainer.Sets[modifier.AttributeSetTag]
         //     .ChangeAttributeBase(modifier.AttributeTag, baseValue);
     }
+
+
 
 
     public static void RemoveEffectWithAllTags(this Effect effect, TagSet tags)

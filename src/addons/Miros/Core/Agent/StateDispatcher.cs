@@ -13,7 +13,7 @@ public enum ExecutorType
 public class StateDispatcher(Agent owner)
 {
     private readonly Dictionary<ExecutorType, IExecutor> _executors = [];
-    
+
 
     public void Update(double delta)
     {
@@ -25,14 +25,11 @@ public class StateDispatcher(Agent owner)
     {
         foreach (var executor in _executors.Values) executor.PhysicsUpdate(delta);
     }
-    
+
 
     public IExecutor GetExecutor(ExecutorType executorType)
     {
-        if (_executors.TryGetValue(executorType, out var executor))
-        {
-            return executor;
-        }
+        if (_executors.TryGetValue(executorType, out var executor)) return executor;
 
         switch (executorType)
         {
@@ -103,7 +100,4 @@ public class StateDispatcher(Agent owner)
 
         effect.Executor.AddState(effect);
     }
-
-
-
 }
