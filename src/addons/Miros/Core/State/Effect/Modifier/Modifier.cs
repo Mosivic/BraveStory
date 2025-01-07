@@ -9,6 +9,12 @@ public enum ModifierMagnitudeType
     SetByCallerFromTag
 }
 
+public enum ModifierType
+{
+    Direct,
+    Post,
+}
+
 public struct ModifierMagnitude
 {
     public ModifierMagnitudeType Type { get; set; }
@@ -17,25 +23,28 @@ public struct ModifierMagnitude
 public class Modifier
 {
     public ModifierMagnitudeCalculation MMC; // 幅度计算
+    public ModifierType Type = ModifierType.Direct;
 
 
     public Modifier(Tag attributeTag, float magnitude, ModifierOperation operation,
-        ModifierMagnitudeCalculation mmc)
+        ModifierMagnitudeCalculation mmc,ModifierType type = ModifierType.Direct)
     {
         AttributeTag = attributeTag;
         Magnitude = magnitude;
         Operation = operation;
         MMC = mmc;
+        Type = type;
     }
 
     public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation,
-        ModifierMagnitudeCalculation mmc)
+        ModifierMagnitudeCalculation mmc,ModifierType type = ModifierType.Direct)
     {
         AttributeSetTag = attributeSetTag;
         AttributeTag = attributeTag;
         Magnitude = magnitude;
         Operation = operation;
         MMC = mmc;
+        Type = type;
     }
 
 
@@ -44,7 +53,6 @@ public class Modifier
     public float Magnitude { get; set; }
     public ModifierOperation Operation { get; set; }
 
-    public bool CanGrab { get; set; } = true;
 
     public float CalculateMagnitude(Effect effect)
     {

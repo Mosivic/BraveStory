@@ -6,7 +6,8 @@ namespace Miros.Core;
 public class AttributeAggregator(AttributeBase attribute, Agent owner)
 {
     private readonly AttributeBase _attribute = attribute;
-    private readonly Dictionary<Modifier, Effect> _modifierCache = [];
+    private readonly Dictionary<Modifier, Effect> _dirctModifierCache = [];
+    private readonly Dictionary<Modifier,Effect> _postModifierCache = [];
     private EffectExecutor _effectExecutor;
 
 
@@ -40,15 +41,25 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             foreach (var modifier in effect.Modifiers)
                 if (modifier.AttributeTag == _attribute.AttributeTag)
                 {
-                    _modifierCache.Add(modifier, effect);
-                    TryRegisterAttributeChangedListen(effect, modifier);
+                    if(modifier.Type == ModifierType.Direct)
+                    {
+                        _dirctModifierCache.Add(modifier, effect);
+                        TryRegisterAttributeChangedListen(effect, modifier);
+                    }
+                    else if(modifier.Type == ModifierType.Post)
+                    {
+                        _postModifierCache.Add(modifier,effect);
+                    }
+                    
                 }
         }
         else
         {
-            foreach (var keyValuePair in _modifierCache)
+            foreach (var keyValuePair in _dirctModifierCache)
                 TryUnregisterAttributeChangedListen(keyValuePair.Value, keyValuePair.Key);
-            _modifierCache.Clear();
+
+            _dirctModifierCache.Clear();
+            _postModifierCache.Clear();
         }
 
         UpdateCurrentValueWhenModifierIsDirty();
@@ -67,7 +78,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             case CalculateMode.Stacking:
             {
                 var newValue = _attribute.BaseValue;
-                foreach (var keyValuePair in _modifierCache)
+                foreach (var keyValuePair in _dirctModifierCache)
                 {
                     var effect = keyValuePair.Value;
                     var modifier = keyValuePair.Key;
@@ -104,7 +115,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             {
                 var hasOverride = false;
                 var min = float.MaxValue;
-                foreach (var keyValuePair in _modifierCache)
+                foreach (var keyValuePair in _dirctModifierCache)
                 {
                     var effect = keyValuePair.Value;
                     var modifier = keyValuePair.Key;
@@ -126,7 +137,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
             {
                 var hasOverride = false;
                 var max = float.MinValue;
-                foreach (var keyValuePair in _modifierCache)
+                foreach (var keyValuePair in _dirctModifierCache)
                 {
                     var effect = keyValuePair.Value;
                     var modifier = keyValuePair.Key;
@@ -170,12 +181,6 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
     {
         var newValue = CalculateNewValue();
         _attribute.SetCurrentValue(newValue);
-    }
-
-    private void UpdateCurrentValueWhenGrabberIsDirty()
-    {
-        // var newValue = CalculateNewValue();
-        // _attribute.SetCurrentValue(newValue);
     }
 
 
@@ -238,8 +243,8 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
     /// <param name="newValue">新值</param>
     private void OnAttributeChanged(AttributeBase attribute, float oldValue, float newValue)
     {
-        if (_modifierCache.Count == 0) return;
-        foreach (var keyValuePair in _modifierCache)
+        if (_dirctModifierCache.Count == 0) return;
+        foreach (var keyValuePair in _dirctModifierCache)
         {
             var effect = keyValuePair.Value;
             var modifier = keyValuePair.Key;
