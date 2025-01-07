@@ -50,7 +50,6 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
                     {
                         _postModifierCache.Add(modifier,effect);
                     }
-                    
                 }
         }
         else
@@ -65,7 +64,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
         UpdateCurrentValueWhenModifierIsDirty();
     }
 
-
+    
 
     /// <summary>
     ///     计算新值
@@ -87,26 +86,7 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
                     if (!_attribute.IsSupportOperation(modifier.Operation))
                         throw new InvalidOperationException("Unsupported operation.");
 
-                    switch (modifier.Operation)
-                    {
-                        case ModifierOperation.Add:
-                            newValue += magnitude;
-                            break;
-                        case ModifierOperation.Minus:
-                            newValue -= magnitude;
-                            break;
-                        case ModifierOperation.Multiply:
-                            newValue *= magnitude;
-                            break;
-                        case ModifierOperation.Divide:
-                            newValue /= magnitude;
-                            break;
-                        case ModifierOperation.Override:
-                            newValue = magnitude;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    newValue = CaculateModifierValue(newValue, effect, modifier);
                 }
 
                 return newValue;
@@ -155,6 +135,47 @@ public class AttributeAggregator(AttributeBase attribute, Agent owner)
 
                 return hasOverride ? max : _attribute.BaseValue;
             }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+   // 作用是计算直接修改器和后置修改器对基础值的影响
+    private float CaculateModifierValue(float baseValue, Effect effect, Modifier directModifier)
+    {
+        var directMagnitude = directModifier.CalculateMagnitude(effect);
+        var newValue = ApplyOperation(directModifier.Operation, baseValue, directMagnitude);
+
+        foreach (var keyValuePair in _postModifierCache)
+        {
+            var postModifier = keyValuePair.Key;
+            var postEffect = keyValuePair.Value;
+
+            if(postModifier.Operation == directModifier.Operation)
+            {
+                var postMagnitude = postModifier.CalculateMagnitude(postEffect);
+                newValue = ApplyOperation(postModifier.PostOperation, newValue, postMagnitude);
+            }
+        }
+
+        return newValue;
+    }
+
+    
+    private static float ApplyOperation(ModifierOperation operation,float oldValue, float newValue)
+    {
+        switch (operation)
+        {
+            case ModifierOperation.Add:
+                return oldValue + newValue;
+            case ModifierOperation.Minus:
+                return oldValue - newValue;
+            case ModifierOperation.Multiply:
+                return oldValue * newValue;
+            case ModifierOperation.Divide:
+                return oldValue / newValue;
+            case ModifierOperation.Override:
+                return newValue;
             default:
                 throw new ArgumentOutOfRangeException();
         }

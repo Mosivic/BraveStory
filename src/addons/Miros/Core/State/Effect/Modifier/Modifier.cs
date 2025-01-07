@@ -52,6 +52,7 @@ public class Modifier
     public Tag AttributeTag { get; set; } = Tags.Default;
     public float Magnitude { get; set; }
     public ModifierOperation Operation { get; set; }
+    public ModifierOperation PostOperation { get; set; } 
 
 
     public float CalculateMagnitude(Effect effect)
