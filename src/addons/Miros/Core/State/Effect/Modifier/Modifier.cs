@@ -20,25 +20,24 @@ public class Modifier
 
 
     public Modifier(Tag attributeTag, float magnitude, ModifierOperation operation,
-        ModifierMagnitudeCalculation mmc, bool canGrab = true)
+        ModifierMagnitudeCalculation mmc)
     {
         AttributeTag = attributeTag;
         Magnitude = magnitude;
         Operation = operation;
         MMC = mmc;
-        CanGrab = canGrab;
     }
 
     public Modifier(Tag attributeSetTag, Tag attributeTag, float magnitude, ModifierOperation operation,
-        ModifierMagnitudeCalculation mmc, bool canGrab = true)
+        ModifierMagnitudeCalculation mmc)
     {
         AttributeSetTag = attributeSetTag;
         AttributeTag = attributeTag;
         Magnitude = magnitude;
         Operation = operation;
         MMC = mmc;
-        CanGrab = canGrab;
     }
+
 
     public Tag AttributeSetTag { get; set; } = Tags.Default;
     public Tag AttributeTag { get; set; } = Tags.Default;
