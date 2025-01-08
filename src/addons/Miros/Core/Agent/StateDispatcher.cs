@@ -31,20 +31,13 @@ public class StateDispatcher(Agent owner)
     {
         if (_executors.TryGetValue(executorType, out var executor)) return executor;
 
-        switch (executorType)
+        executor = executorType switch
         {
-            case ExecutorType.MultiLayerExecutor:
-                executor = new MultiLayerExecutor();
-                break;
-            case ExecutorType.EffectExecutor:
-                executor = new EffectExecutor();
-                break;
-            case ExecutorType.CommonExecutor:
-                executor = new CommonExecutor();
-                break;
-            default:
-                throw new Exception($"Executor {executorType} not found");
-        }
+            ExecutorType.MultiLayerExecutor => new MultiLayerExecutor(),
+            ExecutorType.EffectExecutor => new EffectExecutor(),
+            ExecutorType.CommonExecutor => new CommonExecutor(),
+            _ => throw new Exception($"Executor {executorType} not found")
+        };
 
         _executors[executorType] = executor;
         return executor;
@@ -80,14 +73,15 @@ public class StateDispatcher(Agent owner)
     private void AddAction(Context context, Type stateType)
     {
         var state = (State)Activator.CreateInstance(stateType);
-
+        if (state == null) return;
+        
         state.Executor = GetExecutor(ExecutorType.MultiLayerExecutor) as MultiLayerExecutor;
         state.Context = context;
         state.OwnerAgent = owner;
         state.Task = TaskProvider.GetTask(state.TaskType);
         state.Init();
 
-        state.Executor.AddState(state);
+        state.Executor?.AddState(state);
     }
 
 
@@ -98,6 +92,6 @@ public class StateDispatcher(Agent owner)
         effect.Task = TaskProvider.GetTask(effect.TaskType) as EffectTask;
         effect.Init();
 
-        effect.Executor.AddState(effect);
+        effect.Executor?.AddState(effect);
     }
 }

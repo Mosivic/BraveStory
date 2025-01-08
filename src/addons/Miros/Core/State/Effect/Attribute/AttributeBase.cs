@@ -10,7 +10,7 @@ namespace Miros.Core;
 public class AttributeBase
 {
     private AttributeValue _value;
-    protected IEnumerable<Func<AttributeBase, float, float>> PreBaseValueChangeListeners; // 基础值变化前的事件监听器
+    private IEnumerable<Func<AttributeBase, float, float>> _preBaseValueChangeListeners; // 基础值变化前的事件监听器
 
     public AttributeBase(Tag tag, float value = 0,
         CalculateMode calculateMode = CalculateMode.Stacking,
@@ -119,7 +119,7 @@ public class AttributeBase
     public void RegisterPreBaseValueChange(Func<AttributeBase, float, float> func)
     {
         OnPreBaseValueChange += func;
-        PreBaseValueChangeListeners = OnPreBaseValueChange?.GetInvocationList()
+        _preBaseValueChangeListeners = OnPreBaseValueChange?.GetInvocationList()
             .Cast<Func<AttributeBase, float, float>>();
     }
 
@@ -141,7 +141,7 @@ public class AttributeBase
     public void UnregisterPreBaseValueChange(Func<AttributeBase, float, float> func)
     {
         OnPreBaseValueChange -= func;
-        PreBaseValueChangeListeners = OnPreBaseValueChange?.GetInvocationList()
+        _preBaseValueChangeListeners = OnPreBaseValueChange?.GetInvocationList()
             .Cast<Func<AttributeBase, float, float>>();
     }
 
@@ -170,8 +170,8 @@ public class AttributeBase
 
     private float InvokePreBaseValueChangeListeners(float value)
     {
-        if (PreBaseValueChangeListeners == null) return value;
+        if (_preBaseValueChangeListeners == null) return value;
 
-        return PreBaseValueChangeListeners.Aggregate(value, (current, t) => t.Invoke(this, current));
+        return _preBaseValueChangeListeners.Aggregate(value, (current, t) => t.Invoke(this, current));
     }
 }
